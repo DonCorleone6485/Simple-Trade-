@@ -1,0 +1,5 @@
+{
+  "name": "Simple Trading Journal",
+  "description": "A trading journal application to track trades, risk/reward, and notes based on user specifications.",
+  "requestFramePermissions": []
+}
