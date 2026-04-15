@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ] # veya master, ana dalınızın adı neyse
+    branches: [ main ]
 
 permissions:
   contents: read
