@@ -188,4 +188,202 @@ export default function TradeHistory({ trades, onDelete }: { trades: Trade[], on
     .reduce((acc: any[], trade, index) => {
       const prevTotal = index > 0 ? acc[index - 1].cumulative : 0;
       const pnl = (trade.result === 'Başarılı' || trade.result === 'Manuel Karda') ? (trade.reward || 0) : -getLossAmount(trade);
-      acc.pus
+      acc.push({ name: index + 1, date: getDayDate(trade.date), pnl, cumulative: prevTotal + pnl, isWin: pnl >= 0 });
+      return acc;
+    }, []);
+
+  const getSession = (dateStr: string) => {
+    const hour = new Date(dateStr).getUTCHours();
+    if (hour >= 22 || hour < 7) return 'asianSession';
+    if (hour >= 7 && hour < 12) return 'londonSession';
+    return 'nySession';
+  };
+
+  const sessionStats = ['asianSession', 'londonSession', 'nySession'].map(session => {
+    const st = closedTrades.filter(t => getSession(t.date) === session);
+    const wins = st.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').length;
+    return { session, rate: st.length > 0 ? ((wins / st.length) * 100).toFixed(0) : 0, total: st.length };
+  });
+
+  const getDayKey = (dateStr: string) => {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    return days[new Date(dateStr).getDay()];
+  };
+
+  const dayStats = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].map(day => {
+    const dt = closedTrades.filter(t => getDayKey(t.date) === day);
+    const wins = dt.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').length;
+    return { day, rate: dt.length > 0 ? ((wins / dt.length) * 100).toFixed(0) : 0, total: dt.length };
+  }).filter(d => d.total > 0);
+
+  const statCard: React.CSSProperties = { ...card, padding: '16px' };
+
+  return (
+    <div className="space-y-12 max-w-3xl mx-auto">
+      {Object.entries(groupedTrades).map(([monthYear, days]) => (
+        <div key={monthYear} className="space-y-6">
+          <div className="pb-2" style={{ borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
+            <h2 className="text-2xl font-semibold capitalize tracking-tight text-white">{monthYear}</h2>
+          </div>
+          <div className="space-y-8">
+            {Object.entries(days).map(([dayDate, dayTrades]) => (
+              <div key={dayDate} className="space-y-1">
+                <h3 className="text-base font-medium ps-2" style={{ color: 'rgba(255,255,255,0.6)' }}>{dayDate}</h3>
+                {dayTrades.map(trade => {
+                  const isW = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
+                  const isL = trade.result === 'Başarısız' || trade.result === 'Manuel Zararda';
+                  return (
+                    <div
+                      key={trade.id}
+                      onClick={() => setSelectedTrade(trade)}
+                      className="flex items-center gap-4 sm:gap-8 p-3 rounded-xl transition-all cursor-pointer text-base sm:text-lg font-medium"
+                      style={{ color: 'rgba(255,255,255,0.8)' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                    >
+                      <span style={{ color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace' }}>-</span>
+                      <span className="w-20 sm:w-24">{trade.symbol}</span>
+                      <span className="w-12 sm:w-16" style={{ color: trade.type === 'Buy' ? '#34d399' : '#f87171' }}>
+                        {trade.type === 'Buy' ? t('buy') : t('sell')}
+                      </span>
+                      <span className="w-16 sm:w-20 font-mono text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{getRRDisplay(trade)}</span>
+                      <span className="ms-auto text-end w-24 font-mono" style={{ color: isW ? '#34d399' : isL ? '#f87171' : 'rgba(255,255,255,0.4)' }}>
+                        {isW ? `${(trade.reward || 0) < 0 ? '' : '+'}${trade.reward}$` :
+                         isL ? ((trade.reward || 0) < 0 ? `${trade.reward}$` : `-${trade.risk}$`) :
+                         <span className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('openStatus')}</span>}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* Statistics */}
+      {closedTrades.length > 0 && (
+        <div className="mt-16 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+            <Activity className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.4)' }} />
+            {t('statsTitle')}
+          </h3>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { icon: <PieChart className="w-4 h-4" />, label: t('winRate'), value: `%${winRate}`, color: '#fff' },
+              { icon: <DollarSign className="w-4 h-4" />, label: t('netProfit'), value: `${netProfit >= 0 ? '+' : '-'}$${Math.abs(netProfit).toFixed(2)}`, color: netProfit >= 0 ? '#34d399' : '#f87171' },
+              { icon: <TrendingUp className="w-4 h-4" />, label: t('profitFactor'), value: profitFactor, color: '#fff' },
+              { icon: <Target className="w-4 h-4" />, label: t('avgRR'), value: `${avgRR}R`, color: '#fff' },
+              { icon: <Activity className="w-4 h-4" />, label: t('totalTrades'), value: totalClosed, color: '#fff' },
+              { icon: <Award className="w-4 h-4" />, label: t('bestTrade'), value: `+$${bestTrade.toFixed(2)}`, color: '#34d399' },
+              { icon: <AlertTriangle className="w-4 h-4" />, label: t('worstTrade'), value: `-$${worstTrade.toFixed(2)}`, color: '#f87171' },
+            ].map((s, i) => (
+              <div key={i} style={statCard}>
+                <div className="flex items-center gap-2 mb-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  {s.icon}
+                  <span className="text-xs font-medium uppercase tracking-wider">{s.label}</span>
+                </div>
+                <div className="text-2xl font-semibold font-mono" style={{ color: s.color }}>{s.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <div style={{ ...statCard, padding: '20px' }} className="lg:col-span-2">
+              <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('cumulativePnl')}</h4>
+              <div className="h-72 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={netProfit >= 0 ? '#10b981' : '#f43f5e'} stopOpacity={0.3} />
+                        <stop offset="95%" stopColor={netProfit >= 0 ? '#10b981' : '#f43f5e'} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
+                    <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `$${v}`} />
+                    <RechartsTooltip
+                      contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }}
+                      formatter={(value: number) => [`$${value.toFixed(2)}`, t('cumulativePnl')]}
+                      labelFormatter={label => `Trade #${label}`}
+                    />
+                    <Area type="monotone" dataKey="cumulative" stroke={netProfit >= 0 ? '#10b981' : '#f43f5e'} strokeWidth={2} fillOpacity={1} fill="url(#colorCumulative)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div style={{ ...statCard, padding: '20px' }}>
+              <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('tradePnl')}</h4>
+              <div className="h-72 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
+                    <RechartsTooltip
+                      contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }}
+                      formatter={(value: number) => [`$${value.toFixed(2)}`, 'PnL']}
+                      labelFormatter={label => `Trade #${label}`}
+                      cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                    />
+                    <Bar dataKey="pnl" radius={[4, 4, 4, 4]}>
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.isWin ? '#10b981' : '#f43f5e'} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Session & Day Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div style={{ ...statCard, padding: '20px' }}>
+              <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('sessionStats')}</h4>
+              <div className="space-y-4">
+                {sessionStats.map(({ session, rate, total }) => (
+                  <div key={session} className="flex items-center justify-between">
+                    <span className="text-sm font-medium w-24 text-white">
+                      {t(session as any)} <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>({total})</span>
+                    </span>
+                    <div className="flex-1 mx-4">
+                      <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <div className="h-full rounded-full transition-all" style={{ width: `${rate}%`, background: '#818cf8' }} />
+                      </div>
+                    </div>
+                    <span className="text-sm font-semibold font-mono w-10 text-end text-white">%{rate}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ ...statCard, padding: '20px' }}>
+              <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('dayStats')}</h4>
+              <div className="space-y-4">
+                {dayStats.length > 0 ? dayStats.map(({ day, rate, total }) => (
+                  <div key={day} className="flex items-center justify-between">
+                    <span className="text-sm font-medium w-24 text-white">
+                      {t(day as any)} <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>({total})</span>
+                    </span>
+                    <div className="flex-1 mx-4">
+                      <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <div className="h-full rounded-full transition-all" style={{ width: `${rate}%`, background: '#2dd4bf' }} />
+                      </div>
+                    </div>
+                    <span className="text-sm font-semibold font-mono w-10 text-end text-white">%{rate}</span>
+                  </div>
+                )) : (
+                  <p className="text-sm italic" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('emptyDesc')}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
