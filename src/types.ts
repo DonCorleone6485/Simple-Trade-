@@ -1,6 +1,8 @@
 export interface Account {
   id: string;
   name: string;
+  startDate?: string;
+  startingCapital?: number;
 }
 
 export interface Trade {
