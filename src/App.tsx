@@ -351,55 +351,68 @@ export default function App() {
 
   // ── JOURNAL VIEW ───────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 font-sans" dir={language === 'fa' ? 'rtl' : 'ltr'}>
-      <header className="bg-white border-b border-zinc-200 sticky top-0 z-10">
+    <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={language === 'fa' ? 'rtl' : 'ltr'}>
+      <header style={{ background: '#0d0e1a', borderBottom: '1px solid rgba(255,255,255,0.05)' }} className="sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setView('dashboard')}
-              className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 transition-colors font-medium text-sm"
+              className="flex items-center gap-2 text-sm font-medium transition-colors"
+              style={{ color: 'rgba(255,255,255,0.5)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}
             >
               <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
               <span className="hidden sm:inline">{t('backToDashboard')}</span>
             </button>
-            <div className="h-5 w-px bg-zinc-200" />
-            <span className="font-semibold text-zinc-900 truncate max-w-[160px] sm:max-w-none">
+            <div className="h-5 w-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+            <span className="font-semibold text-white truncate max-w-[160px] sm:max-w-none">
               {activeJournal?.name}
             </span>
           </div>
+
           <div className="flex items-center gap-2">
-            <nav className="flex gap-1 bg-zinc-100/80 p-1 rounded-lg border border-zinc-200/50">
+            <nav className="flex gap-1 p-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <button
                 onClick={() => setJournalTab('add')}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-md text-sm font-medium transition-all ${journalTab === 'add' ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200/50' : 'text-zinc-500 hover:text-zinc-900'}`}
+                className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-md text-sm font-medium transition-all"
+                style={journalTab === 'add'
+                  ? { background: 'rgba(255,255,255,0.1)', color: '#fff' }
+                  : { color: 'rgba(255,255,255,0.4)' }}
               >
                 <PlusCircle className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('newTradeTab')}</span>
               </button>
               <button
                 onClick={() => setJournalTab('history')}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-md text-sm font-medium transition-all ${journalTab === 'history' ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200/50' : 'text-zinc-500 hover:text-zinc-900'}`}
+                className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-md text-sm font-medium transition-all"
+                style={journalTab === 'history'
+                  ? { background: 'rgba(255,255,255,0.1)', color: '#fff' }
+                  : { color: 'rgba(255,255,255,0.4)' }}
               >
                 <List className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('historyTab')}</span>
               </button>
             </nav>
+
             <div className="relative" ref={langMenuRef}>
               <button
                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all border uppercase ${isLangMenuOpen ? 'bg-zinc-100 text-zinc-900 border-zinc-200' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 border-transparent hover:border-zinc-200'}`}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium uppercase transition-all"
+                style={{ color: 'rgba(255,255,255,0.5)' }}
               >
                 <Globe className="w-4 h-4" />
                 {language}
-                <ChevronDown className={`w-3 h-3 opacity-50 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3 h-3 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
               </button>
               {isLangMenuOpen && (
-                <div className="absolute top-full end-0 mt-2 w-36 bg-white border border-zinc-200 rounded-xl shadow-lg overflow-hidden z-50 py-1">
+                <div className="absolute top-full end-0 mt-2 w-40 rounded-xl shadow-xl overflow-hidden z-50 py-1" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
                   {languages.map(lang => (
                     <button
                       key={lang.code}
                       onClick={() => { setLanguage(lang.code as any); setIsLangMenuOpen(false); }}
-                      className={`w-full text-start px-4 py-2 text-sm transition-colors ${language === lang.code ? 'font-semibold text-zinc-900 bg-zinc-50' : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'}`}
+                      className="w-full text-start px-4 py-2 text-sm"
+                      style={{ color: language === lang.code ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: language === lang.code ? 600 : 400 }}
                     >
                       {lang.label}
                     </button>
@@ -410,6 +423,7 @@ export default function App() {
           </div>
         </div>
       </header>
+
       <main className="max-w-5xl mx-auto px-4 py-10">
         {journalTab === 'add' ? (
           <TradeForm onSave={handleAddTrade} />
