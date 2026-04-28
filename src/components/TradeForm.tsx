@@ -11,39 +11,57 @@ interface TradeFormProps {
   onSave: (trade: Trade) => void;
 }
 
-function PhotoUploader({ photos, onUpload, onRemove }: { photos: string[], onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void, onRemove: (index: number) => void }) {
+const inp: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.05)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  color: '#fff',
+  borderRadius: '12px',
+  padding: '8px 12px',
+  width: '100%',
+  outline: 'none',
+  fontSize: '14px',
+};
+
+const lbl: React.CSSProperties = {
+  display: 'block',
+  fontSize: '13px',
+  fontWeight: 500,
+  marginBottom: '6px',
+  color: 'rgba(255,255,255,0.55)',
+};
+
+function PhotoUploader({ photos, onUpload, onRemove }: {
+  photos: string[];
+  onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onRemove: (index: number) => void;
+}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useLanguage();
-
   return (
     <div className="space-y-4">
       {photos.length < 3 && (
-        <div 
+        <div
           onClick={() => fileInputRef.current?.click()}
-          className="w-full h-40 px-3 py-2 border border-dashed border-zinc-300 rounded-xl flex flex-col items-center justify-center text-zinc-500 hover:bg-zinc-50 focus:ring-2 focus:ring-zinc-900 hover:border-zinc-400 outline-none transition-all cursor-pointer bg-white"
+          className="w-full h-40 flex flex-col items-center justify-center cursor-pointer rounded-xl transition-all"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}
         >
-          <Upload className="w-5 h-5 mb-2 text-zinc-400" />
-          <span className="text-sm font-medium text-zinc-600">{t('photoUpload')}</span>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={onUpload} 
-            accept="image/*" 
-            multiple 
-            className="hidden" 
-          />
+          <Upload className="w-5 h-5 mb-2" style={{ color: 'rgba(255,255,255,0.25)' }} />
+          <span className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span>
+          <input type="file" ref={fileInputRef} onChange={onUpload} accept="image/*" multiple className="hidden" />
         </div>
       )}
-      
       {photos.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
           {photos.map((photo, index) => (
-            <div key={index} className="relative aspect-square rounded-xl overflow-hidden border border-zinc-200 group">
+            <div key={index} className="relative aspect-square rounded-xl overflow-hidden group" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
               <img src={photo} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
-              <button 
+              <button
                 type="button"
                 onClick={() => onRemove(index)}
-                className="absolute top-1 end-1 p-1 bg-black/50 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
+                className="absolute top-1 end-1 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -65,261 +83,178 @@ export default function TradeForm({ onSave }: TradeFormProps) {
   const [rr, setRr] = useState('');
   const [result, setResult] = useState<'Başarılı' | 'Başarısız' | 'Manuel Karda' | 'Manuel Zararda'>('Başarılı');
   const [preNotes, setPreNotes] = useState('');
+  const [postNotes, setPostNotes] = useState('');
+  const [prePhotos, setPrePhotos] = useState<string[]>([]);
+  const [postPhotos, setPostPhotos] = useState<string[]>([]);
 
   const handleResultChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value as 'Başarılı' | 'Başarısız' | 'Manuel Karda' | 'Manuel Zararda';
     setResult(val);
-    
     if (val === 'Başarısız' || val === 'Manuel Zararda') {
-      if (!rr) {
-        setRr('-1');
-      } else if (parseFloat(rr) > 0) {
-        setRr((parseFloat(rr) * -1).toString());
-      }
-    } else if (val === 'Başarılı' || val === 'Manuel Karda') {
-      if (rr && parseFloat(rr) < 0) {
-        setRr(Math.abs(parseFloat(rr)).toString());
-      }
+      if (!rr) { setRr('-1'); }
+      else if (parseFloat(rr) > 0) { setRr((parseFloat(rr) * -1).toString()); }
+    } else {
+      if (rr && parseFloat(rr) < 0) { setRr(Math.abs(parseFloat(rr)).toString()); }
     }
   };
-  const [postNotes, setPostNotes] = useState('');
-  
-  const [prePhotos, setPrePhotos] = useState<string[]>([]);
-  const [postPhotos, setPostPhotos] = useState<string[]>([]);
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'pre' | 'post') => {
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
     const files = Array.from(e.target.files || []) as File[];
-    const currentPhotos = type === 'pre' ? prePhotos : postPhotos;
-    
-    if (currentPhotos.length + files.length > 3) {
-      alert('En fazla 3 fotoğraf yükleyebilirsiniz.');
-      return;
-    }
-
+    const current = kind === 'pre' ? prePhotos : postPhotos;
+    if (current.length + files.length > 3) { alert('En fazla 3 fotoğraf yükleyebilirsiniz.'); return; }
     files.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (type === 'pre') {
-          setPrePhotos(prev => [...prev, reader.result as string]);
-        } else {
-          setPostPhotos(prev => [...prev, reader.result as string]);
-        }
+        if (kind === 'pre') { setPrePhotos(p => [...p, reader.result as string]); }
+        else { setPostPhotos(p => [...p, reader.result as string]); }
       };
       reader.readAsDataURL(file);
     });
   };
 
-  const removePhoto = (index: number, type: 'pre' | 'post') => {
-    if (type === 'pre') {
-      setPrePhotos(prev => prev.filter((_, i) => i !== index));
-    } else {
-      setPostPhotos(prev => prev.filter((_, i) => i !== index));
-    }
+  const removePhoto = (index: number, kind: 'pre' | 'post') => {
+    if (kind === 'pre') { setPrePhotos(p => p.filter((_, i) => i !== index)); }
+    else { setPostPhotos(p => p.filter((_, i) => i !== index)); }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!date) {
-      alert(t('pleaseSelectDate') || 'Lütfen tarih seçin');
-      return;
-    }
+    if (!date) { alert(t('pleaseSelectDate') || 'Lütfen tarih seçin'); return; }
     const newTrade: Trade = {
       id: Date.now().toString(),
-      date,
-      symbol,
-      type,
+      date, symbol, type,
       risk: parseFloat(risk) || 0,
       reward: parseFloat(reward) || 0,
-      rr,
-      result,
+      rr, result,
       preTradeNotes: preNotes,
       postTradeNotes: postNotes,
       preTradePhotos: prePhotos,
       postTradePhotos: postPhotos,
     };
     onSave(newTrade);
-    
-    // Reset form
-    setDate('');
-    setSymbol('EURUSD');
-    setRisk('');
-    setReward('');
-    setRr('');
-    setPreNotes('');
-    setPostNotes('');
-    setPrePhotos([]);
-    setPostPhotos([]);
-    setResult('Başarılı');
+    setDate(''); setSymbol('EURUSD'); setRisk(''); setReward(''); setRr('');
+    setPreNotes(''); setPostNotes(''); setPrePhotos([]); setPostPhotos([]); setResult('Başarılı');
   };
 
+  const divider: React.CSSProperties = { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '32px' };
+  const selStyle: React.CSSProperties = { ...inp, cursor: 'pointer' };
+  const optStyle: React.CSSProperties = { background: '#1a1b2e', color: '#fff' };
+  const sectionTitle: React.CSSProperties = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.3)', marginBottom: '16px' };
+
+  const symbols = ['EURUSD','USDJPY','GBPUSD','XAUUSD','US100','SPX500','AUDUSD','US30','USOil','USDCHF','USDCAD','GBPJPY','EURJPY','UKOil','GER30','EURGBP','XAGUSD','NZDUSD','AUDJPY','EURAUD','UK100','JPN225','NGCUSD','F40EUR','AUS200','HSIHKD','USDCNH','USDMXN','USDZAR','USDSGD','USDNOK','USDSEK','USDHKD','EURCAD','EURNZD','GBPCAD','GBPNZD','AUDCAD','AUDCHF','NZDCAD','NZDCHF','CADJPY','CADCHF','EURHUF','EURPLN','EURCZK','SPN35EUR'];
+
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
-      <div className="p-6 border-b border-zinc-100">
-        <h2 className="text-lg font-semibold text-zinc-900">{t('formTitle')}</h2>
-        <p className="text-sm text-zinc-500 mt-1">{t('formSubtitle')}</p>
+    <form onSubmit={handleSubmit} className="rounded-2xl overflow-hidden" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+      {/* Header */}
+      <div className="p-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <h2 className="text-lg font-semibold text-white">{t('formTitle')}</h2>
+        <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('formSubtitle')}</p>
       </div>
 
       <div className="p-6 space-y-8">
-        {/* Top Grid: Basic Details */}
+        {/* Row 1 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-zinc-700">{t('dateTime')}</label>
+          <div>
+            <label style={lbl}>{t('dateTime')}</label>
             <DatePicker
               value={date ? new Date(date) : null}
               onChange={(dateObj: DateObject | null) => {
-                if (dateObj) {
-                  setDate(dateObj.toDate().toISOString());
-                } else {
-                  setDate('');
-                }
+                if (dateObj) { setDate(dateObj.toDate().toISOString()); } else { setDate(''); }
               }}
               format="YYYY/MM/DD HH:mm"
-              plugins={[
-                <TimePicker position="bottom" />
-              ]}
+              plugins={[<TimePicker position="bottom" />]}
               calendar={language === 'fa' ? persian : undefined}
               locale={language === 'fa' ? persian_fa : undefined}
-              inputClass="w-full px-3 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 outline-none transition-all"
+              inputClass="dark-dp-input"
               containerClassName="w-full"
             />
           </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-zinc-700">{t('symbol')}</label>
-            <select value={symbol} onChange={e => setSymbol(e.target.value)} className="w-full px-3 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 outline-none transition-all bg-white">
-              <option value="EURUSD">EURUSD</option>
-              <option value="USDJPY">USDJPY</option>
-              <option value="GBPUSD">GBPUSD</option>
-              <option value="XAUUSD">XAUUSD</option>
-              <option value="US100">US100</option>
-              <option value="SPX500">SPX500</option>
-              <option value="AUDUSD">AUDUSD</option>
-              <option value="US30">US30</option>
-              <option value="USOil">USOil</option>
-              <option value="USDCHF">USDCHF</option>
-              <option value="USDCAD">USDCAD</option>
-              <option value="GBPJPY">GBPJPY</option>
-              <option value="EURJPY">EURJPY</option>
-              <option value="UKOil">UKOil</option>
-              <option value="GER30">GER30</option>
-              <option value="EURGBP">EURGBP</option>
-              <option value="XAGUSD">XAGUSD</option>
-              <option value="NZDUSD">NZDUSD</option>
-              <option value="AUDJPY">AUDJPY</option>
-              <option value="EURAUD">EURAUD</option>
-              <option value="UK100">UK100</option>
-              <option value="JPN225">JPN225</option>
-              <option value="NGCUSD">NGCUSD</option>
-              <option value="F40EUR">F40EUR</option>
-              <option value="AUS200">AUS200</option>
-              <option value="HSIHKD">HSIHKD</option>
-              <option value="USDCNH">USDCNH</option>
-              <option value="USDMXN">USDMXN</option>
-              <option value="USDZAR">USDZAR</option>
-              <option value="USDSGD">USDSGD</option>
-              <option value="USDNOK">USDNOK</option>
-              <option value="USDSEK">USDSEK</option>
-              <option value="USDHKD">USDHKD</option>
-              <option value="EURCAD">EURCAD</option>
-              <option value="EURNZD">EURNZD</option>
-              <option value="GBPCAD">GBPCAD</option>
-              <option value="GBPNZD">GBPNZD</option>
-              <option value="AUDCAD">AUDCAD</option>
-              <option value="AUDCHF">AUDCHF</option>
-              <option value="NZDCAD">NZDCAD</option>
-              <option value="NZDCHF">NZDCHF</option>
-              <option value="CADJPY">CADJPY</option>
-              <option value="CADCHF">CADCHF</option>
-              <option value="EURHUF">EURHUF</option>
-              <option value="EURPLN">EURPLN</option>
-              <option value="EURCZK">EURCZK</option>
-              <option value="SPN35EUR">SPN35EUR</option>
+          <div>
+            <label style={lbl}>{t('symbol')}</label>
+            <select value={symbol} onChange={e => setSymbol(e.target.value)} style={selStyle}>
+              {symbols.map(s => <option key={s} value={s} style={optStyle}>{s}</option>)}
             </select>
           </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-zinc-700">{t('type')}</label>
-            <select value={type} onChange={e => setType(e.target.value as 'Buy' | 'Sell')} className="w-full px-3 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 outline-none transition-all bg-white">
-              <option value="Buy">{t('buy')}</option>
-              <option value="Sell">{t('sell')}</option>
+          <div>
+            <label style={lbl}>{t('type')}</label>
+            <select value={type} onChange={e => setType(e.target.value as 'Buy' | 'Sell')} style={selStyle}>
+              <option value="Buy" style={optStyle}>{t('buy')}</option>
+              <option value="Sell" style={optStyle}>{t('sell')}</option>
             </select>
           </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-zinc-700">{t('rr')}</label>
-            <input type="number" step="any" value={rr} onChange={e => setRr(e.target.value)} className="w-full px-3 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 outline-none transition-all font-mono" placeholder={t('rrPlaceholder')} />
+          <div>
+            <label style={lbl}>{t('rr')}</label>
+            <input type="number" step="any" value={rr} onChange={e => setRr(e.target.value)} style={{ ...inp, fontFamily: 'monospace' }} placeholder={t('rrPlaceholder')} />
           </div>
         </div>
 
-        {/* Middle Grid: Financials & Result */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-zinc-100">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-zinc-700">{t('risk')}</label>
+        {/* Row 2 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6" style={divider}>
+          <div>
+            <label style={lbl}>{t('risk')}</label>
             <div className="relative">
-              <span className="absolute start-3 top-2.5 text-zinc-400">$</span>
-              <input type="number" min="0" step="0.01" required value={risk} onChange={e => setRisk(e.target.value)} className="w-full ps-8 pe-3 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 outline-none transition-all font-mono" placeholder="0.00" />
+              <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+              <input type="number" min="0" step="0.01" required value={risk} onChange={e => setRisk(e.target.value)} style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
             </div>
           </div>
-          
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-zinc-700">{t('reward')}</label>
+          <div>
+            <label style={lbl}>{t('reward')}</label>
             <div className="relative">
-              <span className="absolute start-3 top-2.5 text-zinc-400">$</span>
-              <input type="number" step="0.01" value={reward} onChange={e => setReward(e.target.value)} className="w-full ps-8 pe-3 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 outline-none transition-all font-mono" placeholder="0.00" />
+              <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+              <input type="number" step="0.01" value={reward} onChange={e => setReward(e.target.value)} style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
             </div>
           </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-zinc-700">{t('result')}</label>
-            <select value={result} onChange={handleResultChange} className="w-full px-3 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 outline-none transition-all bg-white">
-              <option value="Başarılı">{t('resultWin')}</option>
-              <option value="Başarısız">{t('resultLoss')}</option>
-              <option value="Manuel Karda">{t('resultManualWin')}</option>
-              <option value="Manuel Zararda">{t('resultManualLoss')}</option>
+          <div>
+            <label style={lbl}>{t('result')}</label>
+            <select value={result} onChange={handleResultChange} style={selStyle}>
+              <option value="Başarılı" style={optStyle}>{t('resultWin')}</option>
+              <option value="Başarısız" style={optStyle}>{t('resultLoss')}</option>
+              <option value="Manuel Karda" style={optStyle}>{t('resultManualWin')}</option>
+              <option value="Manuel Zararda" style={optStyle}>{t('resultManualLoss')}</option>
             </select>
           </div>
         </div>
 
-        {/* Pre-Trade Section */}
-        <div className="pt-8 border-t border-zinc-100">
-          <h3 className="text-sm font-semibold text-zinc-900 mb-4 uppercase tracking-wider">
-            {t('preTrade')}
-          </h3>
-          
+        {/* Pre-Trade */}
+        <div style={divider}>
+          <p style={sectionTitle}>{t('preTrade')}</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-zinc-700">{t('photos')}</label>
-              <PhotoUploader photos={prePhotos} onUpload={(e) => handlePhotoUpload(e, 'pre')} onRemove={(i) => removePhoto(i, 'pre')} />
+            <div>
+              <label style={lbl}>{t('photos')}</label>
+              <PhotoUploader photos={prePhotos} onUpload={e => handlePhotoUpload(e, 'pre')} onRemove={i => removePhoto(i, 'pre')} />
             </div>
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-zinc-700">{t('notes')}</label>
-              <textarea required value={preNotes} onChange={e => setPreNotes(e.target.value)} className="w-full h-40 px-3 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 outline-none transition-all resize-none" placeholder={t('preNotesPlaceholder')} />
+            <div>
+              <label style={lbl}>{t('notes')}</label>
+              <textarea required value={preNotes} onChange={e => setPreNotes(e.target.value)} style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }} placeholder={t('preNotesPlaceholder')} />
             </div>
           </div>
         </div>
 
-        {/* Post-Trade Section */}
-        <div className="pt-8 border-t border-zinc-100">
-          <h3 className="text-sm font-semibold text-zinc-900 mb-4 uppercase tracking-wider">
-            {t('postTrade')}
-          </h3>
-          
+        {/* Post-Trade */}
+        <div style={divider}>
+          <p style={sectionTitle}>{t('postTrade')}</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-zinc-700">{t('photos')}</label>
-              <PhotoUploader photos={postPhotos} onUpload={(e) => handlePhotoUpload(e, 'post')} onRemove={(i) => removePhoto(i, 'post')} />
+            <div>
+              <label style={lbl}>{t('photos')}</label>
+              <PhotoUploader photos={postPhotos} onUpload={e => handlePhotoUpload(e, 'post')} onRemove={i => removePhoto(i, 'post')} />
             </div>
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-zinc-700">{t('notes')}</label>
-              <textarea value={postNotes} onChange={e => setPostNotes(e.target.value)} className="w-full h-40 px-3 py-2 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 outline-none transition-all resize-none" placeholder={t('postNotesPlaceholder')} />
+            <div>
+              <label style={lbl}>{t('notes')}</label>
+              <textarea value={postNotes} onChange={e => setPostNotes(e.target.value)} style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }} placeholder={t('postNotesPlaceholder')} />
             </div>
           </div>
         </div>
-
       </div>
 
-      <div className="p-6 border-t border-zinc-100 bg-zinc-50/50 flex justify-end">
-        <button type="submit" className="px-6 py-2.5 bg-zinc-900 text-white font-medium rounded-xl hover:bg-black focus:ring-4 focus:ring-zinc-200 transition-all">
+      {/* Submit */}
+      <div className="p-6 flex justify-end" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+        <button
+          type="submit"
+          className="px-6 py-2.5 font-semibold rounded-xl transition-all"
+          style={{ background: '#eab308', color: '#000' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ca9a04'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#eab308'; }}
+        >
           {t('saveButton')}
         </button>
       </div>
