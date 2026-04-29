@@ -30,28 +30,12 @@ const lbl: React.CSSProperties = {
   color: 'rgba(255,255,255,0.55)',
 };
 
-const selStyle: React.CSSProperties = {
-  ...inp,
-  cursor: 'pointer',
-};
-
-const optStyle: React.CSSProperties = {
-  background: '#1a1b2e',
-  color: '#fff',
-};
-
-const divider: React.CSSProperties = {
-  borderTop: '1px solid rgba(255,255,255,0.06)',
-  paddingTop: '32px',
-};
-
+const selStyle: React.CSSProperties = { ...inp, cursor: 'pointer' };
+const optStyle: React.CSSProperties = { background: '#1a1b2e', color: '#fff' };
+const divider: React.CSSProperties = { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '32px' };
 const sectionTitle: React.CSSProperties = {
-  fontSize: '11px',
-  fontWeight: 700,
-  textTransform: 'uppercase',
-  letterSpacing: '0.08em',
-  color: 'rgba(255,255,255,0.3)',
-  marginBottom: '16px',
+  fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
+  letterSpacing: '0.08em', color: 'rgba(255,255,255,0.3)', marginBottom: '16px',
 };
 
 const SETUPS = [
@@ -143,6 +127,11 @@ export default function TradeForm({ onSave }: TradeFormProps) {
     }
   };
 
+  const handleSetupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSetup(e.target.value);
+    if (e.target.value !== 'Diğer') setCustomSetup('');
+  };
+
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
     const files = Array.from(e.target.files || []) as File[];
     const current = kind === 'pre' ? prePhotos : postPhotos;
@@ -179,7 +168,6 @@ export default function TradeForm({ onSave }: TradeFormProps) {
       postTradePhotos: postPhotos,
     };
     onSave(newTrade);
-    // Reset
     setDate(''); setSymbol('EURUSD'); setTimeframe('H1');
     setSetup(''); setCustomSetup('');
     setRisk(''); setReward(''); setRr('');
@@ -190,7 +178,6 @@ export default function TradeForm({ onSave }: TradeFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl overflow-hidden" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
-      {/* Header */}
       <div className="p-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <h2 className="text-lg font-semibold text-white">{t('formTitle')}</h2>
         <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('formSubtitle')}</p>
@@ -198,8 +185,8 @@ export default function TradeForm({ onSave }: TradeFormProps) {
 
       <div className="p-6 space-y-8">
 
-        {/* Row 1 — Tarih, Sembol, Tür, Timeframe */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Row 1 — Tarih, Sembol, Tür, Timeframe, Setup, R/R */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
             <label style={lbl}>{t('dateTime')}</label>
             <DatePicker
@@ -233,74 +220,47 @@ export default function TradeForm({ onSave }: TradeFormProps) {
 
           <div>
             <label style={lbl}>{t('timeframe')}</label>
-            <div className="flex flex-wrap gap-2">
+            <select value={timeframe} onChange={e => setTimeframe(e.target.value)} style={selStyle}>
               {TIMEFRAMES.map(tf => (
-                <button
-                  key={tf}
-                  type="button"
-                  onClick={() => setTimeframe(tf)}
-                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-                  style={timeframe === tf
-                    ? { background: '#eab308', color: '#000' }
-                    : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }
-                  }
-                >
-                  {tf}
-                </button>
+                <option key={tf} value={tf} style={optStyle}>{tf}</option>
               ))}
-            </div>
+            </select>
+          </div>
+
+          <div>
+            <label style={lbl}>{t('setup')}</label>
+            <select value={setup} onChange={handleSetupChange} style={selStyle}>
+              <option value="" style={optStyle}>— Seçin —</option>
+              {SETUPS.map(s => (
+                <option key={s} value={s} style={optStyle}>{s}</option>
+              ))}
+            </select>
+            {setup === 'Diğer' && (
+              <input
+                type="text"
+                value={customSetup}
+                onChange={e => setCustomSetup(e.target.value)}
+                placeholder="Setup adını yazın..."
+                className="mt-2"
+                style={{ ...inp }}
+                autoFocus
+              />
+            )}
+          </div>
+
+          <div>
+            <label style={lbl}>{t('rr')}</label>
+            <input
+              type="number" step="any"
+              value={rr} onChange={e => setRr(e.target.value)}
+              style={{ ...inp, fontFamily: 'monospace' }}
+              placeholder={t('rrPlaceholder')}
+            />
           </div>
         </div>
 
-        {/* Row 2 — Setup + R/R + Risk + Reward + Sonuç */}
+        {/* Row 2 — Risk, Reward, Sonuç */}
         <div style={divider}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* Setup seçimi */}
-            <div>
-              <label style={lbl}>{t('setup')}</label>
-              <div className="flex flex-wrap gap-2">
-                {SETUPS.map(s => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => setSetup(setup === s ? '' : s)}
-                    className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-                    style={setup === s
-                      ? { background: 'rgba(129,140,248,0.2)', color: '#818cf8', border: '1px solid rgba(129,140,248,0.4)' }
-                      : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }
-                    }
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-              {setup === 'Diğer' && (
-                <input
-                  type="text"
-                  value={customSetup}
-                  onChange={e => setCustomSetup(e.target.value)}
-                  placeholder="Setup adını yazın..."
-                  className="mt-3"
-                  style={{ ...inp }}
-                  autoFocus
-                />
-              )}
-            </div>
-
-            {/* R/R */}
-            <div>
-              <label style={lbl}>{t('rr')}</label>
-              <input
-                type="number"
-                step="any"
-                value={rr}
-                onChange={e => setRr(e.target.value)}
-                style={{ ...inp, fontFamily: 'monospace' }}
-                placeholder={t('rrPlaceholder')}
-              />
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label style={lbl}>{t('risk')}</label>
@@ -379,7 +339,6 @@ export default function TradeForm({ onSave }: TradeFormProps) {
         </div>
       </div>
 
-      {/* Submit */}
       <div className="p-6 flex justify-end" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
         <button
           type="submit"
