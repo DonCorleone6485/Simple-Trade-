@@ -30,6 +30,48 @@ const lbl: React.CSSProperties = {
   color: 'rgba(255,255,255,0.55)',
 };
 
+const selStyle: React.CSSProperties = {
+  ...inp,
+  cursor: 'pointer',
+};
+
+const optStyle: React.CSSProperties = {
+  background: '#1a1b2e',
+  color: '#fff',
+};
+
+const divider: React.CSSProperties = {
+  borderTop: '1px solid rgba(255,255,255,0.06)',
+  paddingTop: '32px',
+};
+
+const sectionTitle: React.CSSProperties = {
+  fontSize: '11px',
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  letterSpacing: '0.08em',
+  color: 'rgba(255,255,255,0.3)',
+  marginBottom: '16px',
+};
+
+const SETUPS = [
+  'FVG', 'OB', 'BOS / ChoCH', 'Liquidity Sweep',
+  'EQH / EQL', 'Breaker Block', 'Mitigation',
+  'VWAP', 'Trend Pullback', 'Range Breakout', 'Diğer',
+];
+
+const TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1'];
+
+const SYMBOLS = [
+  'EURUSD','USDJPY','GBPUSD','XAUUSD','US100','SPX500','AUDUSD',
+  'US30','USOil','USDCHF','USDCAD','GBPJPY','EURJPY','UKOil',
+  'GER30','EURGBP','XAGUSD','NZDUSD','AUDJPY','EURAUD','UK100',
+  'JPN225','NGCUSD','F40EUR','AUS200','HSIHKD','USDCNH','USDMXN',
+  'USDZAR','USDSGD','USDNOK','USDSEK','USDHKD','EURCAD','EURNZD',
+  'GBPCAD','GBPNZD','AUDCAD','AUDCHF','NZDCAD','NZDCHF','CADJPY',
+  'CADCHF','EURHUF','EURPLN','EURCZK','SPN35EUR',
+];
+
 function PhotoUploader({ photos, onUpload, onRemove }: {
   photos: string[];
   onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -78,6 +120,9 @@ export default function TradeForm({ onSave }: TradeFormProps) {
   const [date, setDate] = useState('');
   const [symbol, setSymbol] = useState('EURUSD');
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
+  const [timeframe, setTimeframe] = useState('H1');
+  const [setup, setSetup] = useState('');
+  const [customSetup, setCustomSetup] = useState('');
   const [risk, setRisk] = useState('');
   const [reward, setReward] = useState('');
   const [rr, setRr] = useState('');
@@ -120,9 +165,11 @@ export default function TradeForm({ onSave }: TradeFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!date) { alert(t('pleaseSelectDate') || 'Lütfen tarih seçin'); return; }
+    const finalSetup = setup === 'Diğer' ? customSetup : setup;
     const newTrade: Trade = {
       id: Date.now().toString(),
-      date, symbol, type,
+      date, symbol, type, timeframe,
+      setup: finalSetup,
       risk: parseFloat(risk) || 0,
       reward: parseFloat(reward) || 0,
       rr, result,
@@ -132,16 +179,14 @@ export default function TradeForm({ onSave }: TradeFormProps) {
       postTradePhotos: postPhotos,
     };
     onSave(newTrade);
-    setDate(''); setSymbol('EURUSD'); setRisk(''); setReward(''); setRr('');
-    setPreNotes(''); setPostNotes(''); setPrePhotos([]); setPostPhotos([]); setResult('Başarılı');
+    // Reset
+    setDate(''); setSymbol('EURUSD'); setTimeframe('H1');
+    setSetup(''); setCustomSetup('');
+    setRisk(''); setReward(''); setRr('');
+    setPreNotes(''); setPostNotes('');
+    setPrePhotos([]); setPostPhotos([]);
+    setResult('Başarılı');
   };
-
-  const divider: React.CSSProperties = { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '32px' };
-  const selStyle: React.CSSProperties = { ...inp, cursor: 'pointer' };
-  const optStyle: React.CSSProperties = { background: '#1a1b2e', color: '#fff' };
-  const sectionTitle: React.CSSProperties = { fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.3)', marginBottom: '16px' };
-
-  const symbols = ['EURUSD','USDJPY','GBPUSD','XAUUSD','US100','SPX500','AUDUSD','US30','USOil','USDCHF','USDCAD','GBPJPY','EURJPY','UKOil','GER30','EURGBP','XAGUSD','NZDUSD','AUDJPY','EURAUD','UK100','JPN225','NGCUSD','F40EUR','AUS200','HSIHKD','USDCNH','USDMXN','USDZAR','USDSGD','USDNOK','USDSEK','USDHKD','EURCAD','EURNZD','GBPCAD','GBPNZD','AUDCAD','AUDCHF','NZDCAD','NZDCHF','CADJPY','CADCHF','EURHUF','EURPLN','EURCZK','SPN35EUR'];
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl overflow-hidden" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -152,7 +197,8 @@ export default function TradeForm({ onSave }: TradeFormProps) {
       </div>
 
       <div className="p-6 space-y-8">
-        {/* Row 1 */}
+
+        {/* Row 1 — Tarih, Sembol, Tür, Timeframe */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div>
             <label style={lbl}>{t('dateTime')}</label>
@@ -169,12 +215,14 @@ export default function TradeForm({ onSave }: TradeFormProps) {
               containerClassName="w-full"
             />
           </div>
+
           <div>
             <label style={lbl}>{t('symbol')}</label>
             <select value={symbol} onChange={e => setSymbol(e.target.value)} style={selStyle}>
-              {symbols.map(s => <option key={s} value={s} style={optStyle}>{s}</option>)}
+              {SYMBOLS.map(s => <option key={s} value={s} style={optStyle}>{s}</option>)}
             </select>
           </div>
+
           <div>
             <label style={lbl}>{t('type')}</label>
             <select value={type} onChange={e => setType(e.target.value as 'Buy' | 'Sell')} style={selStyle}>
@@ -182,36 +230,113 @@ export default function TradeForm({ onSave }: TradeFormProps) {
               <option value="Sell" style={optStyle}>{t('sell')}</option>
             </select>
           </div>
+
           <div>
-            <label style={lbl}>{t('rr')}</label>
-            <input type="number" step="any" value={rr} onChange={e => setRr(e.target.value)} style={{ ...inp, fontFamily: 'monospace' }} placeholder={t('rrPlaceholder')} />
+            <label style={lbl}>{t('timeframe')}</label>
+            <div className="flex flex-wrap gap-2">
+              {TIMEFRAMES.map(tf => (
+                <button
+                  key={tf}
+                  type="button"
+                  onClick={() => setTimeframe(tf)}
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                  style={timeframe === tf
+                    ? { background: '#eab308', color: '#000' }
+                    : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }
+                  }
+                >
+                  {tf}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Row 2 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6" style={divider}>
-          <div>
-            <label style={lbl}>{t('risk')}</label>
-            <div className="relative">
-              <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-              <input type="number" min="0" step="0.01" required value={risk} onChange={e => setRisk(e.target.value)} style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
+        {/* Row 2 — Setup + R/R + Risk + Reward + Sonuç */}
+        <div style={divider}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Setup seçimi */}
+            <div>
+              <label style={lbl}>{t('setup')}</label>
+              <div className="flex flex-wrap gap-2">
+                {SETUPS.map(s => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setSetup(setup === s ? '' : s)}
+                    className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                    style={setup === s
+                      ? { background: 'rgba(129,140,248,0.2)', color: '#818cf8', border: '1px solid rgba(129,140,248,0.4)' }
+                      : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }
+                    }
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+              {setup === 'Diğer' && (
+                <input
+                  type="text"
+                  value={customSetup}
+                  onChange={e => setCustomSetup(e.target.value)}
+                  placeholder="Setup adını yazın..."
+                  className="mt-3"
+                  style={{ ...inp }}
+                  autoFocus
+                />
+              )}
+            </div>
+
+            {/* R/R */}
+            <div>
+              <label style={lbl}>{t('rr')}</label>
+              <input
+                type="number"
+                step="any"
+                value={rr}
+                onChange={e => setRr(e.target.value)}
+                style={{ ...inp, fontFamily: 'monospace' }}
+                placeholder={t('rrPlaceholder')}
+              />
             </div>
           </div>
-          <div>
-            <label style={lbl}>{t('reward')}</label>
-            <div className="relative">
-              <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-              <input type="number" step="0.01" value={reward} onChange={e => setReward(e.target.value)} style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label style={lbl}>{t('risk')}</label>
+              <div className="relative">
+                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                <input
+                  type="number" min="0" step="0.01" required
+                  value={risk} onChange={e => setRisk(e.target.value)}
+                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }}
+                  placeholder="0.00"
+                />
+              </div>
             </div>
-          </div>
-          <div>
-            <label style={lbl}>{t('result')}</label>
-            <select value={result} onChange={handleResultChange} style={selStyle}>
-              <option value="Başarılı" style={optStyle}>{t('resultWin')}</option>
-              <option value="Başarısız" style={optStyle}>{t('resultLoss')}</option>
-              <option value="Manuel Karda" style={optStyle}>{t('resultManualWin')}</option>
-              <option value="Manuel Zararda" style={optStyle}>{t('resultManualLoss')}</option>
-            </select>
+
+            <div>
+              <label style={lbl}>{t('reward')}</label>
+              <div className="relative">
+                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                <input
+                  type="number" step="0.01"
+                  value={reward} onChange={e => setReward(e.target.value)}
+                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }}
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style={lbl}>{t('result')}</label>
+              <select value={result} onChange={handleResultChange} style={selStyle}>
+                <option value="Başarılı" style={optStyle}>{t('resultWin')}</option>
+                <option value="Başarısız" style={optStyle}>{t('resultLoss')}</option>
+                <option value="Manuel Karda" style={optStyle}>{t('resultManualWin')}</option>
+                <option value="Manuel Zararda" style={optStyle}>{t('resultManualLoss')}</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -225,7 +350,11 @@ export default function TradeForm({ onSave }: TradeFormProps) {
             </div>
             <div>
               <label style={lbl}>{t('notes')}</label>
-              <textarea required value={preNotes} onChange={e => setPreNotes(e.target.value)} style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }} placeholder={t('preNotesPlaceholder')} />
+              <textarea
+                required value={preNotes} onChange={e => setPreNotes(e.target.value)}
+                style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }}
+                placeholder={t('preNotesPlaceholder')}
+              />
             </div>
           </div>
         </div>
@@ -240,7 +369,11 @@ export default function TradeForm({ onSave }: TradeFormProps) {
             </div>
             <div>
               <label style={lbl}>{t('notes')}</label>
-              <textarea value={postNotes} onChange={e => setPostNotes(e.target.value)} style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }} placeholder={t('postNotesPlaceholder')} />
+              <textarea
+                value={postNotes} onChange={e => setPostNotes(e.target.value)}
+                style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }}
+                placeholder={t('postNotesPlaceholder')}
+              />
             </div>
           </div>
         </div>
