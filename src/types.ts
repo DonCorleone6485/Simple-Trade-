@@ -11,6 +11,8 @@ export interface Trade {
   date: string;
   symbol: string;
   type: 'Buy' | 'Sell';
+  timeframe?: string;
+  setup?: string;
   risk: number;
   reward: number;
   rr: string;
