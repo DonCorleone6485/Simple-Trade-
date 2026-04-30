@@ -8,11 +8,12 @@ import {
 import TradeForm from './components/TradeForm';
 import TradeHistory from './components/TradeHistory';
 import CalendarView from './components/CalendarView';
-import { Trade, Account } from './types';
+import GoalsView from './components/GoalsView';
+import { Trade, Account, JournalGoals } from './types';
 import { useLanguage } from './context/LanguageContext';
 
 type View = 'dashboard' | 'expanded';
-type JournalTab = 'trades' | 'calendar' | 'stats';
+type JournalTab = 'trades' | 'calendar' | 'stats' | 'goals';
 
 export default function App() {
   const { language, setLanguage, t } = useLanguage();
@@ -101,6 +102,11 @@ export default function App() {
     setJournalTab('trades');
   };
 
+  const handleUpdateGoals = (goals: JournalGoals) => {
+    setAccounts(prev => prev.map(a => a.id === activeJournal?.id ? { ...a, goals } : a));
+    setActiveJournal(prev => prev ? { ...prev, goals } : prev);
+  };
+
   const filteredTrades = activeJournal ? trades.filter(t => t.accountId === activeJournal.id) : [];
 
   const getJournalStats = (accountId: string) => {
@@ -135,6 +141,7 @@ export default function App() {
     { key: 'trades', label: t('historyTab'), icon: <List className="w-4 h-4" /> },
     { key: 'calendar', label: t('calendarTab'), icon: <CalendarDays className="w-4 h-4" /> },
     { key: 'stats', label: t('statsTab'), icon: <BarChart2 className="w-4 h-4" /> },
+    { key: 'goals', label: t('goalsTab'), icon: <Target className="w-4 h-4" /> },
   ];
 
   return (
@@ -413,6 +420,13 @@ export default function App() {
           )}
           {journalTab === 'stats' && (
             <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} statsOnly />
+          )}
+          {journalTab === 'goals' && (
+            <GoalsView
+              trades={filteredTrades}
+              account={activeJournal}
+              onUpdateGoals={handleUpdateGoals}
+            />
           )}
         </main>
       )}
