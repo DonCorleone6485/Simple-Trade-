@@ -10,7 +10,7 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: 'No trades provided' });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return res.status(500).json({ error: 'API key not configured' });
     }
@@ -73,73 +73,61 @@ export default async function handler(req: any, res: any) {
       fa: 'به فارسی پاسخ بده.',
     };
 
-    const prompt = `
-Sen profesyonel bir trading coach ve analistsin. Aşağıdaki trader'ın journal verilerini analiz et ve kapsamlı bir rapor yaz.
+    const prompt = `Sen profesyonel bir trading coach ve analistsin. Aşağıdaki trader'ın journal verilerini analiz et ve kapsamlı bir rapor yaz.
 
 ${langInstructions[language] || langInstructions.tr}
 
-## Journal Bilgileri
-- Journal Adı: ${journalName || 'Belirtilmemiş'}
-- Başlangıç Sermayesi: $${startingCapital || 'Belirtilmemiş'}
-- Toplam İşlem: ${trades.length}
+Journal: ${journalName || 'Belirtilmemiş'}
+Başlangıç Sermayesi: $${startingCapital || 'Belirtilmemiş'}
+Toplam İşlem: ${trades.length}
+Win Rate: %${winRate}
+Net PnL: $${netPnL.toFixed(2)}
+Ortalama R/R: ${avgRR}R
 
-## Genel İstatistikler
-- Win Rate: %${winRate}
-- Net PnL: $${netPnL.toFixed(2)}
-- Gross Profit: $${grossProfit.toFixed(2)}
-- Gross Loss: $${grossLoss.toFixed(2)}
-- Ortalama R/R: ${avgRR}R
-
-## Setup Performansı
+Setup Performansı:
 ${Object.entries(setupMap).map(([s, d]) => `- ${s}: ${d.total} işlem, %${((d.wins / d.total) * 100).toFixed(0)} win rate, $${d.pnl.toFixed(0)} PnL`).join('\n')}
 
-## Sembol Performansı
+Sembol Performansı:
 ${Object.entries(symbolMap).map(([s, d]) => `- ${s}: ${d.total} işlem, %${((d.wins / d.total) * 100).toFixed(0)} win rate, $${d.pnl.toFixed(0)} PnL`).join('\n')}
 
-## Saat Bazlı Performans
+Saat Bazlı:
 ${Object.entries(hourMap).sort((a, b) => Number(b[1].total) - Number(a[1].total)).slice(0, 8).map(([h, d]) => `- Saat ${h}:00 — ${d.total} işlem, %${((d.wins / d.total) * 100).toFixed(0)} win rate`).join('\n')}
 
-## Son İşlem Notları
-${notes.length > 0 ? notes.map((n: any) => `- ${n.symbol} (${n.result}): Pre: "${n.pre || '-'}" | Post: "${n.post || '-'}"`).join('\n') : 'Not girilmemiş.'}
-
----
+Notlar:
+${notes.length > 0 ? notes.map((n: any) => `- ${n.symbol} (${n.result}): "${n.pre || '-'}" / "${n.post || '-'}"`).join('\n') : 'Not yok.'}
 
 Şu başlıklar altında analiz yap:
+1. Genel Performans
+2. Güçlü Yönler
+3. Zayıf Yönler
+4. Setup Analizi
+5. Zamanlama
+6. Psikolojik Patternler
+7. 5 Somut Öneri
+8. Özet`;
 
-1. **Genel Performans Değerlendirmesi**
-2. **Güçlü Yönler**
-3. **Zayıf Yönler ve Riskler**
-4. **Setup Analizi**
-5. **Zamanlama Analizi**
-6. **Psikolojik Patternler**
-7. **Somut Öneriler** (5 madde)
-8. **Özet**
-
-Samimi, dürüst ve yapıcı ol. Az işlem olsa bile mevcut verilerle analiz yap.
-`;
-
-    const response = await fetch(
-`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2048,
-          },
-        }),
-      }
-    );
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 2048,
+        temperature: 0.7,
+      }),
+    });
 
     if (!response.ok) {
       const err = await response.text();
-      console.error('Gemini error:', err);
-      return res.status(500).json({ error: 'Gemini API error: ' + err });
+      console.error('Groq error:', err);
+      return res.status(500).json({ error: 'Groq API error: ' + err });
     }
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const text = data.choices?.[0]?.message?.content || '';
 
     return res.json({ analysis: text });
   } catch (error: any) {
