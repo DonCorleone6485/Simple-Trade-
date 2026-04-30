@@ -185,7 +185,7 @@ export default function TradeForm({ onSave }: TradeFormProps) {
 
       <div className="p-6 space-y-8">
 
-        {/* Row 1 — Tarih, Sembol, Tür, Timeframe, Setup, R/R */}
+        {/* Row 1 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
             <label style={lbl}>{t('dateTime')}</label>
@@ -259,7 +259,7 @@ export default function TradeForm({ onSave }: TradeFormProps) {
           </div>
         </div>
 
-        {/* Row 2 — Risk, Reward, Sonuç */}
+        {/* Row 2 */}
         <div style={divider}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
@@ -343,9 +343,9 @@ export default function TradeForm({ onSave }: TradeFormProps) {
         <button
           type="submit"
           className="px-6 py-2.5 font-semibold rounded-xl transition-all"
-          style={{ background: '#eab308', color: '#000' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ca9a04'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#eab308'; }}
+          style={{ background: '#8b5cf6', color: '#fff' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
         >
           {t('saveButton')}
         </button>
