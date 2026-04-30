@@ -40,12 +40,7 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          trades,
-          language,
-          journalName: '',
-          startingCapital: 0,
-        }),
+        body: JSON.stringify({ trades, language, journalName: '', startingCapital: 0 }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -552,20 +547,20 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
               onMouseEnter={e => { if (!aiLoading) (e.currentTarget as HTMLElement).style.background = '#ca9a04'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#eab308'; }}
             >
-              {aiLoading ? '⏳ Analiz yapılıyor...' : '✨ Analiz Et'}
+              {aiLoading ? t('aiAnalyzeLoading') : t('aiAnalyzeBtn')}
             </button>
           </div>
 
           {!showAi && !aiLoading && (
             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              Tüm trade verilerinizi AI ile analiz edin. Güçlü/zayıf yönler, setup performansı ve kişisel öneriler alın.
+              {t('aiAnalyzeDesc')}
             </p>
           )}
 
           {aiLoading && (
             <div className="flex items-center gap-3 py-4">
               <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(234,179,8,0.3)', borderTopColor: '#eab308' }} />
-              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>Gemini AI analiz yapıyor...</span>
+              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('aiAnalyzing')}</span>
             </div>
           )}
 
