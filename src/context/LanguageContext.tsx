@@ -20,7 +20,7 @@ export const translations: Translations = {
   noJournals: { tr: 'Henüz journal yok. Yeni bir tane oluştur!', en: 'No journals yet. Create a new one!', fa: 'هنوز ژورنالی وجود ندارد. یکی بسازید!' },
   backToDashboard: { tr: 'Dashboard', en: 'Dashboard', fa: 'داشبورد' },
   newTradeTab: { tr: 'Yeni İşlem', en: 'New Trade', fa: 'معامله جدید' },
-  historyTab: { tr: 'Geçmiş', en: 'History', fa: 'تاریخچه' },
+  historyTab: { tr: 'İşlemler', en: 'Trades', fa: 'معاملات' },
   calendarTab: { tr: 'Takvim', en: 'Calendar', fa: 'تقویم' },
   statsTab: { tr: 'İstatistikler', en: 'Statistics', fa: 'آمار' },
   formTitle: { tr: 'Yeni İşlem Kaydı', en: 'New Trade Record', fa: 'ثبت معامله جدید' },
