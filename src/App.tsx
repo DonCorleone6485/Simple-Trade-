@@ -2,18 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   PlusCircle, Globe, ChevronDown, ChevronLeft,
   Trash2, BookOpen, Clock, TrendingUp, X,
-  Target, DollarSign, Activity, PieChart
+  Target, DollarSign, Activity, PieChart,
+  CalendarDays, BarChart2, List
 } from 'lucide-react';
 import TradeForm from './components/TradeForm';
 import TradeHistory from './components/TradeHistory';
+import CalendarView from './components/CalendarView';
 import { Trade, Account } from './types';
 import { useLanguage } from './context/LanguageContext';
 
 type View = 'dashboard' | 'expanded';
+type JournalTab = 'trades' | 'calendar' | 'stats';
 
 export default function App() {
   const { language, setLanguage, t } = useLanguage();
   const [view, setView] = useState<View>('dashboard');
+  const [journalTab, setJournalTab] = useState<JournalTab>('trades');
   const [activeJournal, setActiveJournal] = useState<Account | null>(null);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -67,9 +71,7 @@ export default function App() {
     setAccounts(prev => [...prev, newAccount]);
     setActiveJournal(newAccount);
     setShowNewJournalModal(false);
-    setNewJournalName('');
-    setNewJournalStartDate('');
-    setNewJournalCapital('');
+    setNewJournalName(''); setNewJournalStartDate(''); setNewJournalCapital('');
     setView('expanded');
     setShowTradeModal(true);
   };
@@ -96,6 +98,7 @@ export default function App() {
   const openJournal = (account: Account) => {
     setActiveJournal(account);
     setView('expanded');
+    setJournalTab('trades');
   };
 
   const filteredTrades = activeJournal ? trades.filter(t => t.accountId === activeJournal.id) : [];
@@ -128,6 +131,12 @@ export default function App() {
 
   const activeStats = activeJournal ? getJournalStats(activeJournal.id) : null;
 
+  const tabs = [
+    { key: 'trades', label: t('historyTab'), icon: <List className="w-4 h-4" /> },
+    { key: 'calendar', label: t('calendarTab'), icon: <CalendarDays className="w-4 h-4" /> },
+    { key: 'stats', label: t('statsTab'), icon: <BarChart2 className="w-4 h-4" /> },
+  ];
+
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={language === 'fa' ? 'rtl' : 'ltr'}>
 
@@ -154,59 +163,32 @@ export default function App() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('journalName')}</label>
-                <input
-                  type="text"
-                  value={newJournalName}
-                  onChange={e => setNewJournalName(e.target.value)}
-                  placeholder={t('journalNamePlaceholder')}
-                  autoFocus
+                <input type="text" value={newJournalName} onChange={e => setNewJournalName(e.target.value)} placeholder={t('journalNamePlaceholder')} autoFocus
                   className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
-                />
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('startDate')}</label>
-                <input
-                  type="date"
-                  value={newJournalStartDate}
-                  onChange={e => setNewJournalStartDate(e.target.value)}
+                <input type="date" value={newJournalStartDate} onChange={e => setNewJournalStartDate(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', colorScheme: 'dark' }}
-                />
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', colorScheme: 'dark' }} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('startingCapital')}</label>
                 <div className="relative">
                   <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={newJournalCapital}
-                    onChange={e => setNewJournalCapital(e.target.value)}
-                    placeholder="10000"
+                  <input type="number" min="0" step="0.01" value={newJournalCapital} onChange={e => setNewJournalCapital(e.target.value)} placeholder="10000"
                     className="w-full ps-8 pe-3 py-2.5 rounded-xl text-sm outline-none font-mono"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
-                  />
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
                 </div>
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => { setShowNewJournalModal(false); setNewJournalName(''); setNewJournalStartDate(''); setNewJournalCapital(''); }}
-                className="px-4 py-2 text-sm"
-                style={{ color: 'rgba(255,255,255,0.5)' }}
-              >
-                {t('cancel')}
-              </button>
-              <button
-                onClick={createJournal}
-                disabled={!newJournalName.trim() || !newJournalStartDate || !newJournalCapital}
+              <button onClick={() => { setShowNewJournalModal(false); setNewJournalName(''); setNewJournalStartDate(''); setNewJournalCapital(''); }}
+                className="px-4 py-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('cancel')}</button>
+              <button onClick={createJournal} disabled={!newJournalName.trim() || !newJournalStartDate || !newJournalCapital}
                 className="px-6 py-2 text-sm font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: '#eab308', color: '#000' }}
-              >
-                OK
-              </button>
+                style={{ background: '#eab308', color: '#000' }}>OK</button>
             </div>
           </div>
         </div>
@@ -218,13 +200,10 @@ export default function App() {
           <div className="w-full max-w-4xl my-8">
             <div className="flex items-center justify-between mb-4">
               <span className="font-semibold text-white">{activeJournal?.name}</span>
-              <button
-                onClick={() => setShowTradeModal(false)}
-                className="p-2 rounded-lg transition-all"
+              <button onClick={() => setShowTradeModal(false)} className="p-2 rounded-lg transition-all"
                 style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}
-              >
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -239,13 +218,11 @@ export default function App() {
           <div className="flex items-center gap-4">
             {view === 'expanded' ? (
               <>
-                <button
-                  onClick={() => { setView('dashboard'); setActiveJournal(null); }}
+                <button onClick={() => { setView('dashboard'); setActiveJournal(null); }}
                   className="flex items-center gap-2 text-sm font-medium transition-colors"
                   style={{ color: 'rgba(255,255,255,0.5)' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}
-                >
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
                   <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
                   <span className="hidden sm:inline">{t('myJournals')}</span>
                 </button>
@@ -262,23 +239,19 @@ export default function App() {
 
           <div className="flex items-center gap-3">
             {view === 'expanded' && (
-              <button
-                onClick={() => setShowTradeModal(true)}
+              <button onClick={() => setShowTradeModal(true)}
                 className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
                 style={{ background: '#eab308', color: '#000' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ca9a04'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#eab308'; }}
-              >
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#eab308'; }}>
                 <PlusCircle className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('newTradeTab')}</span>
               </button>
             )}
             <div className="relative" ref={langMenuRef}>
-              <button
-                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+              <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium uppercase"
-                style={{ color: 'rgba(255,255,255,0.5)' }}
-              >
+                style={{ color: 'rgba(255,255,255,0.5)' }}>
                 <Globe className="w-4 h-4" />
                 {language}
                 <ChevronDown className={`w-3 h-3 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
@@ -286,12 +259,9 @@ export default function App() {
               {isLangMenuOpen && (
                 <div className="absolute top-full end-0 mt-2 w-40 rounded-xl shadow-xl overflow-hidden z-50 py-1" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
                   {languages.map(lang => (
-                    <button
-                      key={lang.code}
-                      onClick={() => { setLanguage(lang.code as any); setIsLangMenuOpen(false); }}
+                    <button key={lang.code} onClick={() => { setLanguage(lang.code as any); setIsLangMenuOpen(false); }}
                       className="w-full text-start px-4 py-2 text-sm"
-                      style={{ color: language === lang.code ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: language === lang.code ? 600 : 400 }}
-                    >
+                      style={{ color: language === lang.code ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: language === lang.code ? 600 : 400 }}>
                       {lang.label}
                     </button>
                   ))}
@@ -307,13 +277,11 @@ export default function App() {
         <main className="max-w-6xl mx-auto px-6 py-10">
           <h1 className="text-3xl font-bold mb-8">{t('dashboardTitle')}</h1>
           <div className="mb-10">
-            <button
-              onClick={() => setShowNewJournalModal(true)}
+            <button onClick={() => setShowNewJournalModal(true)}
               className="flex items-center gap-4 rounded-2xl px-6 py-5 transition-all"
               style={{ background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.25)' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(234,179,8,0.13)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(234,179,8,0.5)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(234,179,8,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(234,179,8,0.25)'; }}
-            >
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(234,179,8,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(234,179,8,0.25)'; }}>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(234,179,8,0.15)' }}>
                 <PlusCircle className="w-5 h-5" style={{ color: '#eab308' }} />
               </div>
@@ -331,14 +299,11 @@ export default function App() {
                 {[...accounts].reverse().map(acc => {
                   const stats = getJournalStats(acc.id);
                   return (
-                    <div
-                      key={acc.id}
-                      onClick={() => openJournal(acc)}
+                    <div key={acc.id} onClick={() => openJournal(acc)}
                       className="flex items-center gap-6 rounded-2xl px-6 py-5 cursor-pointer transition-all group"
                       style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.05)' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1f2035'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#1a1b2e'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.05)'; }}
-                    >
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#1a1b2e'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.05)'; }}>
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(99,102,241,0.1)' }}>
                         <BookOpen className="w-5 h-5" style={{ color: '#818cf8' }} />
                       </div>
@@ -366,13 +331,11 @@ export default function App() {
                           </div>
                         </div>
                       </div>
-                      <button
-                        onClick={e => { e.stopPropagation(); setAccountToDelete(acc.id); }}
+                      <button onClick={e => { e.stopPropagation(); setAccountToDelete(acc.id); }}
                         className="p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 ms-2 flex-shrink-0"
                         style={{ color: 'rgba(255,255,255,0.25)' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.1)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.25)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-                      >
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.25)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -393,7 +356,7 @@ export default function App() {
       {view === 'expanded' && activeJournal && activeStats && (
         <main className="max-w-6xl mx-auto px-6 py-10">
           {/* Journal Info */}
-          <div className="mb-8">
+          <div className="mb-6">
             <h1 className="text-2xl font-bold text-white">{activeJournal.name}</h1>
             <div className="flex items-center gap-3 mt-1 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {activeJournal.startDate && (
@@ -402,14 +365,12 @@ export default function App() {
                   {formatDate(activeJournal.startDate)}
                 </span>
               )}
-              {activeJournal.startingCapital && (
-                <><span>·</span><span>${activeJournal.startingCapital.toLocaleString()}</span></>
-              )}
+              {activeJournal.startingCapital && <><span>·</span><span>${activeJournal.startingCapital.toLocaleString()}</span></>}
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          {/* Stats Bar */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
               { icon: <Activity className="w-4 h-4" />, label: t('totalTrades'), value: String(activeStats.total), color: '#fff' },
               { icon: <PieChart className="w-4 h-4" />, label: t('winRate'), value: `%${activeStats.winRate}`, color: '#fff' },
@@ -426,8 +387,33 @@ export default function App() {
             ))}
           </div>
 
-          {/* Trade List */}
-          <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} />
+          {/* Tabs */}
+          <div className="flex gap-1 p-1 rounded-xl mb-8 w-fit" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            {tabs.map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setJournalTab(tab.key as JournalTab)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                style={journalTab === tab.key
+                  ? { background: 'rgba(255,255,255,0.1)', color: '#fff' }
+                  : { color: 'rgba(255,255,255,0.4)' }}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          {journalTab === 'trades' && (
+            <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} />
+          )}
+          {journalTab === 'calendar' && (
+            <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />
+          )}
+          {journalTab === 'stats' && (
+            <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} statsOnly />
+          )}
         </main>
       )}
     </div>
