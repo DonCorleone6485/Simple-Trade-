@@ -195,7 +195,7 @@ export default function App() {
                 className="px-4 py-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('cancel')}</button>
               <button onClick={createJournal} disabled={!newJournalName.trim() || !newJournalStartDate || !newJournalCapital}
                 className="px-6 py-2 text-sm font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: '#eab308', color: '#000' }}>OK</button>
+                style={{ background: '#8b5cf6', color: '#fff' }}>OK</button>
             </div>
           </div>
         </div>
@@ -238,7 +238,7 @@ export default function App() {
               </>
             ) : (
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" style={{ color: '#eab308' }} />
+                <TrendingUp className="w-5 h-5" style={{ color: '#8b5cf6' }} />
                 <span className="font-bold tracking-tight">Trade Journal</span>
               </div>
             )}
@@ -248,9 +248,9 @@ export default function App() {
             {view === 'expanded' && (
               <button onClick={() => setShowTradeModal(true)}
                 className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
-                style={{ background: '#eab308', color: '#000' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#ca9a04'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#eab308'; }}>
+                style={{ background: '#8b5cf6', color: '#fff' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
                 <PlusCircle className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('newTradeTab')}</span>
               </button>
@@ -286,11 +286,11 @@ export default function App() {
           <div className="mb-10">
             <button onClick={() => setShowNewJournalModal(true)}
               className="flex items-center gap-4 rounded-2xl px-6 py-5 transition-all"
-              style={{ background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.25)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(234,179,8,0.13)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(234,179,8,0.5)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(234,179,8,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(234,179,8,0.25)'; }}>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(234,179,8,0.15)' }}>
-                <PlusCircle className="w-5 h-5" style={{ color: '#eab308' }} />
+              style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.13)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(139,92,246,0.5)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(139,92,246,0.25)'; }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.15)' }}>
+                <PlusCircle className="w-5 h-5" style={{ color: '#8b5cf6' }} />
               </div>
               <div className="text-start">
                 <div className="font-semibold">{t('newJournal')}</div>
@@ -311,8 +311,8 @@ export default function App() {
                       style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.05)' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1f2035'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#1a1b2e'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.05)'; }}>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(99,102,241,0.1)' }}>
-                        <BookOpen className="w-5 h-5" style={{ color: '#818cf8' }} />
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(139,92,246,0.1)' }}>
+                        <BookOpen className="w-5 h-5" style={{ color: '#8b5cf6' }} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold truncate">{acc.name}</div>
@@ -362,7 +362,6 @@ export default function App() {
       {/* EXPANDED VIEW */}
       {view === 'expanded' && activeJournal && activeStats && (
         <main className="max-w-6xl mx-auto px-6 py-10">
-          {/* Journal Info */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-white">{activeJournal.name}</h1>
             <div className="flex items-center gap-3 mt-1 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -376,7 +375,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Stats Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
               { icon: <Activity className="w-4 h-4" />, label: t('totalTrades'), value: String(activeStats.total), color: '#fff' },
@@ -394,7 +392,6 @@ export default function App() {
             ))}
           </div>
 
-          {/* Tabs */}
           <div className="flex gap-1 p-1 rounded-xl mb-8 w-fit" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
             {tabs.map(tab => (
               <button
@@ -402,7 +399,7 @@ export default function App() {
                 onClick={() => setJournalTab(tab.key as JournalTab)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
                 style={journalTab === tab.key
-                  ? { background: 'rgba(255,255,255,0.1)', color: '#fff' }
+                  ? { background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }
                   : { color: 'rgba(255,255,255,0.4)' }}
               >
                 {tab.icon}
@@ -411,23 +408,10 @@ export default function App() {
             ))}
           </div>
 
-          {/* Tab Content */}
-          {journalTab === 'trades' && (
-            <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} />
-          )}
-          {journalTab === 'calendar' && (
-            <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />
-          )}
-          {journalTab === 'stats' && (
-            <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} statsOnly />
-          )}
-          {journalTab === 'goals' && (
-            <GoalsView
-              trades={filteredTrades}
-              account={activeJournal}
-              onUpdateGoals={handleUpdateGoals}
-            />
-          )}
+          {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} />}
+          {journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
+          {journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} statsOnly />}
+          {journalTab === 'goals' && <GoalsView trades={filteredTrades} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
         </main>
       )}
     </div>
