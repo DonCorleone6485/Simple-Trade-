@@ -100,6 +100,10 @@ export const translations: Translations = {
   delete: { tr: 'Sil', en: 'Delete', fa: 'حذف' },
   cancel: { tr: 'İptal', en: 'Cancel', fa: 'لغو' },
   save: { tr: 'Kaydet', en: 'Save', fa: 'ذخیره' },
+  aiAnalyzing: { tr: 'Yapay zeka analiz yapıyor...', en: 'AI is analyzing...', fa: 'هوش مصنوعی در حال تحلیل است...' },
+  aiAnalyzeBtn: { tr: '✨ Analiz Et', en: '✨ Analyze', fa: '✨ تحلیل' },
+  aiAnalyzeLoading: { tr: '⏳ Analiz yapılıyor...', en: '⏳ Analyzing...', fa: '⏳ در حال تحلیل...' },
+  aiAnalyzeDesc: { tr: 'Tüm trade verilerinizi AI ile analiz edin. Güçlü/zayıf yönler, setup performansı ve kişisel öneriler alın.', en: 'Analyze all your trade data with AI. Get strengths/weaknesses, setup performance and personal recommendations.', fa: 'تمام داده‌های معاملاتی خود را با هوش مصنوعی تحلیل کنید.' },
 };
 
 interface LanguageContextType {
