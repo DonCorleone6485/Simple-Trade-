@@ -221,7 +221,7 @@ export default function App() {
 
       {/* Header */}
       <header style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0d0e1a' }} className="sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {view === 'expanded' ? (
               <>
@@ -234,7 +234,7 @@ export default function App() {
                   <span className="hidden sm:inline">{t('myJournals')}</span>
                 </button>
                 <div className="h-5 w-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
-                <span className="font-semibold text-white">{activeJournal?.name}</span>
+                <span className="font-semibold text-white truncate max-w-[150px] sm:max-w-none">{activeJournal?.name}</span>
               </>
             ) : (
               <div className="flex items-center gap-2">
@@ -244,10 +244,10 @@ export default function App() {
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {view === 'expanded' && (
               <button onClick={() => setShowTradeModal(true)}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
+                className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
                 style={{ background: '#8b5cf6', color: '#fff' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
@@ -257,10 +257,10 @@ export default function App() {
             )}
             <div className="relative" ref={langMenuRef}>
               <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium uppercase"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-sm font-medium uppercase"
                 style={{ color: 'rgba(255,255,255,0.5)' }}>
                 <Globe className="w-4 h-4" />
-                {language}
+                <span className="hidden sm:inline">{language}</span>
                 <ChevronDown className={`w-3 h-3 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
               </button>
               {isLangMenuOpen && (
@@ -281,15 +281,15 @@ export default function App() {
 
       {/* DASHBOARD */}
       {view === 'dashboard' && (
-        <main className="max-w-6xl mx-auto px-6 py-10">
-          <h1 className="text-3xl font-bold mb-8">{t('dashboardTitle')}</h1>
-          <div className="mb-10">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">{t('dashboardTitle')}</h1>
+          <div className="mb-8 sm:mb-10">
             <button onClick={() => setShowNewJournalModal(true)}
-              className="flex items-center gap-4 rounded-2xl px-6 py-5 transition-all"
+              className="w-full sm:w-auto flex items-center gap-4 rounded-2xl px-6 py-5 transition-all"
               style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.13)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(139,92,246,0.5)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(139,92,246,0.25)'; }}>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.15)' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(139,92,246,0.15)' }}>
                 <PlusCircle className="w-5 h-5" style={{ color: '#8b5cf6' }} />
               </div>
               <div className="text-start">
@@ -307,7 +307,7 @@ export default function App() {
                   const stats = getJournalStats(acc.id);
                   return (
                     <div key={acc.id} onClick={() => openJournal(acc)}
-                      className="flex items-center gap-6 rounded-2xl px-6 py-5 cursor-pointer transition-all group"
+                      className="flex items-center gap-4 sm:gap-6 rounded-2xl px-4 sm:px-6 py-4 sm:py-5 cursor-pointer transition-all group"
                       style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.05)' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1f2035'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#1a1b2e'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.05)'; }}>
@@ -317,13 +317,13 @@ export default function App() {
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold truncate">{acc.name}</div>
                         <div className="flex items-center gap-2 mt-1 text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>{formatDate(acc.startDate)}</span>
+                          <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span className="truncate">{formatDate(acc.startDate)}</span>
                           {acc.startingCapital && <><span>·</span><span>${acc.startingCapital.toLocaleString()}</span></>}
                         </div>
                       </div>
-                      <div className="flex items-center gap-8 text-sm flex-shrink-0">
-                        <div className="text-center hidden sm:block">
+                      <div className="flex items-center gap-4 sm:gap-8 text-sm flex-shrink-0">
+                        <div className="text-center hidden md:block">
                           <div className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('tradeCount')}</div>
                           <div className="font-semibold font-mono">{stats.total}</div>
                         </div>
@@ -339,7 +339,7 @@ export default function App() {
                         </div>
                       </div>
                       <button onClick={e => { e.stopPropagation(); setAccountToDelete(acc.id); }}
-                        className="p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 ms-2 flex-shrink-0"
+                        className="p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 flex-shrink-0"
                         style={{ color: 'rgba(255,255,255,0.25)' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.1)'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.25)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
@@ -361,10 +361,10 @@ export default function App() {
 
       {/* EXPANDED VIEW */}
       {view === 'expanded' && activeJournal && activeStats && (
-        <main className="max-w-6xl mx-auto px-6 py-10">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-white">{activeJournal.name}</h1>
-            <div className="flex items-center gap-3 mt-1 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <h1 className="text-xl sm:text-2xl font-bold text-white">{activeJournal.name}</h1>
+            <div className="flex items-center gap-3 mt-1 text-sm flex-wrap" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {activeJournal.startDate && (
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
@@ -375,39 +375,42 @@ export default function App() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {/* Stats Bar */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
             {[
               { icon: <Activity className="w-4 h-4" />, label: t('totalTrades'), value: String(activeStats.total), color: '#fff' },
               { icon: <PieChart className="w-4 h-4" />, label: t('winRate'), value: `%${activeStats.winRate}`, color: '#fff' },
               { icon: <DollarSign className="w-4 h-4" />, label: t('netProfit'), value: `${activeStats.netPnL >= 0 ? '+' : '-'}$${Math.abs(activeStats.netPnL).toFixed(2)}`, color: activeStats.netPnL >= 0 ? '#34d399' : '#f87171' },
               { icon: <TrendingUp className="w-4 h-4" />, label: t('profitFactor'), value: activeStats.profitFactor, color: '#fff' },
             ].map((s, i) => (
-              <div key={i} className="p-4 rounded-xl" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div key={i} className="p-3 sm:p-4 rounded-xl" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
                 <div className="flex items-center gap-2 mb-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
                   {s.icon}
-                  <span className="text-xs font-medium uppercase tracking-wider">{s.label}</span>
+                  <span className="text-xs font-medium uppercase tracking-wider truncate">{s.label}</span>
                 </div>
-                <div className="text-2xl font-semibold font-mono" style={{ color: s.color }}>{s.value}</div>
+                <div className="text-lg sm:text-2xl font-semibold font-mono" style={{ color: s.color }}>{s.value}</div>
               </div>
             ))}
           </div>
 
-          <div className="flex gap-1 p-1 rounded-xl mb-8 w-fit" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          {/* Tabs */}
+          <div className="flex gap-1 p-1 rounded-xl mb-6 sm:mb-8 w-full sm:w-fit" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
             {tabs.map(tab => (
               <button
                 key={tab.key}
                 onClick={() => setJournalTab(tab.key as JournalTab)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                className="flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all flex-1 sm:flex-none whitespace-nowrap"
                 style={journalTab === tab.key
                   ? { background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }
                   : { color: 'rgba(255,255,255,0.4)' }}
               >
                 {tab.icon}
-                {tab.label}
+                <span className="hidden sm:inline">{tab.label}</span>
               </button>
             ))}
           </div>
 
+          {/* Tab Content */}
           {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} />}
           {journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
           {journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} statsOnly />}
