@@ -249,7 +249,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
     return (
       <div className="space-y-6">
 
-        {/* Ana istatistikler */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { icon: <PieChart className="w-4 h-4" />, label: t('winRate'), value: `%${winRate}`, color: '#fff' },
@@ -271,7 +270,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           ))}
         </div>
 
-        {/* Streak */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div style={statCard}>
             <div className="flex items-center gap-2 mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -306,7 +304,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           </div>
         </div>
 
-        {/* Grafikler */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div style={{ ...statCard, padding: '20px' }} className="lg:col-span-2">
             <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('cumulativePnl')}</h4>
@@ -356,7 +353,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           </div>
         </div>
 
-        {/* Drawdown */}
         <div style={{ ...statCard, padding: '20px' }}>
           <div className="flex items-center justify-between mb-6">
             <h4 className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('drawdownChart')}</h4>
@@ -385,7 +381,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           </div>
         </div>
 
-        {/* Isı haritası */}
         <div style={{ ...statCard, padding: '20px' }}>
           <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('heatMap')}</h4>
           <div className="overflow-x-auto">
@@ -436,7 +431,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           </div>
         </div>
 
-        {/* Setup + Sembol */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {setupStats.length > 0 && (
             <div style={{ ...statCard, padding: '20px' }}>
@@ -484,7 +478,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           )}
         </div>
 
-        {/* Session + Gün */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div style={{ ...statCard, padding: '20px' }}>
             <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('sessionStats')}</h4>
@@ -543,9 +536,9 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
               onClick={runAiAnalysis}
               disabled={aiLoading}
               className="px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: '#eab308', color: '#000' }}
-              onMouseEnter={e => { if (!aiLoading) (e.currentTarget as HTMLElement).style.background = '#ca9a04'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#eab308'; }}
+              style={{ background: '#8b5cf6', color: '#fff' }}
+              onMouseEnter={e => { if (!aiLoading) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
             >
               {aiLoading ? t('aiAnalyzeLoading') : t('aiAnalyzeBtn')}
             </button>
@@ -559,7 +552,7 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
 
           {aiLoading && (
             <div className="flex items-center gap-3 py-4">
-              <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(234,179,8,0.3)', borderTopColor: '#eab308' }} />
+              <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
               <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('aiAnalyzing')}</span>
             </div>
           )}
@@ -578,7 +571,7 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
                   return <p key={i} className="font-semibold mt-3 mb-1 text-white">{line.replace(/\*\*/g, '')}</p>;
                 }
                 if (line.match(/^\d+\.\s\*\*/)) {
-                  return <p key={i} className="font-semibold mt-3 mb-1" style={{ color: '#eab308' }}>{line.replace(/\*\*/g, '')}</p>;
+                  return <p key={i} className="font-semibold mt-3 mb-1" style={{ color: '#a78bfa' }}>{line.replace(/\*\*/g, '')}</p>;
                 }
                 if (line.startsWith('- ') || line.startsWith('• ')) {
                   return <p key={i} className="mt-1 ps-4" style={{ color: 'rgba(255,255,255,0.65)' }}>• {line.replace(/^[-•]\s/, '')}</p>;
@@ -638,7 +631,7 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
                     </span>
                   )}
                   {selectedTrade.setup && (
-                    <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(129,140,248,0.1)', color: '#818cf8' }}>
+                    <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa' }}>
                       {selectedTrade.setup}
                     </span>
                   )}
@@ -764,7 +757,7 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
                         </span>
                       )}
                       {trade.setup && (
-                        <span className="hidden md:block text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(129,140,248,0.1)', color: '#818cf8' }}>
+                        <span className="hidden md:block text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa' }}>
                           {trade.setup}
                         </span>
                       )}
