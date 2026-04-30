@@ -3,13 +3,13 @@ import { Trade } from '../types';
 import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
-  Award, AlertTriangle, Zap, TrendingDown, BarChart2
+  Award, AlertTriangle, Zap, TrendingDown
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip as RechartsTooltip, ResponsiveContainer,
-  BarChart, Bar, Cell, LineChart, Line
+  BarChart, Bar, Cell
 } from 'recharts';
 
 export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
@@ -18,6 +18,10 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
   statsOnly?: boolean;
 }) {
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<string>('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+  const [showAi, setShowAi] = useState(false);
   const { t, language } = useLanguage();
 
   const card: React.CSSProperties = {
@@ -26,6 +30,32 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
     borderRadius: '16px',
   };
   const statCard: React.CSSProperties = { ...card, padding: '16px' };
+
+  const runAiAnalysis = async () => {
+    setAiLoading(true);
+    setAiError('');
+    setShowAi(true);
+    setAiAnalysis('');
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          trades,
+          language,
+          journalName: '',
+          startingCapital: 0,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setAiAnalysis(data.analysis);
+    } catch (e) {
+      setAiError('Analiz yapılamadı. Lütfen tekrar deneyin.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const getResultText = (result: string) => {
     if (result === 'Başarılı') return t('winStatus');
@@ -56,7 +86,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
     return new Intl.DateTimeFormat('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
   };
 
-  // ── CALCULATIONS ───────────────────────────────────────────────────────────
   const closedTrades = trades;
   const winningTrades = closedTrades.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda');
   const losingTrades = closedTrades.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda');
@@ -72,7 +101,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
   const validRRs = closedTrades.map(t => parseFloat(t.rr)).filter(n => !isNaN(n));
   const avgRR = validRRs.length > 0 ? (validRRs.reduce((a, b) => a + b, 0) / validRRs.length).toFixed(2) : '0.00';
 
-  // Chart data
   const sortedByDate = [...closedTrades].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const chartData = sortedByDate.reduce((acc: any[], trade, index) => {
@@ -82,40 +110,32 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
     return acc;
   }, []);
 
-  // Drawdown
   const drawdownData = chartData.map((d, i) => {
     const peak = Math.max(...chartData.slice(0, i + 1).map((x: any) => x.cumulative));
     const drawdown = d.cumulative - peak;
     return { name: d.name, drawdown };
   });
-  const maxDrawdown = Math.min(...drawdownData.map((d: any) => d.drawdown));
+  const maxDrawdown = drawdownData.length > 0 ? Math.min(...drawdownData.map((d: any) => d.drawdown)) : 0;
 
-  // Streak
   const streakCalc = () => {
-    if (sortedByDate.length === 0) return { current: 0, currentType: 'win', bestWin: 0, bestLoss: 0 };
+    if (sortedByDate.length === 0) return { current: 0, currentType: 'win' as 'win' | 'loss', bestWin: 0, bestLoss: 0 };
     let current = 0;
     let currentType: 'win' | 'loss' = 'win';
     let bestWin = 0;
     let bestLoss = 0;
     let tempStreak = 0;
     let tempType: 'win' | 'loss' = 'win';
-
     sortedByDate.forEach((trade, i) => {
       const isWin = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
       const tradeType: 'win' | 'loss' = isWin ? 'win' : 'loss';
-
-      if (i === 0) {
-        tempStreak = 1;
-        tempType = tradeType;
-      } else if (tradeType === tempType) {
-        tempStreak++;
-      } else {
+      if (i === 0) { tempStreak = 1; tempType = tradeType; }
+      else if (tradeType === tempType) { tempStreak++; }
+      else {
         if (tempType === 'win') bestWin = Math.max(bestWin, tempStreak);
         else bestLoss = Math.max(bestLoss, tempStreak);
         tempStreak = 1;
         tempType = tradeType;
       }
-
       if (i === sortedByDate.length - 1) {
         current = tempStreak;
         currentType = tempType;
@@ -123,12 +143,10 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
         else bestLoss = Math.max(bestLoss, tempStreak);
       }
     });
-
     return { current, currentType, bestWin, bestLoss };
   };
   const streak = streakCalc();
 
-  // Session stats
   const getSession = (dateStr: string) => {
     const hour = new Date(dateStr).getUTCHours();
     if (hour >= 22 || hour < 7) return 'asianSession';
@@ -144,7 +162,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
     return { session, rate: st.length > 0 ? ((wins / st.length) * 100).toFixed(0) : 0, total: st.length, pnl: profit - loss };
   });
 
-  // Day stats
   const getDayKey = (dateStr: string) => {
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     return days[new Date(dateStr).getDay()];
@@ -158,7 +175,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
     return { day, rate: dt.length > 0 ? ((wins / dt.length) * 100).toFixed(0) : 0, total: dt.length, pnl: profit - loss };
   }).filter(d => d.total > 0);
 
-  // Setup performance
   const setupStats = (() => {
     const map: Record<string, { wins: number; total: number; pnl: number }> = {};
     closedTrades.forEach(trade => {
@@ -175,7 +191,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
       .sort((a, b) => b.pnl - a.pnl);
   })();
 
-  // Symbol performance
   const symbolStats = (() => {
     const map: Record<string, { wins: number; total: number; pnl: number }> = {};
     closedTrades.forEach(trade => {
@@ -193,14 +208,12 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
       .slice(0, 8);
   })();
 
-  // Heat map: day x hour
   const heatMapData = (() => {
     const days = language === 'tr'
       ? ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
       : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const dayIndices = [1, 2, 3, 4, 5, 6, 0];
     const hours = [0, 4, 8, 12, 16, 20];
-
     return days.map((dayLabel, di) => {
       const dayIndex = dayIndices[di];
       return {
@@ -210,14 +223,12 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
             const d = new Date(trade.date);
             return d.getDay() === dayIndex && d.getHours() >= hour && d.getHours() < hour + 4;
           });
-          const wins = filtered.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').length;
-          const losses = filtered.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda').length;
           const pnl = filtered.reduce((s, t) => {
             const isW = t.result === 'Başarılı' || t.result === 'Manuel Karda';
             const isL = t.result === 'Başarısız' || t.result === 'Manuel Zararda';
             return s + (isW ? (t.reward || 0) : isL ? -getLossAmount(t) : 0);
           }, 0);
-          return { hour: `${String(hour).padStart(2, '0')}:00`, total: filtered.length, wins, losses, pnl };
+          return { hour: `${String(hour).padStart(2, '0')}:00`, total: filtered.length, pnl };
         }),
       };
     });
@@ -225,13 +236,8 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
 
   const getHeatColor = (pnl: number, total: number) => {
     if (total === 0) return 'rgba(255,255,255,0.03)';
-    if (pnl > 0) {
-      const intensity = Math.min(pnl / 50, 1);
-      return `rgba(52,211,153,${0.1 + intensity * 0.4})`;
-    } else {
-      const intensity = Math.min(Math.abs(pnl) / 50, 1);
-      return `rgba(248,113,113,${0.1 + intensity * 0.4})`;
-    }
+    if (pnl > 0) { const intensity = Math.min(pnl / 50, 1); return `rgba(52,211,153,${0.1 + intensity * 0.4})`; }
+    else { const intensity = Math.min(Math.abs(pnl) / 50, 1); return `rgba(248,113,113,${0.1 + intensity * 0.4})`; }
   };
 
   // ── STATS ONLY ─────────────────────────────────────────────────────────────
@@ -270,7 +276,7 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           ))}
         </div>
 
-        {/* Streak kartları */}
+        {/* Streak */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div style={statCard}>
             <div className="flex items-center gap-2 mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -305,7 +311,7 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           </div>
         </div>
 
-        {/* Kümülatif PnL + Trade PnL grafikleri */}
+        {/* Grafikler */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div style={{ ...statCard, padding: '20px' }} className="lg:col-span-2">
             <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('cumulativePnl')}</h4>
@@ -331,7 +337,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
               </ResponsiveContainer>
             </div>
           </div>
-
           <div style={{ ...statCard, padding: '20px' }}>
             <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('tradePnl')}</h4>
             <div className="h-64 w-full">
@@ -356,13 +361,11 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           </div>
         </div>
 
-        {/* Drawdown grafiği */}
+        {/* Drawdown */}
         <div style={{ ...statCard, padding: '20px' }}>
           <div className="flex items-center justify-between mb-6">
             <h4 className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('drawdownChart')}</h4>
-            <div className="text-sm font-mono" style={{ color: '#f87171' }}>
-              {t('maxDrawdown')}: ${maxDrawdown.toFixed(2)}
-            </div>
+            <div className="text-sm font-mono" style={{ color: '#f87171' }}>{t('maxDrawdown')}: ${maxDrawdown.toFixed(2)}</div>
           </div>
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -407,12 +410,11 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
                     {hours.map((cell, i) => (
                       <td key={i} className="px-1 py-1">
                         <div
-                          className="rounded-lg flex items-center justify-center text-xs font-mono transition-all cursor-default"
+                          className="rounded-lg flex items-center justify-center text-xs font-mono"
                           style={{
                             background: getHeatColor(cell.pnl, cell.total),
                             border: '1px solid rgba(255,255,255,0.04)',
                             height: '40px',
-                            width: '100%',
                             minWidth: '48px',
                             color: cell.total > 0 ? (cell.pnl >= 0 ? '#34d399' : '#f87171') : 'rgba(255,255,255,0.15)',
                           }}
@@ -439,9 +441,8 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           </div>
         </div>
 
-        {/* Setup + Sembol performansı */}
+        {/* Setup + Sembol */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Setup performansı */}
           {setupStats.length > 0 && (
             <div style={{ ...statCard, padding: '20px' }}>
               <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('setupPerformance')}</h4>
@@ -464,8 +465,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
               </div>
             </div>
           )}
-
-          {/* Sembol performansı */}
           {symbolStats.length > 0 && (
             <div style={{ ...statCard, padding: '20px' }}>
               <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('symbolPerformance')}</h4>
@@ -490,7 +489,7 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           )}
         </div>
 
-        {/* Oturum + Gün istatistikleri */}
+        {/* Session + Gün */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div style={{ ...statCard, padding: '20px' }}>
             <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('sessionStats')}</h4>
@@ -513,7 +512,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
               ))}
             </div>
           </div>
-
           <div style={{ ...statCard, padding: '20px' }}>
             <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('dayStats')}</h4>
             <div className="space-y-4">
@@ -538,6 +536,65 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
             </div>
           </div>
         </div>
+
+        {/* AI Analiz */}
+        <div style={{ ...statCard, padding: '20px' }}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🤖</span>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.4)' }}>AI Analiz</span>
+            </div>
+            <button
+              onClick={runAiAnalysis}
+              disabled={aiLoading}
+              className="px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ background: '#eab308', color: '#000' }}
+              onMouseEnter={e => { if (!aiLoading) (e.currentTarget as HTMLElement).style.background = '#ca9a04'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#eab308'; }}
+            >
+              {aiLoading ? '⏳ Analiz yapılıyor...' : '✨ Analiz Et'}
+            </button>
+          </div>
+
+          {!showAi && !aiLoading && (
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              Tüm trade verilerinizi AI ile analiz edin. Güçlü/zayıf yönler, setup performansı ve kişisel öneriler alın.
+            </p>
+          )}
+
+          {aiLoading && (
+            <div className="flex items-center gap-3 py-4">
+              <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(234,179,8,0.3)', borderTopColor: '#eab308' }} />
+              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>Gemini AI analiz yapıyor...</span>
+            </div>
+          )}
+
+          {aiError && (
+            <p className="text-sm mt-2" style={{ color: '#f87171' }}>{aiError}</p>
+          )}
+
+          {aiAnalysis && !aiLoading && (
+            <div className="mt-4 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>
+              {aiAnalysis.split('\n').map((line, i) => {
+                if (line.startsWith('## ') || line.startsWith('# ')) {
+                  return <h3 key={i} className="text-base font-bold mt-6 mb-2 text-white">{line.replace(/^#+\s/, '')}</h3>;
+                }
+                if (line.match(/^\*\*.*\*\*$/)) {
+                  return <p key={i} className="font-semibold mt-3 mb-1 text-white">{line.replace(/\*\*/g, '')}</p>;
+                }
+                if (line.match(/^\d+\.\s\*\*/)) {
+                  return <p key={i} className="font-semibold mt-3 mb-1" style={{ color: '#eab308' }}>{line.replace(/\*\*/g, '')}</p>;
+                }
+                if (line.startsWith('- ') || line.startsWith('• ')) {
+                  return <p key={i} className="mt-1 ps-4" style={{ color: 'rgba(255,255,255,0.65)' }}>• {line.replace(/^[-•]\s/, '')}</p>;
+                }
+                if (line.trim() === '') return <div key={i} className="h-2" />;
+                return <p key={i} className="mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>{line}</p>;
+              })}
+            </div>
+          )}
+        </div>
+
       </div>
     );
   }
@@ -566,7 +623,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
           <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
           {t('backToList')}
         </button>
-
         <div className="rounded-2xl overflow-hidden" style={card}>
           <div className="p-5 flex flex-wrap items-center justify-between gap-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="flex items-center gap-4">
@@ -623,7 +679,6 @@ export default function TradeHistory({ trades, onDelete, statsOnly = false }: {
               </button>
             </div>
           </div>
-
           <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-8" style={{ background: 'rgba(255,255,255,0.01)' }}>
             <div className="space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('preTrade')}</h4>
