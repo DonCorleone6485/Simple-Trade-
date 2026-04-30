@@ -1,6 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -117,7 +115,7 @@ ${notes.length > 0 ? notes.map((n: any) => `- ${n.symbol} (${n.result}): Pre: "$
 7. **Somut Öneriler** (5 madde)
 8. **Özet**
 
-Samimi, dürüst ve yapıcı ol. Gerekirse sert eleştiri yap ama her zaman çözüm öner.
+Samimi, dürüst ve yapıcı ol. Az işlem olsa bile mevcut verilerle analiz yap.
 `;
 
     const response = await fetch(
@@ -138,15 +136,15 @@ Samimi, dürüst ve yapıcı ol. Gerekirse sert eleştiri yap ama her zaman çö
     if (!response.ok) {
       const err = await response.text();
       console.error('Gemini error:', err);
-      return res.status(500).json({ error: 'Gemini API error' });
+      return res.status(500).json({ error: 'Gemini API error: ' + err });
     }
 
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     return res.json({ analysis: text });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Analyze error:', error);
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: error.message || 'Server error' });
   }
 }
