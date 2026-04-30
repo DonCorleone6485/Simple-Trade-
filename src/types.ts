@@ -3,6 +3,16 @@ export interface Account {
   name: string;
   startDate?: string;
   startingCapital?: number;
+  goals?: JournalGoals;
+}
+
+export interface JournalGoals {
+  monthlyPnL?: number;
+  winRate?: number;
+  maxDailyTrades?: number;
+  maxRiskPerTrade?: number;
+  noTradeHoursStart?: number;
+  noTradeHoursEnd?: number;
 }
 
 export interface Trade {
