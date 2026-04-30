@@ -40,7 +40,6 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
     color: 'rgba(255,255,255,0.55)',
   };
 
-  // Hesaplamalar
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
@@ -57,13 +56,11 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
   const monthlyPnL = grossProfit - grossLoss;
   const currentWinRate = monthTrades.length > 0 ? ((wins.length / monthTrades.length) * 100) : 0;
 
-  // Günlük işlem sayısı kontrolü
   const todayTrades = trades.filter(t => {
     const d = new Date(t.date);
     return d.toDateString() === now.toDateString();
   });
 
-  // Kural ihlalleri
   const violations: string[] = [];
 
   if (goals.maxDailyTrades && todayTrades.length > goals.maxDailyTrades) {
@@ -122,7 +119,9 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
         <button
           onClick={() => editing ? handleSave() : setEditing(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-          style={{ background: editing ? '#eab308' : 'rgba(255,255,255,0.08)', color: editing ? '#000' : '#fff' }}
+          style={{ background: editing ? '#8b5cf6' : 'rgba(255,255,255,0.08)', color: '#fff' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = editing ? '#7c3aed' : 'rgba(255,255,255,0.12)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = editing ? '#8b5cf6' : 'rgba(255,255,255,0.08)'; }}
         >
           {editing ? <><Save className="w-4 h-4" /> {t('save')}</> : <><Edit3 className="w-4 h-4" /> {t('editGoals')}</>}
         </button>
@@ -152,11 +151,10 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
         </div>
       )}
 
-      {/* Hedef İlerleme Kartları */}
+      {/* Hedef Kartları */}
       {!editing && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-          {/* Aylık PnL Hedefi */}
           {goals.monthlyPnL ? (
             <div style={card}>
               <div className="flex items-center justify-between mb-1">
@@ -171,7 +169,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
               <div className="text-2xl font-bold font-mono mt-2" style={{ color: monthlyPnL >= goals.monthlyPnL ? '#34d399' : '#fff' }}>
                 {monthlyPnL >= goals.monthlyPnL ? '✅' : ''} {((monthlyPnL / goals.monthlyPnL) * 100).toFixed(0)}%
               </div>
-              <ProgressBar value={monthlyPnL} max={goals.monthlyPnL} color={monthlyPnL >= goals.monthlyPnL ? '#34d399' : '#eab308'} />
+              <ProgressBar value={monthlyPnL} max={goals.monthlyPnL} color={monthlyPnL >= goals.monthlyPnL ? '#34d399' : '#8b5cf6'} />
             </div>
           ) : (
             <div style={{ ...card, border: '1px dashed rgba(255,255,255,0.1)' }} className="flex items-center justify-center">
@@ -179,7 +177,6 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
             </div>
           )}
 
-          {/* Win Rate Hedefi */}
           {goals.winRate ? (
             <div style={card}>
               <div className="flex items-center justify-between mb-1">
@@ -194,7 +191,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
               <div className="text-2xl font-bold font-mono mt-2" style={{ color: currentWinRate >= goals.winRate ? '#34d399' : '#fff' }}>
                 {currentWinRate >= goals.winRate ? '✅' : ''} %{currentWinRate.toFixed(0)}
               </div>
-              <ProgressBar value={currentWinRate} max={goals.winRate} color={currentWinRate >= goals.winRate ? '#34d399' : '#818cf8'} />
+              <ProgressBar value={currentWinRate} max={goals.winRate} color={currentWinRate >= goals.winRate ? '#34d399' : '#8b5cf6'} />
             </div>
           ) : (
             <div style={{ ...card, border: '1px dashed rgba(255,255,255,0.1)' }} className="flex items-center justify-center">
@@ -202,7 +199,6 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
             </div>
           )}
 
-          {/* Günlük Maksimum İşlem */}
           {goals.maxDailyTrades ? (
             <div style={card}>
               <div className="flex items-center justify-between mb-1">
@@ -229,7 +225,6 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
             </div>
           )}
 
-          {/* Max Risk Per Trade */}
           {goals.maxRiskPerTrade ? (
             <div style={card}>
               <div className="flex items-center justify-between mb-1">
@@ -250,11 +245,10 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
               <p className="text-sm" style={{ color: 'rgba(255,255,255,0.2)' }}>{t('noMaxRisk')}</p>
             </div>
           )}
-
         </div>
       )}
 
-      {/* İşlem Yasak Saatleri */}
+      {/* Yasak Saatler */}
       {!editing && goals.noTradeHoursStart !== undefined && goals.noTradeHoursEnd !== undefined && (
         <div style={card}>
           <div className="flex items-center gap-2 mb-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -282,52 +276,43 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
             <div>
               <label style={lbl}>{t('monthlyPnLGoal')} ($)</label>
               <input
-                type="number"
-                min="0"
+                type="number" min="0"
                 value={goals.monthlyPnL || ''}
                 onChange={e => setGoals({ ...goals, monthlyPnL: parseFloat(e.target.value) || undefined })}
                 style={inp}
                 placeholder="Örn: 500"
               />
             </div>
-
             <div>
               <label style={lbl}>{t('winRateGoal')} (%)</label>
               <input
-                type="number"
-                min="0"
-                max="100"
+                type="number" min="0" max="100"
                 value={goals.winRate || ''}
                 onChange={e => setGoals({ ...goals, winRate: parseFloat(e.target.value) || undefined })}
                 style={inp}
                 placeholder="Örn: 60"
               />
             </div>
-
             <div>
               <label style={lbl}>{t('maxDailyTrades')}</label>
               <input
-                type="number"
-                min="1"
+                type="number" min="1"
                 value={goals.maxDailyTrades || ''}
                 onChange={e => setGoals({ ...goals, maxDailyTrades: parseInt(e.target.value) || undefined })}
                 style={inp}
                 placeholder="Örn: 3"
               />
             </div>
-
             <div>
               <label style={lbl}>{t('maxRiskPerTrade')} ($)</label>
               <input
-                type="number"
-                min="0"
+                type="number" min="0"
                 value={goals.maxRiskPerTrade || ''}
                 onChange={e => setGoals({ ...goals, maxRiskPerTrade: parseFloat(e.target.value) || undefined })}
                 style={inp}
                 placeholder="Örn: 50"
               />
             </div>
-
             <div>
               <label style={lbl}>{t('noTradeHoursStart')}</label>
               <select
@@ -341,7 +326,6 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                 ))}
               </select>
             </div>
-
             <div>
               <label style={lbl}>{t('noTradeHoursEnd')}</label>
               <select
@@ -358,17 +342,15 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <button
-              onClick={() => setEditing(false)}
-              className="px-4 py-2 text-sm"
-              style={{ color: 'rgba(255,255,255,0.5)' }}
-            >
+            <button onClick={() => setEditing(false)} className="px-4 py-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {t('cancel')}
             </button>
             <button
               onClick={handleSave}
-              className="px-6 py-2 text-sm font-semibold rounded-xl"
-              style={{ background: '#eab308', color: '#000' }}
+              className="px-6 py-2 text-sm font-semibold rounded-xl transition-all"
+              style={{ background: '#8b5cf6', color: '#fff' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
             >
               {t('save')}
             </button>
@@ -384,8 +366,10 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
           <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('noGoalsDesc')}</p>
           <button
             onClick={() => setEditing(true)}
-            className="px-6 py-2 text-sm font-semibold rounded-xl"
-            style={{ background: '#eab308', color: '#000' }}
+            className="px-6 py-2 text-sm font-semibold rounded-xl transition-all"
+            style={{ background: '#8b5cf6', color: '#fff' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
           >
             {t('editGoals')}
           </button>
