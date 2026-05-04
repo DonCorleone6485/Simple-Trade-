@@ -12,11 +12,12 @@ import TradeForm from './components/TradeForm';
 import TradeHistory from './components/TradeHistory';
 import CalendarView from './components/CalendarView';
 import GoalsView from './components/GoalsView';
+import PricingPage from './components/PricingPage';
 import { Trade, Account, JournalGoals } from './types';
 import { useLanguage } from './context/LanguageContext';
 import { supabase } from './lib/supabase';
 
-type View = 'dashboard' | 'expanded';
+type View = 'dashboard' | 'expanded' | 'pricing';
 type JournalTab = 'trades' | 'calendar' | 'stats' | 'goals';
 type AuthView = 'signin' | 'signup';
 
@@ -40,7 +41,6 @@ export default function App() {
   const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Supabase'den verileri yükle
   useEffect(() => {
     if (user) {
       loadJournals();
@@ -51,7 +51,7 @@ export default function App() {
   const loadJournals = async () => {
     if (!user) return;
     setLoading(true);
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('journals')
       .select('*')
       .eq('user_id', user.id)
@@ -71,7 +71,7 @@ export default function App() {
 
   const loadTrades = async () => {
     if (!user) return;
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('trades')
       .select('*')
       .eq('user_id', user.id)
@@ -111,7 +111,7 @@ export default function App() {
 
   const createJournal = async () => {
     if (!newJournalName.trim() || !newJournalStartDate || !newJournalCapital || !user) return;
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('journals')
       .insert({
         user_id: user.id,
@@ -140,7 +140,7 @@ export default function App() {
 
   const handleAddTrade = async (trade: Trade) => {
     if (!activeJournal || !user) return;
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('trades')
       .insert({
         user_id: user.id,
@@ -269,14 +269,14 @@ export default function App() {
               className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
               style={authView === 'signin' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}
             >
-              Giriş Yap
+              {language === 'tr' ? 'Giriş Yap' : language === 'fa' ? 'ورود' : 'Sign In'}
             </button>
             <button
               onClick={() => setAuthView('signup')}
               className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
               style={authView === 'signup' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}
             >
-              Kayıt Ol
+              {language === 'tr' ? 'Kayıt Ol' : language === 'fa' ? 'ثبت نام' : 'Sign Up'}
             </button>
           </div>
           {authView === 'signin' ? (
@@ -378,10 +378,10 @@ export default function App() {
                   <span className="font-semibold text-white truncate max-w-[150px] sm:max-w-none">{activeJournal?.name}</span>
                 </>
               ) : (
-                <div className="flex items-center gap-2">
+                <button onClick={() => setView('dashboard')} className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" style={{ color: '#8b5cf6' }} />
                   <span className="font-bold tracking-tight">Trade Journal</span>
-                </div>
+                </button>
               )}
             </div>
 
@@ -396,6 +396,18 @@ export default function App() {
                   <span className="hidden sm:inline">{t('newTradeTab')}</span>
                 </button>
               )}
+
+              {/* Fiyatlandırma butonu */}
+              <button
+                onClick={() => setView('pricing')}
+                className="hidden sm:block px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                style={{ color: view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)'; }}
+              >
+                {language === 'tr' ? 'Fiyatlar' : language === 'fa' ? 'قیمت‌ها' : 'Pricing'}
+              </button>
+
               <div className="relative" ref={langMenuRef}>
                 <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
                   className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-sm font-medium uppercase"
@@ -416,6 +428,7 @@ export default function App() {
                   </div>
                 )}
               </div>
+
               {/* Kullanıcı + Çıkış */}
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full overflow-hidden" style={{ background: 'rgba(139,92,246,0.2)' }}>
@@ -448,6 +461,9 @@ export default function App() {
             <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
           </div>
         )}
+
+        {/* FİYATLANDIRMA */}
+        {!loading && view === 'pricing' && <PricingPage />}
 
         {/* DASHBOARD */}
         {!loading && view === 'dashboard' && (
