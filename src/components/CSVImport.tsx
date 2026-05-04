@@ -1,5 +1,6 @@
+
 import React, { useState, useRef } from 'react';
-import { Upload, X, CheckCircle, AlertTriangle, FileText, ChevronDown } from 'lucide-react';
+import { Upload, X, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -21,58 +22,64 @@ interface ParseResult {
 function detectPlatform(headers: string[]): string {
   const h = headers.map(x => x.trim().toLowerCase());
 
-  // MetaTrader 4/5
-  if (h.includes('ticket') && h.includes('open time') && h.includes('close time')) return 'MT4/MT5';
-  if (h.includes('ticket') && h.includes('open_time') && h.includes('close_time')) return 'MT4/MT5';
+  // MetaTrader 4/5 — English
+  if (h.includes('ticket') && (h.includes('open time') || h.includes('open_time'))) return 'MT4/MT5';
+
+  // MetaTrader 4/5 — Turkish
+  if (h.includes('pozisyon') && h.includes('sembol') && h.includes('tür')) return 'MT4/MT5';
+  if (h.includes('zaman') && h.includes('sembol') && h.includes('kar')) return 'MT4/MT5';
 
   // cTrader
-  if (h.includes('opening direction') || h.includes('opening time') && h.includes('closing time') && h.includes('entry price')) return 'cTrader';
+  if (h.includes('opening direction') || (h.includes('opening time') && h.includes('closing time') && h.includes('entry price'))) return 'cTrader';
 
   // TradeLocker
-  if (h.includes('position id') && h.includes('net profit')) return 'TradeLocker';
-  if (h.includes('positionid') && h.includes('netprofit')) return 'TradeLocker';
+  if ((h.includes('position id') || h.includes('positionid')) && (h.includes('net profit') || h.includes('netprofit'))) return 'TradeLocker';
 
   // Tradovate
-  if (h.includes('orderid') || h.includes('order id')) {
-    if (h.includes('b/s') || h.includes('contract') || h.includes('fill time')) return 'Tradovate';
-  }
+  if ((h.includes('orderid') || h.includes('order id')) && (h.includes('b/s') || h.includes('contract') || h.includes('fill time'))) return 'Tradovate';
 
   // NinjaTrader
   if (h.includes('instrument') && h.includes('action') && h.includes('e/x')) return 'NinjaTrader';
-  if (h.includes('instrument') && h.includes('action') && h.includes('quantity') && h.includes('price') && h.includes('time')) return 'NinjaTrader';
 
   // TradingView
-  if (h.includes('fill price') && h.includes('closing time') && h.includes('side')) return 'TradingView';
-  if (h.includes('fill price') || (h.includes('side') && h.includes('qty') && h.includes('symbol'))) return 'TradingView';
+  if (h.includes('fill price') && (h.includes('closing time') || h.includes('side'))) return 'TradingView';
 
-  // Interactive Brokers
-  if (h.includes('ibcommission') || h.includes('fifopnlrealized') || h.includes('opencloseIndicator')) return 'IBKR';
-  if (h.includes('tradeprice') && h.includes('buy/sell')) return 'IBKR';
+  // IBKR
+  if (h.includes('ibcommission') || h.includes('fifopnlrealized') || (h.includes('tradeprice') && h.includes('buy/sell'))) return 'IBKR';
 
   // Binance
-  if (h.includes('base-asset') || h.includes('fee-currency')) return 'Binance';
-  if (h.includes('base asset') || h.includes('fee currency')) return 'Binance';
+  if (h.includes('base-asset') || h.includes('fee-currency') || h.includes('base asset') || h.includes('fee currency')) return 'Binance';
   if (h.includes('realized profit') && h.includes('trading fee')) return 'Binance';
 
   // Bybit
-  if (h.includes('realized pnl') || h.includes('realized p&l')) return 'Bybit';
-  if (h.includes('entry price') && h.includes('exit price')) return 'Bybit';
-  if (h.includes('side') && h.includes('entry price')) return 'Bybit';
+  if (h.includes('realized pnl') || h.includes('realized p&l') || (h.includes('entry price') && h.includes('exit price'))) return 'Bybit';
 
   return 'Unknown';
 }
 
-// ── PARSERS ────────────────────────────────────────────────────────────────
+// ── HELPERS ────────────────────────────────────────────────────────────────
 
 function parseDate(dateStr: string): string {
   if (!dateStr) return new Date().toISOString();
   const cleaned = dateStr.trim().replace(/\./g, '-');
+  // MT5 Turkish format: 2024.01.15 10:30:53
+  const mt5 = dateStr.match(/(\d{4})\.(\d{2})\.(\d{2})\s+(\d{2}):(\d{2})/);
+  if (mt5) return new Date(`${mt5[1]}-${mt5[2]}-${mt5[3]}T${mt5[4]}:${mt5[5]}:00`).toISOString();
   const d = new Date(cleaned);
   if (!isNaN(d.getTime())) return d.toISOString();
-  // MT4 format: 2024.01.15 10:30
-  const mt4 = dateStr.match(/(\d{4})\.(\d{2})\.(\d{2})\s+(\d{2}):(\d{2})/);
-  if (mt4) return new Date(`${mt4[1]}-${mt4[2]}-${mt4[3]}T${mt4[4]}:${mt4[5]}:00`).toISOString();
   return new Date().toISOString();
+}
+
+// MT5 Türkçe sayı formatı: "26 973,16" → 26973.16
+function parseNumber(val: string): number {
+  if (!val) return 0;
+  const cleaned = val
+    .replace(/"/g, '')
+    .trim()
+    .replace(/\s/g, '')      // binlik boşluk ayırıcı
+    .replace(/,/g, '.');     // ondalık virgül → nokta
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
 }
 
 function calcRR(openPrice: number, sl: number, tp: number, type: 'Buy' | 'Sell'): string {
@@ -89,7 +96,7 @@ function getResult(profit: number): 'Başarılı' | 'Başarısız' {
 
 function getType(side: string): 'Buy' | 'Sell' {
   const s = side.trim().toLowerCase();
-  if (s === 'buy' || s === 'b' || s === 'long') return 'Buy';
+  if (s === 'buy' || s === 'b' || s === 'long' || s === 'al' || s === 'alış') return 'Buy';
   return 'Sell';
 }
 
@@ -97,35 +104,71 @@ function makeId(): string {
   return `import_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
-// MT4/MT5
+function cleanSymbol(symbol: string): string {
+  return symbol
+    .replace('FX:', '').replace('NASDAQ:', '').replace('NYSE:', '')
+    .replace('CME_MINI:', '').replace('.x', '').replace('.r', '')
+    .trim();
+}
+
+// ── PARSERS ────────────────────────────────────────────────────────────────
+
+// MT4/MT5 — hem İngilizce hem Türkçe
 function parseMT4(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   return rows
     .filter(row => {
-      const type = (row['Type'] || row['type'] || '').toLowerCase();
-      return type === 'buy' || type === 'sell';
+      // Sadece pozisyon satırlarını al (emir satırlarını değil)
+      const type = (
+        row['Type'] || row['type'] ||
+        row['Tür'] || row['tür'] || ''
+      ).toLowerCase().trim();
+      return type === 'buy' || type === 'sell' || type === 'al' || type === 'sat';
     })
     .map(row => {
-      const openPrice = parseFloat(row['Open Price'] || row['open price'] || row['openprice'] || '0');
-      const sl = parseFloat(row['S/L'] || row['sl'] || row['stop loss'] || '0');
-      const tp = parseFloat(row['T/P'] || row['tp'] || row['take profit'] || '0');
-      const profit = parseFloat(row['Profit'] || row['profit'] || '0');
-      const type = getType(row['Type'] || row['type'] || 'buy');
+      // Symbol
+      const symbol = cleanSymbol(
+        row['Symbol'] || row['symbol'] || row['Sembol'] || row['sembol'] || ''
+      );
+
+      // Type
+      const typeRaw = row['Type'] || row['type'] || row['Tür'] || row['tür'] || 'buy';
+      const type = getType(typeRaw);
+
+      // Prices
+      const openPrice = parseNumber(row['Open Price'] || row['open price'] || row['Fiyat'] || row['fiyat'] || '0');
+      const sl = parseNumber(row['S/L'] || row['s/l'] || row['S / L'] || row['s / l'] || '0');
+      const tp = parseNumber(row['T/P'] || row['t/p'] || row['T / P'] || row['t / p'] || '0');
+
+      // Profit
+      const profit = parseNumber(row['Profit'] || row['profit'] || row['Kar'] || row['kar'] || '0');
+
+      // Date
+      const date = parseDate(
+        row['Open Time'] || row['open time'] || row['Open time'] ||
+        row['Zaman'] || row['zaman'] || row['Açılış'] || ''
+      );
+
+      // R/R
       const rr = calcRR(openPrice, sl, tp, type);
+
+      // Risk
+      const risk = sl > 0 ? Math.abs(openPrice - sl) : 0;
+
       return {
         id: makeId(),
         accountId: journalId,
         journal_id: journalId,
         user_id: userId,
-        date: parseDate(row['Open Time'] || row['open time'] || row['opentime'] || ''),
-        symbol: (row['Symbol'] || row['symbol'] || '').trim(),
+        date,
+        symbol,
         type,
         timeframe: '',
         setup: '',
-        risk: sl > 0 ? Math.abs(openPrice - sl) : 0,
+        risk,
         reward: profit > 0 ? profit : 0,
         rr,
         result: getResult(profit),
-        preTradeNotes: row['Comment'] || row['comment'] || '',
+        preTradeNotes: row['Comment'] || row['comment'] || row['Yorum'] || row['yorum'] || '',
         postTradeNotes: '',
         preTradePhotos: [],
         postTradePhotos: [],
@@ -139,9 +182,7 @@ function parseCTrader(rows: Record<string, string>[], journalId: string, userId:
   return rows
     .filter(row => row['Opening Direction'] || row['opening direction'])
     .map(row => {
-      const profit = parseFloat(row['Profit'] || row['profit'] || row['Net Profit'] || row['net profit'] || '0');
-      const entryPrice = parseFloat(row['Entry Price'] || row['entry price'] || '0');
-      const closePrice = parseFloat(row['Closing Price'] || row['closing price'] || '0');
+      const profit = parseNumber(row['Profit'] || row['profit'] || row['Net Profit'] || row['net profit'] || '0');
       const type = getType(row['Opening Direction'] || row['opening direction'] || 'buy');
       return {
         id: makeId(),
@@ -149,7 +190,7 @@ function parseCTrader(rows: Record<string, string>[], journalId: string, userId:
         journal_id: journalId,
         user_id: userId,
         date: parseDate(row['Opening Time'] || row['opening time'] || ''),
-        symbol: (row['Symbol'] || row['symbol'] || '').trim(),
+        symbol: cleanSymbol(row['Symbol'] || row['symbol'] || ''),
         type,
         timeframe: '',
         setup: '',
@@ -169,10 +210,10 @@ function parseCTrader(rows: Record<string, string>[], journalId: string, userId:
 // TradeLocker
 function parseTradeLocker(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   return rows.map(row => {
-    const profit = parseFloat(row['Net Profit'] || row['net profit'] || row['NetProfit'] || row['netprofit'] || '0');
-    const entryPrice = parseFloat(row['Entry Price'] || row['entry price'] || row['EntryPrice'] || '0');
-    const sl = parseFloat(row['SL'] || row['sl'] || row['Stop Loss'] || '0');
-    const tp = parseFloat(row['TP'] || row['tp'] || row['Take Profit'] || '0');
+    const profit = parseNumber(row['Net Profit'] || row['net profit'] || row['NetProfit'] || row['netprofit'] || '0');
+    const entryPrice = parseNumber(row['Entry Price'] || row['entry price'] || row['EntryPrice'] || '0');
+    const sl = parseNumber(row['SL'] || row['sl'] || row['Stop Loss'] || '0');
+    const tp = parseNumber(row['TP'] || row['tp'] || row['Take Profit'] || '0');
     const type = getType(row['Side'] || row['side'] || row['Direction'] || row['direction'] || 'buy');
     const rr = calcRR(entryPrice, sl, tp, type);
     return {
@@ -181,7 +222,7 @@ function parseTradeLocker(rows: Record<string, string>[], journalId: string, use
       journal_id: journalId,
       user_id: userId,
       date: parseDate(row['Open Time'] || row['open time'] || row['OpenTime'] || row['opentime'] || ''),
-      symbol: (row['Symbol'] || row['symbol'] || row['Instrument'] || '').trim(),
+      symbol: cleanSymbol(row['Symbol'] || row['symbol'] || row['Instrument'] || ''),
       type,
       timeframe: '',
       setup: '',
@@ -198,7 +239,7 @@ function parseTradeLocker(rows: Record<string, string>[], journalId: string, use
   });
 }
 
-// Tradovate - execution bazlı, giriş/çıkış çiftlerini eşleştir
+// Tradovate
 function parseTradovate(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   const trades: Trade[] = [];
   const entries: Record<string, string>[] = [];
@@ -220,9 +261,9 @@ function parseTradovate(rows: Record<string, string>[], journalId: string, userI
     if (exitIdx >= 0) {
       used.add(exitIdx);
       const ex = exits[exitIdx];
-      const entryPrice = parseFloat(entry['Avg Fill Price'] || entry['avgPrice'] || entry['Price'] || '0');
-      const exitPrice = parseFloat(ex['Avg Fill Price'] || ex['avgPrice'] || ex['Price'] || '0');
-      const qty = parseFloat(entry['Filled Qty'] || entry['filledQty'] || entry['Quantity'] || '1');
+      const entryPrice = parseNumber(entry['Avg Fill Price'] || entry['avgPrice'] || entry['Price'] || '0');
+      const exitPrice = parseNumber(ex['Avg Fill Price'] || ex['avgPrice'] || ex['Price'] || '0');
+      const qty = parseNumber(entry['Filled Qty'] || entry['filledQty'] || entry['Quantity'] || '1');
       const profit = (exitPrice - entryPrice) * qty;
       trades.push({
         id: makeId(),
@@ -230,7 +271,7 @@ function parseTradovate(rows: Record<string, string>[], journalId: string, userI
         journal_id: journalId,
         user_id: userId,
         date: parseDate(entry['Fill Time'] || entry['Timestamp'] || entry['Date'] || ''),
-        symbol: contract.trim(),
+        symbol: cleanSymbol(contract),
         type: 'Buy',
         timeframe: '',
         setup: '',
@@ -246,11 +287,10 @@ function parseTradovate(rows: Record<string, string>[], journalId: string, userI
       } as Trade);
     }
   });
-
   return trades;
 }
 
-// NinjaTrader - execution bazlı
+// NinjaTrader
 function parseNinjaTrader(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   const trades: Trade[] = [];
   const entries: Record<string, string>[] = [];
@@ -258,7 +298,6 @@ function parseNinjaTrader(rows: Record<string, string>[], journalId: string, use
 
   rows.forEach(row => {
     const ex = (row['E/X'] || row['e/x'] || '').trim().toUpperCase();
-    const action = (row['Action'] || row['action'] || '').trim().toUpperCase();
     if (ex === 'E' || ex === 'ENTRY') entries.push(row);
     else if (ex === 'X' || ex === 'EXIT') exits.push(row);
   });
@@ -273,22 +312,21 @@ function parseNinjaTrader(rows: Record<string, string>[], journalId: string, use
     if (exitIdx >= 0) {
       used.add(exitIdx);
       const ex = exits[exitIdx];
-      const entryPrice = parseFloat(entry['Price'] || entry['price'] || '0');
-      const exitPrice = parseFloat(ex['Price'] || ex['price'] || '0');
-      const qty = parseFloat(entry['Quantity'] || entry['quantity'] || '1');
+      const entryPrice = parseNumber(entry['Price'] || entry['price'] || '0');
+      const exitPrice = parseNumber(ex['Price'] || ex['price'] || '0');
+      const qty = parseNumber(entry['Quantity'] || entry['quantity'] || '1');
       const action = (entry['Action'] || entry['action'] || 'Buy').trim();
       const type = getType(action);
       const profit = type === 'Buy'
         ? (exitPrice - entryPrice) * qty
         : (entryPrice - exitPrice) * qty;
-
       trades.push({
         id: makeId(),
         accountId: journalId,
         journal_id: journalId,
         user_id: userId,
         date: parseDate(entry['Time'] || entry['time'] || ''),
-        symbol: instrument.trim(),
+        symbol: cleanSymbol(instrument),
         type,
         timeframe: '',
         setup: '',
@@ -304,7 +342,6 @@ function parseNinjaTrader(rows: Record<string, string>[], journalId: string, use
       } as Trade);
     }
   });
-
   return trades;
 }
 
@@ -331,9 +368,9 @@ function parseTradingView(rows: Record<string, string>[], journalId: string, use
     if (exitIdx >= 0) {
       used.add(exitIdx);
       const ex = exits[exitIdx];
-      const entryPrice = parseFloat(entry['Fill Price'] || entry['fill price'] || entry['Price'] || '0');
-      const exitPrice = parseFloat(ex['Fill Price'] || ex['fill price'] || ex['Price'] || '0');
-      const qty = parseFloat(entry['Qty'] || entry['qty'] || entry['Quantity'] || '1');
+      const entryPrice = parseNumber(entry['Fill Price'] || entry['fill price'] || entry['Price'] || '0');
+      const exitPrice = parseNumber(ex['Fill Price'] || ex['fill price'] || ex['Price'] || '0');
+      const qty = parseNumber(entry['Qty'] || entry['qty'] || entry['Quantity'] || '1');
       const profit = (exitPrice - entryPrice) * qty;
       trades.push({
         id: makeId(),
@@ -341,7 +378,7 @@ function parseTradingView(rows: Record<string, string>[], journalId: string, use
         journal_id: journalId,
         user_id: userId,
         date: parseDate(entry['Closing Time'] || entry['closing time'] || entry['Time'] || ''),
-        symbol: sym.replace('FX:', '').replace('NASDAQ:', '').replace('NYSE:', '').replace('CME_MINI:', '').trim(),
+        symbol: cleanSymbol(sym),
         type: 'Buy',
         timeframe: '',
         setup: '',
@@ -357,20 +394,15 @@ function parseTradingView(rows: Record<string, string>[], journalId: string, use
       } as Trade);
     }
   });
-
   return trades;
 }
 
 // IBKR
 function parseIBKR(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   return rows
-    .filter(row => {
-      const section = row['DataDiscriminator'] || row['Header'] || '';
-      const buySell = row['Buy/Sell'] || row['buy/sell'] || '';
-      return buySell !== '' || section === 'Trade';
-    })
+    .filter(row => row['Buy/Sell'] || row['buy/sell'])
     .map(row => {
-      const profit = parseFloat(row['FifoPnlRealized'] || row['fifopnlrealized'] || row['Realized P/L'] || '0');
+      const profit = parseNumber(row['FifoPnlRealized'] || row['fifopnlrealized'] || row['Realized P/L'] || '0');
       const type = getType(row['Buy/Sell'] || row['buy/sell'] || 'buy');
       return {
         id: makeId(),
@@ -378,7 +410,7 @@ function parseIBKR(rows: Record<string, string>[], journalId: string, userId: st
         journal_id: journalId,
         user_id: userId,
         date: parseDate(row['DateTime'] || row['datetime'] || row['Date/Time'] || ''),
-        symbol: (row['Symbol'] || row['symbol'] || '').trim(),
+        symbol: cleanSymbol(row['Symbol'] || row['symbol'] || ''),
         type,
         timeframe: '',
         setup: '',
@@ -419,13 +451,12 @@ function parseBinance(rows: Record<string, string>[], journalId: string, userId:
       const exQuote = ex['Quote Asset'] || ex['quote-asset'] || ex['quote asset'] || 'USDT';
       return `${exBase}${exQuote}` === symbol;
     });
-
     if (exitIdx >= 0) {
       used.add(exitIdx);
       const ex = exits[exitIdx];
-      const entryPrice = parseFloat(entry['Price'] || entry['price'] || '0');
-      const exitPrice = parseFloat(ex['Price'] || ex['price'] || '0');
-      const qty = parseFloat(entry['Quantity'] || entry['quantity'] || entry['Amount'] || '1');
+      const entryPrice = parseNumber(entry['Price'] || entry['price'] || '0');
+      const exitPrice = parseNumber(ex['Price'] || ex['price'] || '0');
+      const qty = parseNumber(entry['Quantity'] || entry['quantity'] || entry['Amount'] || '1');
       const profit = (exitPrice - entryPrice) * qty;
       trades.push({
         id: makeId(),
@@ -449,7 +480,6 @@ function parseBinance(rows: Record<string, string>[], journalId: string, userId:
       } as Trade);
     }
   });
-
   return trades;
 }
 
@@ -462,14 +492,13 @@ function parseBybit(rows: Record<string, string>[], journalId: string, userId: s
       return pnl !== '' || side !== '';
     })
     .map(row => {
-      const profit = parseFloat(
+      const profit = parseNumber(
         row['Realized PNL'] || row['Realized P&L'] || row['realized pnl'] ||
         row['Realized Profit'] || row['Closed PnL'] || '0'
       );
-      const entryPrice = parseFloat(row['Entry Price'] || row['entry price'] || row['Avg Entry Price'] || '0');
-      const exitPrice = parseFloat(row['Exit Price'] || row['exit price'] || row['Avg Exit Price'] || row['Close Price'] || '0');
-      const sl = parseFloat(row['SL'] || row['Stop Loss'] || row['stop loss'] || '0');
-      const tp = parseFloat(row['TP'] || row['Take Profit'] || row['take profit'] || '0');
+      const entryPrice = parseNumber(row['Entry Price'] || row['entry price'] || row['Avg Entry Price'] || '0');
+      const sl = parseNumber(row['SL'] || row['Stop Loss'] || row['stop loss'] || '0');
+      const tp = parseNumber(row['TP'] || row['Take Profit'] || row['take profit'] || '0');
       const type = getType(row['Side'] || row['side'] || row['Direction'] || 'buy');
       const rr = calcRR(entryPrice, sl, tp, type);
       return {
@@ -478,7 +507,7 @@ function parseBybit(rows: Record<string, string>[], journalId: string, userId: s
         journal_id: journalId,
         user_id: userId,
         date: parseDate(row['Open Time'] || row['open time'] || row['Create Time'] || row['Time'] || ''),
-        symbol: (row['Symbol'] || row['symbol'] || row['Contract'] || '').trim(),
+        symbol: cleanSymbol(row['Symbol'] || row['symbol'] || row['Contract'] || ''),
         type,
         timeframe: '',
         setup: '',
@@ -499,35 +528,45 @@ function parseBybit(rows: Record<string, string>[], journalId: string, userId: s
 
 function parseCSV(content: string, journalId: string, userId: string): ParseResult {
   const errors: string[] = [];
-
-  // Satırları ayır
   const lines = content.split('\n').filter(l => l.trim() !== '');
   if (lines.length < 2) return { trades: [], platform: 'Unknown', errors: ['CSV dosyası boş veya geçersiz.'] };
 
-  // Header satırını bul (bazı platformlar başta metadata satırları içerir)
+  // Header satırını bul
   let headerIdx = 0;
-  for (let i = 0; i < Math.min(10, lines.length); i++) {
+  for (let i = 0; i < Math.min(15, lines.length); i++) {
     const lower = lines[i].toLowerCase();
     if (
-      lower.includes('symbol') || lower.includes('instrument') ||
-      lower.includes('contract') || lower.includes('ticket') ||
+      lower.includes('symbol') || lower.includes('sembol') ||
+      lower.includes('instrument') || lower.includes('contract') ||
+      lower.includes('ticket') || lower.includes('pozisyon') ||
       lower.includes('base-asset') || lower.includes('base asset') ||
-      lower.includes('side') || lower.includes('b/s')
+      lower.includes('side') || lower.includes('b/s') ||
+      lower.includes('tür') || lower.includes('zaman')
     ) {
       headerIdx = i;
       break;
     }
   }
 
-  // CSV'yi parse et
+  // Sadece "Pozisyonlar" bölümünü al (MT5 Türkçe için)
+  // "Emirler" bölümü başlayınca dur
+  let endIdx = lines.length;
+  for (let i = headerIdx + 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line.toLowerCase().startsWith('emirler') || line.toLowerCase().startsWith('orders')) {
+      endIdx = i;
+      break;
+    }
+  }
+
   const separator = lines[headerIdx].includes(';') ? ';' : ',';
   const headers = lines[headerIdx].split(separator).map(h => h.trim().replace(/"/g, ''));
   const platform = detectPlatform(headers);
 
   const rows: Record<string, string>[] = [];
-  for (let i = headerIdx + 1; i < lines.length; i++) {
-    const values = lines[i].split(separator).map(v => v.trim().replace(/"/g, ''));
-    if (values.length < 2) continue;
+  for (let i = headerIdx + 1; i < endIdx; i++) {
+    const values = lines[i].split(separator).map(v => v.trim().replace(/^"|"$/g, ''));
+    if (values.length < 2 || values.every(v => v === '')) continue;
     const row: Record<string, string> = {};
     headers.forEach((h, idx) => {
       row[h] = values[idx] || '';
@@ -557,7 +596,6 @@ function parseCSV(content: string, journalId: string, userId: string): ParseResu
     errors.push(`Parse hatası: ${e}`);
   }
 
-  // Geçersiz trade'leri filtrele
   trades = trades.filter(t => t.symbol && t.symbol.length > 0 && t.date);
 
   return { trades, platform, errors };
@@ -634,7 +672,6 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
     <div className="fixed inset-0 bg-black/80 flex items-start justify-center z-50 p-4 overflow-y-auto">
       <div className="w-full max-w-2xl my-8 space-y-4">
 
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-white">CSV Import</h2>
@@ -649,7 +686,6 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
           </button>
         </div>
 
-        {/* Desteklenen platformlar */}
         <div style={card}>
           <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(255,255,255,0.3)' }}>
             {language === 'tr' ? 'Desteklenen Platformlar' : 'Supported Platforms'}
@@ -664,7 +700,6 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
           </div>
         </div>
 
-        {/* Upload alanı */}
         <div
           onDragOver={e => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
@@ -689,7 +724,6 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
           </p>
         </div>
 
-        {/* Loading */}
         {loading && (
           <div style={card} className="flex items-center gap-3">
             <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
@@ -699,11 +733,9 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
           </div>
         )}
 
-        {/* Sonuç */}
         {parseResult && !loading && (
           <div style={card} className="space-y-4">
 
-            {/* Platform badge */}
             {parseResult.platform !== 'Unknown' && (
               <div className="flex items-center gap-3">
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -720,7 +752,6 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
               </div>
             )}
 
-            {/* Hatalar */}
             {parseResult.errors.length > 0 && (
               <div className="rounded-xl p-4" style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)' }}>
                 <div className="flex items-center gap-2 mb-2">
@@ -735,32 +766,28 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
               </div>
             )}
 
-            {/* Başarılı */}
             {parseResult.trades.length > 0 && (
               <div className="rounded-xl p-4" style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-1">
                   <CheckCircle className="w-4 h-4" style={{ color: '#34d399' }} />
                   <span className="text-sm font-semibold" style={{ color: '#34d399' }}>
                     {parseResult.trades.length} {language === 'tr' ? 'trade bulundu' : 'trades found'}
                   </span>
                 </div>
                 <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {language === 'tr'
-                    ? 'Aşağıdaki tradeler journal\'ınıza eklenecek:'
-                    : 'The following trades will be added to your journal:'}
+                  {language === 'tr' ? "Journal'ınıza eklenecek:" : 'Will be added to your journal:'}
                 </p>
               </div>
             )}
 
-            {/* Trade önizleme */}
             {parseResult.trades.length > 0 && (
               <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider grid grid-cols-4 gap-2"
                   style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.3)' }}>
                   <span>{language === 'tr' ? 'Tarih' : 'Date'}</span>
-                  <span>{language === 'tr' ? 'Sembol' : 'Symbol'}</span>
-                  <span>{language === 'tr' ? 'Tür' : 'Type'}</span>
-                  <span>{language === 'tr' ? 'Sonuç' : 'Result'}</span>
+                  <span>Symbol</span>
+                  <span>Type</span>
+                  <span>Sonuç</span>
                 </div>
                 <div className="max-h-48 overflow-y-auto">
                   {parseResult.trades.slice(0, 50).map((trade, i) => (
@@ -772,9 +799,7 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
                       <span className="font-mono font-medium text-white">{trade.symbol}</span>
                       <span style={{ color: trade.type === 'Buy' ? '#34d399' : '#f87171' }}>{trade.type}</span>
                       <span style={{ color: trade.result === 'Başarılı' ? '#34d399' : '#f87171' }}>
-                        {trade.result === 'Başarılı'
-                          ? (language === 'tr' ? 'Başarılı' : language === 'fa' ? 'موفق' : 'Win')
-                          : (language === 'tr' ? 'Başarısız' : language === 'fa' ? 'ناموفق' : 'Loss')}
+                        {trade.result === 'Başarılı' ? '✅ Win' : '❌ Loss'}
                       </span>
                     </div>
                   ))}
@@ -787,7 +812,6 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
               </div>
             )}
 
-            {/* Butonlar */}
             <div className="flex justify-end gap-3 pt-2">
               <button onClick={() => { setParseResult(null); setFileName(''); }}
                 className="px-4 py-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -809,7 +833,6 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
           </div>
         )}
 
-        {/* Dosya adı */}
         {fileName && !loading && (
           <div className="flex items-center gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
             <FileText className="w-4 h-4" />
