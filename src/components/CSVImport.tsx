@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Upload, X, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
 import { Trade } from '../types';
@@ -17,17 +16,17 @@ interface ParseResult {
   errors: string[];
 }
 
-// ── PLATFORM DETECTION ─────────────────────────────────────────────────────
-
 function detectPlatform(headers: string[]): string {
   const h = headers.map(x => x.trim().toLowerCase());
 
   // MetaTrader 4/5 — English
   if (h.includes('ticket') && (h.includes('open time') || h.includes('open_time'))) return 'MT4/MT5';
 
-  // MetaTrader 4/5 — Turkish
-  if (h.includes('pozisyon') && h.includes('sembol') && h.includes('tür')) return 'MT4/MT5';
-  if (h.includes('zaman') && h.includes('sembol') && h.includes('kar')) return 'MT4/MT5';
+  // MetaTrader 4/5 — Turkish (encoding sorununa karşı geniş kontrol)
+  if (h.includes('zaman') && h.includes('sembol')) return 'MT4/MT5';
+  if (h.includes('pozisyon') && h.includes('sembol')) return 'MT4/MT5';
+  if (h.includes('sembol') && h.includes('kar')) return 'MT4/MT5';
+  if (h.includes('sembol') && h.includes('hacim')) return 'MT4/MT5';
 
   // cTrader
   if (h.includes('opening direction') || (h.includes('opening time') && h.includes('closing time') && h.includes('entry price'))) return 'cTrader';
@@ -57,27 +56,23 @@ function detectPlatform(headers: string[]): string {
   return 'Unknown';
 }
 
-// ── HELPERS ────────────────────────────────────────────────────────────────
-
 function parseDate(dateStr: string): string {
   if (!dateStr) return new Date().toISOString();
-  const cleaned = dateStr.trim().replace(/\./g, '-');
-  // MT5 Turkish format: 2024.01.15 10:30:53
   const mt5 = dateStr.match(/(\d{4})\.(\d{2})\.(\d{2})\s+(\d{2}):(\d{2})/);
   if (mt5) return new Date(`${mt5[1]}-${mt5[2]}-${mt5[3]}T${mt5[4]}:${mt5[5]}:00`).toISOString();
+  const cleaned = dateStr.trim().replace(/\./g, '-');
   const d = new Date(cleaned);
   if (!isNaN(d.getTime())) return d.toISOString();
   return new Date().toISOString();
 }
 
-// MT5 Türkçe sayı formatı: "26 973,16" → 26973.16
 function parseNumber(val: string): number {
   if (!val) return 0;
   const cleaned = val
     .replace(/"/g, '')
     .trim()
-    .replace(/\s/g, '')      // binlik boşluk ayırıcı
-    .replace(/,/g, '.');     // ondalık virgül → nokta
+    .replace(/\s/g, '')
+    .replace(/,/g, '.');
   const num = parseFloat(cleaned);
   return isNaN(num) ? 0 : num;
 }
@@ -111,47 +106,30 @@ function cleanSymbol(symbol: string): string {
     .trim();
 }
 
-// ── PARSERS ────────────────────────────────────────────────────────────────
-
-// MT4/MT5 — hem İngilizce hem Türkçe
+// MT4/MT5 — Türkçe + İngilizce
 function parseMT4(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   return rows
     .filter(row => {
-      // Sadece pozisyon satırlarını al (emir satırlarını değil)
-      const type = (
-        row['Type'] || row['type'] ||
-        row['Tür'] || row['tür'] || ''
-      ).toLowerCase().trim();
-      return type === 'buy' || type === 'sell' || type === 'al' || type === 'sat';
+      const symbol = row['Sembol'] || row['Symbol'] || row['symbol'] || '';
+      const hasTradeType = Object.values(row).some(v =>
+        v.toLowerCase() === 'buy' || v.toLowerCase() === 'sell'
+      );
+      return symbol.trim() !== '' && hasTradeType;
     })
     .map(row => {
-      // Symbol
-      const symbol = cleanSymbol(
-        row['Symbol'] || row['symbol'] || row['Sembol'] || row['sembol'] || ''
-      );
+      const symbol = cleanSymbol(row['Sembol'] || row['Symbol'] || row['symbol'] || '');
 
-      // Type
-      const typeRaw = row['Type'] || row['type'] || row['Tür'] || row['tür'] || 'buy';
+      const typeRaw = Object.values(row).find(v =>
+        v.toLowerCase() === 'buy' || v.toLowerCase() === 'sell'
+      ) || 'buy';
       const type = getType(typeRaw);
 
-      // Prices
-      const openPrice = parseNumber(row['Open Price'] || row['open price'] || row['Fiyat'] || row['fiyat'] || '0');
-      const sl = parseNumber(row['S/L'] || row['s/l'] || row['S / L'] || row['s / l'] || '0');
-      const tp = parseNumber(row['T/P'] || row['t/p'] || row['T / P'] || row['t / p'] || '0');
-
-      // Profit
-      const profit = parseNumber(row['Profit'] || row['profit'] || row['Kar'] || row['kar'] || '0');
-
-      // Date
-      const date = parseDate(
-        row['Open Time'] || row['open time'] || row['Open time'] ||
-        row['Zaman'] || row['zaman'] || row['Açılış'] || ''
-      );
-
-      // R/R
+      const openPrice = parseNumber(row['Fiyat'] || row['Open Price'] || row['open price'] || '0');
+      const sl = parseNumber(row['S / L'] || row['S/L'] || row['s / l'] || row['s/l'] || '0');
+      const tp = parseNumber(row['T / P'] || row['T/P'] || row['t / p'] || row['t/p'] || '0');
+      const profit = parseNumber(row['Kar'] || row['Profit'] || row['profit'] || '0');
+      const date = parseDate(row['Zaman'] || row['Open Time'] || row['open time'] || '');
       const rr = calcRR(openPrice, sl, tp, type);
-
-      // Risk
       const risk = sl > 0 ? Math.abs(openPrice - sl) : 0;
 
       return {
@@ -168,7 +146,7 @@ function parseMT4(rows: Record<string, string>[], journalId: string, userId: str
         reward: profit > 0 ? profit : 0,
         rr,
         result: getResult(profit),
-        preTradeNotes: row['Comment'] || row['comment'] || row['Yorum'] || row['yorum'] || '',
+        preTradeNotes: row['Yorum'] || row['Comment'] || row['comment'] || '',
         postTradeNotes: '',
         preTradePhotos: [],
         postTradePhotos: [],
@@ -177,7 +155,6 @@ function parseMT4(rows: Record<string, string>[], journalId: string, userId: str
     });
 }
 
-// cTrader
 function parseCTrader(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   return rows
     .filter(row => row['Opening Direction'] || row['opening direction'])
@@ -207,7 +184,6 @@ function parseCTrader(rows: Record<string, string>[], journalId: string, userId:
     });
 }
 
-// TradeLocker
 function parseTradeLocker(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   return rows.map(row => {
     const profit = parseNumber(row['Net Profit'] || row['net profit'] || row['NetProfit'] || row['netprofit'] || '0');
@@ -239,18 +215,15 @@ function parseTradeLocker(rows: Record<string, string>[], journalId: string, use
   });
 }
 
-// Tradovate
 function parseTradovate(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   const trades: Trade[] = [];
   const entries: Record<string, string>[] = [];
   const exits: Record<string, string>[] = [];
-
   rows.forEach(row => {
     const bs = (row['B/S'] || row['b/s'] || row['Side'] || '').trim().toUpperCase();
     if (bs === 'B' || bs === 'BUY') entries.push(row);
     else if (bs === 'S' || bs === 'SELL') exits.push(row);
   });
-
   const used = new Set<number>();
   entries.forEach(entry => {
     const contract = entry['Contract'] || entry['Product'] || entry['Symbol'] || '';
@@ -290,18 +263,15 @@ function parseTradovate(rows: Record<string, string>[], journalId: string, userI
   return trades;
 }
 
-// NinjaTrader
 function parseNinjaTrader(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   const trades: Trade[] = [];
   const entries: Record<string, string>[] = [];
   const exits: Record<string, string>[] = [];
-
   rows.forEach(row => {
     const ex = (row['E/X'] || row['e/x'] || '').trim().toUpperCase();
     if (ex === 'E' || ex === 'ENTRY') entries.push(row);
     else if (ex === 'X' || ex === 'EXIT') exits.push(row);
   });
-
   const used = new Set<number>();
   entries.forEach(entry => {
     const instrument = entry['Instrument'] || entry['instrument'] || entry['Symbol'] || '';
@@ -345,20 +315,16 @@ function parseNinjaTrader(rows: Record<string, string>[], journalId: string, use
   return trades;
 }
 
-// TradingView
 function parseTradingView(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   const entries: Record<string, string>[] = [];
   const exits: Record<string, string>[] = [];
-
   rows.forEach(row => {
     const side = (row['Side'] || row['side'] || row['Type'] || '').trim().toUpperCase();
     if (side === 'BUY' || side === 'B') entries.push(row);
     else exits.push(row);
   });
-
   const trades: Trade[] = [];
   const used = new Set<number>();
-
   entries.forEach(entry => {
     const sym = entry['Symbol'] || entry['symbol'] || '';
     const exitIdx = exits.findIndex((ex, i) => {
@@ -397,7 +363,6 @@ function parseTradingView(rows: Record<string, string>[], journalId: string, use
   return trades;
 }
 
-// IBKR
 function parseIBKR(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   return rows
     .filter(row => row['Buy/Sell'] || row['buy/sell'])
@@ -427,20 +392,16 @@ function parseIBKR(rows: Record<string, string>[], journalId: string, userId: st
     });
 }
 
-// Binance
 function parseBinance(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   const entries: Record<string, string>[] = [];
   const exits: Record<string, string>[] = [];
-
   rows.forEach(row => {
     const type = (row['Type'] || row['type'] || row['Side'] || row['side'] || '').toUpperCase();
     if (type === 'BUY' || type === 'B') entries.push(row);
     else exits.push(row);
   });
-
   const trades: Trade[] = [];
   const used = new Set<number>();
-
   entries.forEach(entry => {
     const base = entry['Base Asset'] || entry['base-asset'] || entry['base asset'] || '';
     const quote = entry['Quote Asset'] || entry['quote-asset'] || entry['quote asset'] || 'USDT';
@@ -483,7 +444,6 @@ function parseBinance(rows: Record<string, string>[], journalId: string, userId:
   return trades;
 }
 
-// Bybit
 function parseBybit(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   return rows
     .filter(row => {
@@ -524,14 +484,11 @@ function parseBybit(rows: Record<string, string>[], journalId: string, userId: s
     });
 }
 
-// ── MAIN PARSER ────────────────────────────────────────────────────────────
-
 function parseCSV(content: string, journalId: string, userId: string): ParseResult {
   const errors: string[] = [];
   const lines = content.split('\n').filter(l => l.trim() !== '');
   if (lines.length < 2) return { trades: [], platform: 'Unknown', errors: ['CSV dosyası boş veya geçersiz.'] };
 
-  // Header satırını bul
   let headerIdx = 0;
   for (let i = 0; i < Math.min(15, lines.length); i++) {
     const lower = lines[i].toLowerCase();
@@ -541,19 +498,18 @@ function parseCSV(content: string, journalId: string, userId: string): ParseResu
       lower.includes('ticket') || lower.includes('pozisyon') ||
       lower.includes('base-asset') || lower.includes('base asset') ||
       lower.includes('side') || lower.includes('b/s') ||
-      lower.includes('tür') || lower.includes('zaman')
+      lower.includes('zaman') || lower.includes('hacim')
     ) {
       headerIdx = i;
       break;
     }
   }
 
-  // Sadece "Pozisyonlar" bölümünü al (MT5 Türkçe için)
-  // "Emirler" bölümü başlayınca dur
+  // MT5'te "Emirler" bölümünü atla
   let endIdx = lines.length;
   for (let i = headerIdx + 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (line.toLowerCase().startsWith('emirler') || line.toLowerCase().startsWith('orders')) {
+    const line = lines[i].trim().toLowerCase();
+    if (line.startsWith('emirler') || line.startsWith('orders')) {
       endIdx = i;
       break;
     }
@@ -568,16 +524,13 @@ function parseCSV(content: string, journalId: string, userId: string): ParseResu
     const values = lines[i].split(separator).map(v => v.trim().replace(/^"|"$/g, ''));
     if (values.length < 2 || values.every(v => v === '')) continue;
     const row: Record<string, string> = {};
-    headers.forEach((h, idx) => {
-      row[h] = values[idx] || '';
-    });
+    headers.forEach((h, idx) => { row[h] = values[idx] || ''; });
     rows.push(row);
   }
 
   if (rows.length === 0) return { trades: [], platform, errors: ['CSV dosyasında veri bulunamadı.'] };
 
   let trades: Trade[] = [];
-
   try {
     switch (platform) {
       case 'MT4/MT5': trades = parseMT4(rows, journalId, userId); break;
@@ -597,11 +550,8 @@ function parseCSV(content: string, journalId: string, userId: string): ParseResu
   }
 
   trades = trades.filter(t => t.symbol && t.symbol.length > 0 && t.date);
-
   return { trades, platform, errors };
 }
-
-// ── UI ─────────────────────────────────────────────────────────────────────
 
 const PLATFORM_COLORS: Record<string, string> = {
   'MT4/MT5': '#818cf8',
