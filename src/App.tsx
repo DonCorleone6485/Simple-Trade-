@@ -40,13 +40,25 @@ export default function App() {
   const [newJournalCapital, setNewJournalCapital] = useState('');
   const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isPro, setIsPro] = useState(false);
 
   useEffect(() => {
     if (user) {
       loadJournals();
       loadTrades();
+      checkProStatus();
     }
   }, [user]);
+
+  const checkProStatus = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('users')
+      .select('is_pro')
+      .eq('user_id', user.id)
+      .single();
+    if (data) setIsPro(data.is_pro);
+  };
 
   const loadJournals = async () => {
     if (!user) return;
@@ -142,8 +154,7 @@ export default function App() {
     if (!activeJournal || !user) return;
 
     // Ücretsiz limit kontrolü
-    const userTradeCount = trades.filter(t => t.user_id === user.id).length;
-    if (userTradeCount >= 20) {
+    if (!isPro && trades.filter(t => t.user_id === user.id).length >= 20) {
       setShowTradeModal(false);
       setView('pricing');
       return;
@@ -404,6 +415,13 @@ export default function App() {
               >
                 {language === 'tr' ? 'Fiyatlar' : language === 'fa' ? 'قیمت‌ها' : 'Pricing'}
               </button>
+
+              {/* Pro badge */}
+              {isPro && (
+                <span className="hidden sm:block px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
+                  PRO
+                </span>
+              )}
 
               <div className="relative" ref={langMenuRef}>
                 <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
