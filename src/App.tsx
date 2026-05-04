@@ -42,6 +42,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [isPro, setIsPro] = useState(false);
 
+  const isRTL = language === 'fa' || language === 'ar';
+
   useEffect(() => {
     if (user) {
       loadJournals();
@@ -152,14 +154,11 @@ export default function App() {
 
   const handleAddTrade = async (trade: Trade) => {
     if (!activeJournal || !user) return;
-
-    // Ücretsiz limit kontrolü
     if (!isPro && trades.filter(t => t.user_id === user.id).length >= 20) {
       setShowTradeModal(false);
       setView('pricing');
       return;
     }
-
     const { data } = await supabase
       .from('trades')
       .insert({
@@ -228,10 +227,7 @@ export default function App() {
 
   const handleUpdateGoals = async (goals: JournalGoals) => {
     if (!activeJournal) return;
-    await supabase
-      .from('journals')
-      .update({ goals })
-      .eq('id', activeJournal.id);
+    await supabase.from('journals').update({ goals }).eq('id', activeJournal.id);
     setAccounts(prev => prev.map(a => a.id === activeJournal.id ? { ...a, goals } : a));
     setActiveJournal(prev => prev ? { ...prev, goals } : prev);
   };
@@ -251,9 +247,15 @@ export default function App() {
   };
 
   const languages = [
-    { code: 'tr', label: 'Türkçe (TR)' },
-    { code: 'en', label: 'English (EN)' },
-    { code: 'fa', label: 'فارسی (FA)' },
+    { code: 'tr', label: 'Türkçe' },
+    { code: 'en', label: 'English' },
+    { code: 'fa', label: 'فارسی' },
+    { code: 'ar', label: 'العربية' },
+    { code: 'ru', label: 'Русский' },
+    { code: 'es', label: 'Español' },
+    { code: 'pt', label: 'Português' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'fr', label: 'Français' },
   ];
 
   const formatDate = (dateStr?: string) => {
@@ -261,6 +263,12 @@ export default function App() {
     const d = new Date(dateStr);
     if (language === 'tr') return new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium' }).format(d);
     if (language === 'fa') return new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium' }).format(d);
+    if (language === 'ar') return new Intl.DateTimeFormat('ar-SA', { dateStyle: 'medium' }).format(d);
+    if (language === 'ru') return new Intl.DateTimeFormat('ru-RU', { dateStyle: 'medium' }).format(d);
+    if (language === 'es') return new Intl.DateTimeFormat('es-ES', { dateStyle: 'medium' }).format(d);
+    if (language === 'pt') return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(d);
+    if (language === 'de') return new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium' }).format(d);
+    if (language === 'fr') return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(d);
     return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(d);
   };
 
@@ -273,9 +281,14 @@ export default function App() {
     { key: 'goals', label: t('goalsTab'), icon: <Target className="w-4 h-4" /> },
   ];
 
-  return (
-    <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={language === 'fa' ? 'rtl' : 'ltr'}>
+  const signInLabel = language === 'tr' ? 'Giriş Yap' : language === 'fa' ? 'ورود' : language === 'ar' ? 'تسجيل الدخول' : language === 'ru' ? 'Войти' : language === 'es' ? 'Iniciar sesión' : language === 'pt' ? 'Entrar' : language === 'de' ? 'Anmelden' : language === 'fr' ? 'Se connecter' : 'Sign In';
+  const signUpLabel = language === 'tr' ? 'Kayıt Ol' : language === 'fa' ? 'ثبت نام' : language === 'ar' ? 'إنشاء حساب' : language === 'ru' ? 'Регистрация' : language === 'es' ? 'Registrarse' : language === 'pt' ? 'Cadastrar' : language === 'de' ? 'Registrieren' : language === 'fr' ? "S'inscrire" : 'Sign Up';
+  const pricingLabel = language === 'tr' ? 'Fiyatlar' : language === 'fa' ? 'قیمت‌ها' : language === 'ar' ? 'الأسعار' : language === 'ru' ? 'Цены' : language === 'es' ? 'Precios' : language === 'pt' ? 'Preços' : language === 'de' ? 'Preise' : language === 'fr' ? 'Tarifs' : 'Pricing';
 
+  return (
+    <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
+
+      {/* AUTH EKRANI */}
       <SignedOut>
         <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: '#0d0e1a' }}>
           <div className="flex items-center gap-2 mb-8">
@@ -283,26 +296,23 @@ export default function App() {
             <span className="text-xl font-bold">Trade Journal</span>
           </div>
           <div className="flex gap-2 mb-6 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
-            <button
-              onClick={() => setAuthView('signin')}
-              className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
-              style={authView === 'signin' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}
-            >
-              {language === 'tr' ? 'Giriş Yap' : language === 'fa' ? 'ورود' : 'Sign In'}
+            <button onClick={() => setAuthView('signin')} className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
+              style={authView === 'signin' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}>
+              {signInLabel}
             </button>
-            <button
-              onClick={() => setAuthView('signup')}
-              className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
-              style={authView === 'signup' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}
-            >
-              {language === 'tr' ? 'Kayıt Ol' : language === 'fa' ? 'ثبت نام' : 'Sign Up'}
+            <button onClick={() => setAuthView('signup')} className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
+              style={authView === 'signup' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}>
+              {signUpLabel}
             </button>
           </div>
           {authView === 'signin' ? <SignIn routing="hash" /> : <SignUp routing="hash" />}
         </div>
       </SignedOut>
 
+      {/* ANA UYGULAMA */}
       <SignedIn>
+
+        {/* Delete Modal */}
         {accountToDelete && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="rounded-2xl p-6 w-full max-w-md" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -316,6 +326,7 @@ export default function App() {
           </div>
         )}
 
+        {/* New Journal Modal */}
         {showNewJournalModal && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="rounded-2xl p-6 w-full max-w-md" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -355,6 +366,7 @@ export default function App() {
           </div>
         )}
 
+        {/* Trade Form Modal */}
         {showTradeModal && (
           <div className="fixed inset-0 bg-black/80 flex items-start justify-center z-50 p-4 overflow-y-auto">
             <div className="w-full max-w-4xl my-8">
@@ -370,6 +382,7 @@ export default function App() {
           </div>
         )}
 
+        {/* Header */}
         <header style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0d0e1a' }} className="sticky top-0 z-10">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -380,7 +393,7 @@ export default function App() {
                     style={{ color: 'rgba(255,255,255,0.5)' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
-                    <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
+                    <ChevronLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
                     <span className="hidden sm:inline">{t('myJournals')}</span>
                   </button>
                   <div className="h-5 w-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
@@ -406,17 +419,14 @@ export default function App() {
                 </button>
               )}
 
-              <button
-                onClick={() => setView('pricing')}
+              <button onClick={() => setView('pricing')}
                 className="hidden sm:block px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
                 style={{ color: view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)'; }}
-              >
-                {language === 'tr' ? 'Fiyatlar' : language === 'fa' ? 'قیمت‌ها' : 'Pricing'}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)'; }}>
+                {pricingLabel}
               </button>
 
-              {/* Pro badge */}
               {isPro && (
                 <span className="hidden sm:block px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
                   PRO
@@ -425,18 +435,20 @@ export default function App() {
 
               <div className="relative" ref={langMenuRef}>
                 <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-sm font-medium uppercase"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-sm font-medium"
                   style={{ color: 'rgba(255,255,255,0.5)' }}>
                   <Globe className="w-4 h-4" />
-                  <span className="hidden sm:inline">{language}</span>
+                  <span className="hidden sm:inline uppercase">{language}</span>
                   <ChevronDown className={`w-3 h-3 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isLangMenuOpen && (
-                  <div className="absolute top-full end-0 mt-2 w-40 rounded-xl shadow-xl overflow-hidden z-50 py-1" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div className="absolute top-full end-0 mt-2 w-44 rounded-xl shadow-xl overflow-hidden z-50 py-1" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
                     {languages.map(lang => (
                       <button key={lang.code} onClick={() => { setLanguage(lang.code as any); setIsLangMenuOpen(false); }}
-                        className="w-full text-start px-4 py-2 text-sm"
-                        style={{ color: language === lang.code ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: language === lang.code ? 600 : 400 }}>
+                        className="w-full text-start px-4 py-2 text-sm transition-colors"
+                        style={{ color: language === lang.code ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: language === lang.code ? 600 : 400 }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                         {lang.label}
                       </button>
                     ))}
@@ -454,14 +466,11 @@ export default function App() {
                     </div>
                   )}
                 </div>
-                <button
-                  onClick={() => signOut()}
-                  className="p-1.5 rounded-lg transition-all"
+                <button onClick={() => signOut()} className="p-1.5 rounded-lg transition-all"
                   style={{ color: 'rgba(255,255,255,0.4)' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}
-                  title="Çıkış Yap"
-                >
+                  title="Çıkış Yap">
                   <LogOut className="w-4 h-4" />
                 </button>
               </div>
@@ -469,14 +478,17 @@ export default function App() {
           </div>
         </header>
 
+        {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
           </div>
         )}
 
+        {/* FİYATLANDIRMA */}
         {!loading && view === 'pricing' && <PricingPage />}
 
+        {/* DASHBOARD */}
         {!loading && view === 'dashboard' && (
           <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
             <div className="flex items-center justify-between mb-6 sm:mb-8">
@@ -561,6 +573,7 @@ export default function App() {
           </main>
         )}
 
+        {/* EXPANDED VIEW */}
         {!loading && view === 'expanded' && activeJournal && activeStats && (
           <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
             <div className="mb-6">
@@ -595,14 +608,11 @@ export default function App() {
 
             <div className="flex gap-1 p-1 rounded-xl mb-6 sm:mb-8 w-full sm:w-fit" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
               {tabs.map(tab => (
-                <button
-                  key={tab.key}
-                  onClick={() => setJournalTab(tab.key as JournalTab)}
+                <button key={tab.key} onClick={() => setJournalTab(tab.key as JournalTab)}
                   className="flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all flex-1 sm:flex-none whitespace-nowrap"
                   style={journalTab === tab.key
                     ? { background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }
-                    : { color: 'rgba(255,255,255,0.4)' }}
-                >
+                    : { color: 'rgba(255,255,255,0.4)' }}>
                   {tab.icon}
                   <span className="hidden sm:inline">{tab.label}</span>
                 </button>
