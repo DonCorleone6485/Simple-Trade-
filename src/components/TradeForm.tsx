@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Upload, X } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Upload, X, Search, ChevronDown } from 'lucide-react';
 import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
@@ -38,6 +38,39 @@ const sectionTitle: React.CSSProperties = {
   letterSpacing: '0.08em', color: 'rgba(255,255,255,0.3)', marginBottom: '16px',
 };
 
+const SYMBOLS: Record<string, string[]> = {
+  Forex: [
+    'EURUSD', 'USDJPY', 'GBPUSD', 'AUDUSD', 'USDCHF', 'USDCAD', 'NZDUSD',
+    'EURGBP', 'EURJPY', 'GBPJPY', 'AUDJPY', 'EURAUD', 'EURNZD', 'EURCAD',
+    'GBPCAD', 'GBPNZD', 'GBPAUD', 'AUDCAD', 'AUDCHF', 'AUDNZD', 'NZDCAD',
+    'NZDCHF', 'CADJPY', 'CADCHF', 'CHFJPY', 'EURHUF', 'EURPLN', 'EURCZK',
+    'USDMXN', 'USDZAR', 'USDSGD', 'USDNOK', 'USDSEK', 'USDHKD', 'USDCNH',
+  ],
+  Crypto: [
+    'BTCUSD', 'ETHUSD', 'BNBUSD', 'SOLUSD', 'XRPUSD', 'ADAUSD', 'DOTUSD',
+    'MATICUSD', 'LINKUSD', 'AVAXUSD', 'ATOMUSD', 'LTCUSD', 'BCHUSD', 'XLMUSD',
+    'UNIUSD', 'AAVEUSD', 'FILUSD', 'TRXUSD', 'ETCUSD', 'ALGOUSD', 'VETUSD',
+    'ICPUSD', 'THETAUSD', 'FTMUSD', 'SANDUSD', 'MANAUSD', 'APEUSD', 'DOGEUSD',
+    'SHIBUSD', 'PEPEUSD',
+  ],
+  Indices: [
+    'US30', 'US100', 'SPX500', 'GER40', 'UK100', 'FRA40', 'JPN225',
+    'AUS200', 'HKG50', 'ESP35', 'ITA40', 'SWI20', 'NLD25', 'SGP30',
+    'CHINAH', 'INDIA50', 'STOXX50', 'RUSSELL2000',
+  ],
+  Metals: [
+    'XAUUSD', 'XAGUSD', 'XPTUSD', 'XPDUSD', 'XCUUSD',
+    'GOLD', 'SILVER', 'PLATINUM', 'PALLADIUM', 'COPPER',
+  ],
+  Futures: [
+    'USOil', 'UKOil', 'NGAS', 'WHEAT', 'CORN', 'SOYBEAN', 'COFFEE',
+    'SUGAR', 'COTTON', 'COCOA', 'LUMBER', 'CATTLE', 'HOGS',
+    'CL', 'NG', 'GC', 'SI', 'ZC', 'ZW', 'ZS',
+  ],
+};
+
+const ALL_CATEGORIES = ['Forex', 'Crypto', 'Indices', 'Metals', 'Futures'];
+
 const SETUPS = [
   'FVG', 'OB', 'BOS / ChoCH', 'Liquidity Sweep',
   'EQH / EQL', 'Breaker Block', 'Mitigation',
@@ -46,15 +79,180 @@ const SETUPS = [
 
 const TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1'];
 
-const SYMBOLS = [
-  'EURUSD','USDJPY','GBPUSD','XAUUSD','US100','SPX500','AUDUSD',
-  'US30','USOil','USDCHF','USDCAD','GBPJPY','EURJPY','UKOil',
-  'GER30','EURGBP','XAGUSD','NZDUSD','AUDJPY','EURAUD','UK100',
-  'JPN225','NGCUSD','F40EUR','AUS200','HSIHKD','USDCNH','USDMXN',
-  'USDZAR','USDSGD','USDNOK','USDSEK','USDHKD','EURCAD','EURNZD',
-  'GBPCAD','GBPNZD','AUDCAD','AUDCHF','NZDCAD','NZDCHF','CADJPY',
-  'CADCHF','EURHUF','EURPLN','EURCZK','SPN35EUR',
-];
+function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('Forex');
+  const [recentlyUsed, setRecentlyUsed] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('recentSymbols') || '[]'); } catch { return []; }
+  });
+  const ref = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (open && searchRef.current) searchRef.current.focus();
+  }, [open]);
+
+  const handleSelect = (symbol: string) => {
+    onChange(symbol);
+    const updated = [symbol, ...recentlyUsed.filter(s => s !== symbol)].slice(0, 5);
+    setRecentlyUsed(updated);
+    localStorage.setItem('recentSymbols', JSON.stringify(updated));
+    setOpen(false);
+    setSearch('');
+  };
+
+  const filteredSymbols = search.trim()
+    ? Object.values(SYMBOLS).flat().filter(s => s.toLowerCase().includes(search.toLowerCase()))
+    : SYMBOLS[category] || [];
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && search.trim()) {
+      handleSelect(search.trim().toUpperCase());
+    }
+  };
+
+  return (
+    <div ref={ref} className="relative w-full">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-mono font-medium transition-all"
+        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
+      >
+        <span>{value || 'Sembol seç...'}</span>
+        <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.4)' }} />
+      </button>
+
+      {open && (
+        <div className="absolute top-full start-0 mt-2 w-full z-50 rounded-2xl overflow-hidden shadow-2xl"
+          style={{ background: '#12131f', border: '1px solid rgba(255,255,255,0.1)', minWidth: '280px' }}>
+
+          {/* Arama */}
+          <div className="p-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <Search className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
+              <input
+                ref={searchRef}
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Sembol ara veya yaz... (Enter ile ekle)"
+                className="flex-1 bg-transparent outline-none text-sm text-white placeholder-gray-500"
+                style={{ color: '#fff' }}
+              />
+              {search && (
+                <button type="button" onClick={() => setSearch('')}>
+                  <X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Kategoriler */}
+          {!search && (
+            <div className="flex gap-1 px-3 py-2 overflow-x-auto" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              {ALL_CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setCategory(cat)}
+                  className="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0"
+                  style={category === cat
+                    ? { background: '#8b5cf6', color: '#fff' }
+                    : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Liste */}
+          <div className="overflow-y-auto" style={{ maxHeight: '280px' }}>
+            {/* Son kullanılanlar */}
+            {!search && recentlyUsed.length > 0 && (
+              <div>
+                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                  Son Kullanılanlar
+                </div>
+                {recentlyUsed.map(symbol => (
+                  <button
+                    key={`recent-${symbol}`}
+                    type="button"
+                    onClick={() => handleSelect(symbol)}
+                    className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
+                    style={{ color: '#fff' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                  >
+                    <span className="font-mono font-medium">{symbol}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.35)' }}>
+                      {Object.entries(SYMBOLS).find(([, v]) => v.includes(symbol))?.[0] || 'Custom'}
+                    </span>
+                  </button>
+                ))}
+                <div className="mx-4 my-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+              </div>
+            )}
+
+            {/* Arama sonuçları veya kategori listesi */}
+            {search && (
+              <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                {filteredSymbols.length > 0 ? 'Sonuçlar' : 'Bulunamadı — Enter ile ekle'}
+              </div>
+            )}
+
+            {!search && (
+              <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                {category}
+              </div>
+            )}
+
+            {filteredSymbols.map(symbol => (
+              <button
+                key={symbol}
+                type="button"
+                onClick={() => handleSelect(symbol)}
+                className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
+                style={{ color: value === symbol ? '#a78bfa' : '#fff' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+              >
+                <span className="font-mono font-medium">{symbol}</span>
+                {value === symbol && <span className="text-xs" style={{ color: '#a78bfa' }}>✓</span>}
+              </button>
+            ))}
+
+            {/* Özel sembol ekle */}
+            {search.trim() && !filteredSymbols.includes(search.trim().toUpperCase()) && (
+              <button
+                type="button"
+                onClick={() => handleSelect(search.trim().toUpperCase())}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm transition-all"
+                style={{ color: '#a78bfa', borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+              >
+                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(139,92,246,0.2)' }}>+</span>
+                <span><span className="font-mono font-semibold">{search.trim().toUpperCase()}</span> ekle</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function PhotoUploader({ photos, onUpload, onRemove }: {
   photos: string[];
@@ -205,9 +403,7 @@ export default function TradeForm({ onSave }: TradeFormProps) {
 
           <div>
             <label style={lbl}>{t('symbol')}</label>
-            <select value={symbol} onChange={e => setSymbol(e.target.value)} style={selStyle}>
-              {SYMBOLS.map(s => <option key={s} value={s} style={optStyle}>{s}</option>)}
-            </select>
+            <SymbolPicker value={symbol} onChange={setSymbol} />
           </div>
 
           <div>
