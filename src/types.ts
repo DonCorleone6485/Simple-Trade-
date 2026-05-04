@@ -34,4 +34,5 @@ export interface Trade {
   postTradeNotes: string;
   preTradePhotos: string[];
   postTradePhotos: string[];
+  importSource?: string;
 }
