@@ -14,7 +14,7 @@ export default function PricingPage() {
 
   const freeFeatures = [
     t('1 Journal', '1 Journal', '۱ ژورنال'),
-    t('Max 50 Trade', 'Max 50 Trades', 'حداکثر ۵۰ معامله'),
+    t('Max 20 Trade', 'Max 20 Trades', 'حداکثر ۲۰ معامله'),
     t('Temel İstatistikler', 'Basic Statistics', 'آمار پایه'),
     t('Takvim Görünümü', 'Calendar View', 'نمای تقویم'),
   ];
@@ -39,7 +39,6 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen py-16 px-4" style={{ background: '#0d0e1a' }}>
-      {/* Başlık */}
       <div className="text-center mb-12">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6" style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', color: '#a78bfa' }}>
           <Zap className="w-4 h-4" />
@@ -53,7 +52,6 @@ export default function PricingPage() {
         </p>
       </div>
 
-      {/* Billing Toggle */}
       <div className="flex items-center justify-center gap-4 mb-12">
         <span className="text-sm font-medium" style={{ color: billing === 'monthly' ? '#fff' : 'rgba(255,255,255,0.4)' }}>
           {t('Aylık', 'Monthly', 'ماهانه')}
@@ -74,10 +72,8 @@ export default function PricingPage() {
         </span>
       </div>
 
-      {/* Kartlar */}
       <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        {/* Ücretsiz Plan */}
         <div className="rounded-2xl p-8" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="mb-6">
             <h2 className="text-xl font-bold text-white mb-1">{t('Ücretsiz', 'Free', 'رایگان')}</h2>
@@ -111,9 +107,7 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* Pro Plan */}
         <div className="rounded-2xl p-8 relative" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
-          {/* Popüler etiketi */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
             <span className="px-4 py-1 rounded-full text-xs font-semibold" style={{ background: '#8b5cf6', color: '#fff' }}>
               {t('En Popüler', 'Most Popular', 'محبوب‌ترین')}
@@ -162,7 +156,6 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Alt bilgi */}
       <div className="text-center mt-12">
         <p className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
           {t('Kredi kartı gerekmez • İstediğiniz zaman iptal edin', 'No credit card required • Cancel anytime', 'نیازی به کارت اعتباری نیست • هر زمان لغو کنید')}
