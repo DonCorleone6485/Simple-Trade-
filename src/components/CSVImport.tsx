@@ -142,13 +142,15 @@ function parseMT4(rows: string[][], journalId: string, userId: string): Trade[] 
     if (!symbol) continue;
 
     const type = getType(typeRaw);
-    const openDate = parseDate(cols[0] || '');    // Zaman (açılış)
-    const openPrice = parseNumber(cols[5] || '0'); // Fiyat (açılış)
-    const sl = parseNumber(cols[6] || '0');        // S / L
-    const tp = parseNumber(cols[7] || '0');        // T / P
-    const profit = parseNumber(cols[12] || '0');   // Kar
+    const openDate = parseDate(cols[0] || '');
+    const openPrice = parseNumber(cols[5] || '0');
+    const sl = parseNumber(cols[6] || '0');
+    const tp = parseNumber(cols[7] || '0');
+    const profit = parseNumber(cols[12] || '0');
+
     const rr = calcRR(openPrice, sl, tp, type);
-    const risk = sl > 0 ? Math.abs(openPrice - sl) : 0;
+    const reward = profit > 0 ? profit : 0;
+    const risk = profit < 0 ? Math.abs(profit) : 0;
 
     trades.push({
       id: makeId(),
@@ -161,7 +163,7 @@ function parseMT4(rows: string[][], journalId: string, userId: string): Trade[] 
       timeframe: '',
       setup: '',
       risk,
-      reward: profit > 0 ? profit : 0,
+      reward,
       rr,
       result: getResult(profit),
       preTradeNotes: '',
