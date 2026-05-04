@@ -207,6 +207,26 @@ export default function App() {
       setShowTradeModal(false);
     }
   };
+  const handleUpdateTrade = async (trade: Trade) => {
+  await supabase.from('trades').update({
+    symbol: trade.symbol,
+    type: trade.type,
+    timeframe: trade.timeframe,
+    setup: trade.setup,
+    risk: trade.risk,
+    reward: trade.reward,
+    rr: trade.rr,
+    result: trade.result,
+    pre_trade_notes: trade.preTradeNotes,
+    post_trade_notes: trade.postTradeNotes,
+  }).eq('id', trade.id);
+  setTrades(prev => prev.map(t => t.id === trade.id ? trade : t));
+};
+
+const handleDeleteMultiple = async (ids: string[]) => {
+  await supabase.from('trades').delete().in('id', ids);
+  setTrades(prev => prev.filter(t => !ids.includes(t.id)));
+};
 
   const handleCSVImport = async (importedTrades: Trade[]) => {
     if (!activeJournal || !user) return;
