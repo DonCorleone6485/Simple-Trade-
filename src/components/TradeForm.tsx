@@ -50,35 +50,39 @@ const SYMBOLS: Record<string, string[]> = {
     'BTCUSD', 'ETHUSD', 'BNBUSD', 'SOLUSD', 'XRPUSD', 'ADAUSD', 'DOTUSD',
     'MATICUSD', 'LINKUSD', 'AVAXUSD', 'ATOMUSD', 'LTCUSD', 'BCHUSD', 'XLMUSD',
     'UNIUSD', 'AAVEUSD', 'FILUSD', 'TRXUSD', 'ETCUSD', 'ALGOUSD', 'VETUSD',
-    'DOGEUSD', 'SHIBUSD', 'PEPEUSD', 'APEUSD', 'SANDUSD', 'MANAUSD',
+    'ICPUSD', 'THETAUSD', 'FTMUSD', 'SANDUSD', 'MANAUSD', 'APEUSD', 'DOGEUSD',
+    'SHIBUSD', 'PEPEUSD',
   ],
   Indices: [
     'US30', 'US100', 'SPX500', 'GER40', 'UK100', 'FRA40', 'JPN225',
-    'AUS200', 'HKG50', 'ESP35', 'ITA40', 'SWI20', 'STOXX50', 'RUSSELL2000',
+    'AUS200', 'HKG50', 'ESP35', 'ITA40', 'SWI20', 'NLD25', 'SGP30',
+    'CHINAH', 'INDIA50', 'STOXX50', 'RUSSELL2000',
   ],
   Metals: [
     'XAUUSD', 'XAGUSD', 'XPTUSD', 'XPDUSD', 'XCUUSD',
     'GOLD', 'SILVER', 'PLATINUM', 'PALLADIUM', 'COPPER',
   ],
   Futures: [
-    'USOil', 'UKOil', 'NGAS', 'CL', 'NG', 'GC', 'SI',
-    'WHEAT', 'CORN', 'SOYBEAN', 'ZC', 'ZW', 'ZS',
-    'COFFEE', 'SUGAR', 'COTTON', 'COCOA',
-    '6E', '6J', '6B', '6A', '6C',
+    'USOil', 'UKOil', 'NGAS', 'WHEAT', 'CORN', 'SOYBEAN', 'COFFEE',
+    'SUGAR', 'COTTON', 'COCOA', 'LUMBER', 'CATTLE', 'HOGS',
+    'CL', 'NG', 'GC', 'SI', 'ZC', 'ZW', 'ZS',
   ],
 };
 
-const CATEGORY_COLORS: Record<string, string> = {
-  Forex: '#818cf8',
-  Crypto: '#f59e0b',
-  Indices: '#34d399',
-  Metals: '#fbbf24',
-  Futures: '#f87171',
-};
+const ALL_CATEGORIES = ['Forex', 'Crypto', 'Indices', 'Metals', 'Futures'];
+
+const SETUPS = [
+  'FVG', 'OB', 'BOS / ChoCH', 'Liquidity Sweep',
+  'EQH / EQL', 'Breaker Block', 'Mitigation',
+  'VWAP', 'Trend Pullback', 'Range Breakout', 'Diğer',
+];
+
+const TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1'];
 
 function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('Forex');
   const [recentlyUsed, setRecentlyUsed] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem('recentSymbols') || '[]'); } catch { return []; }
   });
@@ -87,10 +91,7 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-        setSearch('');
-      }
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -109,78 +110,44 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
     setSearch('');
   };
 
+  const filteredSymbols = search.trim()
+    ? Object.values(SYMBOLS).flat().filter(s => s.toLowerCase().includes(search.toLowerCase()))
+    : SYMBOLS[category] || [];
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && search.trim()) {
-      const q = search.trim().toUpperCase();
-      // İlk eşleşen sembolü seç, yoksa custom ekle
-      const allMatches = Object.values(SYMBOLS).flat().filter(s => s.toLowerCase().includes(search.toLowerCase()));
-      if (allMatches.length > 0) handleSelect(allMatches[0]);
-      else handleSelect(q);
+      handleSelect(search.trim().toUpperCase());
     }
-    if (e.key === 'Escape') { setOpen(false); setSearch(''); }
-  };
-
-  // Arama sonuçlarını kategoriye göre grupla
-  const getGroupedResults = () => {
-    if (!search.trim()) return null;
-    const q = search.toLowerCase();
-    const groups: Record<string, string[]> = {};
-    Object.entries(SYMBOLS).forEach(([cat, symbols]) => {
-      const matches = symbols.filter(s => s.toLowerCase().includes(q));
-      if (matches.length > 0) groups[cat] = matches;
-    });
-    return groups;
-  };
-
-  const groupedResults = getGroupedResults();
-  const totalResults = groupedResults ? Object.values(groupedResults).flat().length : 0;
-  const isCustom = search.trim() && totalResults === 0;
-
-  const getCategoryForSymbol = (symbol: string) => {
-    return Object.entries(SYMBOLS).find(([, v]) => v.includes(symbol))?.[0] || 'Custom';
   };
 
   return (
     <div ref={ref} className="relative w-full">
-      {/* Trigger butonu */}
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-mono font-semibold transition-all"
-        style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${open ? 'rgba(139,92,246,0.5)' : 'rgba(255,255,255,0.1)'}`, color: '#fff' }}
+        className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-mono font-medium transition-all"
+        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
       >
-        <div className="flex items-center gap-2">
-          {value && (
-            <span className="text-xs px-2 py-0.5 rounded-full font-normal" style={{
-              background: `${CATEGORY_COLORS[getCategoryForSymbol(value)]}20`,
-              color: CATEGORY_COLORS[getCategoryForSymbol(value)] || 'rgba(255,255,255,0.4)',
-            }}>
-              {getCategoryForSymbol(value)}
-            </span>
-          )}
-          <span>{value || 'Sembol seç...'}</span>
-        </div>
+        <span>{value || 'Sembol seç...'}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.4)' }} />
       </button>
 
-      {/* Dropdown */}
       {open && (
         <div className="absolute top-full start-0 mt-2 w-full z-50 rounded-2xl overflow-hidden shadow-2xl"
-          style={{ background: '#12131f', border: '1px solid rgba(255,255,255,0.1)', minWidth: '300px' }}>
+          style={{ background: '#12131f', border: '1px solid rgba(255,255,255,0.1)', minWidth: '280px' }}>
 
-          {/* Arama kutusu */}
-          <div className="p-3">
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl"
-              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <Search className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.4)' }} />
+          {/* Arama */}
+          <div className="p-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <Search className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
               <input
                 ref={searchRef}
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="EURUSD, BTC, US30..."
-                className="flex-1 bg-transparent outline-none text-sm font-mono"
+                placeholder="Sembol ara veya yaz... (Enter ile ekle)"
+                className="flex-1 bg-transparent outline-none text-sm text-white placeholder-gray-500"
                 style={{ color: '#fff' }}
               />
               {search && (
@@ -191,111 +158,93 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
             </div>
           </div>
 
-          {/* İçerik */}
-          <div className="overflow-y-auto" style={{ maxHeight: '320px' }}>
+          {/* Kategoriler */}
+          {!search && (
+            <div className="flex gap-1 px-3 py-2 overflow-x-auto" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              {ALL_CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setCategory(cat)}
+                  className="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0"
+                  style={category === cat
+                    ? { background: '#8b5cf6', color: '#fff' }
+                    : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
 
-            {/* Arama yokken: Recently Used + popüler */}
-            {!search && (
-              <>
-                {recentlyUsed.length > 0 && (
-                  <div>
-                    <div className="px-4 py-1.5 text-xs font-semibold uppercase tracking-wider"
-                      style={{ color: 'rgba(255,255,255,0.25)' }}>
-                      Son Kullanılanlar
-                    </div>
-                    {recentlyUsed.map(symbol => (
-                      <button key={`r-${symbol}`} type="button" onClick={() => handleSelect(symbol)}
-                        className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                        <span className="font-mono font-semibold text-white">{symbol}</span>
-                        <span className="text-xs px-2 py-0.5 rounded-full" style={{
-                          background: `${CATEGORY_COLORS[getCategoryForSymbol(symbol)]}20`,
-                          color: CATEGORY_COLORS[getCategoryForSymbol(symbol)] || 'rgba(255,255,255,0.4)',
-                        }}>
-                          {getCategoryForSymbol(symbol)}
-                        </span>
-                      </button>
-                    ))}
-                    <div className="mx-4 my-1" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }} />
-                  </div>
-                )}
-
-                {/* Popüler semboller */}
-                <div className="px-4 py-1.5 text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: 'rgba(255,255,255,0.25)' }}>
-                  Popüler
+          {/* Liste */}
+          <div className="overflow-y-auto" style={{ maxHeight: '280px' }}>
+            {/* Son kullanılanlar */}
+            {!search && recentlyUsed.length > 0 && (
+              <div>
+                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                  Son Kullanılanlar
                 </div>
-                {['EURUSD', 'XAUUSD', 'US100', 'BTCUSD', 'GBPUSD', 'US30', 'USDJPY', 'ETHUSD'].map(symbol => (
-                  <button key={symbol} type="button" onClick={() => handleSelect(symbol)}
+                {recentlyUsed.map(symbol => (
+                  <button
+                    key={`recent-${symbol}`}
+                    type="button"
+                    onClick={() => handleSelect(symbol)}
                     className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
-                    style={{ color: value === symbol ? '#a78bfa' : '#fff' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                    <span className="font-mono font-semibold">{symbol}</span>
-                    <div className="flex items-center gap-2">
-                      {value === symbol && <span style={{ color: '#a78bfa' }}>✓</span>}
-                      <span className="text-xs px-2 py-0.5 rounded-full" style={{
-                        background: `${CATEGORY_COLORS[getCategoryForSymbol(symbol)]}20`,
-                        color: CATEGORY_COLORS[getCategoryForSymbol(symbol)],
-                      }}>
-                        {getCategoryForSymbol(symbol)}
-                      </span>
-                    </div>
+                    style={{ color: '#fff' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                  >
+                    <span className="font-mono font-medium">{symbol}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.35)' }}>
+                      {Object.entries(SYMBOLS).find(([, v]) => v.includes(symbol))?.[0] || 'Custom'}
+                    </span>
                   </button>
                 ))}
-              </>
+                <div className="mx-4 my-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+              </div>
             )}
 
-            {/* Arama varken: kategoriye göre gruplu sonuçlar */}
-            {search && groupedResults && totalResults > 0 && (
-              <>
-                {Object.entries(groupedResults).map(([cat, symbols]) => (
-                  <div key={cat}>
-                    <div className="px-4 py-1.5 text-xs font-semibold uppercase tracking-wider flex items-center gap-2"
-                      style={{ color: CATEGORY_COLORS[cat] || 'rgba(255,255,255,0.25)' }}>
-                      <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: CATEGORY_COLORS[cat] }} />
-                      {cat}
-                    </div>
-                    {symbols.map(symbol => (
-                      <button key={symbol} type="button" onClick={() => handleSelect(symbol)}
-                        className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
-                        style={{ color: value === symbol ? '#a78bfa' : '#fff' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                        <span className="font-mono font-semibold">
-                          {/* Aranan harfleri vurgula */}
-                          {symbol.split(new RegExp(`(${search})`, 'gi')).map((part, i) =>
-                            part.toLowerCase() === search.toLowerCase()
-                              ? <span key={i} style={{ color: '#a78bfa' }}>{part}</span>
-                              : part
-                          )}
-                        </span>
-                        {value === symbol && <span style={{ color: '#a78bfa' }}>✓</span>}
-                      </button>
-                    ))}
-                  </div>
-                ))}
-              </>
+            {/* Arama sonuçları veya kategori listesi */}
+            {search && (
+              <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                {filteredSymbols.length > 0 ? 'Sonuçlar' : 'Bulunamadı — Enter ile ekle'}
+              </div>
             )}
+
+            {!search && (
+              <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                {category}
+              </div>
+            )}
+
+            {filteredSymbols.map(symbol => (
+              <button
+                key={symbol}
+                type="button"
+                onClick={() => handleSelect(symbol)}
+                className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
+                style={{ color: value === symbol ? '#a78bfa' : '#fff' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+              >
+                <span className="font-mono font-medium">{symbol}</span>
+                {value === symbol && <span className="text-xs" style={{ color: '#a78bfa' }}>✓</span>}
+              </button>
+            ))}
 
             {/* Özel sembol ekle */}
-            {search.trim() && (
-              <button type="button"
+            {search.trim() && !filteredSymbols.includes(search.trim().toUpperCase()) && (
+              <button
+                type="button"
                 onClick={() => handleSelect(search.trim().toUpperCase())}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm transition-all"
-                style={{
-                  color: '#a78bfa',
-                  borderTop: totalResults > 0 ? '1px solid rgba(255,255,255,0.06)' : 'none',
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                  style={{ background: 'rgba(139,92,246,0.2)' }}>+</span>
-                <span>
-                  <span className="font-mono font-semibold">{search.trim().toUpperCase()}</span>
-                  <span style={{ color: 'rgba(255,255,255,0.4)' }}> ekle</span>
-                </span>
+                style={{ color: '#a78bfa', borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+              >
+                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(139,92,246,0.2)' }}>+</span>
+                <span><span className="font-mono font-semibold">{search.trim().toUpperCase()}</span> ekle</span>
               </button>
             )}
           </div>
@@ -330,12 +279,14 @@ function PhotoUploader({ photos, onUpload, onRemove }: {
       {photos.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
           {photos.map((photo, index) => (
-            <div key={index} className="relative aspect-square rounded-xl overflow-hidden group"
-              style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+            <div key={index} className="relative aspect-square rounded-xl overflow-hidden group" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
               <img src={photo} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
-              <button type="button" onClick={() => onRemove(index)}
+              <button
+                type="button"
+                onClick={() => onRemove(index)}
                 className="absolute top-1 end-1 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}>
+                style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -362,14 +313,6 @@ export default function TradeForm({ onSave }: TradeFormProps) {
   const [postNotes, setPostNotes] = useState('');
   const [prePhotos, setPrePhotos] = useState<string[]>([]);
   const [postPhotos, setPostPhotos] = useState<string[]>([]);
-
-  const SETUPS = [
-    'FVG', 'OB', 'BOS / ChoCH', 'Liquidity Sweep',
-    'EQH / EQL', 'Breaker Block', 'Mitigation',
-    'VWAP', 'Trend Pullback', 'Range Breakout', 'Diğer',
-  ];
-
-  const TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1'];
 
   const handleResultChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value as 'Başarılı' | 'Başarısız' | 'Manuel Karda' | 'Manuel Zararda';
@@ -432,14 +375,15 @@ export default function TradeForm({ onSave }: TradeFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl overflow-hidden"
-      style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+    <form onSubmit={handleSubmit} className="rounded-2xl overflow-hidden" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
       <div className="p-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <h2 className="text-lg font-semibold text-white">{t('formTitle')}</h2>
         <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('formSubtitle')}</p>
       </div>
 
       <div className="p-6 space-y-8">
+
+        {/* Row 1 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
             <label style={lbl}>{t('dateTime')}</label>
@@ -488,36 +432,58 @@ export default function TradeForm({ onSave }: TradeFormProps) {
               ))}
             </select>
             {setup === 'Diğer' && (
-              <input type="text" value={customSetup} onChange={e => setCustomSetup(e.target.value)}
-                placeholder="Setup adını yazın..." className="mt-2" style={{ ...inp }} autoFocus />
+              <input
+                type="text"
+                value={customSetup}
+                onChange={e => setCustomSetup(e.target.value)}
+                placeholder="Setup adını yazın..."
+                className="mt-2"
+                style={{ ...inp }}
+                autoFocus
+              />
             )}
           </div>
 
           <div>
             <label style={lbl}>{t('rr')}</label>
-            <input type="number" step="any" value={rr} onChange={e => setRr(e.target.value)}
-              style={{ ...inp, fontFamily: 'monospace' }} placeholder={t('rrPlaceholder')} />
+            <input
+              type="number" step="any"
+              value={rr} onChange={e => setRr(e.target.value)}
+              style={{ ...inp, fontFamily: 'monospace' }}
+              placeholder={t('rrPlaceholder')}
+            />
           </div>
         </div>
 
+        {/* Row 2 */}
         <div style={divider}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label style={lbl}>{t('risk')}</label>
               <div className="relative">
                 <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                <input type="number" min="0" step="0.01" required value={risk} onChange={e => setRisk(e.target.value)}
-                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
+                <input
+                  type="number" min="0" step="0.01" required
+                  value={risk} onChange={e => setRisk(e.target.value)}
+                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }}
+                  placeholder="0.00"
+                />
               </div>
             </div>
+
             <div>
               <label style={lbl}>{t('reward')}</label>
               <div className="relative">
                 <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                <input type="number" step="0.01" value={reward} onChange={e => setReward(e.target.value)}
-                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
+                <input
+                  type="number" step="0.01"
+                  value={reward} onChange={e => setReward(e.target.value)}
+                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }}
+                  placeholder="0.00"
+                />
               </div>
             </div>
+
             <div>
               <label style={lbl}>{t('result')}</label>
               <select value={result} onChange={handleResultChange} style={selStyle}>
@@ -530,6 +496,7 @@ export default function TradeForm({ onSave }: TradeFormProps) {
           </div>
         </div>
 
+        {/* Pre-Trade */}
         <div style={divider}>
           <p style={sectionTitle}>{t('preTrade')}</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -539,13 +506,16 @@ export default function TradeForm({ onSave }: TradeFormProps) {
             </div>
             <div>
               <label style={lbl}>{t('notes')}</label>
-              <textarea required value={preNotes} onChange={e => setPreNotes(e.target.value)}
+              <textarea
+                required value={preNotes} onChange={e => setPreNotes(e.target.value)}
                 style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }}
-                placeholder={t('preNotesPlaceholder')} />
+                placeholder={t('preNotesPlaceholder')}
+              />
             </div>
           </div>
         </div>
 
+        {/* Post-Trade */}
         <div style={divider}>
           <p style={sectionTitle}>{t('postTrade')}</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -555,19 +525,24 @@ export default function TradeForm({ onSave }: TradeFormProps) {
             </div>
             <div>
               <label style={lbl}>{t('notes')}</label>
-              <textarea value={postNotes} onChange={e => setPostNotes(e.target.value)}
+              <textarea
+                value={postNotes} onChange={e => setPostNotes(e.target.value)}
                 style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }}
-                placeholder={t('postNotesPlaceholder')} />
+                placeholder={t('postNotesPlaceholder')}
+              />
             </div>
           </div>
         </div>
       </div>
 
       <div className="p-6 flex justify-end" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
-        <button type="submit" className="px-6 py-2.5 font-semibold rounded-xl transition-all"
+        <button
+          type="submit"
+          className="px-6 py-2.5 font-semibold rounded-xl transition-all"
           style={{ background: '#8b5cf6', color: '#fff' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
+        >
           {t('saveButton')}
         </button>
       </div>
