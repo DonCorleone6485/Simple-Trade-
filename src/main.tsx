@@ -1,13 +1,18 @@
-import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
-import App from './App.tsx';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ClerkProvider } from '@clerk/clerk-react';
+import App from './App';
+import { LanguageProvider } from './context/LanguageContext';
 import './index.css';
-import { LanguageProvider } from './context/LanguageContext.tsx';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <LanguageProvider>
-      <App />
-    </LanguageProvider>
-  </StrictMode>,
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
+    </ClerkProvider>
+  </React.StrictMode>
 );
