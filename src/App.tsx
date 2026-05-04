@@ -38,6 +38,7 @@ export default function App() {
   const [showTradeModal, setShowTradeModal] = useState(false);
   const [showNewJournalModal, setShowNewJournalModal] = useState(false);
   const [showCSVImport, setShowCSVImport] = useState(false);
+  const [csvTargetJournal, setCsvTargetJournal] = useState<Account | null>(null);
   const [newJournalName, setNewJournalName] = useState('');
   const [newJournalStartDate, setNewJournalStartDate] = useState('');
   const [newJournalCapital, setNewJournalCapital] = useState('');
@@ -209,9 +210,9 @@ export default function App() {
   };
 
   const handleCSVImport = async (importedTrades: Trade[]) => {
-    if (!activeJournal || !user) return;
+    const targetJournal = csvTargetJournal || activeJournal;
+    if (!targetJournal || !user) return;
 
-    // Pro limit kontrolü
     if (!isPro) {
       const currentCount = trades.filter(t => t.user_id === user.id).length;
       const remaining = 20 - currentCount;
@@ -225,7 +226,7 @@ export default function App() {
         .from('trades')
         .insert({
           user_id: user.id,
-          journal_id: activeJournal.id,
+          journal_id: targetJournal.id,
           date: trade.date,
           symbol: trade.symbol,
           type: trade.type,
@@ -265,6 +266,7 @@ export default function App() {
       }
     }
     setTrades(prev => [...inserted, ...prev]);
+    setCsvTargetJournal(null);
   };
 
   const handleDeleteTrade = async (id: string) => {
@@ -352,11 +354,11 @@ export default function App() {
     <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
 
       {/* CSV Import Modal */}
-      {showCSVImport && activeJournal && user && (
+      {showCSVImport && (csvTargetJournal || activeJournal) && user && (
         <CSVImport
           onImport={handleCSVImport}
-          onClose={() => setShowCSVImport(false)}
-          journalId={activeJournal.id}
+          onClose={() => { setShowCSVImport(false); setCsvTargetJournal(null); }}
+          journalId={(csvTargetJournal || activeJournal)!.id}
           userId={user.id}
         />
       )}
@@ -482,24 +484,14 @@ export default function App() {
 
             <div className="flex items-center gap-2 sm:gap-3">
               {view === 'expanded' && (
-                <>
-                  <button onClick={() => setShowCSVImport(true)}
-                    className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-                    style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
-                    <Upload className="w-4 h-4" />
-                    <span className="hidden md:inline">{importLabel}</span>
-                  </button>
-                  <button onClick={() => setShowTradeModal(true)}
-                    className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
-                    style={{ background: '#8b5cf6', color: '#fff' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
-                    <PlusCircle className="w-4 h-4" />
-                    <span className="hidden sm:inline">{t('newTradeTab')}</span>
-                  </button>
-                </>
+                <button onClick={() => setShowTradeModal(true)}
+                  className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
+                  style={{ background: '#8b5cf6', color: '#fff' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+                  <PlusCircle className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t('newTradeTab')}</span>
+                </button>
               )}
 
               <button onClick={() => setView('pricing')}
@@ -582,9 +574,11 @@ export default function App() {
                 {user?.firstName || user?.emailAddresses[0]?.emailAddress}
               </p>
             </div>
-            <div className="mb-8 sm:mb-10">
+
+            {/* Yeni Journal + CSV İçe Aktar butonları */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-8 sm:mb-10">
               <button onClick={() => setShowNewJournalModal(true)}
-                className="w-full sm:w-auto flex items-center gap-4 rounded-2xl px-6 py-5 transition-all"
+                className="flex items-center gap-4 rounded-2xl px-6 py-5 transition-all flex-1 sm:flex-none"
                 style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.13)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(139,92,246,0.5)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(139,92,246,0.25)'; }}>
@@ -596,6 +590,56 @@ export default function App() {
                   <div className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('newJournalSubtitle')}</div>
                 </div>
               </button>
+
+              {/* CSV İçe Aktar — sadece journal varsa göster */}
+              {accounts.length > 0 && (
+                <div className="relative group">
+                  <button
+                    className="flex items-center gap-4 rounded-2xl px-6 py-5 transition-all w-full sm:w-auto"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.2)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                    onClick={() => {
+                      if (accounts.length === 1) {
+                        setCsvTargetJournal(accounts[0]);
+                        setShowCSVImport(true);
+                      }
+                    }}
+                  >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                      <Upload className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.6)' }} />
+                    </div>
+                    <div className="text-start">
+                      <div className="font-semibold text-white">{importLabel}</div>
+                      <div className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                        {language === 'tr' ? 'MT4/MT5, cTrader, Binance ve daha fazlası' :
+                         language === 'fa' ? 'MT4/MT5، cTrader، بایننس و بیشتر' :
+                         'MT4/MT5, cTrader, Binance & more'}
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Birden fazla journal varsa dropdown */}
+                  {accounts.length > 1 && (
+                    <div className="absolute top-full start-0 mt-2 w-full rounded-xl overflow-hidden z-20 py-1 hidden group-hover:block"
+                      style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', minWidth: '220px' }}>
+                      <p className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                        {language === 'tr' ? 'Journal seçin' : 'Select journal'}
+                      </p>
+                      {accounts.map(acc => (
+                        <button key={acc.id}
+                          onClick={() => { setCsvTargetJournal(acc); setShowCSVImport(true); }}
+                          className="w-full text-start px-4 py-2.5 text-sm transition-colors"
+                          style={{ color: '#fff' }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                          <span className="font-medium">{acc.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {accounts.length > 0 ? (
