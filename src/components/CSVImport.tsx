@@ -490,20 +490,23 @@ function parseCSV(content: string, journalId: string, userId: string): ParseResu
   if (lines.length < 2) return { trades: [], platform: 'Unknown', errors: ['CSV dosyası boş veya geçersiz.'] };
 
   let headerIdx = 0;
-  for (let i = 0; i < Math.min(15, lines.length); i++) {
-    const lower = lines[i].toLowerCase();
-    if (
-      lower.includes('symbol') || lower.includes('sembol') ||
-      lower.includes('instrument') || lower.includes('contract') ||
-      lower.includes('ticket') || lower.includes('pozisyon') ||
-      lower.includes('base-asset') || lower.includes('base asset') ||
-      lower.includes('side') || lower.includes('b/s') ||
-      lower.includes('zaman') || lower.includes('hacim')
-    ) {
-      headerIdx = i;
-      break;
-    }
+for (let i = 0; i < Math.min(15, lines.length); i++) {
+  const lower = lines[i].toLowerCase();
+  const cols = lower.split(',').map(c => c.trim());
+  // En az 3 kolon olmalı ki header satırı olsun
+  if (cols.length < 3) continue;
+  if (
+    cols.includes('symbol') || cols.includes('sembol') ||
+    cols.includes('instrument') || cols.includes('contract') ||
+    cols.includes('ticket') || cols.includes('zaman') ||
+    cols.includes('hacim') || cols.includes('base-asset') ||
+    cols.includes('side') || cols.includes('b/s') ||
+    cols.includes('opening direction') || cols.includes('buy/sell')
+  ) {
+    headerIdx = i;
+    break;
   }
+}
 
   // MT5'te "Emirler" bölümünü atla
   let endIdx = lines.length;
