@@ -1,5 +1,6 @@
 export interface Account {
   id: string;
+  user_id?: string;
   name: string;
   startDate?: string;
   startingCapital?: number;
@@ -18,6 +19,8 @@ export interface JournalGoals {
 export interface Trade {
   id: string;
   accountId?: string;
+  journal_id?: string;
+  user_id?: string;
   date: string;
   symbol: string;
   type: 'Buy' | 'Sell';
