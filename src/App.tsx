@@ -140,6 +140,15 @@ export default function App() {
 
   const handleAddTrade = async (trade: Trade) => {
     if (!activeJournal || !user) return;
+
+    // Ücretsiz limit kontrolü
+    const userTradeCount = trades.filter(t => t.user_id === user.id).length;
+    if (userTradeCount >= 20) {
+      setShowTradeModal(false);
+      setView('pricing');
+      return;
+    }
+
     const { data } = await supabase
       .from('trades')
       .insert({
@@ -256,7 +265,6 @@ export default function App() {
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={language === 'fa' ? 'rtl' : 'ltr'}>
 
-      {/* AUTH EKRANI */}
       <SignedOut>
         <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: '#0d0e1a' }}>
           <div className="flex items-center gap-2 mb-8">
@@ -279,18 +287,11 @@ export default function App() {
               {language === 'tr' ? 'Kayıt Ol' : language === 'fa' ? 'ثبت نام' : 'Sign Up'}
             </button>
           </div>
-          {authView === 'signin' ? (
-            <SignIn routing="hash" />
-          ) : (
-            <SignUp routing="hash" />
-          )}
+          {authView === 'signin' ? <SignIn routing="hash" /> : <SignUp routing="hash" />}
         </div>
       </SignedOut>
 
-      {/* ANA UYGULAMA */}
       <SignedIn>
-
-        {/* Delete Modal */}
         {accountToDelete && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="rounded-2xl p-6 w-full max-w-md" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -304,7 +305,6 @@ export default function App() {
           </div>
         )}
 
-        {/* New Journal Modal */}
         {showNewJournalModal && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="rounded-2xl p-6 w-full max-w-md" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -344,7 +344,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Trade Form Modal */}
         {showTradeModal && (
           <div className="fixed inset-0 bg-black/80 flex items-start justify-center z-50 p-4 overflow-y-auto">
             <div className="w-full max-w-4xl my-8">
@@ -360,7 +359,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Header */}
         <header style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0d0e1a' }} className="sticky top-0 z-10">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -397,7 +395,6 @@ export default function App() {
                 </button>
               )}
 
-              {/* Fiyatlandırma butonu */}
               <button
                 onClick={() => setView('pricing')}
                 className="hidden sm:block px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
@@ -429,7 +426,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* Kullanıcı + Çıkış */}
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full overflow-hidden" style={{ background: 'rgba(139,92,246,0.2)' }}>
                   {user?.imageUrl ? (
@@ -455,17 +451,14 @@ export default function App() {
           </div>
         </header>
 
-        {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
           </div>
         )}
 
-        {/* FİYATLANDIRMA */}
         {!loading && view === 'pricing' && <PricingPage />}
 
-        {/* DASHBOARD */}
         {!loading && view === 'dashboard' && (
           <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
             <div className="flex items-center justify-between mb-6 sm:mb-8">
@@ -550,7 +543,6 @@ export default function App() {
           </main>
         )}
 
-        {/* EXPANDED VIEW */}
         {!loading && view === 'expanded' && activeJournal && activeStats && (
           <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
             <div className="mb-6">
