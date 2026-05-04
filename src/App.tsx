@@ -3,7 +3,8 @@ import {
   PlusCircle, Globe, ChevronDown, ChevronLeft,
   Trash2, BookOpen, Clock, TrendingUp, X,
   Target, DollarSign, Activity, PieChart,
-  CalendarDays, BarChart2, List, LogOut, User
+  CalendarDays, BarChart2, List, LogOut, User,
+  Upload
 } from 'lucide-react';
 import {
   SignIn, SignUp, useUser, useClerk, SignedIn, SignedOut
@@ -13,6 +14,7 @@ import TradeHistory from './components/TradeHistory';
 import CalendarView from './components/CalendarView';
 import GoalsView from './components/GoalsView';
 import PricingPage from './components/PricingPage';
+import CSVImport from './components/CSVImport';
 import { Trade, Account, JournalGoals } from './types';
 import { useLanguage } from './context/LanguageContext';
 import { supabase } from './lib/supabase';
@@ -35,6 +37,7 @@ export default function App() {
   const langMenuRef = useRef<HTMLDivElement>(null);
   const [showTradeModal, setShowTradeModal] = useState(false);
   const [showNewJournalModal, setShowNewJournalModal] = useState(false);
+  const [showCSVImport, setShowCSVImport] = useState(false);
   const [newJournalName, setNewJournalName] = useState('');
   const [newJournalStartDate, setNewJournalStartDate] = useState('');
   const [newJournalCapital, setNewJournalCapital] = useState('');
@@ -205,6 +208,65 @@ export default function App() {
     }
   };
 
+  const handleCSVImport = async (importedTrades: Trade[]) => {
+    if (!activeJournal || !user) return;
+
+    // Pro limit kontrolü
+    if (!isPro) {
+      const currentCount = trades.filter(t => t.user_id === user.id).length;
+      const remaining = 20 - currentCount;
+      if (remaining <= 0) { setView('pricing'); return; }
+      importedTrades = importedTrades.slice(0, remaining);
+    }
+
+    const inserted: Trade[] = [];
+    for (const trade of importedTrades) {
+      const { data } = await supabase
+        .from('trades')
+        .insert({
+          user_id: user.id,
+          journal_id: activeJournal.id,
+          date: trade.date,
+          symbol: trade.symbol,
+          type: trade.type,
+          timeframe: trade.timeframe || '',
+          setup: trade.setup || '',
+          risk: trade.risk || 0,
+          reward: trade.reward || 0,
+          rr: trade.rr || '',
+          result: trade.result,
+          pre_trade_notes: trade.preTradeNotes || '',
+          post_trade_notes: trade.postTradeNotes || '',
+          pre_trade_photos: [],
+          post_trade_photos: [],
+        })
+        .select()
+        .single();
+      if (data) {
+        inserted.push({
+          id: data.id,
+          accountId: data.journal_id,
+          journal_id: data.journal_id,
+          user_id: data.user_id,
+          date: data.date,
+          symbol: data.symbol,
+          type: data.type,
+          timeframe: data.timeframe,
+          setup: data.setup,
+          risk: data.risk,
+          reward: data.reward,
+          rr: data.rr,
+          result: data.result,
+          preTradeNotes: data.pre_trade_notes || '',
+          postTradeNotes: data.post_trade_notes || '',
+          preTradePhotos: [],
+          postTradePhotos: [],
+        });
+      }
+    }
+    setTrades(prev => [...inserted, ...prev]);
+  };
+
   const handleDeleteTrade = async (id: string) => {
     await supabase.from('trades').delete().eq('id', id);
     setTrades(prev => prev.filter(t => t.id !== id));
@@ -284,9 +346,20 @@ export default function App() {
   const signInLabel = language === 'tr' ? 'Giriş Yap' : language === 'fa' ? 'ورود' : language === 'ar' ? 'تسجيل الدخول' : language === 'ru' ? 'Войти' : language === 'es' ? 'Iniciar sesión' : language === 'pt' ? 'Entrar' : language === 'de' ? 'Anmelden' : language === 'fr' ? 'Se connecter' : 'Sign In';
   const signUpLabel = language === 'tr' ? 'Kayıt Ol' : language === 'fa' ? 'ثبت نام' : language === 'ar' ? 'إنشاء حساب' : language === 'ru' ? 'Регистрация' : language === 'es' ? 'Registrarse' : language === 'pt' ? 'Cadastrar' : language === 'de' ? 'Registrieren' : language === 'fr' ? "S'inscrire" : 'Sign Up';
   const pricingLabel = language === 'tr' ? 'Fiyatlar' : language === 'fa' ? 'قیمت‌ها' : language === 'ar' ? 'الأسعار' : language === 'ru' ? 'Цены' : language === 'es' ? 'Precios' : language === 'pt' ? 'Preços' : language === 'de' ? 'Preise' : language === 'fr' ? 'Tarifs' : 'Pricing';
+  const importLabel = language === 'tr' ? 'CSV İçe Aktar' : language === 'fa' ? 'وارد کردن CSV' : language === 'ar' ? 'استيراد CSV' : language === 'ru' ? 'Импорт CSV' : language === 'es' ? 'Importar CSV' : language === 'pt' ? 'Importar CSV' : language === 'de' ? 'CSV Importieren' : language === 'fr' ? 'Importer CSV' : 'Import CSV';
 
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
+
+      {/* CSV Import Modal */}
+      {showCSVImport && activeJournal && user && (
+        <CSVImport
+          onImport={handleCSVImport}
+          onClose={() => setShowCSVImport(false)}
+          journalId={activeJournal.id}
+          userId={user.id}
+        />
+      )}
 
       {/* AUTH EKRANI */}
       <SignedOut>
@@ -409,14 +482,24 @@ export default function App() {
 
             <div className="flex items-center gap-2 sm:gap-3">
               {view === 'expanded' && (
-                <button onClick={() => setShowTradeModal(true)}
-                  className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
-                  style={{ background: '#8b5cf6', color: '#fff' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
-                  <PlusCircle className="w-4 h-4" />
-                  <span className="hidden sm:inline">{t('newTradeTab')}</span>
-                </button>
+                <>
+                  <button onClick={() => setShowCSVImport(true)}
+                    className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                    style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+                    <Upload className="w-4 h-4" />
+                    <span className="hidden md:inline">{importLabel}</span>
+                  </button>
+                  <button onClick={() => setShowTradeModal(true)}
+                    className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
+                    style={{ background: '#8b5cf6', color: '#fff' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+                    <PlusCircle className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t('newTradeTab')}</span>
+                  </button>
+                </>
               )}
 
               <button onClick={() => setView('pricing')}
@@ -428,7 +511,8 @@ export default function App() {
               </button>
 
               {isPro && (
-                <span className="hidden sm:block px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
+                <span className="hidden sm:block px-2 py-0.5 rounded-full text-xs font-semibold"
+                  style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
                   PRO
                 </span>
               )}
@@ -442,7 +526,8 @@ export default function App() {
                   <ChevronDown className={`w-3 h-3 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isLangMenuOpen && (
-                  <div className="absolute top-full end-0 mt-2 w-44 rounded-xl shadow-xl overflow-hidden z-50 py-1" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div className="absolute top-full end-0 mt-2 w-44 rounded-xl shadow-xl overflow-hidden z-50 py-1"
+                    style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
                     {languages.map(lang => (
                       <button key={lang.code} onClick={() => { setLanguage(lang.code as any); setIsLangMenuOpen(false); }}
                         className="w-full text-start px-4 py-2 text-sm transition-colors"
@@ -606,7 +691,8 @@ export default function App() {
               ))}
             </div>
 
-            <div className="flex gap-1 p-1 rounded-xl mb-6 sm:mb-8 w-full sm:w-fit" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="flex gap-1 p-1 rounded-xl mb-6 sm:mb-8 w-full sm:w-fit"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
               {tabs.map(tab => (
                 <button key={tab.key} onClick={() => setJournalTab(tab.key as JournalTab)}
                   className="flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all flex-1 sm:flex-none whitespace-nowrap"
