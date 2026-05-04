@@ -16,17 +16,37 @@ interface ParseResult {
   errors: string[];
 }
 
+// ── PROPER CSV PARSER (handles quoted commas) ──────────────────────────────
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+// ── PLATFORM DETECTION ─────────────────────────────────────────────────────
 function detectPlatform(headers: string[]): string {
   const h = headers.map(x => x.trim().toLowerCase());
 
   // MetaTrader 4/5 — English
   if (h.includes('ticket') && (h.includes('open time') || h.includes('open_time'))) return 'MT4/MT5';
 
-  // MetaTrader 4/5 — Turkish (encoding sorununa karşı geniş kontrol)
-  if (h.includes('zaman') && h.includes('sembol')) return 'MT4/MT5';
-  if (h.includes('pozisyon') && h.includes('sembol')) return 'MT4/MT5';
-  if (h.includes('sembol') && h.includes('kar')) return 'MT4/MT5';
+  // MetaTrader 4/5 — Turkish
   if (h.includes('sembol') && h.includes('hacim')) return 'MT4/MT5';
+  if (h.includes('sembol') && h.includes('kar')) return 'MT4/MT5';
+  if (h.includes('zaman') && h.includes('sembol')) return 'MT4/MT5';
 
   // cTrader
   if (h.includes('opening direction') || (h.includes('opening time') && h.includes('closing time') && h.includes('entry price'))) return 'cTrader';
@@ -48,7 +68,6 @@ function detectPlatform(headers: string[]): string {
 
   // Binance
   if (h.includes('base-asset') || h.includes('fee-currency') || h.includes('base asset') || h.includes('fee currency')) return 'Binance';
-  if (h.includes('realized profit') && h.includes('trading fee')) return 'Binance';
 
   // Bybit
   if (h.includes('realized pnl') || h.includes('realized p&l') || (h.includes('entry price') && h.includes('exit price'))) return 'Bybit';
@@ -56,6 +75,7 @@ function detectPlatform(headers: string[]): string {
   return 'Unknown';
 }
 
+// ── HELPERS ────────────────────────────────────────────────────────────────
 function parseDate(dateStr: string): string {
   if (!dateStr) return new Date().toISOString();
   const mt5 = dateStr.match(/(\d{4})\.(\d{2})\.(\d{2})\s+(\d{2}):(\d{2})/);
@@ -68,11 +88,12 @@ function parseDate(dateStr: string): string {
 
 function parseNumber(val: string): number {
   if (!val) return 0;
+  // "- 127,74" → -127.74 ve "26 973,16" → 26973.16
   const cleaned = val
     .replace(/"/g, '')
     .trim()
-    .replace(/\s/g, '')
-    .replace(/,/g, '.');
+    .replace(/\s/g, '')   // boşlukları kaldır
+    .replace(',', '.');   // ondalık virgülü noktaya çevir
   const num = parseFloat(cleaned);
   return isNaN(num) ? 0 : num;
 }
@@ -106,55 +127,55 @@ function cleanSymbol(symbol: string): string {
     .trim();
 }
 
-// MT4/MT5 — Türkçe + İngilizce
-function parseMT4(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
-  return rows
-    .filter(row => {
-      const symbol = row['Sembol'] || row['Symbol'] || row['symbol'] || '';
-      const hasTradeType = Object.values(row).some(v =>
-        v.toLowerCase() === 'buy' || v.toLowerCase() === 'sell'
-      );
-      return symbol.trim() !== '' && hasTradeType;
-    })
-    .map(row => {
-      const symbol = cleanSymbol(row['Sembol'] || row['Symbol'] || row['symbol'] || '');
+// ── MT4/MT5 PARSER — kolon indeksi bazlı ──────────────────────────────────
+// Header: Zaman(0), Pozisyon(1), Sembol(2), Tür(3), Hacim(4), Fiyat(5), S/L(6), T/P(7), Zaman(8), Fiyat(9), Komisyon(10), Swap(11), Kar(12)
+function parseMT4(rows: string[][], journalId: string, userId: string): Trade[] {
+  const trades: Trade[] = [];
 
-      const typeRaw = Object.values(row).find(v =>
-        v.toLowerCase() === 'buy' || v.toLowerCase() === 'sell'
-      ) || 'buy';
-      const type = getType(typeRaw);
+  for (const cols of rows) {
+    if (cols.length < 13) continue;
 
-      const openPrice = parseNumber(row['Fiyat'] || row['Open Price'] || row['open price'] || '0');
-      const sl = parseNumber(row['S / L'] || row['S/L'] || row['s / l'] || row['s/l'] || '0');
-      const tp = parseNumber(row['T / P'] || row['T/P'] || row['t / p'] || row['t/p'] || '0');
-      const profit = parseNumber(row['Kar'] || row['Profit'] || row['profit'] || '0');
-      const date = parseDate(row['Zaman'] || row['Open Time'] || row['open time'] || '');
-      const rr = calcRR(openPrice, sl, tp, type);
-      const risk = sl > 0 ? Math.abs(openPrice - sl) : 0;
+    const typeRaw = cols[3]?.trim().toLowerCase();
+    if (typeRaw !== 'buy' && typeRaw !== 'sell') continue;
 
-      return {
-        id: makeId(),
-        accountId: journalId,
-        journal_id: journalId,
-        user_id: userId,
-        date,
-        symbol,
-        type,
-        timeframe: '',
-        setup: '',
-        risk,
-        reward: profit > 0 ? profit : 0,
-        rr,
-        result: getResult(profit),
-        preTradeNotes: row['Yorum'] || row['Comment'] || row['comment'] || '',
-        postTradeNotes: '',
-        preTradePhotos: [],
-        postTradePhotos: [],
-        importSource: 'MT4/MT5',
-      } as Trade;
-    });
+    const symbol = cleanSymbol(cols[2] || '');
+    if (!symbol) continue;
+
+    const type = getType(typeRaw);
+    const openDate = parseDate(cols[0] || '');    // Zaman (açılış)
+    const openPrice = parseNumber(cols[5] || '0'); // Fiyat (açılış)
+    const sl = parseNumber(cols[6] || '0');        // S / L
+    const tp = parseNumber(cols[7] || '0');        // T / P
+    const profit = parseNumber(cols[12] || '0');   // Kar
+    const rr = calcRR(openPrice, sl, tp, type);
+    const risk = sl > 0 ? Math.abs(openPrice - sl) : 0;
+
+    trades.push({
+      id: makeId(),
+      accountId: journalId,
+      journal_id: journalId,
+      user_id: userId,
+      date: openDate,
+      symbol,
+      type,
+      timeframe: '',
+      setup: '',
+      risk,
+      reward: profit > 0 ? profit : 0,
+      rr,
+      result: getResult(profit),
+      preTradeNotes: '',
+      postTradeNotes: '',
+      preTradePhotos: [],
+      postTradePhotos: [],
+      importSource: 'MT4/MT5',
+    } as Trade);
+  }
+
+  return trades;
 }
 
+// ── DİĞER PARSER'LAR (dict bazlı) ─────────────────────────────────────────
 function parseCTrader(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
   return rows
     .filter(row => row['Opening Direction'] || row['opening direction'])
@@ -484,69 +505,75 @@ function parseBybit(rows: Record<string, string>[], journalId: string, userId: s
     });
 }
 
-function parseCSV(content: string, journalId: string, userId: string): ParseResult {
+// ── MAIN PARSER ────────────────────────────────────────────────────────────
+function parseCSVFile(content: string, journalId: string, userId: string): ParseResult {
   const errors: string[] = [];
-  const lines = content.split('\n').filter(l => l.trim() !== '');
-  if (lines.length < 2) return { trades: [], platform: 'Unknown', errors: ['CSV dosyası boş veya geçersiz.'] };
+  const rawLines = content.split('\n').filter(l => l.trim() !== '');
+  if (rawLines.length < 2) return { trades: [], platform: 'Unknown', errors: ['CSV dosyası boş veya geçersiz.'] };
 
+  // Her satırı proper CSV olarak parse et
+  const parsedLines = rawLines.map(l => parseCSVLine(l));
+
+  // Header satırını bul
   let headerIdx = 0;
-for (let i = 0; i < Math.min(15, lines.length); i++) {
-  const lower = lines[i].toLowerCase();
-  const cols = lower.split(',').map(c => c.trim());
-  // En az 3 kolon olmalı ki header satırı olsun
-  if (cols.length < 3) continue;
-  if (
-    cols.includes('symbol') || cols.includes('sembol') ||
-    cols.includes('instrument') || cols.includes('contract') ||
-    cols.includes('ticket') || cols.includes('zaman') ||
-    cols.includes('hacim') || cols.includes('base-asset') ||
-    cols.includes('side') || cols.includes('b/s') ||
-    cols.includes('opening direction') || cols.includes('buy/sell')
-  ) {
-    headerIdx = i;
-    break;
+  for (let i = 0; i < Math.min(15, parsedLines.length); i++) {
+    const cols = parsedLines[i].map(c => c.toLowerCase());
+    if (cols.length >= 3 && (
+      cols.includes('symbol') || cols.includes('sembol') ||
+      cols.includes('instrument') || cols.includes('contract') ||
+      cols.includes('ticket') || cols.includes('zaman') ||
+      cols.includes('hacim') || cols.includes('base-asset') ||
+      cols.includes('side') || cols.includes('b/s') ||
+      cols.includes('opening direction') || cols.includes('buy/sell')
+    )) {
+      headerIdx = i;
+      break;
+    }
   }
-}
 
   // MT5'te "Emirler" bölümünü atla
-  let endIdx = lines.length;
-  for (let i = headerIdx + 1; i < lines.length; i++) {
-    const line = lines[i].trim().toLowerCase();
-    if (line.startsWith('emirler') || line.startsWith('orders')) {
+  let endIdx = parsedLines.length;
+  for (let i = headerIdx + 1; i < parsedLines.length; i++) {
+    const first = parsedLines[i][0]?.trim().toLowerCase() || '';
+    if (first === 'emirler' || first === 'orders') {
       endIdx = i;
       break;
     }
   }
 
-  const separator = lines[headerIdx].includes(';') ? ';' : ',';
-  const headers = lines[headerIdx].split(separator).map(h => h.trim().replace(/"/g, ''));
+  const headers = parsedLines[headerIdx];
   const platform = detectPlatform(headers);
 
-  const rows: Record<string, string>[] = [];
-  for (let i = headerIdx + 1; i < endIdx; i++) {
-    const values = lines[i].split(separator).map(v => v.trim().replace(/^"|"$/g, ''));
-    if (values.length < 2 || values.every(v => v === '')) continue;
-    const row: Record<string, string> = {};
-    headers.forEach((h, idx) => { row[h] = values[idx] || ''; });
-    rows.push(row);
-  }
+  const dataLines = parsedLines.slice(headerIdx + 1, endIdx).filter(cols => cols.length >= 3);
 
-  if (rows.length === 0) return { trades: [], platform, errors: ['CSV dosyasında veri bulunamadı.'] };
+  if (dataLines.length === 0) return { trades: [], platform, errors: ['CSV dosyasında veri bulunamadı.'] };
 
   let trades: Trade[] = [];
+
   try {
-    switch (platform) {
-      case 'MT4/MT5': trades = parseMT4(rows, journalId, userId); break;
-      case 'cTrader': trades = parseCTrader(rows, journalId, userId); break;
-      case 'TradeLocker': trades = parseTradeLocker(rows, journalId, userId); break;
-      case 'Tradovate': trades = parseTradovate(rows, journalId, userId); break;
-      case 'NinjaTrader': trades = parseNinjaTrader(rows, journalId, userId); break;
-      case 'TradingView': trades = parseTradingView(rows, journalId, userId); break;
-      case 'IBKR': trades = parseIBKR(rows, journalId, userId); break;
-      case 'Binance': trades = parseBinance(rows, journalId, userId); break;
-      case 'Bybit': trades = parseBybit(rows, journalId, userId); break;
-      default:
-        errors.push('Platform otomatik tanınamadı. Lütfen doğru CSV formatında olduğunu kontrol edin.');
+    if (platform === 'MT4/MT5') {
+      // MT4/MT5 için kolon indeksi bazlı parser kullan
+      trades = parseMT4(dataLines, journalId, userId);
+    } else {
+      // Diğer platformlar için dict bazlı parser
+      const rows: Record<string, string>[] = dataLines.map(cols => {
+        const row: Record<string, string> = {};
+        headers.forEach((h, idx) => { row[h] = cols[idx] || ''; });
+        return row;
+      });
+
+      switch (platform) {
+        case 'cTrader': trades = parseCTrader(rows, journalId, userId); break;
+        case 'TradeLocker': trades = parseTradeLocker(rows, journalId, userId); break;
+        case 'Tradovate': trades = parseTradovate(rows, journalId, userId); break;
+        case 'NinjaTrader': trades = parseNinjaTrader(rows, journalId, userId); break;
+        case 'TradingView': trades = parseTradingView(rows, journalId, userId); break;
+        case 'IBKR': trades = parseIBKR(rows, journalId, userId); break;
+        case 'Binance': trades = parseBinance(rows, journalId, userId); break;
+        case 'Bybit': trades = parseBybit(rows, journalId, userId); break;
+        default:
+          errors.push('Platform otomatik tanınamadı. Lütfen doğru CSV formatında olduğunu kontrol edin.');
+      }
     }
   } catch (e) {
     errors.push(`Parse hatası: ${e}`);
@@ -556,6 +583,7 @@ for (let i = 0; i < Math.min(15, lines.length); i++) {
   return { trades, platform, errors };
 }
 
+// ── UI ─────────────────────────────────────────────────────────────────────
 const PLATFORM_COLORS: Record<string, string> = {
   'MT4/MT5': '#818cf8',
   'cTrader': '#34d399',
@@ -586,7 +614,7 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
-      const result = parseCSV(content, journalId, userId);
+      const result = parseCSVFile(content, journalId, userId);
       setParseResult(result);
       setLoading(false);
     };
@@ -747,7 +775,7 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
                     <div key={i} className="px-4 py-2 grid grid-cols-4 gap-2 text-sm"
                       style={{ borderTop: i > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
                       <span style={{ color: 'rgba(255,255,255,0.5)' }}>
-                        {new Date(trade.date).toLocaleDateString()}
+                        {new Date(trade.date).toLocaleDateString('tr-TR')}
                       </span>
                       <span className="font-mono font-medium text-white">{trade.symbol}</span>
                       <span style={{ color: trade.type === 'Buy' ? '#34d399' : '#f87171' }}>{trade.type}</span>
