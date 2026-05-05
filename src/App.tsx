@@ -721,11 +721,10 @@ const handleDeleteMultiple = async (ids: string[]) => {
                 </button>
               ))}
             </div>
-
-            {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} />}
-            {journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
-            {journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} statsOnly />}
-            {journalTab === 'goals' && <GoalsView trades={filteredTrades} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
+{journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} />}
+{journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
+{journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} statsOnly />}
+{journalTab === 'goals' && <GoalsView trades={filteredTrades} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
           </main>
         )}
 
