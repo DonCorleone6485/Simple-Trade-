@@ -544,8 +544,9 @@ export default function TradeHistory({
     return (
       <div className="space-y-6 max-w-3xl mx-auto">
         <div className="flex items-center justify-between">
-          <button onClick={() => setEditingTrade(null)} className="flex items-center gap-2 text-sm font-medium"
-            style={{ color: 'rgba(255,255,255,0.5)' }}
+          <button onClick={() => setEditingTrade(null)}
+  className="flex items-center gap-2 text-sm font-medium"
+  style={{ color: 'rgba(255,255,255,0.5)' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
             <ChevronLeft className="w-4 h-4" />
@@ -646,11 +647,11 @@ export default function TradeHistory({
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <button onClick={() => setSelectedTrade(null)}
-            className="flex items-center gap-2 text-sm font-medium transition-colors"
-            style={{ color: 'rgba(255,255,255,0.5)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
+         <button onClick={() => setSelectedTrade(null)}
+  className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
+  style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
+  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
             <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
             {t('backToList')}
           </button>
