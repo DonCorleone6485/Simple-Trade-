@@ -478,14 +478,14 @@ const handleDeleteMultiple = async (ids: string[]) => {
             <div className="flex items-center gap-4">
               {view === 'expanded' ? (
                 <>
-                  <button onClick={() => { setView('dashboard'); setActiveJournal(null); }}
-                    className="flex items-center gap-2 text-sm font-medium transition-colors"
-                    style={{ color: 'rgba(255,255,255,0.5)' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
-                    <ChevronLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-                    <span className="hidden sm:inline">{t('myJournals')}</span>
-                  </button>
+                 <button onClick={() => { setView('dashboard'); setActiveJournal(null); }}
+  className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
+  style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
+  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+  <ChevronLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+  <span className="hidden sm:inline">{t('myJournals')}</span>
+</button>
                   <div className="h-5 w-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
                   <span className="font-semibold text-white truncate max-w-[150px] sm:max-w-none">{activeJournal?.name}</span>
                 </>
