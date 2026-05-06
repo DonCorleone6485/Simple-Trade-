@@ -52,12 +52,13 @@ const [showReferral, setShowReferral] = useState(false);
   const isRTL = language === 'fa' || language === 'ar';
 
   useEffect(() => {
-    if (user) {
-      loadJournals();
-      loadTrades();
-      checkProStatus();
-    }
-  }, [user]);
+  if (user) {
+    loadJournals();
+    loadTrades();
+    checkProStatus();
+    generateReferralCode();
+  }
+}, [user]);
 
   const checkProStatus = async () => {
     if (!user) return;
