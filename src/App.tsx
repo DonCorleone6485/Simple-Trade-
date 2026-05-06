@@ -44,6 +44,10 @@ export default function App() {
   const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const [referralCode, setReferralCode] = useState('');
+const [referralInput, setReferralInput] = useState('');
+const [referralMsg, setReferralMsg] = useState('');
+const [showReferral, setShowReferral] = useState(false);
 
   const isRTL = language === 'fa' || language === 'ar';
 
