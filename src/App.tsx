@@ -512,8 +512,6 @@ const handleDeleteMultiple = async (ids: string[]) => {
 {/* Delete Modal */}
 {accountToDelete && (
 
-        {/* Delete Modal */}
-        {accountToDelete && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="rounded-2xl p-6 w-full max-w-md" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
               <h3 className="text-xl font-semibold mb-2" style={{ color: '#f87171' }}>{t('deleteAccountTitle')}</h3>
