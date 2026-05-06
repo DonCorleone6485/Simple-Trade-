@@ -462,10 +462,33 @@ const handleDeleteMultiple = async (ids: string[]) => {
           </div>
           <button
             onClick={() => {
-              navigator.clipboard.writeText(`https://simple-trade-nu.vercel.app?ref=${referralCode}`);
-              setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
-              setTimeout(() => setReferralMsg(''), 2000);
-            }}
+  const text = `https://simple-trade-nu.vercel.app?ref=${referralCode}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+      setTimeout(() => setReferralMsg(''), 2000);
+    }).catch(() => {
+      // Fallback
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+      setTimeout(() => setReferralMsg(''), 2000);
+    });
+  } else {
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+    setTimeout(() => setReferralMsg(''), 2000);
+  }
+}}
             className="px-3 py-2 rounded-xl text-sm font-semibold transition-all"
             style={{ background: '#34d399', color: '#000' }}>
             {language === 'tr' ? 'Kopyala' : 'Copy'}
