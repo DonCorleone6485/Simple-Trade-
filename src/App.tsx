@@ -58,9 +58,29 @@ const [showReferral, setShowReferral] = useState(false);
     checkProStatus();
     generateReferralCode();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get('ref');
-    if (refCode) {
+    // URL'den ref kodunu localStorage'a kaydet
+const urlParams = new URLSearchParams(window.location.search);
+const refCode = urlParams.get('ref');
+if (refCode) {
+  localStorage.setItem('pendingRefCode', refCode);
+  window.history.replaceState({}, '', window.location.pathname);
+}
+
+// localStorage'dan ref kodunu oku
+const pendingRefCode = localStorage.getItem('pendingRefCode');
+if (pendingRefCode) {
+  localStorage.removeItem('pendingRefCode');
+  fetch('/api/referral', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'use', userId: user.id, code: pendingRefCode }),
+  }).then(res => res.json()).then(data => {
+    console.log('Referral use result:', data);
+    if (data.success) {
+      setIsPro(true);
+    }
+  });
+}
       fetch('/api/referral', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
