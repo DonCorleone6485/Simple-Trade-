@@ -57,6 +57,21 @@ const [showReferral, setShowReferral] = useState(false);
     loadTrades();
     checkProStatus();
     generateReferralCode();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      fetch('/api/referral', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'use', userId: user.id, code: refCode }),
+      }).then(res => res.json()).then(data => {
+        if (data.success) {
+          setIsPro(true);
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      });
+    }
   }
 }, [user]);
 
