@@ -1,10 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL!,
+  process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
   process.env.SUPABASE_SERVICE_KEY!
 );
-
 export default async function handler(req: any, res: any) {
   if (req.method === 'POST') {
     const { action, userId, code } = req.body;
