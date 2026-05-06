@@ -432,6 +432,85 @@ const handleDeleteMultiple = async (ids: string[]) => {
 
       {/* ANA UYGULAMA */}
       <SignedIn>
+        {/* Referral Modal */}
+{showReferral && (
+  <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+    <div className="rounded-2xl p-6 w-full max-w-md space-y-5" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-semibold text-white">
+          🎁 {language === 'tr' ? 'Arkadaş Davet Et' : 'Invite a Friend'}
+        </h3>
+        <button onClick={() => { setShowReferral(false); setReferralMsg(''); setReferralInput(''); }}
+          className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)' }}>
+        <p className="text-sm font-semibold" style={{ color: '#34d399' }}>
+          {language === 'tr' ? '📤 Kodunuzu Paylaşın' : '📤 Share Your Code'}
+        </p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          {language === 'tr'
+            ? 'Arkadaşınız bu kodu kullandığında ikiniz de 1 ay ücretsiz Pro kazanırsınız!'
+            : 'When your friend uses this code, you both get 1 month of Pro for free!'}
+        </p>
+        <div className="flex items-center gap-2">
+          <div className="flex-1 px-3 py-2 rounded-xl font-mono text-sm font-bold text-white"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', letterSpacing: '0.1em' }}>
+            {referralCode || '...'}
+          </div>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(`https://simple-trade-nu.vercel.app?ref=${referralCode}`);
+              setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+              setTimeout(() => setReferralMsg(''), 2000);
+            }}
+            className="px-3 py-2 rounded-xl text-sm font-semibold transition-all"
+            style={{ background: '#34d399', color: '#000' }}>
+            {language === 'tr' ? 'Kopyala' : 'Copy'}
+          </button>
+        </div>
+      </div>
+
+      <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.15)' }}>
+        <p className="text-sm font-semibold" style={{ color: '#a78bfa' }}>
+          {language === 'tr' ? '🎟️ Referral Kodu Giriniz' : '🎟️ Enter Referral Code'}
+        </p>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          {language === 'tr'
+            ? 'Bir arkadaşınızdan kod aldıysanız buraya girin, 1 ay ücretsiz Pro kazanın!'
+            : 'If a friend gave you a code, enter it here to get 1 month of Pro for free!'}
+        </p>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={referralInput}
+            onChange={e => setReferralInput(e.target.value.toUpperCase())}
+            placeholder="ST-XXXXXX-XXXX"
+            className="flex-1 px-3 py-2 rounded-xl font-mono text-sm outline-none"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
+          />
+          <button
+            onClick={useReferralCode}
+            disabled={!referralInput.trim()}
+            className="px-3 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
+            style={{ background: '#8b5cf6', color: '#fff' }}>
+            {language === 'tr' ? 'Kullan' : 'Apply'}
+          </button>
+        </div>
+        {referralMsg && (
+          <p className="text-sm font-medium" style={{ color: referralMsg.includes('🎉') || referralMsg.includes('✅') ? '#34d399' : '#f87171' }}>
+            {referralMsg}
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+{/* Delete Modal */}
+{accountToDelete && (
 
         {/* Delete Modal */}
         {accountToDelete && (
