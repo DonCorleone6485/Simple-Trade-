@@ -462,7 +462,7 @@ const handleDeleteMultiple = async (ids: string[]) => {
           </div>
           <button
             onClick={() => {
-  const text = referralCode;
+  const text = `https://simple-trade-nu.vercel.app?ref=${referralCode}`;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(() => {
       setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
