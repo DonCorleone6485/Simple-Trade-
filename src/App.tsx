@@ -68,6 +68,32 @@ const [showReferral, setShowReferral] = useState(false);
       .single();
     if (data) setIsPro(data.is_pro);
   };
+  const generateReferralCode = async () => {
+  if (!user) return;
+  const res = await fetch('/api/referral', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'generate', userId: user.id }),
+  });
+  const data = await res.json();
+  if (data.code) setReferralCode(data.code);
+};
+
+const useReferralCode = async () => {
+  if (!user || !referralInput.trim()) return;
+  const res = await fetch('/api/referral', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'use', userId: user.id, code: referralInput.trim() }),
+  });
+  const data = await res.json();
+  if (data.success) {
+    setReferralMsg('🎉 1 ay ücretsiz Pro kazandınız!');
+    setIsPro(true);
+  } else {
+    setReferralMsg(data.error || 'Hata oluştu');
+  }
+};
 
   const loadJournals = async () => {
     if (!user) return;
