@@ -52,51 +52,56 @@ const [showReferral, setShowReferral] = useState(false);
   const isRTL = language === 'fa' || language === 'ar';
 
   useEffect(() => {
+ useEffect(() => {
   if (user) {
     loadJournals();
     loadTrades();
     checkProStatus();
     generateReferralCode();
 
-    // URL'den ref kodunu localStorage'a kaydet
-const urlParams = new URLSearchParams(window.location.search);
-const refCode = urlParams.get('ref');
-if (refCode) {
-  localStorage.setItem('pendingRefCode', refCode);
-  window.history.replaceState({}, '', window.location.pathname);
-}
-
-// localStorage'dan ref kodunu oku
-const pendingRefCode = localStorage.getItem('pendingRefCode');
-if (pendingRefCode) {
-  localStorage.removeItem('pendingRefCode');
-  fetch('/api/referral', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'use', userId: user.id, code: pendingRefCode }),
-  }).then(res => res.json()).then(data => {
-    console.log('Referral use result:', data);
-    if (data.success) {
-      setIsPro(true);
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      localStorage.setItem('pendingRefCode', refCode);
+      window.history.replaceState({}, '', window.location.pathname);
     }
-  });
-}
+
+    const pendingRefCode = localStorage.getItem('pendingRefCode');
+    if (pendingRefCode) {
+      localStorage.removeItem('pendingRefCode');
       fetch('/api/referral', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'use', userId: user.id, code: refCode }),
+        body: JSON.stringify({ action: 'use', userId: user.id, code: pendingRefCode }),
       }).then(res => res.json()).then(data => {
-        if (data.success) {
-          setIsPro(true);
-          window.history.replaceState({}, '', window.location.pathname);
-        }
+        if (data.success) setIsPro(true);
       });
     }
   }
 }, [user]);
 
   const checkProStatus = async () => {
-    if (!user) return;
+    if (!user) re80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+10turn;
     const { data } = await supabase
       .from('users')
       .select('is_pro')
