@@ -100,7 +100,7 @@ const [showReferral, setShowReferral] = useState(false);
  97
  98
  99
-10turn;
+return;
     const { data } = await supabase
       .from('users')
       .select('is_pro')
