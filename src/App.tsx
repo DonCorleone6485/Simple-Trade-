@@ -476,7 +476,7 @@ export default function App() {
                   <X className="w-4 h-4" />
                 </button>
               </div>
-
+{hasPaid && (
               <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)' }}>
                 <p className="text-sm font-semibold" style={{ color: '#34d399' }}>
                   {language === 'tr' ? '📤 Kodunuzu Paylaşın' : '📤 Share Your Code'}
@@ -491,6 +491,7 @@ export default function App() {
                     style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', letterSpacing: '0.1em' }}>
                     {referralCode || '...'}
                   </div>
+              
                   <button
                     onClick={() => {
                       const text = referralCode;
@@ -525,7 +526,7 @@ export default function App() {
                   </button>
                 </div>
               </div>
-
+ )}
               <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.15)' }}>
                 <p className="text-sm font-semibold" style={{ color: '#a78bfa' }}>
                   {language === 'tr' ? '🎟️ Referans Kodu Giriniz' : '🎟️ Enter Referral Code'}
