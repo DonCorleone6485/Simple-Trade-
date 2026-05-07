@@ -51,7 +51,6 @@ const [showReferral, setShowReferral] = useState(false);
 
   const isRTL = language === 'fa' || language === 'ar';
 
-  useEffect(() => {
  useEffect(() => {
   if (user) {
     loadJournals();
