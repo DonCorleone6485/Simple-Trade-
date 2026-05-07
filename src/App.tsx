@@ -709,7 +709,17 @@ const handleDeleteMultiple = async (ids: string[]) => {
   style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.15)'; }}
   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.1)'; }}>
-  🎁 {language === 'tr' ? 'Arkadaş Davet Et' : 'Invite Friend'}
+  🎁 {
+  language === 'tr' ? 'Referans Kodu' :
+  language === 'fa' ? 'کد معرف' :
+  language === 'ar' ? 'كود الإحالة' :
+  language === 'ru' ? 'Реферальный код' :
+  language === 'es' ? 'Código de referido' :
+  language === 'pt' ? 'Código de referência' :
+  language === 'de' ? 'Empfehlungscode' :
+  language === 'fr' ? 'Code de parrainage' :
+  'Referral Code'
+}
 </button>
 
               <div className="relative" ref={langMenuRef}>
