@@ -44,96 +44,81 @@ export default function App() {
   const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const [hasPaid, setHasPaid] = useState(false);
   const [referralCode, setReferralCode] = useState('');
-const [referralInput, setReferralInput] = useState('');
-const [referralMsg, setReferralMsg] = useState('');
-const [showReferral, setShowReferral] = useState(false);
+  const [referralInput, setReferralInput] = useState('');
+  const [referralMsg, setReferralMsg] = useState('');
+  const [showReferral, setShowReferral] = useState(false);
 
   const isRTL = language === 'fa' || language === 'ar';
 
- useEffect(() => {
-  if (user) {
-    loadJournals();
-    loadTrades();
-    checkProStatus();
-    generateReferralCode();
+  useEffect(() => {
+    if (user) {
+      loadJournals();
+      loadTrades();
+      checkProStatus();
+      generateReferralCode();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get('ref');
-    if (refCode) {
-      localStorage.setItem('pendingRefCode', refCode);
-      window.history.replaceState({}, '', window.location.pathname);
-    }
+      const urlParams = new URLSearchParams(window.location.search);
+      const refCode = urlParams.get('ref');
+      if (refCode) {
+        localStorage.setItem('pendingRefCode', refCode);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
 
-    const pendingRefCode = localStorage.getItem('pendingRefCode');
-    if (pendingRefCode) {
-      localStorage.removeItem('pendingRefCode');
-      fetch('/api/referral', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'use', userId: user.id, code: pendingRefCode }),
-      }).then(res => res.json()).then(data => {
-        if (data.success) setIsPro(true);
-      });
+      const pendingRefCode = localStorage.getItem('pendingRefCode');
+      if (pendingRefCode) {
+        localStorage.removeItem('pendingRefCode');
+        fetch('/api/referral', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'use', userId: user.id, code: pendingRefCode }),
+        }).then(res => res.json()).then(data => {
+          if (data.success) setIsPro(true);
+        });
+      }
     }
-  }
-}, [user]);
+  }, [user]);
 
   const checkProStatus = async () => {
-    if (!user) re80
- 81
- 82
- 83
- 84
- 85
- 86
- 87
- 88
- 89
- 90
- 91
- 92
- 93
- 94
- 95
- 96
- 97
- 98
- 99
-return;
+    if (!user) return;
     const { data } = await supabase
       .from('users')
-      .select('is_pro')
+      .select('is_pro, has_paid')
       .eq('user_id', user.id)
       .single();
-    if (data) setIsPro(data.is_pro);
+    if (data) {
+      setIsPro(data.is_pro);
+      setHasPaid(data.has_paid || false);
+    }
   };
-  const generateReferralCode = async () => {
-  if (!user) return;
-  const res = await fetch('/api/referral', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'generate', userId: user.id }),
-  });
-  const data = await res.json();
-  if (data.code) setReferralCode(data.code);
-};
 
-const useReferralCode = async () => {
-  if (!user || !referralInput.trim()) return;
-  const res = await fetch('/api/referral', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'use', userId: user.id, code: referralInput.trim() }),
-  });
-  const data = await res.json();
-  if (data.success) {
-    setReferralMsg('🎉 1 ay ücretsiz Pro kazandınız!');
-    setIsPro(true);
-  } else {
-    setReferralMsg(data.error || 'Hata oluştu');
-  }
-};
+  const generateReferralCode = async () => {
+    if (!user) return;
+    const res = await fetch('/api/referral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'generate', userId: user.id }),
+    });
+    const data = await res.json();
+    if (data.code) setReferralCode(data.code);
+  };
+
+  const useReferralCode = async () => {
+    if (!user || !referralInput.trim()) return;
+    const res = await fetch('/api/referral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'use', userId: user.id, code: referralInput.trim() }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setReferralMsg('🎉 1 ay ücretsiz Pro kazandınız!');
+      setIsPro(true);
+    } else {
+      setReferralMsg(data.error || 'Hata oluştu');
+    }
+  };
 
   const loadJournals = async () => {
     if (!user) return;
@@ -221,7 +206,6 @@ const useReferralCode = async () => {
       setShowNewJournalModal(false);
       setNewJournalName(''); setNewJournalStartDate(''); setNewJournalCapital('');
       setView('expanded');
-      // ✅ setShowTradeModal(true) kaldırıldı — artık otomatik açılmıyor
     }
   };
 
@@ -277,26 +261,27 @@ const useReferralCode = async () => {
       setShowTradeModal(false);
     }
   };
-  const handleUpdateTrade = async (trade: Trade) => {
-  await supabase.from('trades').update({
-    symbol: trade.symbol,
-    type: trade.type,
-    timeframe: trade.timeframe,
-    setup: trade.setup,
-    risk: trade.risk,
-    reward: trade.reward,
-    rr: trade.rr,
-    result: trade.result,
-    pre_trade_notes: trade.preTradeNotes,
-    post_trade_notes: trade.postTradeNotes,
-  }).eq('id', trade.id);
-  setTrades(prev => prev.map(t => t.id === trade.id ? trade : t));
-};
 
-const handleDeleteMultiple = async (ids: string[]) => {
-  await supabase.from('trades').delete().in('id', ids);
-  setTrades(prev => prev.filter(t => !ids.includes(t.id)));
-};
+  const handleUpdateTrade = async (trade: Trade) => {
+    await supabase.from('trades').update({
+      symbol: trade.symbol,
+      type: trade.type,
+      timeframe: trade.timeframe,
+      setup: trade.setup,
+      risk: trade.risk,
+      reward: trade.reward,
+      rr: trade.rr,
+      result: trade.result,
+      pre_trade_notes: trade.preTradeNotes,
+      post_trade_notes: trade.postTradeNotes,
+    }).eq('id', trade.id);
+    setTrades(prev => prev.map(t => t.id === trade.id ? trade : t));
+  };
+
+  const handleDeleteMultiple = async (ids: string[]) => {
+    await supabase.from('trades').delete().in('id', ids);
+    setTrades(prev => prev.filter(t => !ids.includes(t.id)));
+  };
 
   const handleCSVImport = async (importedTrades: Trade[]) => {
     if (!activeJournal || !user) return;
@@ -450,6 +435,12 @@ const handleDeleteMultiple = async (ids: string[]) => {
 
       {/* AUTH EKRANI */}
       <SignedOut>
+        {(() => {
+          const urlParams = new URLSearchParams(window.location.search);
+          const refCode = urlParams.get('ref');
+          if (refCode) localStorage.setItem('pendingRefCode', refCode);
+          return null;
+        })()}
         <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: '#0d0e1a' }}>
           <div className="flex items-center gap-2 mb-8">
             <TrendingUp className="w-6 h-6" style={{ color: '#8b5cf6' }} />
@@ -471,109 +462,108 @@ const handleDeleteMultiple = async (ids: string[]) => {
 
       {/* ANA UYGULAMA */}
       <SignedIn>
+
         {/* Referral Modal */}
-{showReferral && (
-  <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-    <div className="rounded-2xl p-6 w-full max-w-md space-y-5" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-white">
-          🎁 {language === 'tr' ? 'Arkadaş Davet Et' : 'Invite a Friend'}
-        </h3>
-        <button onClick={() => { setShowReferral(false); setReferralMsg(''); setReferralInput(''); }}
-          className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
-          <X className="w-4 h-4" />
-        </button>
-      </div>
+        {showReferral && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="rounded-2xl p-6 w-full max-w-md space-y-5" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold text-white">
+                  🎁 {language === 'tr' ? 'Referans Kodu' : 'Referral Code'}
+                </h3>
+                <button onClick={() => { setShowReferral(false); setReferralMsg(''); setReferralInput(''); }}
+                  className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-      <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)' }}>
-        <p className="text-sm font-semibold" style={{ color: '#34d399' }}>
-          {language === 'tr' ? '📤 Kodunuzu Paylaşın' : '📤 Share Your Code'}
-        </p>
-        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          {language === 'tr'
-            ? 'Arkadaşınız bu kodu kullandığında ikiniz de 1 ay ücretsiz Pro kazanırsınız!'
-            : 'When your friend uses this code, you both get 1 month of Pro for free!'}
-        </p>
-        <div className="flex items-center gap-2">
-          <div className="flex-1 px-3 py-2 rounded-xl font-mono text-sm font-bold text-white"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', letterSpacing: '0.1em' }}>
-            {referralCode || '...'}
+              <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)' }}>
+                <p className="text-sm font-semibold" style={{ color: '#34d399' }}>
+                  {language === 'tr' ? '📤 Kodunuzu Paylaşın' : '📤 Share Your Code'}
+                </p>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  {language === 'tr'
+                    ? 'Arkadaşınız bu kodu kullandığında ikiniz de 1 ay ücretsiz Pro kazanırsınız!'
+                    : 'When your friend uses this code, you both get 1 month of Pro for free!'}
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 px-3 py-2 rounded-xl font-mono text-sm font-bold text-white"
+                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', letterSpacing: '0.1em' }}>
+                    {referralCode || '...'}
+                  </div>
+                  <button
+                    onClick={() => {
+                      const text = referralCode;
+                      if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(() => {
+                          setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+                          setTimeout(() => setReferralMsg(''), 2000);
+                        }).catch(() => {
+                          const el = document.createElement('textarea');
+                          el.value = text;
+                          document.body.appendChild(el);
+                          el.select();
+                          document.execCommand('copy');
+                          document.body.removeChild(el);
+                          setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+                          setTimeout(() => setReferralMsg(''), 2000);
+                        });
+                      } else {
+                        const el = document.createElement('textarea');
+                        el.value = text;
+                        document.body.appendChild(el);
+                        el.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(el);
+                        setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+                        setTimeout(() => setReferralMsg(''), 2000);
+                      }
+                    }}
+                    className="px-3 py-2 rounded-xl text-sm font-semibold transition-all"
+                    style={{ background: '#34d399', color: '#000' }}>
+                    {language === 'tr' ? 'Kopyala' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.15)' }}>
+                <p className="text-sm font-semibold" style={{ color: '#a78bfa' }}>
+                  {language === 'tr' ? '🎟️ Referans Kodu Giriniz' : '🎟️ Enter Referral Code'}
+                </p>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  {language === 'tr'
+                    ? 'Bir arkadaşınızdan kod aldıysanız buraya girin, 1 ay ücretsiz Pro kazanın!'
+                    : 'If a friend gave you a code, enter it here to get 1 month of Pro for free!'}
+                </p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={referralInput}
+                    onChange={e => setReferralInput(e.target.value.toUpperCase())}
+                    placeholder="ST-XXXXXX-XXXX"
+                    className="flex-1 px-3 py-2 rounded-xl font-mono text-sm outline-none"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
+                  />
+                  <button
+                    onClick={useReferralCode}
+                    disabled={!referralInput.trim()}
+                    className="px-3 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
+                    style={{ background: '#8b5cf6', color: '#fff' }}>
+                    {language === 'tr' ? 'Kullan' : 'Apply'}
+                  </button>
+                </div>
+                {referralMsg && (
+                  <p className="text-sm font-medium" style={{ color: referralMsg.includes('🎉') || referralMsg.includes('✅') ? '#34d399' : '#f87171' }}>
+                    {referralMsg}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
-          <button
-            onClick={() => {
-  const text = referralCode;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
-      setTimeout(() => setReferralMsg(''), 2000);
-    }).catch(() => {
-      // Fallback
-      const el = document.createElement('textarea');
-      el.value = text;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
-      setTimeout(() => setReferralMsg(''), 2000);
-    });
-  } else {
-    const el = document.createElement('textarea');
-    el.value = text;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
-    setTimeout(() => setReferralMsg(''), 2000);
-  }
-}}
-            className="px-3 py-2 rounded-xl text-sm font-semibold transition-all"
-            style={{ background: '#34d399', color: '#000' }}>
-            {language === 'tr' ? 'Kopyala' : 'Copy'}
-          </button>
-        </div>
-      </div>
-
-      <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.15)' }}>
-        <p className="text-sm font-semibold" style={{ color: '#a78bfa' }}>
-          {language === 'tr' ? '🎟️ Referral Kodu Giriniz' : '🎟️ Enter Referral Code'}
-        </p>
-        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          {language === 'tr'
-            ? 'Bir arkadaşınızdan kod aldıysanız buraya girin, 1 ay ücretsiz Pro kazanın!'
-            : 'If a friend gave you a code, enter it here to get 1 month of Pro for free!'}
-        </p>
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={referralInput}
-            onChange={e => setReferralInput(e.target.value.toUpperCase())}
-            placeholder="ST-XXXXXX-XXXX"
-            className="flex-1 px-3 py-2 rounded-xl font-mono text-sm outline-none"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
-          />
-          <button
-            onClick={useReferralCode}
-            disabled={!referralInput.trim()}
-            className="px-3 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
-            style={{ background: '#8b5cf6', color: '#fff' }}>
-            {language === 'tr' ? 'Kullan' : 'Apply'}
-          </button>
-        </div>
-        {referralMsg && (
-          <p className="text-sm font-medium" style={{ color: referralMsg.includes('🎉') || referralMsg.includes('✅') ? '#34d399' : '#f87171' }}>
-            {referralMsg}
-          </p>
         )}
-      </div>
-    </div>
-  </div>
-)}
 
-{/* Delete Modal */}
-{accountToDelete && (
-
+        {/* Delete Modal */}
+        {accountToDelete && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="rounded-2xl p-6 w-full max-w-md" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
               <h3 className="text-xl font-semibold mb-2" style={{ color: '#f87171' }}>{t('deleteAccountTitle')}</h3>
@@ -648,14 +638,14 @@ const handleDeleteMultiple = async (ids: string[]) => {
             <div className="flex items-center gap-4">
               {view === 'expanded' ? (
                 <>
-                 <button onClick={() => { setView('dashboard'); setActiveJournal(null); }}
-  className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
-  style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
-  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
-  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
-  <ChevronLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-  <span className="hidden sm:inline">{t('myJournals')}</span>
-</button>
+                  <button onClick={() => { setView('dashboard'); setActiveJournal(null); }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
+                    style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+                    <ChevronLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                    <span className="hidden sm:inline">{t('myJournals')}</span>
+                  </button>
                   <div className="h-5 w-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
                   <span className="font-semibold text-white truncate max-w-[150px] sm:max-w-none">{activeJournal?.name}</span>
                 </>
@@ -668,7 +658,6 @@ const handleDeleteMultiple = async (ids: string[]) => {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Journal içindeyken CSV + Yeni İşlem butonları */}
               {view === 'expanded' && (
                 <>
                   <button onClick={() => setShowCSVImport(true)}
@@ -704,23 +693,26 @@ const handleDeleteMultiple = async (ids: string[]) => {
                   PRO
                 </span>
               )}
-              <button onClick={() => setShowReferral(true)}
-  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-  style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
-  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.15)'; }}
-  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.1)'; }}>
-  🎁 {
-  language === 'tr' ? 'Referans Kodu' :
-  language === 'fa' ? 'کد معرف' :
-  language === 'ar' ? 'كود الإحالة' :
-  language === 'ru' ? 'Реферальный код' :
-  language === 'es' ? 'Código de referido' :
-  language === 'pt' ? 'Código de referência' :
-  language === 'de' ? 'Empfehlungscode' :
-  language === 'fr' ? 'Code de parrainage' :
-  'Referral Code'
-}
-</button>
+
+              {hasPaid && (
+                <button onClick={() => setShowReferral(true)}
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                  style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.15)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.1)'; }}>
+                  🎁 {
+                    language === 'tr' ? 'Referans Kodu' :
+                    language === 'fa' ? 'کد معرف' :
+                    language === 'ar' ? 'كود الإحالة' :
+                    language === 'ru' ? 'Реферальный код' :
+                    language === 'es' ? 'Código de referido' :
+                    language === 'pt' ? 'Código de referência' :
+                    language === 'de' ? 'Empfehlungscode' :
+                    language === 'fr' ? 'Code de parrainage' :
+                    'Referral Code'
+                  }
+                </button>
+              )}
 
               <div className="relative" ref={langMenuRef}>
                 <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
@@ -908,10 +900,11 @@ const handleDeleteMultiple = async (ids: string[]) => {
                 </button>
               ))}
             </div>
-{journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} />}
-{journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
-{journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} statsOnly />}
-{journalTab === 'goals' && <GoalsView trades={filteredTrades} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
+
+            {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} />}
+            {journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
+            {journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} statsOnly />}
+            {journalTab === 'goals' && <GoalsView trades={filteredTrades} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
           </main>
         )}
 
