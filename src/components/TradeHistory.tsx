@@ -7,6 +7,7 @@ import {
   CheckSquare, Square, X, Save
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useUser } from '@clerk/clerk-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip as RechartsTooltip, ResponsiveContainer,
@@ -38,6 +39,8 @@ export default function TradeHistory({
   const [aiError, setAiError] = useState('');
   const [showAi, setShowAi] = useState(false);
   const { t, language } = useLanguage();
+  const { user } = useUser();
+  const isOwner = user?.primaryEmailAddress?.emailAddress === 'asgharjafari2007@outlook.com';
 
   const card: React.CSSProperties = {
     background: '#1a1b2e',
@@ -283,6 +286,29 @@ export default function TradeHistory({
     onUpdate({ ...editingTrade, ...editForm } as Trade);
     setEditingTrade(null);
     setEditForm({});
+  };
+
+  const handleEditPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
+    const files = Array.from(e.target.files || []) as File[];
+    const current = kind === 'pre' ? (editForm.preTradePhotos || []) : (editForm.postTradePhotos || []);
+    if (!isOwner && current.length + files.length > 3) {
+      alert('En fazla 3 fotoğraf yükleyebilirsiniz.');
+      return;
+    }
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (kind === 'pre') setEditForm(f => ({ ...f, preTradePhotos: [...(f.preTradePhotos || []), reader.result as string] }));
+        else setEditForm(f => ({ ...f, postTradePhotos: [...(f.postTradePhotos || []), reader.result as string] }));
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  };
+
+  const removeEditPhoto = (index: number, kind: 'pre' | 'post') => {
+    if (kind === 'pre') setEditForm(f => ({ ...f, preTradePhotos: (f.preTradePhotos || []).filter((_, i) => i !== index) }));
+    else setEditForm(f => ({ ...f, postTradePhotos: (f.postTradePhotos || []).filter((_, i) => i !== index) }));
   };
 
   // ── STATS ONLY ─────────────────────────────────────────────────────────────
@@ -636,6 +662,50 @@ export default function TradeHistory({
                 placeholder={t('postNotesPlaceholder')} />
             </div>
           </div>
+
+          {/* Fotoğraflar */}
+          {(['pre', 'post'] as const).map(kind => {
+            const photos = (kind === 'pre' ? editForm.preTradePhotos : editForm.postTradePhotos) || [];
+            const canUpload = isOwner || photos.length < 3;
+            const fileRef = React.createRef<HTMLInputElement>();
+            return (
+              <div key={kind}>
+                <label style={lbl}>
+                  {kind === 'pre' ? t('preTrade') : t('postTrade')} {t('photos')}
+                  {!isOwner && <span style={{ color: 'rgba(255,255,255,0.25)', marginLeft: 6 }}>({photos.length}/3)</span>}
+                </label>
+                <div className="space-y-3">
+                  {canUpload && (
+                    <div
+                      onClick={() => fileRef.current?.click()}
+                      className="w-full h-24 flex flex-col items-center justify-center cursor-pointer rounded-xl transition-all"
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}
+                    >
+                      <Upload className="w-4 h-4 mb-1" style={{ color: 'rgba(255,255,255,0.25)' }} />
+                      <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span>
+                      <input type="file" ref={fileRef} onChange={e => handleEditPhotoUpload(e, kind)} accept="image/*" multiple className="hidden" />
+                    </div>
+                  )}
+                  {photos.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2">
+                      {photos.map((photo, i) => (
+                        <div key={i} className="relative aspect-square rounded-xl overflow-hidden group" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                          <img src={photo} alt={`photo-${i}`} className="w-full h-full object-cover" />
+                          <button type="button" onClick={() => removeEditPhoto(i, kind)}
+                            className="absolute top-1 end-1 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                            style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}>
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
