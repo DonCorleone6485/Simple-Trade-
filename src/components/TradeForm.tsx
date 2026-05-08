@@ -8,6 +8,7 @@ import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
 
+
 interface TradeFormProps {
   onSave: (trade: Trade) => void;
 }
