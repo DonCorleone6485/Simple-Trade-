@@ -546,8 +546,8 @@ export default function TradeHistory({
       <div className="space-y-6 max-w-3xl mx-auto">
         <div className="flex items-center justify-between">
           <button onClick={() => setEditingTrade(null)}
-  className="flex items-center gap-2 text-sm font-medium"
-  style={{ color: 'rgba(255,255,255,0.5)' }}
+            className="flex items-center gap-2 text-sm font-medium"
+            style={{ color: 'rgba(255,255,255,0.5)' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
             <ChevronLeft className="w-4 h-4" />
@@ -642,132 +642,168 @@ export default function TradeHistory({
   }
 
   // ── DETAIL VIEW ────────────────────────────────────────────────────────────
- 
-  {lightboxPhoto && (
-  <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
-    onClick={() => setLightboxPhoto(null)}>
-    <button onClick={() => setLightboxPhoto(null)}
-      className="absolute top-4 end-4 p-2 rounded-full"
-      style={{ background: 'rgba(255,255,255,0.1)', color: '#fff' }}>
-      <X className="w-6 h-6" />
-    </button>
-    <img src={lightboxPhoto} alt="Trade photo"
-      className="max-w-full max-h-full rounded-2xl object-contain"
-      style={{ maxHeight: '90vh', maxWidth: '90vw' }}
-      onClick={e => e.stopPropagation()} />
-  </div>
-)}
   if (selectedTrade) {
     const isWin = selectedTrade.result === 'Başarılı' || selectedTrade.result === 'Manuel Karda';
     const isLoss = selectedTrade.result === 'Başarısız' || selectedTrade.result === 'Manuel Zararda';
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-         <button onClick={() => setSelectedTrade(null)}
-  className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
-  style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
-  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
-  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
-            <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
-            {t('backToList')}
-          </button>
-          <div className="flex items-center gap-2">
-            <button onClick={e => startEdit(selectedTrade, e)}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-all"
-              style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.2)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
-              <Edit2 className="w-4 h-4" />
-              {language === 'tr' ? 'Düzenle' : 'Edit'}
+      <>
+        {/* ── LIGHTBOX ── */}
+        {lightboxPhoto && (
+          <div
+            className="fixed inset-0 flex items-center justify-center z-50 p-4"
+            style={{ background: 'rgba(0,0,0,0.92)' }}
+            onClick={() => setLightboxPhoto(null)}
+          >
+            <button
+              onClick={() => setLightboxPhoto(null)}
+              className="absolute top-4 end-4 p-2 rounded-full"
+              style={{ background: 'rgba(255,255,255,0.15)', color: '#fff' }}
+            >
+              <X className="w-6 h-6" />
             </button>
-            <button onClick={() => { onDelete(selectedTrade.id); setSelectedTrade(null); }}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-all"
-              style={{ background: 'rgba(248,113,113,0.1)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.2)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.1)'; }}>
-              <Trash2 className="w-4 h-4" />
-              {t('delete')}
-            </button>
+            <img
+              src={lightboxPhoto}
+              alt="Trade photo"
+              className="rounded-2xl object-contain"
+              style={{ maxHeight: '90vh', maxWidth: '90vw' }}
+              onClick={e => e.stopPropagation()}
+            />
           </div>
-        </div>
+        )}
 
-        <div className="rounded-2xl overflow-hidden" style={card}>
-          <div className="p-5 flex flex-wrap items-center justify-between gap-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{
-                background: selectedTrade.type === 'Buy' ? 'rgba(52,211,153,0.1)' : 'rgba(248,113,113,0.1)',
-                border: selectedTrade.type === 'Buy' ? '1px solid rgba(52,211,153,0.2)' : '1px solid rgba(248,113,113,0.2)',
-              }}>
-                {selectedTrade.type === 'Buy' ? <ArrowUpRight className="w-6 h-6 rtl:-scale-x-100" style={{ color: '#34d399' }} /> : <ArrowDownRight className="w-6 h-6 rtl:-scale-x-100" style={{ color: '#f87171' }} />}
-              </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-lg font-bold text-white">{selectedTrade.symbol}</span>
-                  {selectedTrade.timeframe && <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>{selectedTrade.timeframe}</span>}
-                  {selectedTrade.setup && <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa' }}>{selectedTrade.setup}</span>}
-                </div>
-                <div className="flex items-center gap-1.5 text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  <Calendar className="w-4 h-4" />
-                  {getFullDateTime(selectedTrade.date)}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-6 flex-wrap">
-              <div className="text-end">
-                <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('riskRewardLabel')}</div>
-                <div className="font-semibold text-white">${selectedTrade.risk} <span className="mx-1" style={{ color: 'rgba(255,255,255,0.2)' }}>/</span> ${selectedTrade.reward}</div>
-              </div>
-              <div className="text-end">
-                <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>R/R</div>
-                <div className="font-mono font-semibold text-white">{selectedTrade.rr || '-'}</div>
-              </div>
-              <div className="px-4 py-1.5 rounded-full text-sm font-semibold" style={{
-                background: isWin ? 'rgba(52,211,153,0.1)' : isLoss ? 'rgba(248,113,113,0.1)' : 'rgba(251,191,36,0.1)',
-                border: isWin ? '1px solid rgba(52,211,153,0.2)' : isLoss ? '1px solid rgba(248,113,113,0.2)' : '1px solid rgba(251,191,36,0.2)',
-                color: isWin ? '#34d399' : isLoss ? '#f87171' : '#fbbf24',
-              }}>
-                {getResultText(selectedTrade.result)}
-              </div>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <button onClick={() => setSelectedTrade(null)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
+              style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+              <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
+              {t('backToList')}
+            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={e => startEdit(selectedTrade, e)}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-all"
+                style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.2)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
+                <Edit2 className="w-4 h-4" />
+                {language === 'tr' ? 'Düzenle' : 'Edit'}
+              </button>
+              <button onClick={() => { onDelete(selectedTrade.id); setSelectedTrade(null); }}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-all"
+                style={{ background: 'rgba(248,113,113,0.1)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.2)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.1)'; }}>
+                <Trash2 className="w-4 h-4" />
+                {t('delete')}
+              </button>
             </div>
           </div>
-          <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-8" style={{ background: 'rgba(255,255,255,0.01)' }}>
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('preTrade')}</h4>
-              <p className="text-sm whitespace-pre-wrap leading-relaxed p-4 rounded-xl" style={{ color: 'rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                {selectedTrade.preTradeNotes || <span style={{ color: 'rgba(255,255,255,0.25)' }}>{t('noNotes')}</span>}
-              </p>
-             {selectedTrade.preTradePhotos?.length > 0 && (
-  <div className="flex gap-3 flex-wrap">
-    {selectedTrade.preTradePhotos.map((photo, i) => (
-      <button key={i} onClick={() => setLightboxPhoto(photo)}
-        className="w-24 h-24 rounded-xl overflow-hidden block hover:opacity-80 transition-opacity flex-shrink-0"
-        style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
-        <img src={photo} alt="Pre-trade" className="w-full h-full object-cover" />
-      </button>
-    ))}
-  </div>
-)}
+
+          <div className="rounded-2xl overflow-hidden" style={card}>
+            <div className="p-5 flex flex-wrap items-center justify-between gap-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{
+                  background: selectedTrade.type === 'Buy' ? 'rgba(52,211,153,0.1)' : 'rgba(248,113,113,0.1)',
+                  border: selectedTrade.type === 'Buy' ? '1px solid rgba(52,211,153,0.2)' : '1px solid rgba(248,113,113,0.2)',
+                }}>
+                  {selectedTrade.type === 'Buy'
+                    ? <ArrowUpRight className="w-6 h-6 rtl:-scale-x-100" style={{ color: '#34d399' }} />
+                    : <ArrowDownRight className="w-6 h-6 rtl:-scale-x-100" style={{ color: '#f87171' }} />}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-lg font-bold text-white">{selectedTrade.symbol}</span>
+                    {selectedTrade.timeframe && (
+                      <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
+                        {selectedTrade.timeframe}
+                      </span>
+                    )}
+                    {selectedTrade.setup && (
+                      <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa' }}>
+                        {selectedTrade.setup}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    <Calendar className="w-4 h-4" />
+                    {getFullDateTime(selectedTrade.date)}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-6 flex-wrap">
+                <div className="text-end">
+                  <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('riskRewardLabel')}</div>
+                  <div className="font-semibold text-white">${selectedTrade.risk} <span className="mx-1" style={{ color: 'rgba(255,255,255,0.2)' }}>/</span> ${selectedTrade.reward}</div>
+                </div>
+                <div className="text-end">
+                  <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>R/R</div>
+                  <div className="font-mono font-semibold text-white">{selectedTrade.rr || '-'}</div>
+                </div>
+                <div className="px-4 py-1.5 rounded-full text-sm font-semibold" style={{
+                  background: isWin ? 'rgba(52,211,153,0.1)' : isLoss ? 'rgba(248,113,113,0.1)' : 'rgba(251,191,36,0.1)',
+                  border: isWin ? '1px solid rgba(52,211,153,0.2)' : isLoss ? '1px solid rgba(248,113,113,0.2)' : '1px solid rgba(251,191,36,0.2)',
+                  color: isWin ? '#34d399' : isLoss ? '#f87171' : '#fbbf24',
+                }}>
+                  {getResultText(selectedTrade.result)}
+                </div>
+              </div>
             </div>
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('postTrade')}</h4>
-              <p className="text-sm whitespace-pre-wrap leading-relaxed p-4 rounded-xl" style={{ color: 'rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                {selectedTrade.postTradeNotes || <span style={{ color: 'rgba(255,255,255,0.25)' }}>{t('noNotes')}</span>}
-              </p>
-              {selectedTrade.postTradePhotos?.length > 0 && (
-  <div className="flex gap-3 flex-wrap">
-    {selectedTrade.postTradePhotos.map((photo, i) => (
-      <button key={i} onClick={() => setLightboxPhoto(photo)}
-        className="w-24 h-24 rounded-xl overflow-hidden block hover:opacity-80 transition-opacity flex-shrink-0"
-        style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
-        <img src={photo} alt="Post-trade" className="w-full h-full object-cover" />
-      </button>
-    ))}
-  </div>
-)}
+
+            {/* ── NOTlar ve FOTOĞRAFLAR ── */}
+            <div className="p-5 space-y-8" style={{ background: 'rgba(255,255,255,0.01)' }}>
+
+              {/* İşlem Öncesi */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('preTrade')}</h4>
+                <p className="text-sm whitespace-pre-wrap leading-relaxed p-4 rounded-xl"
+                  style={{ color: 'rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  {selectedTrade.preTradeNotes || <span style={{ color: 'rgba(255,255,255,0.25)' }}>{t('noNotes')}</span>}
+                </p>
+                {selectedTrade.preTradePhotos?.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {selectedTrade.preTradePhotos.map((photo, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setLightboxPhoto(photo)}
+                        className="rounded-xl overflow-hidden hover:opacity-90 transition-opacity w-full"
+                        style={{ border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}
+                      >
+                        <img src={photo} alt={`Pre-trade ${i + 1}`} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* İşlem Sonrası */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('postTrade')}</h4>
+                <p className="text-sm whitespace-pre-wrap leading-relaxed p-4 rounded-xl"
+                  style={{ color: 'rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  {selectedTrade.postTradeNotes || <span style={{ color: 'rgba(255,255,255,0.25)' }}>{t('noNotes')}</span>}
+                </p>
+                {selectedTrade.postTradePhotos?.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {selectedTrade.postTradePhotos.map((photo, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setLightboxPhoto(photo)}
+                        className="rounded-xl overflow-hidden hover:opacity-90 transition-opacity w-full"
+                        style={{ border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}
+                      >
+                        <img src={photo} alt={`Post-trade ${i + 1}`} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -805,8 +841,6 @@ export default function TradeHistory({
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
-
-      {/* Toplu işlem toolbar */}
       <div className="flex items-center justify-between">
         <button onClick={toggleSelectAll} className="flex items-center gap-2 text-sm transition-all"
           style={{ color: 'rgba(255,255,255,0.5)' }}
@@ -832,7 +866,6 @@ export default function TradeHistory({
         )}
       </div>
 
-      {/* Trade listesi */}
       {Object.entries(groupedTrades).map(([monthYear, days]) => (
         <div key={monthYear} className="space-y-6">
           <div className="pb-2" style={{ borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
@@ -859,7 +892,6 @@ export default function TradeHistory({
                       onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                       onClick={() => setSelectedTrade(trade)}
                     >
-                      {/* Checkbox */}
                       <div onClick={e => toggleSelect(trade.id, e)} className="flex-shrink-0 transition-opacity"
                         style={{ opacity: isSelected ? 1 : 0 }}
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; e.stopPropagation(); }}
@@ -889,7 +921,6 @@ export default function TradeHistory({
                         {isW ? `+${trade.reward}$` : isL ? `-${trade.risk}$` : <span className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('openStatus')}</span>}
                       </span>
 
-                      {/* Hover aksiyon butonları */}
                       <div className="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                         style={{ background: '#1a1b2e', borderRadius: '8px', padding: '2px', border: '1px solid rgba(255,255,255,0.08)' }}
                         onClick={e => e.stopPropagation()}>
