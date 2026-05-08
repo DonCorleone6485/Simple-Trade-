@@ -6,10 +6,14 @@ import persian_fa from "react-date-object/locales/persian_fa";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useUser } from '@clerk/clerk-react';
 
 interface TradeFormProps {
   onSave: (trade: Trade) => void;
 }
+
+const OWNER_EMAIL = 'asgharjafari2007@gmail.com';
+const PHOTO_LIMIT = 3;
 
 const inp: React.CSSProperties = {
   background: 'rgba(255,255,255,0.05)',
@@ -115,9 +119,7 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
     : SYMBOLS[category] || [];
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && search.trim()) {
-      handleSelect(search.trim().toUpperCase());
-    }
+    if (e.key === 'Enter' && search.trim()) handleSelect(search.trim().toUpperCase());
   };
 
   return (
@@ -136,7 +138,6 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
         <div className="absolute top-full start-0 mt-2 w-full z-50 rounded-2xl overflow-hidden shadow-2xl"
           style={{ background: '#12131f', border: '1px solid rgba(255,255,255,0.1)', minWidth: '280px' }}>
 
-          {/* Arama */}
           <div className="p-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <Search className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
@@ -158,7 +159,6 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
             </div>
           </div>
 
-          {/* Kategoriler */}
           {!search && (
             <div className="flex gap-1 px-3 py-2 overflow-x-auto" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
               {ALL_CATEGORIES.map(cat => (
@@ -177,9 +177,7 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
             </div>
           )}
 
-          {/* Liste */}
           <div className="overflow-y-auto" style={{ maxHeight: '280px' }}>
-            {/* Son kullanılanlar */}
             {!search && recentlyUsed.length > 0 && (
               <div>
                 <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
@@ -205,7 +203,6 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
               </div>
             )}
 
-            {/* Arama sonuçları veya kategori listesi */}
             {search && (
               <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
                 {filteredSymbols.length > 0 ? 'Sonuçlar' : 'Bulunamadı — Enter ile ekle'}
@@ -233,7 +230,6 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
               </button>
             ))}
 
-            {/* Özel sembol ekle */}
             {search.trim() && !filteredSymbols.includes(search.trim().toUpperCase()) && (
               <button
                 type="button"
@@ -254,16 +250,19 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
   );
 }
 
-function PhotoUploader({ photos, onUpload, onRemove }: {
+function PhotoUploader({ photos, onUpload, onRemove, isUnlimited }: {
   photos: string[];
   onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemove: (index: number) => void;
+  isUnlimited?: boolean;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useLanguage();
+  const canUploadMore = isUnlimited ? true : photos.length < PHOTO_LIMIT;
+
   return (
     <div className="space-y-4">
-      {photos.length < 3 && (
+      {canUploadMore && (
         <div
           onClick={() => fileInputRef.current?.click()}
           className="w-full h-40 flex flex-col items-center justify-center cursor-pointer rounded-xl transition-all"
@@ -273,6 +272,9 @@ function PhotoUploader({ photos, onUpload, onRemove }: {
         >
           <Upload className="w-5 h-5 mb-2" style={{ color: 'rgba(255,255,255,0.25)' }} />
           <span className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span>
+          {isUnlimited && (
+            <span className="text-xs mt-1" style={{ color: 'rgba(139,92,246,0.7)' }}>∞ limitsiz</span>
+          )}
           <input type="file" ref={fileInputRef} onChange={onUpload} accept="image/*" multiple className="hidden" />
         </div>
       )}
@@ -299,6 +301,11 @@ function PhotoUploader({ photos, onUpload, onRemove }: {
 
 export default function TradeForm({ onSave }: TradeFormProps) {
   const { t, language } = useLanguage();
+  const { user } = useUser();
+
+  // Sahip kontrolü: yalnızca kurucu e-postası
+  const isOwner = user?.primaryEmailAddress?.emailAddress === OWNER_EMAIL;
+
   const [date, setDate] = useState('');
   const [symbol, setSymbol] = useState('EURUSD');
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
@@ -333,20 +340,26 @@ export default function TradeForm({ onSave }: TradeFormProps) {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
     const files = Array.from(e.target.files || []) as File[];
     const current = kind === 'pre' ? prePhotos : postPhotos;
-    if (current.length + files.length > 3) { alert('En fazla 3 fotoğraf yükleyebilirsiniz.'); return; }
+
+    // Sadece normal kullanıcılar için limit uygula
+    if (!isOwner && current.length + files.length > PHOTO_LIMIT) {
+      alert(`En fazla ${PHOTO_LIMIT} fotoğraf yükleyebilirsiniz.`);
+      return;
+    }
+
     files.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (kind === 'pre') { setPrePhotos(p => [...p, reader.result as string]); }
-        else { setPostPhotos(p => [...p, reader.result as string]); }
+        if (kind === 'pre') setPrePhotos(p => [...p, reader.result as string]);
+        else setPostPhotos(p => [...p, reader.result as string]);
       };
       reader.readAsDataURL(file);
     });
   };
 
   const removePhoto = (index: number, kind: 'pre' | 'post') => {
-    if (kind === 'pre') { setPrePhotos(p => p.filter((_, i) => i !== index)); }
-    else { setPostPhotos(p => p.filter((_, i) => i !== index)); }
+    if (kind === 'pre') setPrePhotos(p => p.filter((_, i) => i !== index));
+    else setPostPhotos(p => p.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -390,7 +403,8 @@ export default function TradeForm({ onSave }: TradeFormProps) {
             <DatePicker
               value={date ? new Date(date) : null}
               onChange={(dateObj: DateObject | null) => {
-                if (dateObj) { setDate(dateObj.toDate().toISOString()); } else { setDate(''); }
+                if (dateObj) setDate(dateObj.toDate().toISOString());
+                else setDate('');
               }}
               format="YYYY/MM/DD HH:mm"
               plugins={[<TimePicker position="bottom" />]}
@@ -502,7 +516,12 @@ export default function TradeForm({ onSave }: TradeFormProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
               <label style={lbl}>{t('photos')}</label>
-              <PhotoUploader photos={prePhotos} onUpload={e => handlePhotoUpload(e, 'pre')} onRemove={i => removePhoto(i, 'pre')} />
+              <PhotoUploader
+                photos={prePhotos}
+                onUpload={e => handlePhotoUpload(e, 'pre')}
+                onRemove={i => removePhoto(i, 'pre')}
+                isUnlimited={isOwner}
+              />
             </div>
             <div>
               <label style={lbl}>{t('notes')}</label>
@@ -521,7 +540,12 @@ export default function TradeForm({ onSave }: TradeFormProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
               <label style={lbl}>{t('photos')}</label>
-              <PhotoUploader photos={postPhotos} onUpload={e => handlePhotoUpload(e, 'post')} onRemove={i => removePhoto(i, 'post')} />
+              <PhotoUploader
+                photos={postPhotos}
+                onUpload={e => handlePhotoUpload(e, 'post')}
+                onRemove={i => removePhoto(i, 'post')}
+                isUnlimited={isOwner}
+              />
             </div>
             <div>
               <label style={lbl}>{t('notes')}</label>
