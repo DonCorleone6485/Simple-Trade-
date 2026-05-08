@@ -8,12 +8,11 @@ import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
 
-
 interface TradeFormProps {
   onSave: (trade: Trade) => void;
 }
 
-const OWNER_EMAIL = 'asgharjafari2007@gmail.com';
+const OWNER_EMAIL = 'asgharjafari2007@outlook.com';
 const PHOTO_LIMIT = 3;
 
 const inp: React.CSSProperties = {
