@@ -32,6 +32,7 @@ export default function TradeHistory({
   const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
   const [editForm, setEditForm] = useState<Partial<Trade>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
@@ -641,6 +642,21 @@ export default function TradeHistory({
   }
 
   // ── DETAIL VIEW ────────────────────────────────────────────────────────────
+ 
+  {lightboxPhoto && (
+  <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
+    onClick={() => setLightboxPhoto(null)}>
+    <button onClick={() => setLightboxPhoto(null)}
+      className="absolute top-4 end-4 p-2 rounded-full"
+      style={{ background: 'rgba(255,255,255,0.1)', color: '#fff' }}>
+      <X className="w-6 h-6" />
+    </button>
+    <img src={lightboxPhoto} alt="Trade photo"
+      className="max-w-full max-h-full rounded-2xl object-contain"
+      style={{ maxHeight: '90vh', maxWidth: '90vw' }}
+      onClick={e => e.stopPropagation()} />
+  </div>
+)}
   if (selectedTrade) {
     const isWin = selectedTrade.result === 'Başarılı' || selectedTrade.result === 'Manuel Karda';
     const isLoss = selectedTrade.result === 'Başarısız' || selectedTrade.result === 'Manuel Zararda';
@@ -720,15 +736,17 @@ export default function TradeHistory({
               <p className="text-sm whitespace-pre-wrap leading-relaxed p-4 rounded-xl" style={{ color: 'rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 {selectedTrade.preTradeNotes || <span style={{ color: 'rgba(255,255,255,0.25)' }}>{t('noNotes')}</span>}
               </p>
-              {selectedTrade.preTradePhotos?.length > 0 && (
-                <div className="flex gap-3">
-                  {selectedTrade.preTradePhotos.map((photo, i) => (
-                    <a key={i} href={photo} target="_blank" rel="noreferrer" className="w-20 h-20 rounded-lg overflow-hidden block hover:opacity-80 transition-opacity" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
-                      <img src={photo} alt="Pre-trade" className="w-full h-full object-cover" />
-                    </a>
-                  ))}
-                </div>
-              )}
+             {selectedTrade.preTradePhotos?.length > 0 && (
+  <div className="flex gap-3 flex-wrap">
+    {selectedTrade.preTradePhotos.map((photo, i) => (
+      <button key={i} onClick={() => setLightboxPhoto(photo)}
+        className="w-24 h-24 rounded-xl overflow-hidden block hover:opacity-80 transition-opacity flex-shrink-0"
+        style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+        <img src={photo} alt="Pre-trade" className="w-full h-full object-cover" />
+      </button>
+    ))}
+  </div>
+)}
             </div>
             <div className="space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('postTrade')}</h4>
@@ -736,14 +754,16 @@ export default function TradeHistory({
                 {selectedTrade.postTradeNotes || <span style={{ color: 'rgba(255,255,255,0.25)' }}>{t('noNotes')}</span>}
               </p>
               {selectedTrade.postTradePhotos?.length > 0 && (
-                <div className="flex gap-3">
-                  {selectedTrade.postTradePhotos.map((photo, i) => (
-                    <a key={i} href={photo} target="_blank" rel="noreferrer" className="w-20 h-20 rounded-lg overflow-hidden block hover:opacity-80 transition-opacity" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
-                      <img src={photo} alt="Post-trade" className="w-full h-full object-cover" />
-                    </a>
-                  ))}
-                </div>
-              )}
+  <div className="flex gap-3 flex-wrap">
+    {selectedTrade.postTradePhotos.map((photo, i) => (
+      <button key={i} onClick={() => setLightboxPhoto(photo)}
+        className="w-24 h-24 rounded-xl overflow-hidden block hover:opacity-80 transition-opacity flex-shrink-0"
+        style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+        <img src={photo} alt="Post-trade" className="w-full h-full object-cover" />
+      </button>
+    ))}
+  </div>
+)}
             </div>
           </div>
         </div>
