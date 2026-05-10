@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { Check, Zap, TrendingUp, Shield } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
-export default function PricingPage() {
+interface PricingPageProps {
+  onboardingMode?: boolean;
+  onFreeStart?: () => void;
+  onProStart?: () => void;
+}
+
+export default function PricingPage({ onboardingMode, onFreeStart, onProStart }: PricingPageProps) {
   const { language } = useLanguage();
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly');
 
@@ -41,20 +47,37 @@ export default function PricingPage() {
   const yearlyMonthly = (yearlyPrice / 12).toFixed(2);
   const savings = Math.round(((monthlyPrice * 12 - yearlyPrice) / (monthlyPrice * 12)) * 100);
 
-  return (
+  const content = (
     <div className="min-h-screen py-16 px-4" style={{ background: '#0d0e1a' }}>
       <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6"
-          style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', color: '#a78bfa' }}>
-          <Zap className="w-4 h-4" />
-          {t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری')}
-        </div>
-        <h1 className="text-4xl font-bold text-white mb-4">
-          {t('Sade ve Şeffaf Fiyatlar', 'Simple & Transparent Pricing', 'قیمت‌های ساده و شفاف')}
-        </h1>
-        <p className="text-lg" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          {t('Ücretsiz başlayın, büyüdükçe yükseltin.', 'Start free, upgrade as you grow.', 'رایگان شروع کنید، با رشد ارتقا دهید.')}
-        </p>
+        {onboardingMode ? (
+          <>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <TrendingUp className="w-6 h-6" style={{ color: '#8b5cf6' }} />
+              <span className="text-xl font-bold text-white">Trade Journal</span>
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-4">
+              {t('Hoş Geldiniz! 👋', 'Welcome! 👋', '!خوش آمدید 👋')}
+            </h1>
+            <p className="text-lg" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              {t('Nasıl başlamak istersiniz?', 'How would you like to get started?', 'چطور می‌خواهید شروع کنید؟')}
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6"
+              style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', color: '#a78bfa' }}>
+              <Zap className="w-4 h-4" />
+              {t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری')}
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-4">
+              {t('Sade ve Şeffaf Fiyatlar', 'Simple & Transparent Pricing', 'قیمت‌های ساده و شفاف')}
+            </h1>
+            <p className="text-lg" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              {t('Ücretsiz başlayın, büyüdükçe yükseltin.', 'Start free, upgrade as you grow.', 'رایگان شروع کنید، با رشد ارتقا دهید.')}
+            </p>
+          </>
+        )}
       </div>
 
       {/* Billing toggle */}
@@ -96,6 +119,7 @@ export default function PricingPage() {
             </span>
           </div>
           <button
+            onClick={onFreeStart}
             className="w-full py-3 rounded-xl text-sm font-semibold mb-8 transition-all"
             style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
@@ -147,7 +171,7 @@ export default function PricingPage() {
             )}
           </div>
 
-          {/* 3 Gün Para İade Garantisi */}
+          {/* 3 Gün Trial */}
           <div className="flex items-center gap-2 mb-6 px-3 py-2 rounded-xl"
             style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.15)' }}>
             <Shield className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
@@ -155,12 +179,13 @@ export default function PricingPage() {
               {t(
                 '3 Gün Ücretsiz Dene — 3. günün sonunda ödeme alınır, istediğin zaman iptal et',
                 '3-Day Free Trial — charged on day 3, cancel anytime',
-                '۳ روز رایگان امتحان کن — در روز سوم پرداخت می‌شود، هر زمان لغو کن'
+                '۳ روز رایگان — در روز سوم پرداخت می‌شود، هر زمان لغو کن'
               )}
             </span>
           </div>
 
           <button
+            onClick={onProStart}
             className="w-full py-3 rounded-xl text-sm font-semibold mb-8 transition-all"
             style={{ background: '#8b5cf6', color: '#fff' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
@@ -194,4 +219,14 @@ export default function PricingPage() {
       </div>
     </div>
   );
+
+  if (onboardingMode) {
+    return (
+      <div className="fixed inset-0 z-[100] overflow-y-auto" style={{ background: '#0d0e1a' }}>
+        {content}
+      </div>
+    );
+  }
+
+  return content;
 }
