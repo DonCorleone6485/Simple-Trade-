@@ -196,15 +196,16 @@ export default function App() {
   }, []);
 
   // ── JOURNAL OLUŞTURMA — LİMİT KONTROLÜ ──
-  const createJournal = async () => {
-    if (!newJournalName.trim() || !newJournalStartDate || !newJournalCapital || !user) return;
-
+  const handleNewJournalClick = () => {
     if (!isPro && accounts.length >= 1) {
-      setShowNewJournalModal(false);
       setUpgradeReason('journal');
       setShowUpgradeModal(true);
       return;
     }
+    setShowNewJournalModal(true);
+  };
+
+  const createJournal = async () => {
 
     const { data } = await supabase
       .from('journals')
@@ -232,7 +233,26 @@ export default function App() {
     }
   };
 
-  // ── TRADE EKLEME — GÜNLÜK + TOPLAM LİMİT KONTROLÜ ──
+  // ── TRADE EKLEME — ÖNCE LİMİT KONTROL, SONRA MODAL AÇ ──
+  const handleNewTradeClick = () => {
+    if (!isPro && user) {
+      const userTrades = trades.filter(t => t.user_id === user.id);
+      if (userTrades.length >= 20) {
+        setUpgradeReason('total');
+        setShowUpgradeModal(true);
+        return;
+      }
+      const today = new Date().toDateString();
+      const todayTrades = userTrades.filter(t => new Date(t.date).toDateString() === today);
+      if (todayTrades.length >= 1) {
+        setUpgradeReason('daily');
+        setShowUpgradeModal(true);
+        return;
+      }
+    }
+    setShowTradeModal(true);
+  };
+
   const handleAddTrade = async (trade: Trade) => {
     if (!activeJournal || !user) return;
 
@@ -479,9 +499,14 @@ export default function App() {
   const proFeaturesList = [
     language === 'tr' ? 'Sınırsız Journal' : 'Unlimited Journals',
     language === 'tr' ? 'Sınırsız Trade' : 'Unlimited Trades',
-    language === 'tr' ? 'Sınırsız Fotoğraf' : 'Unlimited Photos',
+    language === 'tr' ? 'Sınırsız Fotoğraf Yükleme' : 'Unlimited Photo Upload',
     language === 'tr' ? 'AI Analiz' : 'AI Analysis',
     language === 'tr' ? 'Gelişmiş İstatistikler' : 'Advanced Statistics',
+    language === 'tr' ? 'Hedef & Kural Sistemi' : 'Goals & Rules System',
+    language === 'tr' ? 'Drawdown & Streak Analizi' : 'Drawdown & Streak Analysis',
+    language === 'tr' ? 'Isı Haritası' : 'Heat Map',
+    language === 'tr' ? 'Setup Performans Analizi' : 'Setup Performance Analysis',
+    language === 'tr' ? 'Öncelikli Destek' : 'Priority Support',
   ];
 
   return (
@@ -882,7 +907,6 @@ export default function App() {
                     <span className="hidden md:inline">{importLabel}</span>
                   </button>
                   <button onClick={() => setShowTradeModal(true)}
-                    className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
                     style={{ background: '#8b5cf6', color: '#fff' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
@@ -979,7 +1003,7 @@ export default function App() {
               </p>
             </div>
             <div className="mb-8 sm:mb-10">
-              <button onClick={() => setShowNewJournalModal(true)}
+                <button onClick={handleNewJournalClick}
                 className="w-full sm:w-auto flex items-center gap-4 rounded-2xl px-6 py-5 transition-all"
                 style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.13)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(139,92,246,0.5)'; }}
