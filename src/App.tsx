@@ -906,7 +906,7 @@ export default function App() {
                     <Upload className="w-4 h-4" />
                     <span className="hidden md:inline">{importLabel}</span>
                   </button>
-                  <button onClick={() => setShowTradeModal(true)}
+                  <button onClick={handleNewTradeClick}
                     style={{ background: '#8b5cf6', color: '#fff' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
