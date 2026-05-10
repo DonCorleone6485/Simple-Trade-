@@ -865,7 +865,7 @@ export default function App() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <TradeForm onSave={handleAddTrade} />
+              <TradeForm onSave={handleAddTrade} isPro={isPro} />
             </div>
           </div>
         )}
