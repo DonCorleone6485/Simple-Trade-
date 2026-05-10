@@ -30,8 +30,10 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
   };
 
   const getDayKey = (day: number) => {
-    const d = new Date(year, month, day);
-    return d.toISOString().split('T')[0];
+  const y = year;
+  const m = String(month + 1).padStart(2, '0');
+  const d = String(day).padStart(2, '0');
+  return `${y}-${m}-${d}`;
   };
 
   const getTradesForDay = (day: number) => {
