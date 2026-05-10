@@ -252,12 +252,19 @@ export default function App() {
   };
 
   const handleUpdateTrade = async (trade: Trade) => {
-    await supabase.from('trades').update({
+    const { error } = await supabase.from('trades').update({
       symbol: trade.symbol, type: trade.type, timeframe: trade.timeframe, setup: trade.setup,
       risk: trade.risk, reward: trade.reward, rr: trade.rr, result: trade.result,
       pre_trade_notes: trade.preTradeNotes, post_trade_notes: trade.postTradeNotes,
       pre_trade_photos: trade.preTradePhotos, post_trade_photos: trade.postTradePhotos,
     }).eq('id', trade.id);
+
+    if (error) {
+      alert(language === 'tr'
+        ? 'Kayıt başarısız. Fotoğraflar çok büyük olabilir, daha küçük fotoğraflar deneyin.'
+        : 'Save failed. Photos may be too large, try smaller images.');
+      return;
+    }
     setTrades(prev => prev.map(tr => tr.id === trade.id ? trade : tr));
   };
 
@@ -295,9 +302,39 @@ export default function App() {
     setTrades(prev => [...inserted, ...prev]);
   };
 
+  // ── STORAGE'DAN FOTOĞRAF SİL ──
+  const deletePhotosFromStorage = async (photos: string[]) => {
+    const paths = photos
+      .filter(url => url && url.includes('/trade-photos/'))
+      .map(url => url.split('/trade-photos/')[1])
+      .filter(Boolean);
+    if (paths.length > 0) {
+      await supabase.storage.from('trade-photos').remove(paths);
+    }
+  };
+
   const handleDeleteTrade = async (id: string) => {
+    const trade = trades.find(tr => tr.id === id);
+    if (trade) {
+      await deletePhotosFromStorage([
+        ...(trade.preTradePhotos || []),
+        ...(trade.postTradePhotos || []),
+      ]);
+    }
     await supabase.from('trades').delete().eq('id', id);
     setTrades(prev => prev.filter(tr => tr.id !== id));
+  };
+
+  const handleDeleteMultiple = async (ids: string[]) => {
+    const toDelete = trades.filter(tr => ids.includes(tr.id));
+    for (const trade of toDelete) {
+      await deletePhotosFromStorage([
+        ...(trade.preTradePhotos || []),
+        ...(trade.postTradePhotos || []),
+      ]);
+    }
+    await supabase.from('trades').delete().in('id', ids);
+    setTrades(prev => prev.filter(tr => !ids.includes(tr.id)));
   };
 
   const confirmDeleteAccount = async () => {
