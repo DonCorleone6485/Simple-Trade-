@@ -292,4 +292,608 @@ export default function App() {
     if (!accountToDelete) return;
     await supabase.from('journals').delete().eq('id', accountToDelete);
     setAccounts(prev => prev.filter(a => a.id !== accountToDelete));
-    setTrades(prev => prev.filter(tr => tr.accountId !== accountToDelet
+    setTrades(prev => prev.filter(tr => tr.accountId !== accountToDelete));
+    if (activeJournal?.id === accountToDelete) { setView('dashboard'); setActiveJournal(null); }
+    setAccountToDelete(null);
+  };
+
+  const openJournal = (account: Account) => { setActiveJournal(account); setView('expanded'); setJournalTab('trades'); };
+
+  const handleUpdateGoals = async (goals: JournalGoals) => {
+    if (!activeJournal) return;
+    await supabase.from('journals').update({ goals }).eq('id', activeJournal.id);
+    setAccounts(prev => prev.map(a => a.id === activeJournal.id ? { ...a, goals } : a));
+    setActiveJournal(prev => prev ? { ...prev, goals } : prev);
+  };
+
+  const filteredTrades = activeJournal ? trades.filter(tr => tr.accountId === activeJournal.id) : [];
+
+  const getJournalStats = (accountId: string) => {
+    const jt = trades.filter(tr => tr.accountId === accountId);
+    const wins = jt.filter(tr => tr.result === 'Başarılı' || tr.result === 'Manuel Karda');
+    const losses = jt.filter(tr => tr.result === 'Başarısız' || tr.result === 'Manuel Zararda');
+    const winRate = jt.length > 0 ? ((wins.length / jt.length) * 100).toFixed(0) : '0';
+    const grossProfit = wins.reduce((s, tr) => s + (tr.reward || 0), 0);
+    const grossLoss = losses.reduce((s, tr) => s + (tr.risk || 0), 0);
+    const netPnL = grossProfit - grossLoss;
+    const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : grossProfit > 0 ? '∞' : '0.00';
+    return { total: jt.length, winRate, netPnL, profitFactor };
+  };
+
+  const languages = [
+    { code: 'tr', label: 'Türkçe' }, { code: 'en', label: 'English' }, { code: 'fa', label: 'فارسی' },
+    { code: 'ar', label: 'العربية' }, { code: 'ru', label: 'Русский' }, { code: 'es', label: 'Español' },
+    { code: 'pt', label: 'Português' }, { code: 'de', label: 'Deutsch' }, { code: 'fr', label: 'Français' },
+  ];
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    if (language === 'tr') return new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium' }).format(d);
+    if (language === 'fa') return new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium' }).format(d);
+    if (language === 'ar') return new Intl.DateTimeFormat('ar-SA', { dateStyle: 'medium' }).format(d);
+    if (language === 'ru') return new Intl.DateTimeFormat('ru-RU', { dateStyle: 'medium' }).format(d);
+    if (language === 'es') return new Intl.DateTimeFormat('es-ES', { dateStyle: 'medium' }).format(d);
+    if (language === 'pt') return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(d);
+    if (language === 'de') return new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium' }).format(d);
+    if (language === 'fr') return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(d);
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(d);
+  };
+
+  const activeStats = activeJournal ? getJournalStats(activeJournal.id) : null;
+
+  const tabs = [
+    { key: 'trades', label: t('historyTab'), icon: <List className="w-4 h-4" /> },
+    { key: 'calendar', label: t('calendarTab'), icon: <CalendarDays className="w-4 h-4" /> },
+    { key: 'stats', label: t('statsTab'), icon: <BarChart2 className="w-4 h-4" /> },
+    { key: 'goals', label: t('goalsTab'), icon: <Target className="w-4 h-4" /> },
+  ];
+
+  const signInLabel = language === 'tr' ? 'Giriş Yap' : language === 'fa' ? 'ورود' : 'Sign In';
+  const signUpLabel = language === 'tr' ? 'Kayıt Ol' : language === 'fa' ? 'ثبت نام' : 'Sign Up';
+  const pricingLabel = language === 'tr' ? 'Fiyatlar' : language === 'fa' ? 'قیمت‌ها' : 'Pricing';
+  const importLabel = language === 'tr' ? 'CSV İçe Aktar' : 'Import CSV';
+
+  return (
+    <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
+
+      {/* ── ONBOARDİNG ── */}
+      {showOnboarding && (
+        <PricingPage
+          onboardingMode
+          onFreeStart={() => {
+            localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
+            setShowOnboarding(false);
+          }}
+          onProStart={() => {
+            localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
+            setShowOnboarding(false);
+            setView('pricing');
+          }}
+        />
+      )}
+
+      {/* ── UPGRADE MODAL ── */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="rounded-2xl p-8 relative w-full max-w-md my-8"
+            style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
+            <button onClick={() => setShowUpgradeModal(false)}
+              className="absolute top-4 end-4 p-1.5 rounded-lg"
+              style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }}>
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="w-5 h-5" style={{ color: '#a78bfa' }} />
+              <h2 className="text-xl font-bold text-white">
+                {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
+              </h2>
+            </div>
+            <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              {upgradeReasonText[upgradeReason]}
+            </p>
+
+            {/* Billing Toggle */}
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-sm" style={{ color: modalBilling === 'monthly' ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+                {language === 'tr' ? 'Aylık' : 'Monthly'}
+              </span>
+              <button
+                onClick={() => setModalBilling(modalBilling === 'monthly' ? 'yearly' : 'monthly')}
+                className="relative w-12 h-6 rounded-full transition-all flex-shrink-0"
+                style={{ background: modalBilling === 'yearly' ? '#8b5cf6' : 'rgba(255,255,255,0.1)' }}>
+                <div className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all"
+                  style={{ left: modalBilling === 'yearly' ? '26px' : '2px' }} />
+              </button>
+              <span className="text-sm" style={{ color: modalBilling === 'yearly' ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+                {language === 'tr' ? 'Yıllık' : 'Yearly'}
+                <span className="ms-1 px-1.5 py-0.5 rounded-full text-xs font-semibold"
+                  style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
+                  %36
+                </span>
+              </span>
+            </div>
+
+            <div className="mb-2">
+              <span className="text-5xl font-bold text-white">
+                ${modalBilling === 'monthly' ? '12.99' : '8.25'}
+              </span>
+              <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {language === 'tr' ? '/ ay' : '/ month'}
+              </span>
+              {modalBilling === 'yearly' && (
+                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  {language === 'tr' ? 'Yıllık $99 faturalandırılır' : 'Billed $99/year'}
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 mb-6 mt-4 px-3 py-2 rounded-xl"
+              style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.15)' }}>
+              <Shield className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
+              <span className="text-xs font-medium" style={{ color: '#34d399' }}>
+                {language === 'tr' ? '3 Gün Ücretsiz Dene — 3. günün sonunda ödeme alınır' : '3-Day Free Trial — charged on day 3'}
+              </span>
+            </div>
+
+            <button onClick={() => { setShowUpgradeModal(false); setView('pricing'); }}
+              className="w-full py-3 rounded-xl text-sm font-semibold mb-6 transition-all"
+              style={{ background: '#8b5cf6', color: '#fff' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+              {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
+            </button>
+
+            <div className="space-y-3 mb-6">
+              {proFeaturesList.map((f, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(139,92,246,0.2)' }}>
+                    <Check className="w-3 h-3" style={{ color: '#a78bfa' }} />
+                  </div>
+                  <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{f}</span>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={() => setShowUpgradeModal(false)}
+              className="w-full py-2 rounded-xl text-sm transition-all text-center"
+              style={{ color: 'rgba(255,255,255,0.4)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+              {language === 'tr' ? 'Şimdilik Devam Et' : 'Continue for Now'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* CSV Import */}
+      {showCSVImport && activeJournal && user && (
+        <CSVImport onImport={handleCSVImport} onClose={() => setShowCSVImport(false)} journalId={activeJournal.id} userId={user.id} />
+      )}
+
+      {/* AUTH */}
+      <SignedOut>
+        {(() => {
+          const urlParams = new URLSearchParams(window.location.search);
+          const refCode = urlParams.get('ref');
+          if (refCode) localStorage.setItem('pendingRefCode', refCode);
+          return null;
+        })()}
+        <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: '#0d0e1a' }}>
+          <div className="flex items-center gap-2 mb-8">
+            <TrendingUp className="w-6 h-6" style={{ color: '#8b5cf6' }} />
+            <span className="text-xl font-bold">Trade Journal</span>
+          </div>
+          <div className="flex gap-2 mb-6 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
+            <button onClick={() => setAuthView('signin')} className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
+              style={authView === 'signin' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}>
+              {signInLabel}
+            </button>
+            <button onClick={() => setAuthView('signup')} className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
+              style={authView === 'signup' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}>
+              {signUpLabel}
+            </button>
+          </div>
+          {authView === 'signin' ? <SignIn routing="hash" /> : <SignUp routing="hash" />}
+        </div>
+      </SignedOut>
+
+      <SignedIn>
+
+        {/* Referral Modal */}
+        {showReferral && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="rounded-2xl p-6 w-full max-w-md space-y-5" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold text-white">🎁 {language === 'tr' ? 'Referans Kodu' : 'Referral Code'}</h3>
+                <button onClick={() => { setShowReferral(false); setReferralMsg(''); setReferralInput(''); }}
+                  className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              {hasPaid && (
+                <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)' }}>
+                  <p className="text-sm font-semibold" style={{ color: '#34d399' }}>
+                    {language === 'tr' ? '📤 Kodunuzu Paylaşın' : '📤 Share Your Code'}
+                  </p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    {language === 'tr' ? 'Arkadaşınız bu kodu kullandığında ikiniz de 1 ay ücretsiz Pro kazanırsınız!' : 'When your friend uses this code, you both get 1 month of Pro for free!'}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 px-3 py-2 rounded-xl font-mono text-sm font-bold text-white"
+                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', letterSpacing: '0.1em' }}>
+                      {referralCode || '...'}
+                    </div>
+                    <button onClick={() => {
+                      navigator.clipboard?.writeText(referralCode).then(() => {
+                        setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+                        setTimeout(() => setReferralMsg(''), 2000);
+                      });
+                    }} className="px-3 py-2 rounded-xl text-sm font-semibold" style={{ background: '#34d399', color: '#000' }}>
+                      {language === 'tr' ? 'Kopyala' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.15)' }}>
+                <p className="text-sm font-semibold" style={{ color: '#a78bfa' }}>
+                  {language === 'tr' ? '🎟️ Referans Kodu Giriniz' : '🎟️ Enter Referral Code'}
+                </p>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  {language === 'tr' ? 'Bir arkadaşınızdan kod aldıysanız buraya girin, 1 ay ücretsiz Pro kazanın!' : 'If a friend gave you a code, enter it here to get 1 month of Pro for free!'}
+                </p>
+                <div className="flex items-center gap-2">
+                  <input type="text" value={referralInput} onChange={e => setReferralInput(e.target.value.toUpperCase())}
+                    placeholder="ST-XXXXXX-XXXX" className="flex-1 px-3 py-2 rounded-xl font-mono text-sm outline-none"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
+                  <button onClick={useReferralCode} disabled={!referralInput.trim()}
+                    className="px-3 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
+                    style={{ background: '#8b5cf6', color: '#fff' }}>
+                    {language === 'tr' ? 'Kullan' : 'Apply'}
+                  </button>
+                </div>
+                {referralMsg && (
+                  <p className="text-sm font-medium" style={{ color: referralMsg.includes('🎉') || referralMsg.includes('✅') ? '#34d399' : '#f87171' }}>
+                    {referralMsg}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Journal Modal */}
+        {accountToDelete && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="rounded-2xl p-6 w-full max-w-md" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <h3 className="text-xl font-semibold mb-2" style={{ color: '#f87171' }}>{t('deleteAccountTitle')}</h3>
+              <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('deleteAccountDesc')}</p>
+              <div className="flex justify-end gap-3">
+                <button onClick={() => setAccountToDelete(null)} className="px-4 py-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('cancel')}</button>
+                <button onClick={confirmDeleteAccount} className="px-4 py-2 text-sm font-medium rounded-xl" style={{ background: '#dc2626', color: '#fff' }}>{t('delete')}</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* New Journal Modal */}
+        {showNewJournalModal && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="rounded-2xl p-6 w-full max-w-md" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <h3 className="text-xl font-semibold mb-1">{t('newJournal')}</h3>
+              <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('newJournalDesc')}</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('journalName')}</label>
+                  <input type="text" value={newJournalName} onChange={e => setNewJournalName(e.target.value)} placeholder={t('journalNamePlaceholder')} autoFocus
+                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('startDate')}</label>
+                  <input type="date" value={newJournalStartDate} onChange={e => setNewJournalStartDate(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', colorScheme: 'dark' }} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('startingCapital')}</label>
+                  <div className="relative">
+                    <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                    <input type="number" min="0" step="0.01" value={newJournalCapital} onChange={e => setNewJournalCapital(e.target.value)} placeholder="10000"
+                      className="w-full ps-8 pe-3 py-2.5 rounded-xl text-sm outline-none font-mono"
+                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button onClick={() => { setShowNewJournalModal(false); setNewJournalName(''); setNewJournalStartDate(''); setNewJournalCapital(''); }}
+                  className="px-4 py-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('cancel')}</button>
+                <button onClick={createJournal} disabled={!newJournalName.trim() || !newJournalStartDate || !newJournalCapital}
+                  className="px-6 py-2 text-sm font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ background: '#8b5cf6', color: '#fff' }}>OK</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Trade Form Modal */}
+        {showTradeModal && (
+          <div className="fixed inset-0 bg-black/80 flex items-start justify-center z-50 p-4 overflow-y-auto">
+            <div className="w-full max-w-4xl my-8">
+              <div className="flex items-center justify-between mb-4">
+                <span className="font-semibold text-white">{activeJournal?.name}</span>
+                <button onClick={() => setShowTradeModal(false)} className="p-2 rounded-lg transition-all"
+                  style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <TradeForm onSave={handleAddTrade} isPro={isPro} />
+            </div>
+          </div>
+        )}
+
+        {/* Header */}
+        <header style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0d0e1a' }} className="sticky top-0 z-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {view === 'expanded' ? (
+                <>
+                  <button onClick={() => { setView('dashboard'); setActiveJournal(null); }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
+                    style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+                    <ChevronLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                    <span className="hidden sm:inline">{t('myJournals')}</span>
+                  </button>
+                  <div className="h-5 w-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                  <span className="font-semibold text-white truncate max-w-[150px] sm:max-w-none">{activeJournal?.name}</span>
+                </>
+              ) : (
+                <button onClick={() => setView('dashboard')} className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" style={{ color: '#8b5cf6' }} />
+                  <span className="font-bold tracking-tight">Trade Journal</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 sm:gap-3">
+              {view === 'expanded' && (
+                <>
+                  <button onClick={() => setShowCSVImport(true)}
+                    className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                    style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+                    <Upload className="w-4 h-4" />
+                    <span className="hidden md:inline">{importLabel}</span>
+                  </button>
+                  <button onClick={handleNewTradeClick}
+                    className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
+                    style={{ background: '#8b5cf6', color: '#fff' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+                    <PlusCircle className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t('newTradeTab')}</span>
+                  </button>
+                </>
+              )}
+
+              <button onClick={() => setView('pricing')}
+                className="hidden sm:block px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                style={{ color: view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)'; }}>
+                {pricingLabel}
+              </button>
+
+              {isPro && (
+                <span className="hidden sm:block px-2 py-0.5 rounded-full text-xs font-semibold"
+                  style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
+                  PRO
+                </span>
+              )}
+
+              <button onClick={() => setShowReferral(true)}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.15)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.1)'; }}>
+                🎁 {language === 'tr' ? 'Referans Kodu' : 'Referral Code'}
+              </button>
+
+              <div className="relative" ref={langMenuRef}>
+                <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-sm font-medium"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <Globe className="w-4 h-4" />
+                  <span className="hidden sm:inline uppercase">{language}</span>
+                  <ChevronDown className={`w-3 h-3 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isLangMenuOpen && (
+                  <div className="absolute top-full end-0 mt-2 w-44 rounded-xl shadow-xl overflow-hidden z-50 py-1"
+                    style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    {languages.map(lang => (
+                      <button key={lang.code} onClick={() => { setLanguage(lang.code as any); setIsLangMenuOpen(false); }}
+                        className="w-full text-start px-4 py-2 text-sm transition-colors"
+                        style={{ color: language === lang.code ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: language === lang.code ? 600 : 400 }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                        {lang.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full overflow-hidden" style={{ background: 'rgba(139,92,246,0.2)' }}>
+                  {user?.imageUrl
+                    ? <img src={user.imageUrl} alt="avatar" className="w-full h-full object-cover" />
+                    : <div className="w-full h-full flex items-center justify-center"><User className="w-4 h-4" style={{ color: '#8b5cf6' }} /></div>}
+                </div>
+                <button onClick={() => signOut()} className="p-1.5 rounded-lg transition-all"
+                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}
+                  title="Çıkış Yap">
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {loading && (
+          <div className="flex items-center justify-center py-20">
+            <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
+          </div>
+        )}
+
+        {!loading && view === 'pricing' && (
+          <PricingPage
+            onFreeStart={() => setView('dashboard')}
+            onProStart={() => {}}
+          />
+        )}
+
+        {/* Dashboard */}
+        {!loading && view === 'dashboard' && (
+          <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold">{t('dashboardTitle')}</h1>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {user?.firstName || user?.emailAddresses[0]?.emailAddress}
+              </p>
+            </div>
+            <div className="mb-8 sm:mb-10">
+              <button onClick={handleNewJournalClick}
+                className="w-full sm:w-auto flex items-center gap-4 rounded-2xl px-6 py-5 transition-all"
+                style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.13)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(139,92,246,0.5)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(139,92,246,0.25)'; }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(139,92,246,0.15)' }}>
+                  <PlusCircle className="w-5 h-5" style={{ color: '#8b5cf6' }} />
+                </div>
+                <div className="text-start">
+                  <div className="font-semibold">{t('newJournal')}</div>
+                  <div className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('newJournalSubtitle')}</div>
+                </div>
+              </button>
+            </div>
+
+            {accounts.length > 0 ? (
+              <div>
+                <h2 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('myJournals')}</h2>
+                <div className="space-y-3">
+                  {[...accounts].reverse().map(acc => {
+                    const stats = getJournalStats(acc.id);
+                    return (
+                      <div key={acc.id} onClick={() => openJournal(acc)}
+                        className="flex items-center gap-4 sm:gap-6 rounded-2xl px-4 sm:px-6 py-4 sm:py-5 cursor-pointer transition-all group"
+                        style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.05)' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1f2035'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#1a1b2e'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.05)'; }}>
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(139,92,246,0.1)' }}>
+                          <BookOpen className="w-5 h-5" style={{ color: '#8b5cf6' }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold truncate">{acc.name}</div>
+                          <div className="flex items-center gap-2 mt-1 text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                            <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span className="truncate">{formatDate(acc.startDate)}</span>
+                            {acc.startingCapital && <><span>·</span><span>${acc.startingCapital.toLocaleString()}</span></>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 sm:gap-8 text-sm flex-shrink-0">
+                          <div className="text-center hidden md:block">
+                            <div className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('tradeCount')}</div>
+                            <div className="font-semibold font-mono">{stats.total}</div>
+                          </div>
+                          <div className="text-center hidden sm:block">
+                            <div className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('winRate')}</div>
+                            <div className="font-semibold font-mono">%{stats.winRate}</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('netProfit')}</div>
+                            <div className="font-semibold font-mono" style={{ color: stats.netPnL >= 0 ? '#34d399' : '#f87171' }}>
+                              {stats.netPnL >= 0 ? '+' : '-'}${Math.abs(stats.netPnL).toFixed(2)}
+                            </div>
+                          </div>
+                        </div>
+                        <button onClick={e => { e.stopPropagation(); setAccountToDelete(acc.id); }}
+                          className="p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 flex-shrink-0"
+                          style={{ color: 'rgba(255,255,255,0.25)' }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.1)'; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.25)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-20 rounded-2xl" style={{ background: '#1a1b2e', border: '1px dashed rgba(255,255,255,0.08)' }}>
+                <BookOpen className="w-12 h-12 mx-auto mb-4" style={{ color: 'rgba(255,255,255,0.15)' }} />
+                <p style={{ color: 'rgba(255,255,255,0.35)' }}>{t('noJournals')}</p>
+              </div>
+            )}
+          </main>
+        )}
+
+        {/* Expanded View */}
+        {!loading && view === 'expanded' && activeJournal && activeStats && (
+          <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+            <div className="mb-6">
+              <h1 className="text-xl sm:text-2xl font-bold text-white">{activeJournal.name}</h1>
+              <div className="flex items-center gap-3 mt-1 text-sm flex-wrap" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {activeJournal.startDate && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{formatDate(activeJournal.startDate)}</span>}
+                {activeJournal.startingCapital && <><span>·</span><span>${activeJournal.startingCapital.toLocaleString()}</span></>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+              {[
+                { icon: <Activity className="w-4 h-4" />, label: t('totalTrades'), value: String(activeStats.total), color: '#fff' },
+                { icon: <PieChart className="w-4 h-4" />, label: t('winRate'), value: `%${activeStats.winRate}`, color: '#fff' },
+                { icon: <DollarSign className="w-4 h-4" />, label: t('netProfit'), value: `${activeStats.netPnL >= 0 ? '+' : '-'}$${Math.abs(activeStats.netPnL).toFixed(2)}`, color: activeStats.netPnL >= 0 ? '#34d399' : '#f87171' },
+                { icon: <TrendingUp className="w-4 h-4" />, label: t('profitFactor'), value: activeStats.profitFactor, color: '#fff' },
+              ].map((s, i) => (
+                <div key={i} className="p-3 sm:p-4 rounded-xl" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div className="flex items-center gap-2 mb-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    {s.icon}
+                    <span className="text-xs font-medium uppercase tracking-wider truncate">{s.label}</span>
+                  </div>
+                  <div className="text-lg sm:text-2xl font-semibold font-mono" style={{ color: s.color }}>{s.value}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-1 p-1 rounded-xl mb-6 sm:mb-8 w-full sm:w-fit"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              {tabs.map(tab => (
+                <button key={tab.key} onClick={() => setJournalTab(tab.key as JournalTab)}
+                  className="flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all flex-1 sm:flex-none whitespace-nowrap"
+                  style={journalTab === tab.key
+                    ? { background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }
+                    : { color: 'rgba(255,255,255,0.4)' }}>
+                  {tab.icon}
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} />}
+            {journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
+            {journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} statsOnly />}
+            {journalTab === 'goals' && <GoalsView trades={filteredTrades} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
+          </main>
+        )}
+
+      </SignedIn>
+    </div>
+  );
+}
