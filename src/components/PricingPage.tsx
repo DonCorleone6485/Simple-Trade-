@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Zap, TrendingUp } from 'lucide-react';
+import { Check, Zap, TrendingUp, Shield } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function PricingPage() {
@@ -14,18 +14,22 @@ export default function PricingPage() {
 
   const freeFeatures = [
     t('1 Journal', '1 Journal', '۱ ژورنال'),
-    t('Max 20 Trade', 'Max 20 Trades', 'حداکثر ۲۰ معامله'),
-    t('Temel İstatistikler', 'Basic Statistics', 'آمار پایه'),
+    t('Günde 1 Trade (Maks. 20 Trade)', 'Daily 1 Trade (Max. 20 Trades)', 'روزانه ۱ معامله (حداکثر ۲۰ معامله)'),
+    t('Trade Başına 1 Fotoğraf', '1 Photo per Trade', '۱ عکس در هر معامله'),
+    t('Tüm İstatistikler', 'All Statistics', 'همه آمارها'),
     t('Takvim Görünümü', 'Calendar View', 'نمای تقویم'),
+    t('Hedef & Kural Sistemi', 'Goals & Rules System', 'سیستم اهداف و قوانین'),
+    t('Isı Haritası', 'Heat Map', 'نقشه حرارتی'),
+    t('Setup Performans Analizi', 'Setup Performance Analysis', 'تحلیل عملکرد ستاپ'),
   ];
 
   const proFeatures = [
     t('Sınırsız Journal', 'Unlimited Journals', 'ژورنال نامحدود'),
     t('Sınırsız Trade', 'Unlimited Trades', 'معاملات نامحدود'),
+    t('Sınırsız Fotoğraf Yükleme', 'Unlimited Photo Upload', 'آپلود عکس نامحدود'),
     t('AI Analiz', 'AI Analysis', 'تحلیل هوش مصنوعی'),
     t('Gelişmiş İstatistikler', 'Advanced Statistics', 'آمار پیشرفته'),
     t('Hedef & Kural Sistemi', 'Goals & Rules System', 'سیستم اهداف و قوانین'),
-    t('Fotoğraf Yükleme', 'Photo Upload', 'آپلود عکس'),
     t('Drawdown & Streak Analizi', 'Drawdown & Streak Analysis', 'تحلیل افت و سری'),
     t('Isı Haritası', 'Heat Map', 'نقشه حرارتی'),
     t('Setup Performans Analizi', 'Setup Performance Analysis', 'تحلیل عملکرد ستاپ'),
@@ -40,7 +44,8 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen py-16 px-4" style={{ background: '#0d0e1a' }}>
       <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6" style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', color: '#a78bfa' }}>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6"
+          style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', color: '#a78bfa' }}>
           <Zap className="w-4 h-4" />
           {t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری')}
         </div>
@@ -52,6 +57,7 @@ export default function PricingPage() {
         </p>
       </div>
 
+      {/* Billing toggle */}
       <div className="flex items-center justify-center gap-4 mb-12">
         <span className="text-sm font-medium" style={{ color: billing === 'monthly' ? '#fff' : 'rgba(255,255,255,0.4)' }}>
           {t('Aylık', 'Monthly', 'ماهانه')}
@@ -66,7 +72,8 @@ export default function PricingPage() {
         </button>
         <span className="text-sm font-medium" style={{ color: billing === 'yearly' ? '#fff' : 'rgba(255,255,255,0.4)' }}>
           {t('Yıllık', 'Yearly', 'سالانه')}
-          <span className="ms-2 px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
+          <span className="ms-2 px-2 py-0.5 rounded-full text-xs font-semibold"
+            style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
             {t(`%${savings} İndirim`, `${savings}% Off`, `${savings}% تخفیف`)}
           </span>
         </span>
@@ -74,6 +81,7 @@ export default function PricingPage() {
 
       <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
 
+        {/* FREE */}
         <div className="rounded-2xl p-8" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="mb-6">
             <h2 className="text-xl font-bold text-white mb-1">{t('Ücretsiz', 'Free', 'رایگان')}</h2>
@@ -98,7 +106,8 @@ export default function PricingPage() {
           <div className="space-y-3">
             {freeFeatures.map((feature, i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(52,211,153,0.1)' }}>
+                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(52,211,153,0.1)' }}>
                   <Check className="w-3 h-3" style={{ color: '#34d399' }} />
                 </div>
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{feature}</span>
@@ -107,7 +116,9 @@ export default function PricingPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl p-8 relative" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
+        {/* PRO */}
+        <div className="rounded-2xl p-8 relative"
+          style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
             <span className="px-4 py-1 rounded-full text-xs font-semibold" style={{ background: '#8b5cf6', color: '#fff' }}>
               {t('En Popüler', 'Most Popular', 'محبوب‌ترین')}
@@ -122,7 +133,7 @@ export default function PricingPage() {
               {t('Ciddi traderlar için', 'For serious traders', 'برای معامله‌گران جدی')}
             </p>
           </div>
-          <div className="mb-8">
+          <div className="mb-2">
             <span className="text-5xl font-bold text-white">
               ${billing === 'monthly' ? monthlyPrice : yearlyMonthly}
             </span>
@@ -135,18 +146,34 @@ export default function PricingPage() {
               </p>
             )}
           </div>
+
+          {/* 3 Gün Para İade Garantisi */}
+          <div className="flex items-center gap-2 mb-6 px-3 py-2 rounded-xl"
+            style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.15)' }}>
+            <Shield className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
+            <span className="text-xs font-medium" style={{ color: '#34d399' }}>
+              {t(
+                '3 Gün Ücretsiz Dene — 3. günün sonunda ödeme alınır, istediğin zaman iptal et',
+                '3-Day Free Trial — charged on day 3, cancel anytime',
+                '۳ روز رایگان امتحان کن — در روز سوم پرداخت می‌شود، هر زمان لغو کن'
+              )}
+            </span>
+          </div>
+
           <button
             className="w-full py-3 rounded-xl text-sm font-semibold mb-8 transition-all"
             style={{ background: '#8b5cf6', color: '#fff' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
           >
-            {t('Pro\'ya Geç', 'Upgrade to Pro', 'ارتقا به Pro')}
+            {t("Pro'ya Geç", 'Upgrade to Pro', 'ارتقا به Pro')}
           </button>
+
           <div className="space-y-3">
             {proFeatures.map((feature, i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(139,92,246,0.2)' }}>
+                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(139,92,246,0.2)' }}>
                   <Check className="w-3 h-3" style={{ color: '#a78bfa' }} />
                 </div>
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{feature}</span>
@@ -158,7 +185,11 @@ export default function PricingPage() {
 
       <div className="text-center mt-12">
         <p className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          {t('Kredi kartı gerekmez • İstediğiniz zaman iptal edin', 'No credit card required • Cancel anytime', 'نیازی به کارت اعتباری نیست • هر زمان لغو کنید')}
+          {t(
+            'Kart bilgisi gereklidir • 3 gün ücretsiz • 3. günün sonunda ödeme alınır • İstediğiniz zaman iptal edin',
+            'Card required • 3-day free trial • Charged on day 3 • Cancel anytime',
+            'کارت لازم است • ۳ روز رایگان • در روز سوم پرداخت • هر زمان لغو کنید'
+          )}
         </p>
       </div>
     </div>
