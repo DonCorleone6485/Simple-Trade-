@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
+
 interface CalendarViewProps {
   trades: Trade[];
   onDelete: (id: string) => void;
