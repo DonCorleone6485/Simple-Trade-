@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, X, Search, ChevronDown } from 'lucide-react';
+import { Upload, X, Search, ChevronDown, Loader } from 'lucide-react';
 import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
@@ -7,11 +7,11 @@ import TimePicker from "react-multi-date-picker/plugins/time_picker";
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
+import { supabase } from '../lib/supabase';
 
 interface TradeFormProps {
   onSave: (trade: Trade) => void;
   isPro?: boolean;
-  
 }
 
 const OWNER_EMAIL = 'asgharjafari2007@outlook.com';
@@ -127,75 +127,44 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
 
   return (
     <div ref={ref} className="relative w-full">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
+      <button type="button" onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-mono font-medium transition-all"
-        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
-      >
+        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}>
         <span>{value || 'Sembol seç...'}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.4)' }} />
       </button>
-
       {open && (
         <div className="absolute top-full start-0 mt-2 w-full z-50 rounded-2xl overflow-hidden shadow-2xl"
           style={{ background: '#12131f', border: '1px solid rgba(255,255,255,0.1)', minWidth: '280px' }}>
-
           <div className="p-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <Search className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
-              <input
-                ref={searchRef}
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                onKeyDown={handleKeyDown}
+              <input ref={searchRef} type="text" value={search} onChange={e => setSearch(e.target.value)} onKeyDown={handleKeyDown}
                 placeholder="Sembol ara veya yaz... (Enter ile ekle)"
-                className="flex-1 bg-transparent outline-none text-sm text-white placeholder-gray-500"
-                style={{ color: '#fff' }}
-              />
-              {search && (
-                <button type="button" onClick={() => setSearch('')}>
-                  <X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} />
-                </button>
-              )}
+                className="flex-1 bg-transparent outline-none text-sm text-white placeholder-gray-500" style={{ color: '#fff' }} />
+              {search && <button type="button" onClick={() => setSearch('')}><X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} /></button>}
             </div>
           </div>
-
           {!search && (
             <div className="flex gap-1 px-3 py-2 overflow-x-auto" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
               {ALL_CATEGORIES.map(cat => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setCategory(cat)}
+                <button key={cat} type="button" onClick={() => setCategory(cat)}
                   className="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0"
-                  style={category === cat
-                    ? { background: '#8b5cf6', color: '#fff' }
-                    : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
-                >
+                  style={category === cat ? { background: '#8b5cf6', color: '#fff' } : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
                   {cat}
                 </button>
               ))}
             </div>
           )}
-
           <div className="overflow-y-auto" style={{ maxHeight: '280px' }}>
             {!search && recentlyUsed.length > 0 && (
               <div>
-                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                  Son Kullanılanlar
-                </div>
+                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>Son Kullanılanlar</div>
                 {recentlyUsed.map(symbol => (
-                  <button
-                    key={`recent-${symbol}`}
-                    type="button"
-                    onClick={() => handleSelect(symbol)}
-                    className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
-                    style={{ color: '#fff' }}
+                  <button key={`recent-${symbol}`} type="button" onClick={() => handleSelect(symbol)}
+                    className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all" style={{ color: '#fff' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-                  >
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                     <span className="font-mono font-medium">{symbol}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.35)' }}>
                       {Object.entries(SYMBOLS).find(([, v]) => v.includes(symbol))?.[0] || 'Custom'}
@@ -205,43 +174,24 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
                 <div className="mx-4 my-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
               </div>
             )}
-
-            {search && (
-              <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                {filteredSymbols.length > 0 ? 'Sonuçlar' : 'Bulunamadı — Enter ile ekle'}
-              </div>
-            )}
-
-            {!search && (
-              <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                {category}
-              </div>
-            )}
-
+            {search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{filteredSymbols.length > 0 ? 'Sonuçlar' : 'Bulunamadı — Enter ile ekle'}</div>}
+            {!search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{category}</div>}
             {filteredSymbols.map(symbol => (
-              <button
-                key={symbol}
-                type="button"
-                onClick={() => handleSelect(symbol)}
+              <button key={symbol} type="button" onClick={() => handleSelect(symbol)}
                 className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
                 style={{ color: value === symbol ? '#a78bfa' : '#fff' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-              >
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                 <span className="font-mono font-medium">{symbol}</span>
                 {value === symbol && <span className="text-xs" style={{ color: '#a78bfa' }}>✓</span>}
               </button>
             ))}
-
             {search.trim() && !filteredSymbols.includes(search.trim().toUpperCase()) && (
-              <button
-                type="button"
-                onClick={() => handleSelect(search.trim().toUpperCase())}
+              <button type="button" onClick={() => handleSelect(search.trim().toUpperCase())}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm transition-all"
                 style={{ color: '#a78bfa', borderTop: '1px solid rgba(255,255,255,0.06)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-              >
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                 <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(139,92,246,0.2)' }}>+</span>
                 <span><span className="font-mono font-semibold">{search.trim().toUpperCase()}</span> ekle</span>
               </button>
@@ -253,12 +203,13 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
   );
 }
 
-function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit }: {
+function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit, uploading }: {
   photos: string[];
   onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemove: (index: number) => void;
   isUnlimited?: boolean;
   limit: number;
+  uploading?: boolean;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useLanguage();
@@ -267,19 +218,21 @@ function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit }: {
   return (
     <div className="space-y-4">
       {canUploadMore && (
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="w-full h-40 flex flex-col items-center justify-center cursor-pointer rounded-xl transition-all"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}
-        >
-          <Upload className="w-5 h-5 mb-2" style={{ color: 'rgba(255,255,255,0.25)' }} />
-          <span className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span>
-          {isUnlimited && (
-            <span className="text-xs mt-1" style={{ color: 'rgba(139,92,246,0.7)' }}>∞ limitsiz</span>
-          )}
-          <input type="file" ref={fileInputRef} onChange={onUpload} accept="image/*" multiple className="hidden" />
+        <div onClick={() => !uploading && fileInputRef.current?.click()}
+          className="w-full h-40 flex flex-col items-center justify-center rounded-xl transition-all"
+          style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px dashed rgba(255,255,255,0.12)',
+            cursor: uploading ? 'not-allowed' : 'pointer',
+            opacity: uploading ? 0.6 : 1,
+          }}
+          onMouseEnter={e => { if (!uploading) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}>
+          {uploading
+            ? <><Loader className="w-5 h-5 mb-2 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Yükleniyor...</span></>
+            : <><Upload className="w-5 h-5 mb-2" style={{ color: 'rgba(255,255,255,0.25)' }} /><span className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span>{isUnlimited && <span className="text-xs mt-1" style={{ color: 'rgba(139,92,246,0.7)' }}>∞ limitsiz</span>}</>
+          }
+          <input type="file" ref={fileInputRef} onChange={onUpload} accept="image/*" multiple className="hidden" disabled={uploading} />
         </div>
       )}
       {photos.length > 0 && (
@@ -287,12 +240,9 @@ function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit }: {
           {photos.map((photo, index) => (
             <div key={index} className="relative aspect-square rounded-xl overflow-hidden group" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
               <img src={photo} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
-              <button
-                type="button"
-                onClick={() => onRemove(index)}
+              <button type="button" onClick={() => onRemove(index)}
                 className="absolute top-1 end-1 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}
-              >
+                style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}>
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -324,6 +274,19 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
   const [postNotes, setPostNotes] = useState('');
   const [prePhotos, setPrePhotos] = useState<string[]>([]);
   const [postPhotos, setPostPhotos] = useState<string[]>([]);
+  const [uploadingPre, setUploadingPre] = useState(false);
+  const [uploadingPost, setUploadingPost] = useState(false);
+
+  // ── STORAGE UPLOAD ──
+  const uploadPhotoToStorage = async (file: File, kind: 'pre' | 'post'): Promise<string | null> => {
+    if (!user) return null;
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${user.id}/${Date.now()}_${Math.random().toString(36).substr(2, 6)}_${kind}.${ext}`;
+    const { data, error } = await supabase.storage.from('trade-photos').upload(path, file, { contentType: file.type });
+    if (error) { console.error('Upload error:', error); return null; }
+    const { data: urlData } = supabase.storage.from('trade-photos').getPublicUrl(data.path);
+    return urlData.publicUrl;
+  };
 
   const handleResultChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value as 'Başarılı' | 'Başarısız' | 'Manuel Karda' | 'Manuel Zararda';
@@ -341,7 +304,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
     if (e.target.value !== 'Diğer') setCustomSetup('');
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
     const files = Array.from(e.target.files || []) as File[];
     const current = kind === 'pre' ? prePhotos : postPhotos;
 
@@ -350,17 +313,32 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
       return;
     }
 
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (kind === 'pre') setPrePhotos(p => [...p, reader.result as string]);
-        else setPostPhotos(p => [...p, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
+    if (kind === 'pre') setUploadingPre(true);
+    else setUploadingPost(true);
+
+    for (const file of files) {
+      const url = await uploadPhotoToStorage(file, kind);
+      if (url) {
+        if (kind === 'pre') setPrePhotos(p => [...p, url]);
+        else setPostPhotos(p => [...p, url]);
+      }
+    }
+
+    if (kind === 'pre') setUploadingPre(false);
+    else setUploadingPost(false);
+    e.target.value = '';
   };
 
-  const removePhoto = (index: number, kind: 'pre' | 'post') => {
+  const removePhoto = async (index: number, kind: 'pre' | 'post') => {
+    const photos = kind === 'pre' ? prePhotos : postPhotos;
+    const url = photos[index];
+
+    // Storage'dan sil
+    if (url && url.includes('/trade-photos/')) {
+      const path = url.split('/trade-photos/')[1];
+      if (path) await supabase.storage.from('trade-photos').remove([path]);
+    }
+
     if (kind === 'pre') setPrePhotos(p => p.filter((_, i) => i !== index));
     else setPostPhotos(p => p.filter((_, i) => i !== index));
   };
@@ -371,15 +349,11 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
     const finalSetup = setup === 'Diğer' ? customSetup : setup;
     const newTrade: Trade = {
       id: Date.now().toString(),
-      date, symbol, type, timeframe,
-      setup: finalSetup,
-      risk: parseFloat(risk) || 0,
-      reward: parseFloat(reward) || 0,
+      date, symbol, type, timeframe, setup: finalSetup,
+      risk: parseFloat(risk) || 0, reward: parseFloat(reward) || 0,
       rr, result,
-      preTradeNotes: preNotes,
-      postTradeNotes: postNotes,
-      preTradePhotos: prePhotos,
-      postTradePhotos: postPhotos,
+      preTradeNotes: preNotes, postTradeNotes: postNotes,
+      preTradePhotos: prePhotos, postTradePhotos: postPhotos,
     };
     onSave(newTrade);
     setDate(''); setSymbol('EURUSD'); setTimeframe('H1');
@@ -403,10 +377,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
             <label style={lbl}>{t('dateTime')}</label>
             <DatePicker
               value={date ? new Date(date) : null}
-              onChange={(dateObj: DateObject | null) => {
-                if (dateObj) setDate(dateObj.toDate().toISOString());
-                else setDate('');
-              }}
+              onChange={(dateObj: DateObject | null) => { if (dateObj) setDate(dateObj.toDate().toISOString()); else setDate(''); }}
               format="YYYY/MM/DD HH:mm"
               plugins={[<TimePicker position="bottom" />]}
               calendar={language === 'fa' ? persian : undefined}
@@ -415,12 +386,10 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
               containerClassName="w-full"
             />
           </div>
-
           <div>
             <label style={lbl}>{t('symbol')}</label>
             <SymbolPicker value={symbol} onChange={setSymbol} />
           </div>
-
           <div>
             <label style={lbl}>{t('type')}</label>
             <select value={type} onChange={e => setType(e.target.value as 'Buy' | 'Sell')} style={selStyle}>
@@ -428,45 +397,27 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
               <option value="Sell" style={optStyle}>{t('sell')}</option>
             </select>
           </div>
-
           <div>
             <label style={lbl}>{t('timeframe')}</label>
             <select value={timeframe} onChange={e => setTimeframe(e.target.value)} style={selStyle}>
-              {TIMEFRAMES.map(tf => (
-                <option key={tf} value={tf} style={optStyle}>{tf}</option>
-              ))}
+              {TIMEFRAMES.map(tf => <option key={tf} value={tf} style={optStyle}>{tf}</option>)}
             </select>
           </div>
-
           <div>
             <label style={lbl}>{t('setup')}</label>
             <select value={setup} onChange={handleSetupChange} style={selStyle}>
               <option value="" style={optStyle}>— Seçin —</option>
-              {SETUPS.map(s => (
-                <option key={s} value={s} style={optStyle}>{s}</option>
-              ))}
+              {SETUPS.map(s => <option key={s} value={s} style={optStyle}>{s}</option>)}
             </select>
             {setup === 'Diğer' && (
-              <input
-                type="text"
-                value={customSetup}
-                onChange={e => setCustomSetup(e.target.value)}
-                placeholder="Setup adını yazın..."
-                className="mt-2"
-                style={{ ...inp }}
-                autoFocus
-              />
+              <input type="text" value={customSetup} onChange={e => setCustomSetup(e.target.value)}
+                placeholder="Setup adını yazın..." className="mt-2" style={{ ...inp }} autoFocus />
             )}
           </div>
-
           <div>
             <label style={lbl}>{t('rr')}</label>
-            <input
-              type="number" step="any"
-              value={rr} onChange={e => setRr(e.target.value)}
-              style={{ ...inp, fontFamily: 'monospace' }}
-              placeholder={t('rrPlaceholder')}
-            />
+            <input type="number" step="any" value={rr} onChange={e => setRr(e.target.value)}
+              style={{ ...inp, fontFamily: 'monospace' }} placeholder={t('rrPlaceholder')} />
           </div>
         </div>
 
@@ -476,28 +427,18 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
               <label style={lbl}>{t('risk')}</label>
               <div className="relative">
                 <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                <input
-                  type="number" min="0" step="0.01" required
-                  value={risk} onChange={e => setRisk(e.target.value)}
-                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }}
-                  placeholder="0.00"
-                />
+                <input type="number" min="0" step="0.01" required value={risk} onChange={e => setRisk(e.target.value)}
+                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
               </div>
             </div>
-
             <div>
               <label style={lbl}>{t('reward')}</label>
               <div className="relative">
                 <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                <input
-                  type="number" step="0.01"
-                  value={reward} onChange={e => setReward(e.target.value)}
-                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }}
-                  placeholder="0.00"
-                />
+                <input type="number" step="0.01" value={reward} onChange={e => setReward(e.target.value)}
+                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
               </div>
             </div>
-
             <div>
               <label style={lbl}>{t('result')}</label>
               <select value={result} onChange={handleResultChange} style={selStyle}>
@@ -521,15 +462,14 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
                 onRemove={i => removePhoto(i, 'pre')}
                 isUnlimited={isOwner}
                 limit={photoLimit}
+                uploading={uploadingPre}
               />
             </div>
             <div>
               <label style={lbl}>{t('notes')}</label>
-              <textarea
-                required value={preNotes} onChange={e => setPreNotes(e.target.value)}
+              <textarea required value={preNotes} onChange={e => setPreNotes(e.target.value)}
                 style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }}
-                placeholder={t('preNotesPlaceholder')}
-              />
+                placeholder={t('preNotesPlaceholder')} />
             </div>
           </div>
         </div>
@@ -545,29 +485,26 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
                 onRemove={i => removePhoto(i, 'post')}
                 isUnlimited={isOwner}
                 limit={photoLimit}
+                uploading={uploadingPost}
               />
             </div>
             <div>
               <label style={lbl}>{t('notes')}</label>
-              <textarea
-                value={postNotes} onChange={e => setPostNotes(e.target.value)}
+              <textarea value={postNotes} onChange={e => setPostNotes(e.target.value)}
                 style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }}
-                placeholder={t('postNotesPlaceholder')}
-              />
+                placeholder={t('postNotesPlaceholder')} />
             </div>
           </div>
         </div>
       </div>
 
       <div className="p-6 flex justify-end" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
-        <button
-          type="submit"
-          className="px-6 py-2.5 font-semibold rounded-xl transition-all"
+        <button type="submit" disabled={uploadingPre || uploadingPost}
+          className="px-6 py-2.5 font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ background: '#8b5cf6', color: '#fff' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
-        >
-          {t('saveButton')}
+          onMouseEnter={e => { if (!uploadingPre && !uploadingPost) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+          {uploadingPre || uploadingPost ? 'Fotoğraflar yükleniyor...' : t('saveButton')}
         </button>
       </div>
     </form>
