@@ -906,14 +906,14 @@ export default function App() {
                     <Upload className="w-4 h-4" />
                     <span className="hidden md:inline">{importLabel}</span>
                   </button>
-                  <button onClick={handleNewTradeClick}
-  className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
-  style={{ background: '#8b5cf6', color: '#fff' }}
-  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
-  <PlusCircle className="w-4 h-4" />
-  <span className="hidden sm:inline">{t('newTradeTab')}</span>
-</button>
+                <button onClick={handleNewTradeClick}
+                    className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
+                    style={{ background: '#8b5cf6', color: '#fff' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+                    <PlusCircle className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t('newTradeTab')}</span>
+                  </button>
                 </>
               )}
 
