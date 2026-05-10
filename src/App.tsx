@@ -54,7 +54,7 @@ export default function App() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState<'daily' | 'total' | 'journal'>('total');
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const hasLoadedInitially = useRef(false);
+
 
   const isRTL = language === 'fa' || language === 'ar';
 
@@ -134,28 +134,24 @@ export default function App() {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: true });
-    if (data) {
-      const mapped = data.map((j: any) => ({
-        id: j.id,
-        user_id: j.user_id,
-        name: j.name,
-        startDate: j.start_date,
-        startingCapital: j.starting_capital,
-        goals: j.goals,
-      }));
-      setAccounts(mapped);
 
-      // ── YENİ KULLANICI ONBOARDİNG KONTROLÜ ──
-      if (!hasLoadedInitially.current) {
-        hasLoadedInitially.current = true;
-        if (mapped.length === 0) {
-          const key = `hasSeenOnboarding_${user.id}`;
-          if (!localStorage.getItem(key)) {
-            setShowOnboarding(true);
-          }
-        }
-      }
+    const mapped = (data || []).map((j: any) => ({
+      id: j.id,
+      user_id: j.user_id,
+      name: j.name,
+      startDate: j.start_date,
+      startingCapital: j.starting_capital,
+      goals: j.goals,
+    }));
+
+    setAccounts(mapped);
+
+    // ── YENİ KULLANICI ONBOARDİNG KONTROLÜ ──
+    const key = `hasSeenOnboarding_${user.id}`;
+    if (mapped.length === 0 && !localStorage.getItem(key)) {
+      setShowOnboarding(true);
     }
+
     setLoading(false);
   };
 
