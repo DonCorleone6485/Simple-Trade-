@@ -11,6 +11,7 @@ import { useUser } from '@clerk/clerk-react';
 interface TradeFormProps {
   onSave: (trade: Trade) => void;
   isPro?: boolean;
+  
 }
 
 const OWNER_EMAIL = 'asgharjafari2007@outlook.com';
