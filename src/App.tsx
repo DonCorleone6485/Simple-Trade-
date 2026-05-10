@@ -4,7 +4,7 @@ import {
   Trash2, BookOpen, Clock, TrendingUp, X,
   Target, DollarSign, Activity, PieChart,
   CalendarDays, BarChart2, List, LogOut, User,
-  Upload, Zap, Check
+  Upload, Zap, Check, Shield
 } from 'lucide-react';
 import {
   SignIn, SignUp, useUser, useClerk, SignedIn, SignedOut
@@ -514,165 +514,92 @@ export default function App() {
 
       {/* ── ONBOARDİNG EKRANI — YENİ KULLANICI ── */}
       {showOnboarding && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: '#0d0e1a' }}>
-          <div className="w-full max-w-4xl">
-            <div className="text-center mb-10">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <TrendingUp className="w-7 h-7" style={{ color: '#8b5cf6' }} />
-                <span className="text-2xl font-bold text-white">Trade Journal</span>
-              </div>
-              <h1 className="text-3xl font-bold text-white mb-3">
-                {language === 'tr' ? 'Hoş Geldiniz! 👋' : 'Welcome! 👋'}
-              </h1>
-              <p style={{ color: 'rgba(255,255,255,0.5)' }}>
-                {language === 'tr' ? 'Nasıl başlamak istersiniz?' : 'How would you like to get started?'}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              {/* Ücretsiz */}
-              <div className="rounded-2xl p-8" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
-                <h2 className="text-xl font-bold text-white mb-1">
-                  {language === 'tr' ? 'Ücretsiz Başla' : 'Start Free'}
-                </h2>
-                <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  {language === 'tr' ? 'Sınırlı özelliklerle dene' : 'Try with limited features'}
-                </p>
-                <div className="space-y-2 mb-8 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  {[
-                    language === 'tr' ? '1 Journal' : '1 Journal',
-                    language === 'tr' ? 'Günde 1 Trade (Maks. 20)' : '1 Trade/day (Max. 20)',
-                    language === 'tr' ? 'Trade başına 1 Fotoğraf' : '1 Photo per trade',
-                    language === 'tr' ? 'Tüm İstatistikler' : 'All Statistics',
-                  ].map((f, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
-                      <span>{f}</span>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => {
-                    localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
-                    setShowOnboarding(false);
-                  }}
-                  className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
-                  style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
-                >
-                  {language === 'tr' ? 'Ücretsiz Başla' : 'Get Started Free'}
-                </button>
-              </div>
-
-              {/* Pro */}
-              <div className="rounded-2xl p-8 relative" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="px-4 py-1 rounded-full text-xs font-semibold" style={{ background: '#8b5cf6', color: '#fff' }}>
-                    {language === 'tr' ? 'Önerilen' : 'Recommended'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 mb-1">
-                  <Zap className="w-5 h-5" style={{ color: '#a78bfa' }} />
-                  <h2 className="text-xl font-bold text-white">Pro</h2>
-                </div>
-                <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  {language === 'tr' ? 'Tüm özellikler, sınırsız' : 'All features, unlimited'}
-                </p>
-                <div className="space-y-2 mb-8 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  {[
-                    language === 'tr' ? 'Sınırsız Journal & Trade' : 'Unlimited Journals & Trades',
-                    language === 'tr' ? 'Sınırsız Fotoğraf' : 'Unlimited Photos',
-                    language === 'tr' ? 'AI Analiz' : 'AI Analysis',
-                    language === 'tr' ? '3 Gün Ücretsiz Deneme' : '3-Day Free Trial',
-                  ].map((f, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#a78bfa' }} />
-                      <span>{f}</span>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => {
-                    localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
-                    setShowOnboarding(false);
-                    setView('pricing');
-                  }}
-                  className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
-                  style={{ background: '#8b5cf6', color: '#fff' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
-                >
-                  {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PricingPage
+          onboardingMode
+          onFreeStart={() => {
+            localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
+            setShowOnboarding(false);
+          }}
+          onProStart={() => {
+            localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
+            setShowOnboarding(false);
+            setView('pricing');
+          }}
+        />
       )}
 
-      {/* ── UPGRADE MODAL ── */}
+      {/* ── UPGRADE MODAL — PRO KARTI ── */}
       {showUpgradeModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="rounded-2xl p-7 w-full max-w-md relative" style={{ background: '#1a1b2e', border: '1px solid rgba(139,92,246,0.3)' }}>
-            <button
-              onClick={() => setShowUpgradeModal(false)}
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="rounded-2xl p-8 relative w-full max-w-md my-8"
+            style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
+
+            <button onClick={() => setShowUpgradeModal(false)}
               className="absolute top-4 end-4 p-1.5 rounded-lg"
-              style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}
-            >
+              style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }}>
               <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center justify-center w-12 h-12 rounded-2xl mb-4"
-              style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)' }}>
-              <Zap className="w-6 h-6" style={{ color: '#a78bfa' }} />
+            {/* Başlık */}
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="w-5 h-5" style={{ color: '#a78bfa' }} />
+              <h2 className="text-xl font-bold text-white">
+                {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
+              </h2>
             </div>
-
-            <h3 className="text-xl font-bold text-white mb-2">
-              {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
-            </h3>
-            <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {upgradeReasonText[upgradeReason]}
             </p>
 
-            <div className="space-y-2 mb-6">
-              {proFeaturesList.map((f, i) => (
-                <div key={i} className="flex items-center gap-3 text-sm">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgba(139,92,246,0.2)' }}>
-                    <Check className="w-3 h-3" style={{ color: '#a78bfa' }} />
-                  </div>
-                  <span style={{ color: 'rgba(255,255,255,0.75)' }}>{f}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-center mb-4">
-              <span className="text-3xl font-bold text-white">$12.99</span>
-              <span className="text-sm ms-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            {/* Fiyat */}
+            <div className="mb-2">
+              <span className="text-5xl font-bold text-white">$12.99</span>
+              <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 {language === 'tr' ? '/ ay' : '/ month'}
               </span>
-              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                {language === 'tr' ? '3 gün ücretsiz • istediğin zaman iptal' : '3-day free trial • cancel anytime'}
+              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {language === 'tr' ? 'Yıllık $99 ile %36 tasarruf et' : 'Save 36% with yearly $99'}
               </p>
+            </div>
+
+            {/* 3 gün trial */}
+            <div className="flex items-center gap-2 mb-6 mt-4 px-3 py-2 rounded-xl"
+              style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.15)' }}>
+              <Shield className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
+              <span className="text-xs font-medium" style={{ color: '#34d399' }}>
+                {language === 'tr'
+                  ? '3 Gün Ücretsiz Dene — 3. günün sonunda ödeme alınır'
+                  : '3-Day Free Trial — charged on day 3'}
+              </span>
             </div>
 
             <button
               onClick={() => { setShowUpgradeModal(false); setView('pricing'); }}
-              className="w-full py-3 rounded-xl text-sm font-semibold mb-3 transition-all"
+              className="w-full py-3 rounded-xl text-sm font-semibold mb-6 transition-all"
               style={{ background: '#8b5cf6', color: '#fff' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
-            >
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
               {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
             </button>
-            <button
-              onClick={() => setShowUpgradeModal(false)}
-              className="w-full py-2 rounded-xl text-sm transition-all"
+
+            {/* Özellikler */}
+            <div className="space-y-3 mb-6">
+              {proFeaturesList.map((f, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(139,92,246,0.2)' }}>
+                    <Check className="w-3 h-3" style={{ color: '#a78bfa' }} />
+                  </div>
+                  <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{f}</span>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={() => setShowUpgradeModal(false)}
+              className="w-full py-2 rounded-xl text-sm transition-all text-center"
               style={{ color: 'rgba(255,255,255,0.4)' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}
-            >
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
               {language === 'tr' ? 'Şimdilik Devam Et' : 'Continue for Now'}
             </button>
           </div>
@@ -865,7 +792,7 @@ export default function App() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <TradeForm onSave={handleAddTrade} isPro={isPro} />
+              <TradeForm onSave={handleAddTrade} />
             </div>
           </div>
         )}
@@ -906,8 +833,7 @@ export default function App() {
                     <Upload className="w-4 h-4" />
                     <span className="hidden md:inline">{importLabel}</span>
                   </button>
-                <button onClick={handleNewTradeClick}
-                    className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
+                  <button onClick={() => setShowTradeModal(true)}
                     style={{ background: '#8b5cf6', color: '#fff' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
