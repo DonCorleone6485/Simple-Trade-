@@ -551,15 +551,38 @@ export default function App() {
               {upgradeReasonText[upgradeReason]}
             </p>
 
-            {/* Fiyat */}
+            {/* Fiyat + Billing Toggle */}
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-sm" style={{ color: modalBilling === 'monthly' ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+                {language === 'tr' ? 'Aylık' : 'Monthly'}
+              </span>
+              <button
+                onClick={() => setModalBilling(modalBilling === 'monthly' ? 'yearly' : 'monthly')}
+                className="relative w-12 h-6 rounded-full transition-all flex-shrink-0"
+                style={{ background: modalBilling === 'yearly' ? '#8b5cf6' : 'rgba(255,255,255,0.1)' }}>
+                <div className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all"
+                  style={{ left: modalBilling === 'yearly' ? '26px' : '2px' }} />
+              </button>
+              <span className="text-sm" style={{ color: modalBilling === 'yearly' ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+                {language === 'tr' ? 'Yıllık' : 'Yearly'}
+                <span className="ms-1 px-1.5 py-0.5 rounded-full text-xs font-semibold"
+                  style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
+                  %36
+                </span>
+              </span>
+            </div>
             <div className="mb-2">
-              <span className="text-5xl font-bold text-white">$12.99</span>
+              <span className="text-5xl font-bold text-white">
+                ${modalBilling === 'monthly' ? '12.99' : '8.25'}
+              </span>
               <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 {language === 'tr' ? '/ ay' : '/ month'}
               </span>
-              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                {language === 'tr' ? 'Yıllık $99 ile %36 tasarruf et' : 'Save 36% with yearly $99'}
-              </p>
+              {modalBilling === 'yearly' && (
+                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  {language === 'tr' ? 'Yıllık $99 faturalandırılır' : 'Billed $99/year'}
+                </p>
+              )}
             </div>
 
             {/* 3 gün trial */}
