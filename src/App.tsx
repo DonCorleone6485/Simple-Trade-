@@ -198,17 +198,29 @@ export default function App() {
   };
 
   // ── TRADE LİMİT KONTROLÜ ──
-  const handleNewTradeClick = () => {
+  const handleNewTradeClick = async () => {
     if (!isPro && user) {
-      const userTrades = trades.filter(tr => tr.user_id === user.id);
-      if (userTrades.length >= 20) {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      const { count: totalCount } = await supabase
+        .from('trades')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      if ((totalCount || 0) >= 20) {
         setUpgradeReason('total');
         setShowUpgradeModal(true);
         return;
       }
-      const today = new Date().toDateString();
-      const todayTrades = userTrades.filter(tr => new Date(tr.date).toDateString() === today);
-      if (todayTrades.length >= 1) {
+
+      const { count: todayCount } = await supabase
+        .from('trades')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gte('date', todayStart.toISOString());
+
+      if ((todayCount || 0) >= 1) {
         setUpgradeReason('daily');
         setShowUpgradeModal(true);
         return;
