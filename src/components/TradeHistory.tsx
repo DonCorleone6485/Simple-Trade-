@@ -4,10 +4,11 @@ import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
   Award, AlertTriangle, Zap, TrendingDown, Edit2, Eye,
-  CheckSquare, Square, X, Save, Upload
+  CheckSquare, Square, X, Save, Upload, Loader
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
+import { supabase } from '../lib/supabase';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip as RechartsTooltip, ResponsiveContainer,
@@ -34,6 +35,7 @@ export default function TradeHistory({
   const [editForm, setEditForm] = useState<Partial<Trade>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
+  const [uploadingEditPhoto, setUploadingEditPhoto] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
@@ -288,25 +290,36 @@ export default function TradeHistory({
     setEditForm({});
   };
 
-  const handleEditPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
+  const handleEditPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
     const files = Array.from(e.target.files || []) as File[];
     const current = kind === 'pre' ? (editForm.preTradePhotos || []) : (editForm.postTradePhotos || []);
     if (!isOwner && current.length + files.length > 3) {
       alert('En fazla 3 fotoğraf yükleyebilirsiniz.');
       return;
     }
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (kind === 'pre') setEditForm(f => ({ ...f, preTradePhotos: [...(f.preTradePhotos || []), reader.result as string] }));
-        else setEditForm(f => ({ ...f, postTradePhotos: [...(f.postTradePhotos || []), reader.result as string] }));
-      };
-      reader.readAsDataURL(file);
-    });
+    setUploadingEditPhoto(true);
+    for (const file of files) {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `${user?.id}/${Date.now()}_${Math.random().toString(36).substr(2, 6)}_${kind}.${ext}`;
+      const { data, error } = await supabase.storage.from('trade-photos').upload(path, file, { contentType: file.type });
+      if (!error && data) {
+        const { data: urlData } = supabase.storage.from('trade-photos').getPublicUrl(data.path);
+        const url = urlData.publicUrl;
+        if (kind === 'pre') setEditForm(f => ({ ...f, preTradePhotos: [...(f.preTradePhotos || []), url] }));
+        else setEditForm(f => ({ ...f, postTradePhotos: [...(f.postTradePhotos || []), url] }));
+      }
+    }
+    setUploadingEditPhoto(false);
     e.target.value = '';
   };
 
-  const removeEditPhoto = (index: number, kind: 'pre' | 'post') => {
+  const removeEditPhoto = async (index: number, kind: 'pre' | 'post') => {
+    const photos = kind === 'pre' ? (editForm.preTradePhotos || []) : (editForm.postTradePhotos || []);
+    const url = photos[index];
+    if (url && url.includes('/trade-photos/')) {
+      const path = url.split('/trade-photos/')[1];
+      if (path) await supabase.storage.from('trade-photos').remove([path]);
+    }
     if (kind === 'pre') setEditForm(f => ({ ...f, preTradePhotos: (f.preTradePhotos || []).filter((_, i) => i !== index) }));
     else setEditForm(f => ({ ...f, postTradePhotos: (f.postTradePhotos || []).filter((_, i) => i !== index) }));
   };
@@ -675,17 +688,24 @@ export default function TradeHistory({
                   {!isOwner && <span style={{ color: 'rgba(255,255,255,0.25)', marginLeft: 6 }}>({photos.length}/3)</span>}
                 </label>
                 <div className="space-y-3">
-                  {canUpload && (
+                                      {canUpload && (
                     <div
-                      onClick={() => fileRef.current?.click()}
-                      className="w-full h-24 flex flex-col items-center justify-center cursor-pointer rounded-xl transition-all"
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+                      onClick={() => !uploadingEditPhoto && fileRef.current?.click()}
+                      className="w-full h-24 flex flex-col items-center justify-center rounded-xl transition-all"
+                      style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px dashed rgba(255,255,255,0.12)',
+                        cursor: uploadingEditPhoto ? 'not-allowed' : 'pointer',
+                        opacity: uploadingEditPhoto ? 0.6 : 1,
+                      }}
+                      onMouseEnter={e => { if (!uploadingEditPhoto) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}
                     >
-                      <Upload className="w-4 h-4 mb-1" style={{ color: 'rgba(255,255,255,0.25)' }} />
-                      <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span>
-                      <input type="file" ref={fileRef} onChange={e => handleEditPhotoUpload(e, kind)} accept="image/*" multiple className="hidden" />
+                      {uploadingEditPhoto
+                        ? <><Loader className="w-4 h-4 mb-1 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Yükleniyor...</span></>
+                        : <><Upload className="w-4 h-4 mb-1" style={{ color: 'rgba(255,255,255,0.25)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span></>
+                      }
+                      <input type="file" ref={fileRef} onChange={e => handleEditPhotoUpload(e, kind)} accept="image/*" multiple className="hidden" disabled={uploadingEditPhoto} />
                     </div>
                   )}
                   {photos.length > 0 && (
