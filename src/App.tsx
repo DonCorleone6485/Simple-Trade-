@@ -4,7 +4,7 @@ import {
   Trash2, BookOpen, Clock, TrendingUp, X,
   Target, DollarSign, Activity, PieChart,
   CalendarDays, BarChart2, List, LogOut, User,
-  Upload
+  Upload, Zap, Check
 } from 'lucide-react';
 import {
   SignIn, SignUp, useUser, useClerk, SignedIn, SignedOut
@@ -49,6 +49,12 @@ export default function App() {
   const [referralInput, setReferralInput] = useState('');
   const [referralMsg, setReferralMsg] = useState('');
   const [showReferral, setShowReferral] = useState(false);
+
+  // ── YENİ STATE'LER ──
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState<'daily' | 'total' | 'journal'>('total');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const hasLoadedInitially = useRef(false);
 
   const isRTL = language === 'fa' || language === 'ar';
 
@@ -129,14 +135,26 @@ export default function App() {
       .eq('user_id', user.id)
       .order('created_at', { ascending: true });
     if (data) {
-      setAccounts(data.map((j: any) => ({
+      const mapped = data.map((j: any) => ({
         id: j.id,
         user_id: j.user_id,
         name: j.name,
         startDate: j.start_date,
         startingCapital: j.starting_capital,
         goals: j.goals,
-      })));
+      }));
+      setAccounts(mapped);
+
+      // ── YENİ KULLANICI ONBOARDİNG KONTROLÜ ──
+      if (!hasLoadedInitially.current) {
+        hasLoadedInitially.current = true;
+        if (mapped.length === 0) {
+          const key = `hasSeenOnboarding_${user.id}`;
+          if (!localStorage.getItem(key)) {
+            setShowOnboarding(true);
+          }
+        }
+      }
     }
     setLoading(false);
   };
@@ -181,8 +199,17 @@ export default function App() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // ── JOURNAL OLUŞTURMA — LİMİT KONTROLÜ ──
   const createJournal = async () => {
     if (!newJournalName.trim() || !newJournalStartDate || !newJournalCapital || !user) return;
+
+    if (!isPro && accounts.length >= 1) {
+      setShowNewJournalModal(false);
+      setUpgradeReason('journal');
+      setShowUpgradeModal(true);
+      return;
+    }
+
     const { data } = await supabase
       .from('journals')
       .insert({
@@ -209,13 +236,32 @@ export default function App() {
     }
   };
 
+  // ── TRADE EKLEME — GÜNLÜK + TOPLAM LİMİT KONTROLÜ ──
   const handleAddTrade = async (trade: Trade) => {
     if (!activeJournal || !user) return;
-    if (!isPro && trades.filter(t => t.user_id === user.id).length >= 20) {
-      setShowTradeModal(false);
-      setView('pricing');
-      return;
+
+    if (!isPro) {
+      const userTrades = trades.filter(t => t.user_id === user.id);
+
+      // Toplam 20 trade limiti
+      if (userTrades.length >= 20) {
+        setShowTradeModal(false);
+        setUpgradeReason('total');
+        setShowUpgradeModal(true);
+        return;
+      }
+
+      // Günlük 1 trade limiti
+      const today = new Date().toDateString();
+      const todayTrades = userTrades.filter(t => new Date(t.date).toDateString() === today);
+      if (todayTrades.length >= 1) {
+        setShowTradeModal(false);
+        setUpgradeReason('daily');
+        setShowUpgradeModal(true);
+        return;
+      }
     }
+
     const { data } = await supabase
       .from('trades')
       .insert({
@@ -262,6 +308,7 @@ export default function App() {
     }
   };
 
+  // ── TRADE GÜNCELLEME — FOTOĞRAFLAR DA KAYDEDİLİYOR (BUGFIX) ──
   const handleUpdateTrade = async (trade: Trade) => {
     await supabase.from('trades').update({
       symbol: trade.symbol,
@@ -274,6 +321,8 @@ export default function App() {
       result: trade.result,
       pre_trade_notes: trade.preTradeNotes,
       post_trade_notes: trade.postTradeNotes,
+      pre_trade_photos: trade.preTradePhotos,
+      post_trade_photos: trade.postTradePhotos,
     }).eq('id', trade.id);
     setTrades(prev => prev.map(t => t.id === trade.id ? trade : t));
   };
@@ -288,7 +337,11 @@ export default function App() {
     if (!isPro) {
       const currentCount = trades.filter(t => t.user_id === user.id).length;
       const remaining = 20 - currentCount;
-      if (remaining <= 0) { setView('pricing'); return; }
+      if (remaining <= 0) {
+        setUpgradeReason('total');
+        setShowUpgradeModal(true);
+        return;
+      }
       importedTrades = importedTrades.slice(0, remaining);
     }
     const inserted: Trade[] = [];
@@ -420,8 +473,190 @@ export default function App() {
   const pricingLabel = language === 'tr' ? 'Fiyatlar' : language === 'fa' ? 'قیمت‌ها' : language === 'ar' ? 'الأسعار' : language === 'ru' ? 'Цены' : language === 'es' ? 'Precios' : language === 'pt' ? 'Preços' : language === 'de' ? 'Preise' : language === 'fr' ? 'Tarifs' : 'Pricing';
   const importLabel = language === 'tr' ? 'CSV İçe Aktar' : language === 'fa' ? 'وارد کردن CSV' : language === 'ar' ? 'استيراد CSV' : language === 'ru' ? 'Импорт CSV' : language === 'es' ? 'Importar CSV' : language === 'pt' ? 'Importar CSV' : language === 'de' ? 'CSV Importieren' : language === 'fr' ? 'Importer CSV' : 'Import CSV';
 
+  // Upgrade modal metinleri
+  const upgradeReasonText = {
+    daily: language === 'tr' ? 'Günlük 1 trade limitine ulaştınız.' : 'You've reached the daily 1 trade limit.',
+    total: language === 'tr' ? '20 trade limitine ulaştınız.' : 'You've reached the 20 trade limit.',
+    journal: language === 'tr' ? '1 journal limitine ulaştınız.' : 'You've reached the 1 journal limit.',
+  };
+
+  const proFeaturesList = [
+    language === 'tr' ? 'Sınırsız Journal' : 'Unlimited Journals',
+    language === 'tr' ? 'Sınırsız Trade' : 'Unlimited Trades',
+    language === 'tr' ? 'Sınırsız Fotoğraf' : 'Unlimited Photos',
+    language === 'tr' ? 'AI Analiz' : 'AI Analysis',
+    language === 'tr' ? 'Gelişmiş İstatistikler' : 'Advanced Statistics',
+  ];
+
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
+
+      {/* ── ONBOARDİNG EKRANI — YENİ KULLANICI ── */}
+      {showOnboarding && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: '#0d0e1a' }}>
+          <div className="w-full max-w-4xl">
+            <div className="text-center mb-10">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <TrendingUp className="w-7 h-7" style={{ color: '#8b5cf6' }} />
+                <span className="text-2xl font-bold text-white">Trade Journal</span>
+              </div>
+              <h1 className="text-3xl font-bold text-white mb-3">
+                {language === 'tr' ? 'Hoş Geldiniz! 👋' : 'Welcome! 👋'}
+              </h1>
+              <p style={{ color: 'rgba(255,255,255,0.5)' }}>
+                {language === 'tr' ? 'Nasıl başlamak istersiniz?' : 'How would you like to get started?'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              {/* Ücretsiz */}
+              <div className="rounded-2xl p-8" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <h2 className="text-xl font-bold text-white mb-1">
+                  {language === 'tr' ? 'Ücretsiz Başla' : 'Start Free'}
+                </h2>
+                <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  {language === 'tr' ? 'Sınırlı özelliklerle dene' : 'Try with limited features'}
+                </p>
+                <div className="space-y-2 mb-8 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  {[
+                    language === 'tr' ? '1 Journal' : '1 Journal',
+                    language === 'tr' ? 'Günde 1 Trade (Maks. 20)' : '1 Trade/day (Max. 20)',
+                    language === 'tr' ? 'Trade başına 1 Fotoğraf' : '1 Photo per trade',
+                    language === 'tr' ? 'Tüm İstatistikler' : 'All Statistics',
+                  ].map((f, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
+                      <span>{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => {
+                    localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
+                    setShowOnboarding(false);
+                  }}
+                  className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+                >
+                  {language === 'tr' ? 'Ücretsiz Başla' : 'Get Started Free'}
+                </button>
+              </div>
+
+              {/* Pro */}
+              <div className="rounded-2xl p-8 relative" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className="px-4 py-1 rounded-full text-xs font-semibold" style={{ background: '#8b5cf6', color: '#fff' }}>
+                    {language === 'tr' ? 'Önerilen' : 'Recommended'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Zap className="w-5 h-5" style={{ color: '#a78bfa' }} />
+                  <h2 className="text-xl font-bold text-white">Pro</h2>
+                </div>
+                <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  {language === 'tr' ? 'Tüm özellikler, sınırsız' : 'All features, unlimited'}
+                </p>
+                <div className="space-y-2 mb-8 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  {[
+                    language === 'tr' ? 'Sınırsız Journal & Trade' : 'Unlimited Journals & Trades',
+                    language === 'tr' ? 'Sınırsız Fotoğraf' : 'Unlimited Photos',
+                    language === 'tr' ? 'AI Analiz' : 'AI Analysis',
+                    language === 'tr' ? '3 Gün Ücretsiz Deneme' : '3-Day Free Trial',
+                  ].map((f, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#a78bfa' }} />
+                      <span>{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => {
+                    localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
+                    setShowOnboarding(false);
+                    setView('pricing');
+                  }}
+                  className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
+                  style={{ background: '#8b5cf6', color: '#fff' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
+                >
+                  {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── UPGRADE MODAL ── */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="rounded-2xl p-7 w-full max-w-md relative" style={{ background: '#1a1b2e', border: '1px solid rgba(139,92,246,0.3)' }}>
+            <button
+              onClick={() => setShowUpgradeModal(false)}
+              className="absolute top-4 end-4 p-1.5 rounded-lg"
+              style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center justify-center w-12 h-12 rounded-2xl mb-4"
+              style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)' }}>
+              <Zap className="w-6 h-6" style={{ color: '#a78bfa' }} />
+            </div>
+
+            <h3 className="text-xl font-bold text-white mb-2">
+              {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
+            </h3>
+            <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              {upgradeReasonText[upgradeReason]}
+            </p>
+
+            <div className="space-y-2 mb-6">
+              {proFeaturesList.map((f, i) => (
+                <div key={i} className="flex items-center gap-3 text-sm">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(139,92,246,0.2)' }}>
+                    <Check className="w-3 h-3" style={{ color: '#a78bfa' }} />
+                  </div>
+                  <span style={{ color: 'rgba(255,255,255,0.75)' }}>{f}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mb-4">
+              <span className="text-3xl font-bold text-white">$12.99</span>
+              <span className="text-sm ms-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {language === 'tr' ? '/ ay' : '/ month'}
+              </span>
+              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                {language === 'tr' ? '3 gün ücretsiz • istediğin zaman iptal' : '3-day free trial • cancel anytime'}
+              </p>
+            </div>
+
+            <button
+              onClick={() => { setShowUpgradeModal(false); setView('pricing'); }}
+              className="w-full py-3 rounded-xl text-sm font-semibold mb-3 transition-all"
+              style={{ background: '#8b5cf6', color: '#fff' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
+            >
+              {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
+            </button>
+            <button
+              onClick={() => setShowUpgradeModal(false)}
+              className="w-full py-2 rounded-xl text-sm transition-all"
+              style={{ color: 'rgba(255,255,255,0.4)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}
+            >
+              {language === 'tr' ? 'Şimdilik Devam Et' : 'Continue for Now'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* CSV Import Modal */}
       {showCSVImport && activeJournal && user && (
@@ -476,57 +711,38 @@ export default function App() {
                   <X className="w-4 h-4" />
                 </button>
               </div>
-{hasPaid && (
-              <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)' }}>
-                <p className="text-sm font-semibold" style={{ color: '#34d399' }}>
-                  {language === 'tr' ? '📤 Kodunuzu Paylaşın' : '📤 Share Your Code'}
-                </p>
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {language === 'tr'
-                    ? 'Arkadaşınız bu kodu kullandığında ikiniz de 1 ay ücretsiz Pro kazanırsınız!'
-                    : 'When your friend uses this code, you both get 1 month of Pro for free!'}
-                </p>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 px-3 py-2 rounded-xl font-mono text-sm font-bold text-white"
-                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', letterSpacing: '0.1em' }}>
-                    {referralCode || '...'}
+              {hasPaid && (
+                <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)' }}>
+                  <p className="text-sm font-semibold" style={{ color: '#34d399' }}>
+                    {language === 'tr' ? '📤 Kodunuzu Paylaşın' : '📤 Share Your Code'}
+                  </p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    {language === 'tr'
+                      ? 'Arkadaşınız bu kodu kullandığında ikiniz de 1 ay ücretsiz Pro kazanırsınız!'
+                      : 'When your friend uses this code, you both get 1 month of Pro for free!'}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 px-3 py-2 rounded-xl font-mono text-sm font-bold text-white"
+                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', letterSpacing: '0.1em' }}>
+                      {referralCode || '...'}
+                    </div>
+                    <button
+                      onClick={() => {
+                        const text = referralCode;
+                        if (navigator.clipboard?.writeText) {
+                          navigator.clipboard.writeText(text).then(() => {
+                            setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+                            setTimeout(() => setReferralMsg(''), 2000);
+                          });
+                        }
+                      }}
+                      className="px-3 py-2 rounded-xl text-sm font-semibold"
+                      style={{ background: '#34d399', color: '#000' }}>
+                      {language === 'tr' ? 'Kopyala' : 'Copy'}
+                    </button>
                   </div>
-              
-                  <button
-                    onClick={() => {
-                      const text = referralCode;
-                      if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(text).then(() => {
-                          setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
-                          setTimeout(() => setReferralMsg(''), 2000);
-                        }).catch(() => {
-                          const el = document.createElement('textarea');
-                          el.value = text;
-                          document.body.appendChild(el);
-                          el.select();
-                          document.execCommand('copy');
-                          document.body.removeChild(el);
-                          setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
-                          setTimeout(() => setReferralMsg(''), 2000);
-                        });
-                      } else {
-                        const el = document.createElement('textarea');
-                        el.value = text;
-                        document.body.appendChild(el);
-                        el.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(el);
-                        setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
-                        setTimeout(() => setReferralMsg(''), 2000);
-                      }
-                    }}
-                    className="px-3 py-2 rounded-xl text-sm font-semibold transition-all"
-                    style={{ background: '#34d399', color: '#000' }}>
-                    {language === 'tr' ? 'Kopyala' : 'Copy'}
-                  </button>
                 </div>
-              </div>
- )}
+              )}
               <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.15)' }}>
                 <p className="text-sm font-semibold" style={{ color: '#a78bfa' }}>
                   {language === 'tr' ? '🎟️ Referans Kodu Giriniz' : '🎟️ Enter Referral Code'}
@@ -695,25 +911,13 @@ export default function App() {
                 </span>
               )}
 
-              
-                <button onClick={() => setShowReferral(true)}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-                  style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.15)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.1)'; }}>
-                  🎁 {
-                    language === 'tr' ? 'Referans Kodu' :
-                    language === 'fa' ? 'کد معرف' :
-                    language === 'ar' ? 'كود الإحالة' :
-                    language === 'ru' ? 'Реферальный код' :
-                    language === 'es' ? 'Código de referido' :
-                    language === 'pt' ? 'Código de referência' :
-                    language === 'de' ? 'Empfehlungscode' :
-                    language === 'fr' ? 'Code de parrainage' :
-                    'Referral Code'
-                  }
-                </button>
-             
+              <button onClick={() => setShowReferral(true)}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.15)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.1)'; }}>
+                🎁 {language === 'tr' ? 'Referans Kodu' : language === 'fa' ? 'کد معرف' : language === 'ar' ? 'كود الإحالة' : language === 'ru' ? 'Реферальный код' : language === 'es' ? 'Código de referido' : language === 'pt' ? 'Código de referência' : language === 'de' ? 'Empfehlungscode' : language === 'fr' ? 'Code de parrainage' : 'Referral Code'}
+              </button>
 
               <div className="relative" ref={langMenuRef}>
                 <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
@@ -761,7 +965,6 @@ export default function App() {
           </div>
         </header>
 
-        {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
