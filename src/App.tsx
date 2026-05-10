@@ -471,9 +471,9 @@ export default function App() {
 
   // Upgrade modal metinleri
   const upgradeReasonText = {
-    daily: language === 'tr' ? 'Günlük 1 trade limitine ulaştınız.' : 'You've reached the daily 1 trade limit.',
-    total: language === 'tr' ? '20 trade limitine ulaştınız.' : 'You've reached the 20 trade limit.',
-    journal: language === 'tr' ? '1 journal limitine ulaştınız.' : 'You've reached the 1 journal limit.',
+    daily: language === 'tr' ? 'Günlük 1 trade limitine ulaştınız.' : "You've reached the daily 1 trade limit.",
+    total: language === 'tr' ? '20 trade limitine ulaştınız.' : "You've reached the 20 trade limit.",
+    journal: language === 'tr' ? '1 journal limitine ulaştınız.' : "You've reached the 1 journal limit.",
   };
 
   const proFeaturesList = [
