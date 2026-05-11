@@ -794,13 +794,15 @@ export default function App() {
                 </span>
               )}
 
-              <button onClick={() => setShowReferral(true)}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-                style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.15)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.1)'; }}>
-                🎁 {language === 'tr' ? 'Referans Kodu' : 'Referral Code'}
-              </button>
+             {isPro && (
+  <button onClick={() => setShowReferral(true)}
+    className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+    style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
+    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.15)'; }}
+    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.1)'; }}>
+    🎁 {language === 'tr' ? 'Referans Kodu Oluştur' : 'Create Referral Code'}
+  </button>
+)}
 
               <div className="relative" ref={langMenuRef}>
                 <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
