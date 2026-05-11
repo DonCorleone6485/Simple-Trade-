@@ -4,11 +4,12 @@ import { useLanguage } from '../context/LanguageContext';
 
 interface PricingPageProps {
   onboardingMode?: boolean;
+  expiredMode?: boolean;
   onFreeStart?: () => void;
   onProStart?: () => void;
 }
 
-export default function PricingPage({ onboardingMode, onFreeStart, onProStart }: PricingPageProps) {
+export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, onProStart }: PricingPageProps) {
   const { language } = useLanguage();
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly');
 
@@ -20,7 +21,7 @@ export default function PricingPage({ onboardingMode, onFreeStart, onProStart }:
 
   const freeFeatures = [
     t('1 Journal', '1 Journal', '۱ ژورنال'),
-    t('Günde 3 Trade (Maks. 20 Trade)', 'Daily 3 Trade (Max. 20 Trades)', 'روزانه ۳ معامله (حداکثر ۲۰ معامله)'),
+    t('Günde 1 Trade (Maks. 20 Trade)', 'Daily 1 Trade (Max. 20 Trades)', 'روزانه ۱ معامله (حداکثر ۲۰ معامله)'),
     t('Trade Başına 1 Fotoğraf', '1 Photo per Trade', '۱ عکس در هر معامله'),
     t('Tüm İstatistikler', 'All Statistics', 'همه آمارها'),
     t('Takvim Görünümü', 'Calendar View', 'نمای تقویم'),
