@@ -20,7 +20,7 @@ export default function PricingPage({ onboardingMode, onFreeStart, onProStart }:
 
   const freeFeatures = [
     t('1 Journal', '1 Journal', '۱ ژورنال'),
-    t('Günde 3 Trade (Maks. 20 Trade)', 'Daily 3 Trade (Max. 20 Trades)', 'روزانه ۱ معامله (حداکثر ۲۰ معامله)'),
+    t('Günde 3 Trade (Maks. 20 Trade)', 'Daily 3 Trade (Max. 20 Trades)', 'روزانه ۳ معامله (حداکثر ۲۰ معامله)'),
     t('Trade Başına 1 Fotoğraf', '1 Photo per Trade', '۱ عکس در هر معامله'),
     t('Tüm İstatistikler', 'All Statistics', 'همه آمارها'),
     t('Takvim Görünümü', 'Calendar View', 'نمای تقویم'),
