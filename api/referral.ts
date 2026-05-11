@@ -10,7 +10,26 @@ export default async function handler(req: any, res: any) {
 
   const { action, userId, code } = req.body;
 
-  // ── GENERATE ──
+  // ── GENERATE NEW (her tıklamada yeni kod) ──
+  if (action === 'generate_new') {
+    const { splitType, code: newCode } = req.body;
+    if (!userId || !newCode || !splitType) return res.status(400).json({ error: 'Eksik parametre' });
+
+    await supabase.from('referrals').insert({
+      referrer_user_id: userId,
+      code: newCode,
+      split_type: splitType,
+    });
+
+    await supabase.from('users').upsert(
+      { user_id: userId, referral_code: newCode },
+      { onConflict: 'user_id' }
+    );
+
+    return res.json({ code: newCode });
+  }
+
+  // ── GENERATE (ilk kod, değişmez) ──
   if (action === 'generate') {
     const { data: existing } = await supabase
       .from('users')
