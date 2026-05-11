@@ -9,8 +9,8 @@ export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { action, userId, code } = req.body;
-  console.log('Referral action:', action, 'userId:', userId, 'code:', code);
 
+  // ── GENERATE ──
   if (action === 'generate') {
     const { data: existing } = await supabase
       .from('users')
@@ -37,20 +37,33 @@ export default async function handler(req: any, res: any) {
     return res.json({ code: newCode });
   }
 
-  if (action === 'use') {
-    console.log('Trying to use code:', code, 'for user:', userId);
+  // ── VALIDATE ──
+  if (action === 'validate') {
+    if (!code || !userId) return res.status(400).json({ valid: false, error: 'Eksik parametre' });
 
-    if (!code || !userId) {
-      return res.status(400).json({ error: 'Kod veya kullanıcı ID eksik' });
-    }
+    const { data: referral } = await supabase
+      .from('referrals')
+      .select('*')
+      .eq('code', code)
+      .single();
+
+    if (!referral) return res.json({ valid: false, error: 'Geçersiz kod' });
+    if (referral.used_at) return res.json({ valid: false, error: 'Bu kod zaten kullanılmış' });
+    if (referral.referrer_user_id === userId) return res.json({ valid: false, error: 'Kendi kodunuzu kullanamazsınız' });
+
+    const splitType = referral.split_type || '50_50';
+    return res.json({ valid: true, splitType });
+  }
+
+  // ── USE ──
+  if (action === 'use') {
+    if (!code || !userId) return res.status(400).json({ error: 'Kod veya kullanıcı ID eksik' });
 
     const { data: referral, error: refError } = await supabase
       .from('referrals')
       .select('*')
       .eq('code', code)
       .single();
-
-    console.log('Referral found:', referral, 'Error:', refError);
 
     if (!referral) return res.status(404).json({ error: 'Geçersiz kod' });
     if (referral.used_at) return res.status(400).json({ error: 'Bu kod zaten kullanılmış' });
@@ -60,25 +73,15 @@ export default async function handler(req: any, res: any) {
     const oneMonthLater = new Date(now);
     oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
 
-    // Referral'ı kullanıldı olarak işaretle
-    const { error: updateError } = await supabase
-      .from('referrals')
+    await supabase.from('referrals')
       .update({ referred_user_id: userId, used_at: new Date().toISOString() })
       .eq('code', code);
 
-    console.log('Update referral error:', updateError);
+    await supabase.from('users').upsert(
+      { user_id: userId, is_pro: true, pro_until: oneMonthLater.toISOString() },
+      { onConflict: 'user_id' }
+    );
 
-    // Yeni kullanıcıya 1 ay pro ekle
-    const { error: newUserError } = await supabase
-      .from('users')
-      .upsert(
-        { user_id: userId, is_pro: true, pro_until: oneMonthLater.toISOString() },
-        { onConflict: 'user_id' }
-      );
-
-    console.log('New user pro error:', newUserError);
-
-    // Referral gönderen kişiye de 1 ay pro ekle
     const { data: referrer } = await supabase
       .from('users')
       .select('pro_until')
@@ -91,12 +94,10 @@ export default async function handler(req: any, res: any) {
     }
     referrerProUntil.setMonth(referrerProUntil.getMonth() + 1);
 
-    await supabase
-      .from('users')
-      .upsert(
-        { user_id: referral.referrer_user_id, is_pro: true, pro_until: referrerProUntil.toISOString() },
-        { onConflict: 'user_id' }
-      );
+    await supabase.from('users').upsert(
+      { user_id: referral.referrer_user_id, is_pro: true, pro_until: referrerProUntil.toISOString() },
+      { onConflict: 'user_id' }
+    );
 
     return res.json({ success: true });
   }
