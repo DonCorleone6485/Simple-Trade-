@@ -270,10 +270,6 @@ export default function App() {
     setTrades(prev => prev.map(tr => tr.id === trade.id ? trade : tr));
   };
 
-  const handleDeleteMultiple = async (ids: string[]) => {
-    await supabase.from('trades').delete().in('id', ids);
-    setTrades(prev => prev.filter(tr => !ids.includes(tr.id)));
-  };
 
   const handleCSVImport = async (importedTrades: Trade[]) => {
     if (!activeJournal || !user) return;
