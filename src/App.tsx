@@ -270,6 +270,10 @@ export default function App() {
     setTrades(prev => prev.map(tr => tr.id === trade.id ? trade : tr));
   };
 
+  const handleDeleteMultiple = async (ids: string[]) => {
+    await supabase.from('trades').delete().in('id', ids);
+    setTrades(prev => prev.filter(tr => !ids.includes(tr.id)));
+  };
 
   const handleCSVImport = async (importedTrades: Trade[]) => {
     if (!activeJournal || !user) return;
@@ -557,59 +561,107 @@ export default function App() {
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="rounded-2xl p-6 w-full max-w-md space-y-5" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-white">🎁 {language === 'tr' ? 'Referans Kodu' : 'Referral Code'}</h3>
+                <div>
+                  <h3 className="text-xl font-semibold text-white">🎁 {language === 'tr' ? 'Referans Kodu Oluştur' : 'Create Referral Code'}</h3>
+                  <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    {language === 'tr' ? 'Her tıklamada yeni kod oluşturulur' : 'A new code is generated each time'}
+                  </p>
+                </div>
                 <button onClick={() => { setShowReferral(false); setReferralMsg(''); setReferralInput(''); }}
                   className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              {hasPaid && (
+
+              {/* Ödül paylaşım seçimi */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  {language === 'tr' ? 'Ödülü nasıl paylaşmak istersiniz?' : 'How would you like to share the reward?'}
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    {
+                      key: '50_50',
+                      title: language === 'tr' ? '%50 / %50' : '50% / 50%',
+                      desc: language === 'tr' ? 'Ödülü paylaş' : 'Share the reward',
+                      detail: language === 'tr' ? '1 ay → sen 7 gün, arkadaşın 7 gün\n1 yıl → sen 45 gün, arkadaşın 45 gün' : '1mo → you 7d, friend 7d\n1yr → you 45d, friend 45d',
+                    },
+                    {
+                      key: '100_friend',
+                      title: language === 'tr' ? '%100 Arkadaşa' : '100% to Friend',
+                      desc: language === 'tr' ? 'Tüm ödülü hediye et' : 'Gift all reward',
+                      detail: language === 'tr' ? '1 ay → arkadaşın 14 gün\n1 yıl → arkadaşın 90 gün' : '1mo → friend 14d\n1yr → friend 90d',
+                    },
+                  ].map(opt => (
+                    <button key={opt.key} type="button"
+                      onClick={() => setReferralInput(opt.key)}
+                      className="p-3 rounded-xl text-start transition-all"
+                      style={referralInput === opt.key
+                        ? { background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.4)' }
+                        : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div className="font-semibold text-sm text-white">{opt.title}</div>
+                      <div className="text-xs mt-0.5" style={{ color: '#34d399' }}>{opt.desc}</div>
+                      <div className="text-xs mt-1.5 whitespace-pre-line" style={{ color: 'rgba(255,255,255,0.4)' }}>{opt.detail}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Kod oluştur butonu */}
+              <button
+                onClick={async () => {
+                  if (!user || !referralInput) return;
+                  const splitType = referralInput;
+                  // Yeni kod oluştur
+                  const newCode = `ST-${user.id.slice(-6).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+                  const res = await fetch('/api/referral', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'generate_new', userId: user.id, splitType, code: newCode }),
+                  });
+                  const data = await res.json();
+                  if (data.code) {
+                    setReferralCode(data.code);
+                    setReferralMsg('');
+                  }
+                }}
+                disabled={!referralInput}
+                className="w-full py-3 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
+                style={{ background: '#34d399', color: '#000' }}>
+                {language === 'tr' ? '✨ Yeni Kod Oluştur' : '✨ Generate New Code'}
+              </button>
+
+              {/* Oluşturulan kod */}
+              {referralCode && (
                 <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)' }}>
-                  <p className="text-sm font-semibold" style={{ color: '#34d399' }}>
-                    {language === 'tr' ? '📤 Kodunuzu Paylaşın' : '📤 Share Your Code'}
-                  </p>
-                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    {language === 'tr' ? 'Arkadaşınız bu kodu kullandığında ikiniz de 1 ay ücretsiz Pro kazanırsınız!' : 'When your friend uses this code, you both get 1 month of Pro for free!'}
+                  <p className="text-xs font-semibold" style={{ color: '#34d399' }}>
+                    {language === 'tr' ? '✅ Kodunuz hazır! Arkadaşınızla paylaşın:' : '✅ Your code is ready! Share with your friend:'}
                   </p>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 px-3 py-2 rounded-xl font-mono text-sm font-bold text-white"
                       style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', letterSpacing: '0.1em' }}>
-                      {referralCode || '...'}
+                      {referralCode}
                     </div>
-                    <button onClick={() => {
-                      navigator.clipboard?.writeText(referralCode).then(() => {
-                        setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
-                        setTimeout(() => setReferralMsg(''), 2000);
-                      });
-                    }} className="px-3 py-2 rounded-xl text-sm font-semibold" style={{ background: '#34d399', color: '#000' }}>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard?.writeText(referralCode).then(() => {
+                          setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+                          setTimeout(() => setReferralMsg(''), 2000);
+                        });
+                      }}
+                      className="px-3 py-2 rounded-xl text-sm font-semibold flex-shrink-0"
+                      style={{ background: '#34d399', color: '#000' }}>
                       {language === 'tr' ? 'Kopyala' : 'Copy'}
                     </button>
                   </div>
+                  {referralMsg && <p className="text-sm font-medium" style={{ color: '#34d399' }}>{referralMsg}</p>}
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    {language === 'tr'
+                      ? '⚠️ Bu kod bir kez kullanılabilir. Kullanıldıktan sonra yeni kod oluşturun.'
+                      : '⚠️ This code can only be used once. Generate a new code after it\'s used.'}
+                  </p>
                 </div>
               )}
-              <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.15)' }}>
-                <p className="text-sm font-semibold" style={{ color: '#a78bfa' }}>
-                  {language === 'tr' ? '🎟️ Referans Kodu Giriniz' : '🎟️ Enter Referral Code'}
-                </p>
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {language === 'tr' ? 'Bir arkadaşınızdan kod aldıysanız buraya girin, 1 ay ücretsiz Pro kazanın!' : 'If a friend gave you a code, enter it here to get 1 month of Pro for free!'}
-                </p>
-                <div className="flex items-center gap-2">
-                  <input type="text" value={referralInput} onChange={e => setReferralInput(e.target.value.toUpperCase())}
-                    placeholder="ST-XXXXXX-XXXX" className="flex-1 px-3 py-2 rounded-xl font-mono text-sm outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
-                  <button onClick={useReferralCode} disabled={!referralInput.trim()}
-                    className="px-3 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
-                    style={{ background: '#8b5cf6', color: '#fff' }}>
-                    {language === 'tr' ? 'Kullan' : 'Apply'}
-                  </button>
-                </div>
-                {referralMsg && (
-                  <p className="text-sm font-medium" style={{ color: referralMsg.includes('🎉') || referralMsg.includes('✅') ? '#34d399' : '#f87171' }}>
-                    {referralMsg}
-                  </p>
-                )}
-              </div>
             </div>
           </div>
         )}
