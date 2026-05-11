@@ -14,6 +14,7 @@ import TradeHistory from './components/TradeHistory';
 import CalendarView from './components/CalendarView';
 import GoalsView from './components/GoalsView';
 import PricingPage from './components/PricingPage';
+import PaymentModal from './components/PaymentModal';
 import CSVImport from './components/CSVImport';
 import { Trade, Account, JournalGoals } from './types';
 import { useLanguage } from './context/LanguageContext';
@@ -53,6 +54,7 @@ export default function App() {
   const [upgradeReason, setUpgradeReason] = useState<'daily' | 'total' | 'journal'>('total');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [modalBilling, setModalBilling] = useState<'monthly' | 'yearly'>('yearly');
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const isRTL = language === 'fa' || language === 'ar';
 
@@ -268,6 +270,11 @@ export default function App() {
     setTrades(prev => prev.map(tr => tr.id === trade.id ? trade : tr));
   };
 
+  const handleDeleteMultiple = async (ids: string[]) => {
+    await supabase.from('trades').delete().in('id', ids);
+    setTrades(prev => prev.filter(tr => !ids.includes(tr.id)));
+  };
+
   const handleCSVImport = async (importedTrades: Trade[]) => {
     if (!activeJournal || !user) return;
     if (!isPro) {
@@ -412,10 +419,13 @@ export default function App() {
           onProStart={() => {
             localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
             setShowOnboarding(false);
-            setView('pricing');
+            setShowPaymentModal(true);
           }}
         />
       )}
+
+      {/* ── PAYMENT MODAL ── */}
+      {showPaymentModal && <PaymentModal onClose={() => setShowPaymentModal(false)} />}
 
       {/* ── UPGRADE MODAL ── */}
       {showUpgradeModal && (
@@ -481,7 +491,7 @@ export default function App() {
               </span>
             </div>
 
-            <button onClick={() => { setShowUpgradeModal(false); setView('pricing'); }}
+            <button onClick={() => { setShowUpgradeModal(false); setShowPaymentModal(true); }}
               className="w-full py-3 rounded-xl text-sm font-semibold mb-6 transition-all"
               style={{ background: '#8b5cf6', color: '#fff' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
@@ -799,7 +809,7 @@ export default function App() {
         {!loading && view === 'pricing' && (
           <PricingPage
             onFreeStart={() => setView('dashboard')}
-            onProStart={() => {}}
+            onProStart={() => setShowPaymentModal(true)}
           />
         )}
 
