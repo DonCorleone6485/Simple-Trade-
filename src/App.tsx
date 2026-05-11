@@ -55,6 +55,7 @@ export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [modalBilling, setModalBilling] = useState<'monthly' | 'yearly'>('yearly');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showExpiredPricing, setShowExpiredPricing] = useState(false);
 
   const isRTL = language === 'fa' || language === 'ar';
 
@@ -107,8 +108,20 @@ export default function App() {
 
   const checkProStatus = async () => {
     if (!user) return;
-    const { data } = await supabase.from('users').select('is_pro, has_paid').eq('user_id', user.id).single();
-    if (data) { setIsPro(data.is_pro); setHasPaid(data.has_paid || false); }
+    const { data } = await supabase.from('users').select('is_pro, has_paid, pro_until').eq('user_id', user.id).single();
+    if (data) {
+      const isStillPro = data.is_pro && data.pro_until && new Date(data.pro_until) > new Date();
+      const proExpired = data.is_pro && !isStillPro && data.pro_until;
+
+      if (proExpired) {
+        // Pro süresi doldu, DB'yi güncelle
+        await supabase.from('users').update({ is_pro: false }).eq('user_id', user.id);
+        setShowExpiredPricing(true);
+      }
+
+      setIsPro(!!isStillPro);
+      setHasPaid(data.has_paid || false);
+    }
   };
 
   const generateReferralCode = async () => {
@@ -222,7 +235,7 @@ export default function App() {
         .eq('user_id', user.id)
         .gte('date', todayStart.toISOString());
 
-      if ((todayCount || 0) >= 3) {
+      if ((todayCount || 0) >= 1) {
         setUpgradeReason('daily');
         setShowUpgradeModal(true);
         return;
@@ -270,6 +283,10 @@ export default function App() {
     setTrades(prev => prev.map(tr => tr.id === trade.id ? trade : tr));
   };
 
+  const handleDeleteMultiple = async (ids: string[]) => {
+    await supabase.from('trades').delete().in('id', ids);
+    setTrades(prev => prev.filter(tr => !ids.includes(tr.id)));
+  };
 
   const handleCSVImport = async (importedTrades: Trade[]) => {
     if (!activeJournal || !user) return;
@@ -403,6 +420,16 @@ export default function App() {
 
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
+
+      {/* ── PRO SÜRESİ DOLDU EKRANI ── */}
+      {showExpiredPricing && (
+        <PricingPage
+          onboardingMode
+          onFreeStart={() => setShowExpiredPricing(false)}
+          onProStart={() => { setShowExpiredPricing(false); setShowPaymentModal(true); }}
+          expiredMode
+        />
+      )}
 
       {/* ── ONBOARDİNG ── */}
       {showOnboarding && (
@@ -779,13 +806,15 @@ export default function App() {
                 </>
               )}
 
-              <button onClick={() => setView('pricing')}
-                className="hidden sm:block px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-                style={{ color: view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)'; }}>
-                {pricingLabel}
-              </button>
+              {!isPro && (
+                <button onClick={() => setView('pricing')}
+                  className="hidden sm:block px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                  style={{ color: view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = view === 'pricing' ? '#a78bfa' : 'rgba(255,255,255,0.5)'; }}>
+                  {pricingLabel}
+                </button>
+              )}
 
               {isPro && (
                 <span className="hidden sm:block px-2 py-0.5 rounded-full text-xs font-semibold"
@@ -794,15 +823,13 @@ export default function App() {
                 </span>
               )}
 
-             {isPro && (
-  <button onClick={() => setShowReferral(true)}
-    className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-    style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
-    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.15)'; }}
-    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.1)'; }}>
-    🎁 {language === 'tr' ? 'Referans Kodu Oluştur' : 'Create Referral Code'}
-  </button>
-)}
+              <button onClick={() => setShowReferral(true)}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.15)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(52,211,153,0.1)'; }}>
+                🎁 {language === 'tr' ? 'Referans Kodu' : 'Referral Code'}
+              </button>
 
               <div className="relative" ref={langMenuRef}>
                 <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
