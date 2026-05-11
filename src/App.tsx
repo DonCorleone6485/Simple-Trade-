@@ -222,7 +222,7 @@ export default function App() {
         .eq('user_id', user.id)
         .gte('date', todayStart.toISOString());
 
-      if ((todayCount || 0) >= 1) {
+      if ((todayCount || 0) >= 3) {
         setUpgradeReason('daily');
         setShowUpgradeModal(true);
         return;
