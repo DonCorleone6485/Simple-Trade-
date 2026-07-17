@@ -16,6 +16,7 @@ import GoalsView from './components/GoalsView';
 import PricingPage from './components/PricingPage';
 import PaymentModal from './components/PaymentModal';
 import CSVImport from './components/CSVImport';
+import LandingPage from './components/LandingPage';
 import { Trade, Account, JournalGoals } from './types';
 import { useLanguage } from './context/LanguageContext';
 import { supabase } from './lib/supabase';
@@ -23,6 +24,15 @@ import { supabase } from './lib/supabase';
 type View = 'dashboard' | 'expanded' | 'pricing';
 type JournalTab = 'trades' | 'calendar' | 'stats' | 'goals';
 type AuthView = 'signin' | 'signup';
+type AuthStage = 'landing' | 'auth';
+
+function getInitialAuthStage(): AuthStage {
+  // Clerk's routing="hash" drives multi-step auth (email verification,
+  // OAuth/SSO return) via window.location.hash. A non-trivial hash on
+  // first load means we're mid-flow — resume auth, don't show the
+  // marketing page.
+  return window.location.hash && window.location.hash.length > 1 ? 'auth' : 'landing';
+}
 
 export default function App() {
   const { language, setLanguage, t } = useLanguage();
@@ -35,6 +45,7 @@ export default function App() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [authView, setAuthView] = useState<AuthView>('signin');
+  const [authStage, setAuthStage] = useState<AuthStage>(getInitialAuthStage);
   const langMenuRef = useRef<HTMLDivElement>(null);
   const [showTradeModal, setShowTradeModal] = useState(false);
   const [showNewJournalModal, setShowNewJournalModal] = useState(false);
@@ -52,7 +63,6 @@ export default function App() {
   const [showReferral, setShowReferral] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState<'daily' | 'total' | 'journal'>('total');
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [modalBilling, setModalBilling] = useState<'monthly' | 'yearly'>('yearly');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showExpiredPricing, setShowExpiredPricing] = useState(false);
@@ -156,8 +166,6 @@ export default function App() {
       startDate: j.start_date, startingCapital: j.starting_capital, goals: j.goals,
     }));
     setAccounts(mapped);
-    const key = `hasSeenOnboarding_${user.id}`;
-    if (mapped.length === 0 && !localStorage.getItem(key)) setShowOnboarding(true);
     setLoading(false);
   };
 
@@ -359,6 +367,16 @@ export default function App() {
 
   const openJournal = (account: Account) => { setActiveJournal(account); setView('expanded'); setJournalTab('trades'); };
 
+  const goToAuth = (targetView: AuthView) => {
+    // Clear any in-page anchor hash left by the landing page (#features etc.)
+    // so it can't be mistaken for one of Clerk's own hash-routing steps.
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+    setAuthView(targetView);
+    setAuthStage('auth');
+  };
+
   const handleUpdateGoals = async (goals: JournalGoals) => {
     if (!activeJournal) return;
     await supabase.from('journals').update({ goals }).eq('id', activeJournal.id);
@@ -424,22 +442,6 @@ export default function App() {
           onFreeStart={() => setShowExpiredPricing(false)}
           onProStart={() => { setShowExpiredPricing(false); setShowPaymentModal(true); }}
           expiredMode
-        />
-      )}
-
-      {/* ── ONBOARDİNG ── */}
-      {showOnboarding && (
-        <PricingPage
-          onboardingMode
-          onFreeStart={() => {
-            localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
-            setShowOnboarding(false);
-          }}
-          onProStart={() => {
-            localStorage.setItem(`hasSeenOnboarding_${user?.id}`, 'true');
-            setShowOnboarding(false);
-            setShowPaymentModal(true);
-          }}
         />
       )}
 
@@ -554,23 +556,40 @@ export default function App() {
           if (refCode) localStorage.setItem('pendingRefCode', refCode);
           return null;
         })()}
-        <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: '#0d0e1a' }}>
-          <div className="flex items-center gap-2 mb-8">
-            <TrendingUp className="w-6 h-6" style={{ color: '#8b5cf6' }} />
-            <span className="text-xl font-bold">Trade Journal</span>
-          </div>
-          <div className="flex gap-2 mb-6 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
-            <button onClick={() => setAuthView('signin')} className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
-              style={authView === 'signin' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}>
-              {signInLabel}
+
+        {authStage === 'landing' ? (
+          <LandingPage
+            onGetStarted={() => goToAuth('signup')}
+            onSignIn={() => goToAuth('signin')}
+          />
+        ) : (
+          <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: '#0d0e1a' }}>
+            <button onClick={() => setAuthStage('landing')}
+              className="fixed top-4 start-4 sm:top-6 sm:start-6 flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
+              style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+              <ChevronLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+              <span>{language === 'tr' ? 'Geri' : language === 'fa' ? 'بازگشت' : 'Back'}</span>
             </button>
-            <button onClick={() => setAuthView('signup')} className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
-              style={authView === 'signup' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}>
-              {signUpLabel}
-            </button>
+
+            <div className="flex items-center gap-2 mb-8">
+              <TrendingUp className="w-6 h-6" style={{ color: '#8b5cf6' }} />
+              <span className="text-xl font-bold">Simple Trading Journal</span>
+            </div>
+            <div className="flex gap-2 mb-6 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <button onClick={() => setAuthView('signin')} className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
+                style={authView === 'signin' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}>
+                {signInLabel}
+              </button>
+              <button onClick={() => setAuthView('signup')} className="px-6 py-2 rounded-lg text-sm font-medium transition-all"
+                style={authView === 'signup' ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.5)' }}>
+                {signUpLabel}
+              </button>
+            </div>
+            {authView === 'signin' ? <SignIn routing="hash" /> : <SignUp routing="hash" />}
           </div>
-          {authView === 'signin' ? <SignIn routing="hash" /> : <SignUp routing="hash" />}
-        </div>
+        )}
       </SignedOut>
 
       <SignedIn>
@@ -775,7 +794,7 @@ export default function App() {
               ) : (
                 <button onClick={() => setView('dashboard')} className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" style={{ color: '#8b5cf6' }} />
-                  <span className="font-bold tracking-tight">Trade Journal</span>
+                  <span className="font-bold tracking-tight">Simple Trading Journal</span>
                 </button>
               )}
             </div>

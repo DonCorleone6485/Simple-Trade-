@@ -55,7 +55,7 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
           <>
             <div className="flex items-center justify-center gap-2 mb-4">
               <TrendingUp className="w-6 h-6" style={{ color: '#8b5cf6' }} />
-              <span className="text-xl font-bold text-white">Trade Journal</span>
+              <span className="text-xl font-bold text-white">Simple Trading Journal</span>
             </div>
             <h1 className="text-4xl font-bold text-white mb-4">
               {t('Hoş Geldiniz! 👋', 'Welcome! 👋', '!خوش آمدید 👋')}
