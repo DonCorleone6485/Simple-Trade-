@@ -21,6 +21,9 @@
 - VITE_SUPABASE_URL
 - VITE_SUPABASE_ANON_KEY
 
+## Test
+- Local git push yetkisi doğrulandı (2026-07-17)
+
 ## Yapılacaklar
 - Stripe ödeme entegrasyonu
 - Coinbase Commerce kripto ödeme
