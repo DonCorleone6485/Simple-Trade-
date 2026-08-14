@@ -12,6 +12,8 @@ import { useLanguage } from '../context/LanguageContext';
 interface LandingPageProps {
   onGetStarted: () => void;
   onSignIn: () => void;
+  /** Kullanıcı zaten giriş yapmışsa CTA'lar auth yerine journal'a yönlenir. */
+  signedIn?: boolean;
 }
 
 const equityData = [
@@ -26,7 +28,7 @@ const languages = [
   { code: 'pt', label: 'Português' }, { code: 'de', label: 'Deutsch' }, { code: 'fr', label: 'Français' },
 ];
 
-export default function LandingPage({ onGetStarted, onSignIn }: LandingPageProps) {
+export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }: LandingPageProps) {
   const { language, setLanguage } = useLanguage();
   const isRTL = language === 'fa' || language === 'ar';
   const shouldReduceMotion = useReducedMotion();
@@ -39,6 +41,11 @@ export default function LandingPage({ onGetStarted, onSignIn }: LandingPageProps
     if (language === 'fa') return fa;
     return en;
   };
+
+  // Giriş yapmış kullanıcı için tüm "Ücretsiz Başla" CTA'ları journal'a götürür.
+  const ctaLabel = signedIn
+    ? t("Journal'a Git", 'Go to Journal', 'رفتن به ژورنال')
+    : t('Ücretsiz Başla', 'Get Started Free', 'رایگان شروع کنید');
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -245,19 +252,22 @@ export default function LandingPage({ onGetStarted, onSignIn }: LandingPageProps
               )}
             </div>
 
-            <button onClick={onSignIn}
-              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-sm font-semibold transition-all"
-              style={{ color: 'rgba(255,255,255,0.8)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.8)'; }}>
-              {t('Giriş Yap', 'Sign In', 'ورود')}
-            </button>
+            {!signedIn && (
+              <button onClick={onSignIn}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-sm font-semibold transition-all"
+                style={{ color: 'rgba(255,255,255,0.8)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.8)'; }}>
+                {t('Giriş Yap', 'Sign In', 'ورود')}
+              </button>
+            )}
             <button onClick={onGetStarted}
-              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-sm font-semibold transition-all"
+              className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-sm font-semibold transition-all"
               style={{ background: '#8b5cf6', color: '#fff' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
-              {t('Ücretsiz Başla', 'Get Started Free', 'رایگان شروع کنید')}
+              {signedIn && <BookOpen className="w-4 h-4" />}
+              {ctaLabel}
             </button>
           </div>
         </div>
@@ -304,7 +314,7 @@ export default function LandingPage({ onGetStarted, onSignIn }: LandingPageProps
                 whileTap={{ scale: shouldReduceMotion ? 1 : 0.97 }}
                 className="flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold"
                 style={{ background: '#8b5cf6', color: '#fff' }}>
-                {t('Ücretsiz Başla', 'Get Started Free', 'رایگان شروع کنید')}
+                {ctaLabel}
                 <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
               </motion.button>
               <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
@@ -503,7 +513,7 @@ export default function LandingPage({ onGetStarted, onSignIn }: LandingPageProps
                 style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
-                {t('Ücretsiz Başla', 'Get Started Free', 'رایگان شروع کنید')}
+                {ctaLabel}
               </button>
             </motion.div>
 
@@ -537,7 +547,7 @@ export default function LandingPage({ onGetStarted, onSignIn }: LandingPageProps
                 style={{ background: '#8b5cf6', color: '#fff' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
-                {t('Ücretsiz Dene', 'Start Free Trial', 'شروع آزمایشی رایگان')}
+                {signedIn ? ctaLabel : t('Ücretsiz Dene', 'Start Free Trial', 'شروع آزمایشی رایگان')}
               </button>
             </motion.div>
           </motion.div>
@@ -595,7 +605,7 @@ export default function LandingPage({ onGetStarted, onSignIn }: LandingPageProps
               whileHover={{ scale: shouldReduceMotion ? 1 : 1.03 }} whileTap={{ scale: shouldReduceMotion ? 1 : 0.97 }}
               className="relative inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-semibold"
               style={{ background: '#8b5cf6', color: '#fff' }}>
-              {t('Ücretsiz Başla', 'Get Started Free', 'رایگان شروع کنید')}
+              {ctaLabel}
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
             </motion.button>
           </motion.div>
@@ -610,8 +620,12 @@ export default function LandingPage({ onGetStarted, onSignIn }: LandingPageProps
             <span className="text-sm font-semibold">{t('Simple Trading Journal', 'Simple Trading Journal', 'سیمپل تریدینگ ژورنال')}</span>
           </div>
           <div className="flex items-center gap-6">
-            <button onClick={onSignIn} className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('Giriş Yap', 'Sign In', 'ورود')}</button>
-            <button onClick={onGetStarted} className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('Ücretsiz Başla', 'Get Started', 'شروع رایگان')}</button>
+            {!signedIn && (
+              <button onClick={onSignIn} className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('Giriş Yap', 'Sign In', 'ورود')}</button>
+            )}
+            <button onClick={onGetStarted} className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              {signedIn ? ctaLabel : t('Ücretsiz Başla', 'Get Started', 'شروع رایگان')}
+            </button>
           </div>
           <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
             © {new Date().getFullYear()} Simple Trading Journal

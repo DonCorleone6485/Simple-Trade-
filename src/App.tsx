@@ -4,7 +4,7 @@ import {
   Trash2, BookOpen, Clock, TrendingUp, X,
   Target, DollarSign, Activity, PieChart,
   CalendarDays, BarChart2, List, LogOut, User,
-  Upload, Check, Shield
+  Upload, Check, Shield, Home
 } from 'lucide-react';
 import {
   SignIn, SignUp, useUser, useClerk, SignedIn, SignedOut
@@ -25,6 +25,17 @@ type View = 'dashboard' | 'expanded' | 'pricing';
 type JournalTab = 'trades' | 'calendar' | 'stats' | 'goals';
 type AuthView = 'signin' | 'signup';
 type AuthStage = 'landing' | 'auth';
+type Page = 'home' | 'journal';
+
+const JOURNAL_PATH = '/journal';
+
+function getInitialPage(): Page {
+  return window.location.pathname.replace(/\/+$/, '') === JOURNAL_PATH ? 'journal' : 'home';
+}
+
+function pathForPage(page: Page): string {
+  return page === 'journal' ? JOURNAL_PATH : '/';
+}
 
 function getInitialAuthStage(): AuthStage {
   // Clerk's routing="hash" drives multi-step auth (email verification,
@@ -36,8 +47,9 @@ function getInitialAuthStage(): AuthStage {
 
 export default function App() {
   const { language, setLanguage, t } = useLanguage();
-  const { user } = useUser();
+  const { user, isSignedIn, isLoaded } = useUser();
   const { signOut } = useClerk();
+  const [page, setPage] = useState<Page>(getInitialPage);
   const [view, setView] = useState<View>('dashboard');
   const [journalTab, setJournalTab] = useState<JournalTab>('trades');
   const [activeJournal, setActiveJournal] = useState<Account | null>(null);
@@ -182,6 +194,39 @@ export default function App() {
       })));
     }
   };
+
+  // ── SAYFA YÖNLENDİRME (ana sayfa ↔ journal) ──
+  const navigate = (target: Page, replace = false) => {
+    const path = pathForPage(target);
+    // Landing page anchor'ları (#features) ve Clerk'in hash routing'i geride
+    // kalmasın — sayfa değişince hash'i temizle.
+    if (window.location.pathname !== path || window.location.hash) {
+      const method = replace ? 'replaceState' : 'pushState';
+      window.history[method]({}, '', path + window.location.search);
+    }
+    setPage(target);
+    window.scrollTo(0, 0);
+  };
+
+  useEffect(() => {
+    const onPopState = () => setPage(getInitialPage());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (isSignedIn) {
+      // Giriş/kayıt tamamlandı: kullanıcıyı doğrudan journal'a al.
+      if (authStage === 'auth') {
+        setAuthStage('landing');
+        navigate('journal', true);
+      }
+    } else if (page === 'journal') {
+      // Girişi olmayan biri /journal'a geldi — ana sayfaya döndür.
+      navigate('home', true);
+    }
+  }, [isLoaded, isSignedIn, authStage, page]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -430,13 +475,14 @@ export default function App() {
   const signInLabel = language === 'tr' ? 'Giriş Yap' : language === 'fa' ? 'ورود' : 'Sign In';
   const signUpLabel = language === 'tr' ? 'Kayıt Ol' : language === 'fa' ? 'ثبت نام' : 'Sign Up';
   const pricingLabel = language === 'tr' ? 'Fiyatlar' : language === 'fa' ? 'قیمت‌ها' : 'Pricing';
+  const homeLabel = language === 'tr' ? 'Ana Sayfa' : language === 'fa' ? 'صفحه اصلی' : 'Home';
   const importLabel = language === 'tr' ? 'CSV İçe Aktar' : 'Import CSV';
 
   return (
     <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
 
       {/* ── PRO SÜRESİ DOLDU EKRANI ── */}
-      {showExpiredPricing && (
+      {showExpiredPricing && page === 'journal' && (
         <PricingPage
           onboardingMode
           onFreeStart={() => setShowExpiredPricing(false)}
@@ -593,6 +639,15 @@ export default function App() {
       </SignedOut>
 
       <SignedIn>
+        {page === 'home' ? (
+          /* Giriş yapmış kullanıcı için ana sayfa — CTA'lar journal'a götürür */
+          <LandingPage
+            signedIn
+            onGetStarted={() => navigate('journal')}
+            onSignIn={() => navigate('journal')}
+          />
+        ) : (
+        <>
 
         {/* Referral Modal */}
         {showReferral && (
@@ -777,7 +832,15 @@ export default function App() {
         {/* Header */}
         <header style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0d0e1a' }} className="sticky top-0 z-10">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <button onClick={() => navigate('home')} title={homeLabel}
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-sm font-medium transition-all flex-shrink-0"
+                style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }}>
+                <Home className="w-4 h-4" />
+                <span className="hidden lg:inline">{homeLabel}</span>
+              </button>
               {view === 'expanded' ? (
                 <>
                   <button onClick={() => { setView('dashboard'); setActiveJournal(null); }}
@@ -1035,6 +1098,43 @@ export default function App() {
           </main>
         )}
 
+        {/* Footer */}
+        <footer className="mt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button onClick={() => navigate('home')} className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" style={{ color: '#8b5cf6' }} />
+              <span className="text-sm font-semibold">Simple Trading Journal</span>
+            </button>
+            <div className="flex items-center gap-6">
+              <button onClick={() => navigate('home')} className="text-sm transition-colors"
+                style={{ color: 'rgba(255,255,255,0.4)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+                {homeLabel}
+              </button>
+              <button onClick={() => { setView('dashboard'); setActiveJournal(null); }} className="text-sm transition-colors"
+                style={{ color: 'rgba(255,255,255,0.4)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+                {t('myJournals')}
+              </button>
+              {!isPro && (
+                <button onClick={() => setView('pricing')} className="text-sm transition-colors"
+                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+                  {pricingLabel}
+                </button>
+              )}
+            </div>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+              © {new Date().getFullYear()} Simple Trading Journal
+            </p>
+          </div>
+        </footer>
+
+        </>
+        )}
       </SignedIn>
     </div>
   );
