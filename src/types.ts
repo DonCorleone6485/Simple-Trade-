@@ -16,6 +16,15 @@ export interface JournalGoals {
   noTradeHoursEnd?: number;
 }
 
+export type MTFBias = 'bullish' | 'bearish' | 'consolidation';
+
+/** Tek bir timeframe için multi-timeframe analiz kaydı. */
+export interface MTFEntry {
+  timeframe: string;
+  bias: MTFBias;
+  notes: string;
+}
+
 export interface Trade {
   id: string;
   accountId?: string;
@@ -34,5 +43,6 @@ export interface Trade {
   postTradeNotes: string;
   preTradePhotos: string[];
   postTradePhotos: string[];
+  mtfAnalysis?: MTFEntry[];
   importSource?: string;
 }

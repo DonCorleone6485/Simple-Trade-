@@ -191,6 +191,7 @@ export default function App() {
         risk: t.risk, reward: t.reward, rr: t.rr, result: t.result,
         preTradeNotes: t.pre_trade_notes || '', postTradeNotes: t.post_trade_notes || '',
         preTradePhotos: t.pre_trade_photos || [], postTradePhotos: t.post_trade_photos || [],
+        mtfAnalysis: t.mtf_analysis || [],
       })));
     }
   };
@@ -305,6 +306,7 @@ export default function App() {
       risk: trade.risk, reward: trade.reward, rr: trade.rr, result: trade.result,
       pre_trade_notes: trade.preTradeNotes, post_trade_notes: trade.postTradeNotes,
       pre_trade_photos: trade.preTradePhotos, post_trade_photos: trade.postTradePhotos,
+      mtf_analysis: trade.mtfAnalysis?.length ? trade.mtfAnalysis : null,
     }).select().single();
     if (data) {
       const newTrade: Trade = {
@@ -313,6 +315,7 @@ export default function App() {
         risk: data.risk, reward: data.reward, rr: data.rr, result: data.result,
         preTradeNotes: data.pre_trade_notes || '', postTradeNotes: data.post_trade_notes || '',
         preTradePhotos: data.pre_trade_photos || [], postTradePhotos: data.post_trade_photos || [],
+        mtfAnalysis: data.mtf_analysis || [],
       };
       setTrades(prev => [newTrade, ...prev]);
       setShowTradeModal(false);
@@ -325,6 +328,7 @@ export default function App() {
       risk: trade.risk, reward: trade.reward, rr: trade.rr, result: trade.result,
       pre_trade_notes: trade.preTradeNotes, post_trade_notes: trade.postTradeNotes,
       pre_trade_photos: trade.preTradePhotos, post_trade_photos: trade.postTradePhotos,
+      mtf_analysis: trade.mtfAnalysis?.length ? trade.mtfAnalysis : null,
     }).eq('id', trade.id);
 
     if (error) {

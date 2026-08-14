@@ -4,7 +4,8 @@ import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
-import { Trade } from '../types';
+import { Trade, MTFEntry } from '../types';
+import MTFAnalysis from './MTFAnalysis';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../lib/supabase';
@@ -425,6 +426,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
   const [result, setResult] = useState<'Başarılı' | 'Başarısız' | 'Manuel Karda' | 'Manuel Zararda'>('Başarılı');
   const [preNotes, setPreNotes] = useState('');
   const [postNotes, setPostNotes] = useState('');
+  const [mtf, setMtf] = useState<MTFEntry[]>([]);
   const [prePhotos, setPrePhotos] = useState<string[]>([]);
   const [postPhotos, setPostPhotos] = useState<string[]>([]);
   const [uploadingPre, setUploadingPre] = useState(false);
@@ -491,12 +493,13 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
       rr, result,
       preTradeNotes: preNotes, postTradeNotes: postNotes,
       preTradePhotos: prePhotos, postTradePhotos: postPhotos,
+      mtfAnalysis: mtf.length > 0 ? mtf : undefined,
     };
     onSave(newTrade);
     setDate(''); setSymbol('EURUSD'); setTimeframe('H1');
     setSetup(''); setRisk(''); setReward(''); setRr('');
     setPreNotes(''); setPostNotes('');
-    setPrePhotos([]); setPostPhotos([]);
+    setPrePhotos([]); setPostPhotos([]); setMtf([]);
     setResult('Başarılı');
   };
 
@@ -578,6 +581,11 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
               </select>
             </div>
           </div>
+        </div>
+
+        <div style={divider}>
+          <p style={sectionTitle}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</p>
+          <MTFAnalysis value={mtf} onChange={setMtf} symbol={symbol} autoFill />
         </div>
 
         <div style={divider}>
