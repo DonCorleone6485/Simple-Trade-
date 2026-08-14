@@ -432,14 +432,15 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
   const [uploadingPre, setUploadingPre] = useState(false);
   const [uploadingPost, setUploadingPost] = useState(false);
 
-  const uploadPhotoToStorage = async (file: File, kind: 'pre' | 'post'): Promise<string | null> => {
-    if (!user) return null;
+  /** Yükleme başarısızsa hata mesajını döndürür — sessizce yutulmamalı. */
+  const uploadPhotoToStorage = async (file: File, kind: 'pre' | 'post'): Promise<{ url?: string; error?: string }> => {
+    if (!user) return { error: 'no user' };
     const ext = file.name.split('.').pop() || 'jpg';
     const path = `${user.id}/${Date.now()}_${Math.random().toString(36).substr(2, 6)}_${kind}.${ext}`;
     const { data, error } = await supabase.storage.from('trade-photos').upload(path, file, { contentType: file.type });
-    if (error) { console.error('Upload error:', error); return null; }
+    if (error) { console.error('Upload error:', error); return { error: error.message }; }
     const { data: urlData } = supabase.storage.from('trade-photos').getPublicUrl(data.path);
-    return urlData.publicUrl;
+    return { url: urlData.publicUrl };
   };
 
   const handleResultChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -461,15 +462,23 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
       return;
     }
     if (kind === 'pre') setUploadingPre(true); else setUploadingPost(true);
+    let failure = '';
     for (const file of files) {
-      const url = await uploadPhotoToStorage(file, kind);
+      const { url, error } = await uploadPhotoToStorage(file, kind);
       if (url) {
         if (kind === 'pre') setPrePhotos(p => [...p, url]);
         else setPostPhotos(p => [...p, url]);
+      } else if (error) {
+        failure = error;
       }
     }
     if (kind === 'pre') setUploadingPre(false); else setUploadingPost(false);
     e.target.value = '';
+    if (failure) {
+      alert(language === 'tr'
+        ? `Fotoğraf yüklenemedi: ${failure}`
+        : `Photo upload failed: ${failure}`);
+    }
   };
 
   const removePhoto = async (index: number, kind: 'pre' | 'post') => {

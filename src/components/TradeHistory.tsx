@@ -299,6 +299,7 @@ export default function TradeHistory({
       return;
     }
     setUploadingEditPhoto(true);
+    let failure = '';
     for (const file of files) {
       const ext = file.name.split('.').pop() || 'jpg';
       const path = `${user?.id}/${Date.now()}_${Math.random().toString(36).substr(2, 6)}_${kind}.${ext}`;
@@ -308,10 +309,16 @@ export default function TradeHistory({
         const url = urlData.publicUrl;
         if (kind === 'pre') setEditForm(f => ({ ...f, preTradePhotos: [...(f.preTradePhotos || []), url] }));
         else setEditForm(f => ({ ...f, postTradePhotos: [...(f.postTradePhotos || []), url] }));
+      } else if (error) {
+        console.error('Upload error:', error);
+        failure = error.message;
       }
     }
     setUploadingEditPhoto(false);
     e.target.value = '';
+    if (failure) {
+      alert(language === 'tr' ? `Fotoğraf yüklenemedi: ${failure}` : `Photo upload failed: ${failure}`);
+    }
   };
 
   const removeEditPhoto = async (index: number, kind: 'pre' | 'post') => {
