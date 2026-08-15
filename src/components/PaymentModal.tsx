@@ -66,7 +66,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div className="rounded-2xl w-full max-w-md my-8 overflow-hidden"
-        style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+        style={{ background: 'rgba(255,255,255,0.025)' }}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4"
@@ -90,7 +90,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
           {/* Plan seçimi */}
           <div className="flex gap-3">
             <button onClick={() => handleBillingChange('monthly')}
-              className="flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all relative"
+              className="flex-1 py-3 px-4 rounded-full text-sm font-medium transition-all relative"
               style={billing === 'monthly'
                 ? { background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.4)' }
                 : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -98,7 +98,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
               <div className="text-xs mt-0.5 font-normal">$12.99 / {language === 'tr' ? 'ay' : 'mo'}</div>
             </button>
             <button onClick={() => handleBillingChange('yearly')}
-              className="flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all relative"
+              className="flex-1 py-3 px-4 rounded-full text-sm font-medium transition-all relative"
               style={billing === 'yearly'
                 ? { background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.4)' }
                 : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -157,7 +157,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                   color: '#fff',
                 }} />
               <button onClick={validateCode} disabled={!referralCode.trim() || validating}
-                className="px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-40 flex-shrink-0"
+                className="px-4 py-2 rounded-full text-sm font-medium transition-all disabled:opacity-40 flex-shrink-0"
                 style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
                 {validating ? '...' : (language === 'tr' ? 'Uygula' : 'Apply')}
               </button>
@@ -185,7 +185,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                 {language === 'tr' ? 'Toplam' : 'Total'}
               </span>
               <div className="text-end">
-                <span className="text-2xl font-bold text-white">${totalPrice}</span>
+                <span className="font-display text-[26px] font-medium text-white">${totalPrice}</span>
                 <span className="text-sm ms-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
                   {billing === 'yearly'
                     ? (language === 'tr' ? '/ yıl' : '/ year')
@@ -195,7 +195,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
             </div>
 
             <button disabled
-              className="w-full py-3 rounded-xl text-sm font-semibold cursor-not-allowed"
+              className="w-full py-3 rounded-full text-sm font-medium cursor-not-allowed"
               style={{ background: 'rgba(139,92,246,0.15)', color: 'rgba(255,255,255,0.35)', border: '1px solid rgba(139,92,246,0.15)' }}>
               💳 {language === 'tr' ? 'Ödeme Yap — Yakında' : 'Pay Now — Coming Soon'}
             </button>

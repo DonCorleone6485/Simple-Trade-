@@ -55,9 +55,9 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
           <>
             <div className="flex items-center justify-center gap-2 mb-4">
               <TrendingUp className="w-6 h-6" style={{ color: '#8b5cf6' }} />
-              <span className="text-xl font-bold text-white">Simple Trading Journal</span>
+              <span className="font-display text-[22px] font-medium text-white">Simple Trading Journal</span>
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4">
+            <h1 className="font-display text-[38px] font-medium text-white mb-4">
               {t('Hoş Geldiniz! 👋', 'Welcome! 👋', '!خوش آمدید 👋')}
             </h1>
             <p className="text-lg" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -71,7 +71,7 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
               <Zap className="w-4 h-4" />
               {t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری')}
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4">
+            <h1 className="font-display text-[38px] font-medium text-white mb-4">
               {t('Sade ve Şeffaf Fiyatlar', 'Simple & Transparent Pricing', 'قیمت‌های ساده و شفاف')}
             </h1>
             <p className="text-lg" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -106,9 +106,9 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
       <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
 
         {/* FREE */}
-        <div className="rounded-2xl p-8" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="rounded-2xl p-8" style={{ background: 'rgba(255,255,255,0.025)' }}>
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-white mb-1">{t('Ücretsiz', 'Free', 'رایگان')}</h2>
+            <h2 className="font-display text-[22px] font-medium text-white mb-1">{t('Ücretsiz', 'Free', 'رایگان')}</h2>
             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {t('Başlamak için ideal', 'Perfect to get started', 'ایده‌آل برای شروع')}
             </p>
@@ -121,7 +121,7 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
           </div>
           <button
             onClick={onFreeStart}
-            className="w-full py-3 rounded-xl text-sm font-semibold mb-8 transition-all"
+            className="w-full py-3 rounded-full text-sm font-medium mb-8 transition-all"
             style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
@@ -152,7 +152,7 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="w-5 h-5" style={{ color: '#a78bfa' }} />
-              <h2 className="text-xl font-bold text-white">Pro</h2>
+              <h2 className="font-display text-[22px] font-medium text-white">Pro</h2>
             </div>
             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {t('Ciddi traderlar için', 'For serious traders', 'برای معامله‌گران جدی')}
@@ -187,7 +187,7 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
 
           <button
             onClick={onProStart}
-            className="w-full py-3 rounded-xl text-sm font-semibold mb-8 transition-all"
+            className="w-full py-3 rounded-full text-sm font-medium mb-8 transition-all"
             style={{ background: '#8b5cf6', color: '#fff' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}

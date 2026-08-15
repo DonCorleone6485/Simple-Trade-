@@ -22,6 +22,7 @@ import AppShell, { NavKey } from './components/AppShell';
 import { Trade, Account, JournalGoals } from './types';
 import { useLanguage } from './context/LanguageContext';
 import { supabase } from './lib/supabase';
+import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
 import { isWinTrade, isLossTrade, lossAmount, winAmount } from './lib/tradeMath';
 
 type View = 'dashboard' | 'expanded' | 'pricing';
@@ -613,8 +614,8 @@ export default function App() {
       {/* ── UPGRADE MODAL ── */}
       {showUpgradeModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="rounded-2xl p-8 relative w-full max-w-md my-8"
-            style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
+          <div className="p-8 relative w-full max-w-md my-8"
+            style={{ ...modalCard, background: 'linear-gradient(180deg, rgba(139,92,246,0.12), rgba(18,19,31,1) 45%)', border: '1px solid rgba(139,92,246,0.22)' }}>
             <button onClick={() => setShowUpgradeModal(false)}
               className="absolute top-4 end-4 p-1.5 rounded-lg"
               style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }}>
@@ -623,7 +624,7 @@ export default function App() {
 
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="w-5 h-5" style={{ color: '#a78bfa' }} />
-              <h2 className="text-xl font-bold text-white">
+              <h2 className="font-display text-[22px] text-white" style={{ letterSpacing: '-0.01em' }}>
                 {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
               </h2>
             </div>
@@ -675,7 +676,7 @@ export default function App() {
             </div>
 
             <button onClick={() => { setShowUpgradeModal(false); setShowPaymentModal(true); }}
-              className="w-full py-3 rounded-xl text-sm font-semibold mb-6 transition-all"
+              className="w-full py-3 rounded-full text-sm font-medium mb-6 transition-all"
               style={{ background: '#8b5cf6', color: '#fff' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
@@ -695,7 +696,7 @@ export default function App() {
             </div>
 
             <button onClick={() => setShowUpgradeModal(false)}
-              className="w-full py-2 rounded-xl text-sm transition-all text-center"
+              className="w-full py-2 rounded-full text-sm transition-all text-center"
               style={{ color: 'rgba(255,255,255,0.4)' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
@@ -768,10 +769,10 @@ export default function App() {
         {/* Referral Modal */}
         {showReferral && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="rounded-2xl p-6 w-full max-w-md space-y-5" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="p-7 w-full max-w-md space-y-6" style={modalCard}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold text-white">🎁 {language === 'tr' ? 'Referans Kodu Oluştur' : 'Create Referral Code'}</h3>
+                  <h3 className="font-display text-[22px] text-white" style={{ letterSpacing: '-0.01em' }}>{language === 'tr' ? 'Referans Kodu Oluştur' : 'Create Referral Code'}</h3>
                   <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
                     {language === 'tr' ? 'Her tıklamada yeni kod oluşturulur' : 'A new code is generated each time'}
                   </p>
@@ -835,8 +836,8 @@ export default function App() {
                   }
                 }}
                 disabled={!referralInput}
-                className="w-full py-3 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
-                style={{ background: '#34d399', color: '#000' }}>
+                className="w-full py-3 rounded-full text-sm font-medium transition-all disabled:opacity-40"
+                style={{ background: '#34d399', color: '#04140d', transition: TRANSITION }}>
                 {language === 'tr' ? '✨ Yeni Kod Oluştur' : '✨ Generate New Code'}
               </button>
 
@@ -858,8 +859,8 @@ export default function App() {
                           setTimeout(() => setReferralMsg(''), 2000);
                         });
                       }}
-                      className="px-3 py-2 rounded-xl text-sm font-semibold flex-shrink-0"
-                      style={{ background: '#34d399', color: '#000' }}>
+                      className="px-4 py-2 rounded-full text-sm font-medium flex-shrink-0"
+                      style={{ background: 'rgba(52,211,153,0.15)', color: '#34d399', transition: TRANSITION }}>
                       {language === 'tr' ? 'Kopyala' : 'Copy'}
                     </button>
                   </div>
@@ -878,12 +879,17 @@ export default function App() {
         {/* Delete Journal Modal */}
         {accountToDelete && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="rounded-2xl p-6 w-full max-w-md" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <h3 className="text-xl font-semibold mb-2" style={{ color: '#f87171' }}>{t('deleteAccountTitle')}</h3>
-              <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('deleteAccountDesc')}</p>
-              <div className="flex justify-end gap-3">
-                <button onClick={() => setAccountToDelete(null)} className="px-4 py-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('cancel')}</button>
-                <button onClick={confirmDeleteAccount} className="px-4 py-2 text-sm font-medium rounded-xl" style={{ background: '#dc2626', color: '#fff' }}>{t('delete')}</button>
+            <div className="p-7 w-full max-w-md" style={modalCard}>
+              <h3 className="font-display text-[22px] mb-2" style={{ color: '#f87171', letterSpacing: '-0.01em' }}>{t('deleteAccountTitle')}</h3>
+              <p className="text-sm mb-8 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{t('deleteAccountDesc')}</p>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setAccountToDelete(null)} style={quietBtn}>{t('cancel')}</button>
+                <button onClick={confirmDeleteAccount} className="rounded-full"
+                  style={{ background: 'rgba(220,38,38,0.15)', color: '#f87171', padding: '10px 20px', fontSize: '14px', fontWeight: 500, transition: TRANSITION }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#dc2626'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(220,38,38,0.15)'; (e.currentTarget as HTMLElement).style.color = '#f87171'; }}>
+                  {t('delete')}
+                </button>
               </div>
             </div>
           </div>
@@ -892,39 +898,37 @@ export default function App() {
         {/* New Journal Modal */}
         {showNewJournalModal && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="rounded-2xl p-6 w-full max-w-md" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <h3 className="text-xl font-semibold mb-1">{t('newJournal')}</h3>
-              <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('newJournalDesc')}</p>
+            <div className="p-7 w-full max-w-md" style={modalCard}>
+              <h3 className="font-display text-[22px] mb-1.5" style={{ letterSpacing: '-0.01em' }}>{t('newJournal')}</h3>
+              <p className="text-sm mb-7" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('newJournalDesc')}</p>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('journalName')}</label>
+                  <label style={uiLabel}>{t('journalName')}</label>
                   <input type="text" value={newJournalName} onChange={e => setNewJournalName(e.target.value)} placeholder={t('journalNamePlaceholder')} autoFocus
                     onFocus={e => e.target.select()}
-                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
+                    style={uiInput} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('startDate')}</label>
+                  <label style={uiLabel}>{t('startDate')}</label>
                   <input type="date" value={newJournalStartDate} onChange={e => setNewJournalStartDate(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', colorScheme: 'dark' }} />
+                    style={{ ...uiInput, colorScheme: 'dark' }} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('startingCapital')}</label>
+                  <label style={uiLabel}>{t('startingCapital')}</label>
                   <div className="relative">
                     <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
                     <input type="number" min="0" step="0.01" value={newJournalCapital} onChange={e => setNewJournalCapital(e.target.value)} placeholder="10000"
-                      className="w-full ps-8 pe-3 py-2.5 rounded-xl text-sm outline-none font-mono"
-                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
+                      className="font-mono"
+                      style={{ ...uiInput, paddingInlineStart: '30px' }} />
                   </div>
                 </div>
               </div>
               <div className="flex justify-end gap-3 mt-6">
                 <button onClick={() => { setShowNewJournalModal(false); setNewJournalName(''); setNewJournalStartDate(''); setNewJournalCapital(''); }}
-                  className="px-4 py-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('cancel')}</button>
+                  style={quietBtn}>{t('cancel')}</button>
                 <button onClick={createJournal} disabled={!newJournalName.trim() || !newJournalStartDate || !newJournalCapital}
-                  className="px-6 py-2 text-sm font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ background: '#8b5cf6', color: '#fff' }}>OK</button>
+                  className="rounded-full disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={primaryBtn}>{t('newJournal')}</button>
               </div>
             </div>
           </div>
@@ -935,7 +939,7 @@ export default function App() {
           <div className="fixed inset-0 bg-black/80 flex items-start justify-center z-50 p-4 overflow-y-auto">
             <div className="w-full max-w-4xl my-8">
               <div className="flex items-center justify-between mb-4">
-                <span className="font-semibold text-white">{activeJournal?.name}</span>
+                <span className="font-display text-[18px] text-white" style={{ letterSpacing: '-0.01em' }}>{activeJournal?.name}</span>
                 <button onClick={() => setShowTradeModal(false)} className="p-2 rounded-lg transition-all"
                   style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
                   <X className="w-5 h-5" />

@@ -97,10 +97,10 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
   const monthWinRate = monthDecided > 0 ? ((monthWins.length / monthDecided) * 100).toFixed(0) : '0';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-9">
       {/* Monthly Summary Bar */}
       {monthTrades.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-8 pb-9" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           {[
             { label: t('totalTrades'), value: String(monthTrades.length), color: '#fff' },
             { label: t('winRate'), value: `%${monthWinRate}`, color: '#fff' },
@@ -117,16 +117,16 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
               return best > 0 ? `+$${best.toFixed(0)}` : '-';
             })(), color: '#34d399' },
           ].map((s, i) => (
-            <div key={i} className="p-3 rounded-xl" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <div className="text-xs mb-1 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>{s.label}</div>
-              <div className="text-xl font-semibold font-mono" style={{ color: s.color }}>{s.value}</div>
+            <div key={i}>
+              <div className="text-[11px] mb-2.5 uppercase tracking-[0.12em] truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{s.label}</div>
+              <div className="font-mono text-[26px]" style={{ color: s.color, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>{s.value}</div>
             </div>
           ))}
         </div>
       )}
 
       {/* Calendar */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.025)' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <button
@@ -138,7 +138,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
           >
             <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
           </button>
-          <h2 className="text-lg font-semibold capitalize text-white">{getMonthLabel()}</h2>
+          <h2 className="font-display text-[20px] capitalize text-white">{getMonthLabel()}</h2>
           <button
             onClick={nextMonth}
             className="p-2 rounded-lg transition-all"
@@ -233,7 +233,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
 
       {/* Selected Day Panel */}
       {selectedDay && selectedTrades.length > 0 && (
-        <div className="rounded-2xl overflow-hidden" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.025)' }}>
           <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <div>
               <h3 className="font-semibold text-white">
@@ -316,7 +316,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
       )}
 
       {trades.length === 0 && (
-        <div className="text-center py-20 rounded-2xl" style={{ background: '#1a1b2e', border: '1px dashed rgba(255,255,255,0.08)' }}>
+        <div className="text-center py-20 rounded-2xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
           <p style={{ color: 'rgba(255,255,255,0.35)' }}>{t('emptyDesc')}</p>
         </div>
       )}

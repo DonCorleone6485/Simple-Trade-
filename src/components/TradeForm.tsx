@@ -8,6 +8,7 @@ import { Trade, MTFEntry, TradeResult, OrderType, ChecklistItem } from '../types
 import MTFAnalysis from './MTFAnalysis';
 import Checklist from './Checklist';
 import { useLanguage } from '../context/LanguageContext';
+import { input as uiInput, label as uiLabel, surface, hairline, sectionLabel, primaryBtn, TRANSITION } from '../lib/ui';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../lib/supabase';
 
@@ -20,37 +21,18 @@ const OWNER_EMAIL = 'asgharjafari2007@outlook.com';
 const PHOTO_LIMIT_FREE = 1;
 const PHOTO_LIMIT_PRO = 3;
 
-const inp: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.05)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  color: '#fff',
-  borderRadius: '12px',
-  padding: '8px 12px',
-  width: '100%',
-  outline: 'none',
-  fontSize: '14px',
-};
+const inp = uiInput;
+const lbl = uiLabel;
 
-const lbl: React.CSSProperties = {
-  display: 'block',
-  fontSize: '13px',
-  fontWeight: 500,
-  marginBottom: '6px',
-  color: 'rgba(255,255,255,0.55)',
-};
-
-const card: React.CSSProperties = { background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' };
+const card: React.CSSProperties = { ...surface };
 
 /** Zorunlu alan işareti. */
 const Req = () => <span style={{ color: '#f87171', marginInlineStart: '3px' }}>*</span>;
 const selStyle: React.CSSProperties = { ...inp, cursor: 'pointer' };
 const optStyle: React.CSSProperties = { background: '#1a1b2e', color: '#fff' };
-const divider: React.CSSProperties = { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '32px' };
+const divider: React.CSSProperties = { borderTop: hairline, paddingTop: '40px' };
 const optHint: React.CSSProperties = { color: 'rgba(255,255,255,0.3)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 };
-const sectionTitle: React.CSSProperties = {
-  fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
-  letterSpacing: '0.08em', color: 'rgba(255,255,255,0.3)', marginBottom: '16px',
-};
+const sectionTitle: React.CSSProperties = { ...sectionLabel, marginBottom: '18px' };
 
 const SYMBOLS: Record<string, string[]> = {
   Forex: [
@@ -382,8 +364,8 @@ function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit, uploadi
     <div className="space-y-4">
       {canUploadMore && (
         <div onClick={() => !uploading && fileInputRef.current?.click()}
-          className="w-full h-40 flex flex-col items-center justify-center rounded-xl transition-all"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)', cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.6 : 1 }}
+          className="w-full h-40 flex flex-col items-center justify-center transition-all"
+          style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.6 : 1, transition: TRANSITION }}
           onMouseEnter={e => { if (!uploading) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}>
           {uploading
@@ -535,7 +517,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
       {/* İşleme girmeden önce kontrol listesi */}
       <div className="rounded-2xl overflow-hidden" style={card}>
         <div className="p-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="font-display text-[21px] text-white" style={{ letterSpacing: '-0.01em' }}>
             Checklist <span style={{ ...optHint, fontSize: '13px' }}>({t('optionalLabel')})</span>
           </h2>
           <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -551,7 +533,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
 
       <div className="rounded-2xl overflow-hidden" style={card}>
       <div className="p-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <h2 className="text-lg font-semibold text-white">{t('formTitle')}</h2>
+        <h2 className="font-display text-[21px] text-white" style={{ letterSpacing: '-0.01em' }}>{t('formTitle')}</h2>
         <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('formSubtitle')}</p>
       </div>
 
@@ -683,8 +665,8 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
           <span style={{ color: '#f87171' }}>*</span> {t('requiredNote')}
         </p>
         <button type="submit" disabled={uploadingPre || uploadingPost}
-          className="px-6 py-2.5 font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ background: '#8b5cf6', color: '#fff' }}
+          className="px-6 py-2.5 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          style={primaryBtn}
           onMouseEnter={e => { if (!uploadingPre && !uploadingPost) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
           {uploadingPre || uploadingPost ? 'Fotoğraflar yükleniyor...' : t('saveButton')}

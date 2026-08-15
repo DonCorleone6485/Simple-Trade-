@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Trade, Account, JournalGoals } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { isWinTrade, isLossTrade, lossAmount, winAmount } from '../lib/tradeMath';
-import { Target, TrendingUp, DollarSign, Activity, Clock, AlertTriangle, CheckCircle, Edit3, Save, X } from 'lucide-react';
+import { Target, TrendingUp, DollarSign, Activity, Clock, AlertTriangle, CheckCircle, Check, Edit3, Save, X } from 'lucide-react';
 
 interface GoalsViewProps {
   trades: Trade[];
@@ -17,7 +17,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
 
   const card: React.CSSProperties = {
     background: '#1a1b2e',
-    border: '1px solid rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.05)',
     borderRadius: '16px',
     padding: '20px',
   };
@@ -116,12 +116,12 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
       {/* Başlık */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white">{t('goalsTitle')}</h2>
+          <h2 className="font-display text-[22px] font-medium text-white">{t('goalsTitle')}</h2>
           <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{getMonthLabel()}</p>
         </div>
         <button
           onClick={() => editing ? handleSave() : setEditing(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all"
           style={{ background: editing ? '#8b5cf6' : 'rgba(255,255,255,0.08)', color: '#fff' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = editing ? '#7c3aed' : 'rgba(255,255,255,0.12)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = editing ? '#8b5cf6' : 'rgba(255,255,255,0.08)'; }}
@@ -169,8 +169,8 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                   ${monthlyPnL.toFixed(0)} / ${goals.monthlyPnL}
                 </span>
               </div>
-              <div className="text-2xl font-bold font-mono mt-2" style={{ color: monthlyPnL >= goals.monthlyPnL ? '#34d399' : '#fff' }}>
-                {monthlyPnL >= goals.monthlyPnL ? '✅' : ''} {((monthlyPnL / goals.monthlyPnL) * 100).toFixed(0)}%
+              <div className="font-mono text-[26px] mt-2" style={{ color: monthlyPnL >= goals.monthlyPnL ? '#34d399' : '#fff' }}>
+                {monthlyPnL >= goals.monthlyPnL && <Check className="w-5 h-5 inline-block me-1.5 -mt-0.5" />}{((monthlyPnL / goals.monthlyPnL) * 100).toFixed(0)}%
               </div>
               <ProgressBar value={monthlyPnL} max={goals.monthlyPnL} color={monthlyPnL >= goals.monthlyPnL ? '#34d399' : '#8b5cf6'} />
             </div>
@@ -191,8 +191,8 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                   %{currentWinRate.toFixed(0)} / %{goals.winRate}
                 </span>
               </div>
-              <div className="text-2xl font-bold font-mono mt-2" style={{ color: currentWinRate >= goals.winRate ? '#34d399' : '#fff' }}>
-                {currentWinRate >= goals.winRate ? '✅' : ''} %{currentWinRate.toFixed(0)}
+              <div className="font-mono text-[26px] mt-2" style={{ color: currentWinRate >= goals.winRate ? '#34d399' : '#fff' }}>
+                {currentWinRate >= goals.winRate && <Check className="w-5 h-5 inline-block me-1.5 -mt-0.5" />}%{currentWinRate.toFixed(0)}
               </div>
               <ProgressBar value={currentWinRate} max={goals.winRate} color={currentWinRate >= goals.winRate ? '#34d399' : '#8b5cf6'} />
             </div>
@@ -213,8 +213,10 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                   {todayTrades.length} / {goals.maxDailyTrades}
                 </span>
               </div>
-              <div className="text-2xl font-bold font-mono mt-2" style={{ color: todayTrades.length > goals.maxDailyTrades ? '#f87171' : '#34d399' }}>
-                {todayTrades.length > goals.maxDailyTrades ? '⚠️' : '✅'} {todayTrades.length}
+              <div className="font-mono text-[26px] mt-2" style={{ color: todayTrades.length > goals.maxDailyTrades ? '#f87171' : '#34d399' }}>
+                {todayTrades.length > goals.maxDailyTrades
+                  ? <AlertTriangle className="w-5 h-5 inline-block me-1.5 -mt-0.5" />
+                  : <Check className="w-5 h-5 inline-block me-1.5 -mt-0.5" />}{todayTrades.length}
               </div>
               <ProgressBar
                 value={todayTrades.length}
@@ -236,7 +238,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                   <span className="text-xs font-medium uppercase tracking-wider">{t('maxRiskPerTrade')}</span>
                 </div>
               </div>
-              <div className="text-2xl font-bold font-mono mt-2 text-white">
+              <div className="font-mono text-[26px] mt-2 text-white">
                 ${goals.maxRiskPerTrade}
               </div>
               <p className="text-xs mt-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
@@ -363,7 +365,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
 
       {/* Hedef yoksa */}
       {!editing && Object.keys(account.goals || {}).length === 0 && (
-        <div className="text-center py-16 rounded-2xl" style={{ background: '#1a1b2e', border: '1px dashed rgba(255,255,255,0.08)' }}>
+        <div className="text-center py-16 rounded-2xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
           <Target className="w-12 h-12 mx-auto mb-4" style={{ color: 'rgba(255,255,255,0.15)' }} />
           <p className="font-medium text-white mb-1">{t('noGoalsTitle')}</p>
           <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('noGoalsDesc')}</p>

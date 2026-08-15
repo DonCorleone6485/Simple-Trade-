@@ -49,7 +49,7 @@ export default function TradeHistory({
 
   const card: React.CSSProperties = {
     background: '#1a1b2e',
-    border: '1px solid rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.05)',
     borderRadius: '16px',
   };
   const statCard: React.CSSProperties = { ...card, padding: '16px' };
@@ -349,54 +349,51 @@ export default function TradeHistory({
   if (statsOnly) {
     if (trades.length === 0) {
       return (
-        <div className="text-center py-20 rounded-2xl" style={{ background: '#1a1b2e', border: '1px dashed rgba(255,255,255,0.08)' }}>
+        <div className="text-center py-20 rounded-2xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
           <Target className="w-12 h-12 mx-auto mb-4" style={{ color: 'rgba(255,255,255,0.15)' }} />
           <p style={{ color: 'rgba(255,255,255,0.35)' }}>{t('emptyDesc')}</p>
         </div>
       );
     }
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="space-y-10">
+        {/* Ana metrikler — kutu yok, hizalı sayılar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-9 pb-10" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           {[
-            { icon: <PieChart className="w-4 h-4" />, label: t('winRate'), value: `%${winRate}`, color: '#fff' },
-            { icon: <DollarSign className="w-4 h-4" />, label: t('netProfit'), value: `${netProfit >= 0 ? '+' : '-'}$${Math.abs(netProfit).toFixed(2)}`, color: netProfit >= 0 ? '#34d399' : '#f87171' },
-            { icon: <TrendingUp className="w-4 h-4" />, label: t('profitFactor'), value: profitFactor, color: '#fff' },
-            { icon: <Target className="w-4 h-4" />, label: t('avgRR'), value: `${avgRR}R`, color: '#fff' },
-            { icon: <Activity className="w-4 h-4" />, label: t('totalTrades'), value: String(totalClosed), color: '#fff' },
-            { icon: <Award className="w-4 h-4" />, label: t('bestTrade'), value: `+$${bestTrade.toFixed(2)}`, color: '#34d399' },
-            { icon: <AlertTriangle className="w-4 h-4" />, label: t('worstTrade'), value: `-$${worstTrade.toFixed(2)}`, color: '#f87171' },
-            { icon: <TrendingDown className="w-4 h-4" />, label: t('maxDrawdown'), value: `$${maxDrawdown.toFixed(2)}`, color: '#f87171' },
+            { label: t('winRate'), value: `%${winRate}`, color: 'rgba(255,255,255,0.9)' },
+            { label: t('netProfit'), value: `${netProfit >= 0 ? '+' : '\u2212'}$${Math.abs(netProfit).toFixed(2)}`, color: netProfit >= 0 ? '#34d399' : '#f87171' },
+            { label: t('profitFactor'), value: profitFactor, color: 'rgba(255,255,255,0.9)' },
+            { label: t('avgRR'), value: `${avgRR}R`, color: 'rgba(255,255,255,0.9)' },
+            { label: t('totalTrades'), value: String(totalClosed), color: 'rgba(255,255,255,0.9)' },
+            { label: t('bestTrade'), value: `+$${bestTrade.toFixed(2)}`, color: '#34d399' },
+            { label: t('worstTrade'), value: `\u2212$${worstTrade.toFixed(2)}`, color: '#f87171' },
+            { label: t('maxDrawdown'), value: `$${Math.abs(maxDrawdown).toFixed(2)}`, color: '#f87171' },
           ].map((s, i) => (
-            <div key={i} style={statCard}>
-              <div className="flex items-center gap-2 mb-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                {s.icon}
-                <span className="text-xs font-medium uppercase tracking-wider">{s.label}</span>
-              </div>
-              <div className="text-2xl font-semibold font-mono" style={{ color: s.color }}>{s.value}</div>
+            <div key={i}>
+              <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{s.label}</div>
+              <div className="font-mono text-[26px]" style={{ color: s.color, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>{s.value}</div>
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div style={statCard}>
-            <div className="flex items-center gap-2 mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              <Zap className="w-4 h-4" />
-              <span className="text-xs font-medium uppercase tracking-wider">{t('currentStreak')}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-3xl font-bold font-mono" style={{ color: streak.currentType === 'win' ? '#34d399' : '#f87171' }}>{streak.current}</div>
-              <div className="text-sm px-2 py-1 rounded-lg" style={{ background: streak.currentType === 'win' ? 'rgba(52,211,153,0.1)' : 'rgba(248,113,113,0.1)', color: streak.currentType === 'win' ? '#34d399' : '#f87171' }}>
+
+        {/* Seriler */}
+        <div className="grid grid-cols-3 gap-x-8 pb-10" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('currentStreak')}</div>
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-mono text-[26px]" style={{ color: streak.currentType === 'win' ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>{streak.current}</span>
+              <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
                 {streak.currentType === 'win' ? t('winStatus') : t('lossStatus')}
-              </div>
+              </span>
             </div>
           </div>
-          <div style={statCard}>
-            <div className="flex items-center gap-2 mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}><Award className="w-4 h-4" /><span className="text-xs font-medium uppercase tracking-wider">{t('bestWinStreak')}</span></div>
-            <div className="text-3xl font-bold font-mono" style={{ color: '#34d399' }}>{streak.bestWin}</div>
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('bestWinStreak')}</div>
+            <div className="font-mono text-[26px]" style={{ color: '#34d399', fontVariantNumeric: 'tabular-nums' }}>{streak.bestWin}</div>
           </div>
-          <div style={statCard}>
-            <div className="flex items-center gap-2 mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}><AlertTriangle className="w-4 h-4" /><span className="text-xs font-medium uppercase tracking-wider">{t('bestLossStreak')}</span></div>
-            <div className="text-3xl font-bold font-mono" style={{ color: '#f87171' }}>{streak.bestLoss}</div>
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('bestLossStreak')}</div>
+            <div className="font-mono text-[26px]" style={{ color: '#f87171', fontVariantNumeric: 'tabular-nums' }}>{streak.bestLoss}</div>
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -414,7 +411,7 @@ export default function TradeHistory({
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                   <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
                   <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `$${v}`} />
-                  <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [`$${value.toFixed(2)}`, t('cumulativePnl')]} labelFormatter={label => `Trade #${label}`} />
+                  <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [`$${value.toFixed(2)}`, t('cumulativePnl')]} labelFormatter={label => `Trade #${label}`} />
                   <Area type="monotone" dataKey="cumulative" stroke={netProfit >= 0 ? '#10b981' : '#f43f5e'} strokeWidth={2} fillOpacity={1} fill="url(#colorCumulative)" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -427,7 +424,7 @@ export default function TradeHistory({
                 <BarChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                   <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
-                  <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [`$${value.toFixed(2)}`, 'PnL']} labelFormatter={label => `Trade #${label}`} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                  <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [`$${value.toFixed(2)}`, 'PnL']} labelFormatter={label => `Trade #${label}`} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                   <Bar dataKey="pnl" radius={[4, 4, 4, 4]}>
                     {chartData.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.isWin ? '#10b981' : '#f43f5e'} />))}
                   </Bar>
@@ -453,7 +450,7 @@ export default function TradeHistory({
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                 <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
                 <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `$${v}`} />
-                <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [`$${value.toFixed(2)}`, 'Drawdown']} labelFormatter={label => `Trade #${label}`} />
+                <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [`$${value.toFixed(2)}`, 'Drawdown']} labelFormatter={label => `Trade #${label}`} />
                 <Area type="monotone" dataKey="drawdown" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#colorDrawdown)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -567,7 +564,7 @@ export default function TradeHistory({
               <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.4)' }}>AI Analiz</span>
             </div>
             <button onClick={runAiAnalysis} disabled={aiLoading}
-              className="px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-full text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ background: '#8b5cf6', color: '#fff' }}
               onMouseEnter={e => { if (!aiLoading) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
@@ -824,7 +821,7 @@ export default function TradeHistory({
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <button onClick={() => setSelectedTrade(null)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all"
               style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>

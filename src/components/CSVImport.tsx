@@ -644,7 +644,7 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
 
   const card: React.CSSProperties = {
     background: '#1a1b2e',
-    border: '1px solid rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.05)',
     borderRadius: '16px',
     padding: '20px',
   };
@@ -657,7 +657,7 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
 
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white">CSV Import</h2>
+            <h2 className="font-display text-[22px] font-medium text-white">CSV Import</h2>
             <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {language === 'tr' ? 'Trade geçmişinizi otomatik içe aktarın' :
                language === 'fa' ? 'تاریخچه معاملات خود را وارد کنید' :
