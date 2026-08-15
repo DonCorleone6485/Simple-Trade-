@@ -192,6 +192,7 @@ export default function App() {
         preTradeNotes: t.pre_trade_notes || '', postTradeNotes: t.post_trade_notes || '',
         preTradePhotos: t.pre_trade_photos || [], postTradePhotos: t.post_trade_photos || [],
         mtfAnalysis: t.mtf_analysis || [],
+        checklist: t.checklist || [],
       })));
     }
   };
@@ -325,6 +326,7 @@ export default function App() {
       pre_trade_notes: trade.preTradeNotes, post_trade_notes: trade.postTradeNotes,
       pre_trade_photos: trade.preTradePhotos, post_trade_photos: trade.postTradePhotos,
       mtf_analysis: trade.mtfAnalysis?.length ? trade.mtfAnalysis : null,
+      checklist: trade.checklist?.length ? trade.checklist : null,
     }).select().single();
     if (data) {
       const newTrade: Trade = {
@@ -334,6 +336,7 @@ export default function App() {
         preTradeNotes: data.pre_trade_notes || '', postTradeNotes: data.post_trade_notes || '',
         preTradePhotos: data.pre_trade_photos || [], postTradePhotos: data.post_trade_photos || [],
         mtfAnalysis: data.mtf_analysis || [],
+        checklist: data.checklist || [],
       };
       setTrades(prev => [newTrade, ...prev]);
       setShowTradeModal(false);
@@ -347,6 +350,7 @@ export default function App() {
       pre_trade_notes: trade.preTradeNotes, post_trade_notes: trade.postTradeNotes,
       pre_trade_photos: trade.preTradePhotos, post_trade_photos: trade.postTradePhotos,
       mtf_analysis: trade.mtfAnalysis?.length ? trade.mtfAnalysis : null,
+      checklist: trade.checklist?.length ? trade.checklist : null,
     }).eq('id', trade.id);
 
     if (error) {

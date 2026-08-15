@@ -26,6 +26,17 @@ export type TradeResult =
 
 export type OrderType = 'Market' | 'Limit' | 'Stop';
 
+/**
+ * İşlem öncesi kontrol maddesi. Maddelerin kendisi kullanıcı bazlı kalıcıdır
+ * (users.checklist_template); `checked` ise her işleme özeldir.
+ */
+export interface ChecklistItem {
+  id: string;
+  title: string;
+  desc?: string;
+  checked?: boolean;
+}
+
 export type MTFBias = 'bullish' | 'bearish' | 'consolidation';
 
 /** Tek bir timeframe için multi-timeframe analiz kaydı. */
@@ -55,5 +66,6 @@ export interface Trade {
   preTradePhotos: string[];
   postTradePhotos: string[];
   mtfAnalysis?: MTFEntry[];
+  checklist?: ChecklistItem[];
   importSource?: string;
 }

@@ -7,6 +7,7 @@ import {
   CheckSquare, Square, X, Save, Upload, Loader
 } from 'lucide-react';
 import MTFAnalysis, { MTFAnalysisView } from './MTFAnalysis';
+import Checklist, { ChecklistView } from './Checklist';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../lib/supabase';
@@ -684,12 +685,21 @@ export default function TradeHistory({
             </div>
           </div>
 
-          <div>
-            <label style={lbl}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</label>
-            <MTFAnalysis
-              value={editForm.mtfAnalysis || []}
-              onChange={entries => setEditForm(f => ({ ...f, mtfAnalysis: entries }))}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label style={lbl}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</label>
+              <MTFAnalysis
+                value={editForm.mtfAnalysis || []}
+                onChange={entries => setEditForm(f => ({ ...f, mtfAnalysis: entries }))}
+              />
+            </div>
+            <div>
+              <label style={lbl}>Checklist</label>
+              <Checklist
+                value={editForm.checklist || []}
+                onChange={items => setEditForm(f => ({ ...f, checklist: items }))}
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -877,13 +887,28 @@ export default function TradeHistory({
             {/* ── NOTlar ve FOTOĞRAFLAR ── */}
             <div className="p-5 space-y-8" style={{ background: 'rgba(255,255,255,0.01)' }}>
 
-              {/* Multi Timeframe Analiz */}
-              {selectedTrade.mtfAnalysis && selectedTrade.mtfAnalysis.length > 0 && (
-                <div className="space-y-4">
-                  <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                    {language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}
-                  </h4>
-                  <MTFAnalysisView entries={selectedTrade.mtfAnalysis} />
+              {/* Multi Timeframe Analiz & Checklist */}
+              {((selectedTrade.mtfAnalysis?.length ?? 0) > 0 || (selectedTrade.checklist?.length ?? 0) > 0) && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {(selectedTrade.mtfAnalysis?.length ?? 0) > 0 && (
+                    <div className="space-y-4">
+                      <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                        {language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}
+                      </h4>
+                      <MTFAnalysisView entries={selectedTrade.mtfAnalysis!} />
+                    </div>
+                  )}
+                  {(selectedTrade.checklist?.length ?? 0) > 0 && (
+                    <div className="space-y-4">
+                      <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                        Checklist
+                        <span className="ms-2 font-mono" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                          {selectedTrade.checklist!.filter(i => i.checked).length}/{selectedTrade.checklist!.length}
+                        </span>
+                      </h4>
+                      <ChecklistView items={selectedTrade.checklist!} />
+                    </div>
+                  )}
                 </div>
               )}
 

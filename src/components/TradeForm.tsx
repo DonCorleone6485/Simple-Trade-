@@ -4,8 +4,9 @@ import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
-import { Trade, MTFEntry, TradeResult, OrderType } from '../types';
+import { Trade, MTFEntry, TradeResult, OrderType, ChecklistItem } from '../types';
 import MTFAnalysis from './MTFAnalysis';
+import Checklist from './Checklist';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../lib/supabase';
@@ -425,6 +426,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
   const [preNotes, setPreNotes] = useState('');
   const [postNotes, setPostNotes] = useState('');
   const [mtf, setMtf] = useState<MTFEntry[]>([]);
+  const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
   const [prePhotos, setPrePhotos] = useState<string[]>([]);
   const [postPhotos, setPostPhotos] = useState<string[]>([]);
   const [uploadingPre, setUploadingPre] = useState(false);
@@ -504,6 +506,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
       preTradeNotes: preNotes, postTradeNotes: postNotes,
       preTradePhotos: prePhotos, postTradePhotos: postPhotos,
       mtfAnalysis: mtf.length > 0 ? mtf : undefined,
+      checklist: checklist.length > 0 ? checklist : undefined,
     };
     onSave(newTrade);
     // Bir sonraki kayıt için tarihi tekrar "şu an"a al.
@@ -511,6 +514,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
     setSetup(''); setRisk(''); setReward(''); setRr('');
     setPreNotes(''); setPostNotes('');
     setPrePhotos([]); setPostPhotos([]); setMtf([]);
+    setChecklist(prev => prev.map(i => ({ ...i, checked: false })));
     setResult('Başarılı');
   };
 
@@ -598,8 +602,16 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
         </div>
 
         <div style={divider}>
-          <p style={sectionTitle}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</p>
-          <MTFAnalysis value={mtf} onChange={setMtf} symbol={symbol} autoFill />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+              <p style={sectionTitle}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</p>
+              <MTFAnalysis value={mtf} onChange={setMtf} symbol={symbol} autoFill />
+            </div>
+            <div>
+              <p style={sectionTitle}>Checklist</p>
+              <Checklist value={checklist} onChange={setChecklist} syncTemplate />
+            </div>
+          </div>
         </div>
 
         <div style={divider}>
