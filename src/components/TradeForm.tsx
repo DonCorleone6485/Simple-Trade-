@@ -40,9 +40,13 @@ const lbl: React.CSSProperties = {
 };
 
 const card: React.CSSProperties = { background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' };
+
+/** Zorunlu alan işareti. */
+const Req = () => <span style={{ color: '#f87171', marginInlineStart: '3px' }}>*</span>;
 const selStyle: React.CSSProperties = { ...inp, cursor: 'pointer' };
 const optStyle: React.CSSProperties = { background: '#1a1b2e', color: '#fff' };
 const divider: React.CSSProperties = { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '32px' };
+const optHint: React.CSSProperties = { color: 'rgba(255,255,255,0.3)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 };
 const sectionTitle: React.CSSProperties = {
   fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
   letterSpacing: '0.08em', color: 'rgba(255,255,255,0.3)', marginBottom: '16px',
@@ -524,7 +528,9 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
       {/* İşleme girmeden önce kontrol listesi */}
       <div className="rounded-2xl overflow-hidden" style={card}>
         <div className="p-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <h2 className="text-lg font-semibold text-white">Checklist</h2>
+          <h2 className="text-lg font-semibold text-white">
+            Checklist <span style={{ ...optHint, fontSize: '13px' }}>({t('optionalLabel')})</span>
+          </h2>
           <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
             {language === 'tr'
               ? 'İşleme girmeden önce kendi kurallarını kontrol et.'
@@ -545,7 +551,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
       <div className="p-6 space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
-            <label style={lbl}>{t('dateTime')}</label>
+            <label style={lbl}>{t('dateTime')}<Req /></label>
             <DatePicker
               value={date ? new Date(date) : null}
               onChange={(dateObj: DateObject | null) => { if (dateObj) setDate(dateObj.toDate().toISOString()); else setDate(''); }}
@@ -558,18 +564,18 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
             />
           </div>
           <div>
-            <label style={lbl}>{t('symbol')}</label>
+            <label style={lbl}>{t('symbol')}<Req /></label>
             <SymbolPicker value={symbol} onChange={setSymbol} />
           </div>
           <div>
-            <label style={lbl}>{t('type')}</label>
+            <label style={lbl}>{t('type')}<Req /></label>
             <select value={type} onChange={e => setType(e.target.value as 'Buy' | 'Sell')} style={selStyle}>
               <option value="Buy" style={optStyle}>{t('buy')}</option>
               <option value="Sell" style={optStyle}>{t('sell')}</option>
             </select>
           </div>
           <div>
-            <label style={lbl}>{t('orderType')}</label>
+            <label style={lbl}>{t('orderType')}<Req /></label>
             <select value={orderType} onChange={e => setOrderType(e.target.value as OrderType)} style={selStyle}>
               <option value="Market" style={optStyle}>{t('orderMarket')}</option>
               <option value="Limit" style={optStyle}>{t('orderLimit')}</option>
@@ -577,12 +583,12 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
             </select>
           </div>
           <div>
-            <label style={lbl}>{t('setup')}</label>
+            <label style={lbl}>{t('setup')} <span style={optHint}>({t('optionalLabel')})</span></label>
             <SetupPicker value={setup} onChange={setSetup} />
           </div>
           <div>
-            <label style={lbl}>{t('rr')}</label>
-            <input type="number" step="any" value={rr} onChange={e => setRr(e.target.value)}
+            <label style={lbl}>{t('rr')}<Req /></label>
+            <input type="number" step="any" required value={rr} onChange={e => setRr(e.target.value)}
               style={{ ...inp, fontFamily: 'monospace' }} placeholder={t('rrPlaceholder')} />
           </div>
         </div>
@@ -590,7 +596,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
         <div style={divider}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label style={lbl}>{t('risk')}</label>
+              <label style={lbl}>{t('risk')}<Req /></label>
               <div className="relative">
                 <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
                 <input type="number" min="0" step="0.01" required value={risk} onChange={e => setRisk(e.target.value)}
@@ -598,15 +604,15 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
               </div>
             </div>
             <div>
-              <label style={lbl}>{t('reward')}</label>
+              <label style={lbl}>{t('reward')}<Req /></label>
               <div className="relative">
                 <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                <input type="number" step="0.01" value={reward} onChange={e => setReward(e.target.value)}
+                <input type="number" step="0.01" required value={reward} onChange={e => setReward(e.target.value)}
                   style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
               </div>
             </div>
             <div>
-              <label style={lbl}>{t('result')}</label>
+              <label style={lbl}>{t('result')}<Req /></label>
               <select value={result} onChange={handleResultChange} style={selStyle}>
                 <option value="Başarılı" style={optStyle}>{t('resultWin')}</option>
                 <option value="Başarısız" style={optStyle}>{t('resultLoss')}</option>
@@ -619,7 +625,10 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
         </div>
 
         <div style={divider}>
-          <p style={sectionTitle}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</p>
+          <p style={sectionTitle}>
+            {language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}
+            <span style={optHint}> ({t('optionalLabel')})</span>
+          </p>
           <MTFAnalysis value={mtf} onChange={setMtf} symbol={symbol} autoFill />
         </div>
 
@@ -627,11 +636,11 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
           <p style={sectionTitle}>{t('preTrade')}</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <label style={lbl}>{t('photos')}</label>
+              <label style={lbl}>{t('photos')} <span style={optHint}>({t('optionalLabel')})</span></label>
               <PhotoUploader photos={prePhotos} onUpload={e => handlePhotoUpload(e, 'pre')} onRemove={i => removePhoto(i, 'pre')} isUnlimited={isOwner} limit={photoLimit} uploading={uploadingPre} />
             </div>
             <div>
-              <label style={lbl}>{t('notes')}</label>
+              <label style={lbl}>{t('notes')}<Req /></label>
               <textarea required value={preNotes} onChange={e => setPreNotes(e.target.value)}
                 style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }} placeholder={t('preNotesPlaceholder')} />
             </div>
@@ -642,19 +651,22 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
           <p style={sectionTitle}>{t('postTrade')}</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <label style={lbl}>{t('photos')}</label>
+              <label style={lbl}>{t('photos')} <span style={optHint}>({t('optionalLabel')})</span></label>
               <PhotoUploader photos={postPhotos} onUpload={e => handlePhotoUpload(e, 'post')} onRemove={i => removePhoto(i, 'post')} isUnlimited={isOwner} limit={photoLimit} uploading={uploadingPost} />
             </div>
             <div>
-              <label style={lbl}>{t('notes')}</label>
-              <textarea value={postNotes} onChange={e => setPostNotes(e.target.value)}
+              <label style={lbl}>{t('notes')}<Req /></label>
+              <textarea required value={postNotes} onChange={e => setPostNotes(e.target.value)}
                 style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }} placeholder={t('postNotesPlaceholder')} />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="p-6 flex justify-end" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+      <div className="p-6 flex items-center justify-between gap-4 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <span style={{ color: '#f87171' }}>*</span> {t('requiredNote')}
+        </p>
         <button type="submit" disabled={uploadingPre || uploadingPost}
           className="px-6 py-2.5 font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ background: '#8b5cf6', color: '#fff' }}

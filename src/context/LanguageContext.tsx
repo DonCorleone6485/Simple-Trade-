@@ -33,6 +33,8 @@ export const translations: Translations = {
   sell: { tr: 'Sell', en: 'Sell', fa: 'Sell', ar: 'بيع', ru: 'Продать', es: 'Venta', pt: 'Venda', de: 'Verkaufen', fr: 'Vente' },
   timeframe: { tr: 'Timeframe', en: 'Timeframe', fa: 'تایم‌فریم', ar: 'الإطار الزمني', ru: 'Таймфрейм', es: 'Marco temporal', pt: 'Tempo gráfico', de: 'Zeitrahmen', fr: 'Unité de temps' },
   setup: { tr: 'Strateji', en: 'Strategy', fa: 'استراتژی', ar: 'الاستراتيجية', ru: 'Стратегия', es: 'Estrategia', pt: 'Estratégia', de: 'Strategie', fr: 'Stratégie' },
+  requiredNote: { tr: 'Zorunlu alan', en: 'Required field', fa: 'فیلد الزامی', ar: 'حقل مطلوب', ru: 'Обязательное поле', es: 'Campo obligatorio', pt: 'Campo obrigatório', de: 'Pflichtfeld', fr: 'Champ obligatoire' },
+  optionalLabel: { tr: 'isteğe bağlı', en: 'optional', fa: 'اختیاری', ar: 'اختياري', ru: 'необязательно', es: 'opcional', pt: 'opcional', de: 'optional', fr: 'facultatif' },
   orderType: { tr: 'Emir Türü', en: 'Order Type', fa: 'نوع سفارش', ar: 'نوع الأمر', ru: 'Тип ордера', es: 'Tipo de orden', pt: 'Tipo de ordem', de: 'Orderart', fr: 'Type d\'ordre' },
   orderMarket: { tr: 'Piyasa', en: 'Market', fa: 'بازار', ar: 'سوق', ru: 'Рыночный', es: 'Mercado', pt: 'Mercado', de: 'Market', fr: 'Marché' },
   orderLimit: { tr: 'Limit', en: 'Limit', fa: 'لیمیت', ar: 'حد', ru: 'Лимитный', es: 'Límite', pt: 'Limite', de: 'Limit', fr: 'Limite' },
