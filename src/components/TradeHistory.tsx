@@ -685,21 +685,20 @@ export default function TradeHistory({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-              <label style={lbl}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</label>
-              <MTFAnalysis
-                value={editForm.mtfAnalysis || []}
-                onChange={entries => setEditForm(f => ({ ...f, mtfAnalysis: entries }))}
-              />
-            </div>
-            <div>
-              <label style={lbl}>Checklist</label>
-              <Checklist
-                value={editForm.checklist || []}
-                onChange={items => setEditForm(f => ({ ...f, checklist: items }))}
-              />
-            </div>
+          <div>
+            <label style={lbl}>Checklist</label>
+            <Checklist
+              value={editForm.checklist || []}
+              onChange={items => setEditForm(f => ({ ...f, checklist: items }))}
+            />
+          </div>
+
+          <div>
+            <label style={lbl}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</label>
+            <MTFAnalysis
+              value={editForm.mtfAnalysis || []}
+              onChange={entries => setEditForm(f => ({ ...f, mtfAnalysis: entries }))}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

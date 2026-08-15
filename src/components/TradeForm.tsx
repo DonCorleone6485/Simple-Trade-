@@ -39,6 +39,7 @@ const lbl: React.CSSProperties = {
   color: 'rgba(255,255,255,0.55)',
 };
 
+const card: React.CSSProperties = { background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' };
 const selStyle: React.CSSProperties = { ...inp, cursor: 'pointer' };
 const optStyle: React.CSSProperties = { background: '#1a1b2e', color: '#fff' };
 const divider: React.CSSProperties = { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '32px' };
@@ -519,7 +520,23 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl overflow-hidden" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* İşleme girmeden önce kontrol listesi */}
+      <div className="rounded-2xl overflow-hidden" style={card}>
+        <div className="p-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <h2 className="text-lg font-semibold text-white">Checklist</h2>
+          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            {language === 'tr'
+              ? 'İşleme girmeden önce kendi kurallarını kontrol et.'
+              : 'Run through your own rules before taking the trade.'}
+          </p>
+        </div>
+        <div className="p-6">
+          <Checklist value={checklist} onChange={setChecklist} syncTemplate />
+        </div>
+      </div>
+
+      <div className="rounded-2xl overflow-hidden" style={card}>
       <div className="p-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <h2 className="text-lg font-semibold text-white">{t('formTitle')}</h2>
         <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('formSubtitle')}</p>
@@ -602,16 +619,8 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
         </div>
 
         <div style={divider}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <p style={sectionTitle}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</p>
-              <MTFAnalysis value={mtf} onChange={setMtf} symbol={symbol} autoFill />
-            </div>
-            <div>
-              <p style={sectionTitle}>Checklist</p>
-              <Checklist value={checklist} onChange={setChecklist} syncTemplate />
-            </div>
-          </div>
+          <p style={sectionTitle}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</p>
+          <MTFAnalysis value={mtf} onChange={setMtf} symbol={symbol} autoFill />
         </div>
 
         <div style={divider}>
@@ -653,6 +662,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
           {uploadingPre || uploadingPost ? 'Fotoğraflar yükleniyor...' : t('saveButton')}
         </button>
+      </div>
       </div>
     </form>
   );
