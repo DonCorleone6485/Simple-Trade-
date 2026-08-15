@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trade } from '../types';
+import { Trade, OrderType } from '../types';
 import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
@@ -84,6 +84,13 @@ export default function TradeHistory({
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const getOrderTypeText = (orderType?: string) => {
+    if (orderType === 'Market') return t('orderMarket');
+    if (orderType === 'Limit') return t('orderLimit');
+    if (orderType === 'Stop') return t('orderStop');
+    return '';
   };
 
   const getResultText = (result: string) => {
@@ -639,6 +646,14 @@ export default function TradeHistory({
               </select>
             </div>
             <div>
+              <label style={lbl}>{t('orderType')}</label>
+              <select style={{ ...inp, cursor: 'pointer' }} value={editForm.orderType || 'Market'} onChange={e => setEditForm(f => ({ ...f, orderType: e.target.value as OrderType }))}>
+                <option value="Market" style={{ background: '#1a1b2e' }}>{t('orderMarket')}</option>
+                <option value="Limit" style={{ background: '#1a1b2e' }}>{t('orderLimit')}</option>
+                <option value="Stop" style={{ background: '#1a1b2e' }}>{t('orderStop')}</option>
+              </select>
+            </div>
+            <div>
               <label style={lbl}>{t('setup')}</label>
               <select style={{ ...inp, cursor: 'pointer' }} value={editForm.setup || ''} onChange={e => setEditForm(f => ({ ...f, setup: e.target.value }))}>
                 <option value="" style={{ background: '#1a1b2e' }}>—</option>
@@ -823,6 +838,11 @@ export default function TradeHistory({
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-lg font-bold text-white">{selectedTrade.symbol}</span>
+                    {selectedTrade.orderType && (
+                      <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
+                        {getOrderTypeText(selectedTrade.orderType)}
+                      </span>
+                    )}
                     {selectedTrade.setup && (
                       <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa' }}>
                         {selectedTrade.setup}

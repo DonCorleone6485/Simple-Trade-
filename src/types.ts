@@ -24,6 +24,8 @@ export type TradeResult =
   | 'Manuel Zararda'
   | 'Başa Baş';
 
+export type OrderType = 'Market' | 'Limit' | 'Stop';
+
 export type MTFBias = 'bullish' | 'bearish' | 'consolidation';
 
 /** Tek bir timeframe için multi-timeframe analiz kaydı. */
@@ -42,6 +44,7 @@ export interface Trade {
   symbol: string;
   type: 'Buy' | 'Sell';
   timeframe?: string;
+  orderType?: OrderType;
   setup?: string;
   risk: number;
   reward: number;

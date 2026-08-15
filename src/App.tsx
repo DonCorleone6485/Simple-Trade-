@@ -187,7 +187,7 @@ export default function App() {
     if (data) {
       setTrades(data.map((t: any) => ({
         id: t.id, accountId: t.journal_id, journal_id: t.journal_id, user_id: t.user_id,
-        date: t.date, symbol: t.symbol, type: t.type, timeframe: t.timeframe, setup: t.setup,
+        date: t.date, symbol: t.symbol, type: t.type, timeframe: t.timeframe, orderType: t.order_type || undefined, setup: t.setup,
         risk: t.risk, reward: t.reward, rr: t.rr, result: t.result,
         preTradeNotes: t.pre_trade_notes || '', postTradeNotes: t.post_trade_notes || '',
         preTradePhotos: t.pre_trade_photos || [], postTradePhotos: t.post_trade_photos || [],
@@ -320,7 +320,7 @@ export default function App() {
     if (!activeJournal || !user) return;
     const { data } = await supabase.from('trades').insert({
       user_id: user.id, journal_id: activeJournal.id, date: trade.date,
-      symbol: trade.symbol, type: trade.type, timeframe: trade.timeframe, setup: trade.setup,
+      symbol: trade.symbol, type: trade.type, timeframe: trade.timeframe, order_type: trade.orderType || null, setup: trade.setup,
       risk: trade.risk, reward: trade.reward, rr: trade.rr, result: trade.result,
       pre_trade_notes: trade.preTradeNotes, post_trade_notes: trade.postTradeNotes,
       pre_trade_photos: trade.preTradePhotos, post_trade_photos: trade.postTradePhotos,
@@ -329,7 +329,7 @@ export default function App() {
     if (data) {
       const newTrade: Trade = {
         id: data.id, accountId: data.journal_id, journal_id: data.journal_id, user_id: data.user_id,
-        date: data.date, symbol: data.symbol, type: data.type, timeframe: data.timeframe, setup: data.setup,
+        date: data.date, symbol: data.symbol, type: data.type, timeframe: data.timeframe, orderType: data.order_type || undefined, setup: data.setup,
         risk: data.risk, reward: data.reward, rr: data.rr, result: data.result,
         preTradeNotes: data.pre_trade_notes || '', postTradeNotes: data.post_trade_notes || '',
         preTradePhotos: data.pre_trade_photos || [], postTradePhotos: data.post_trade_photos || [],
@@ -342,7 +342,7 @@ export default function App() {
 
   const handleUpdateTrade = async (trade: Trade) => {
     const { error } = await supabase.from('trades').update({
-      symbol: trade.symbol, type: trade.type, timeframe: trade.timeframe, setup: trade.setup,
+      symbol: trade.symbol, type: trade.type, timeframe: trade.timeframe, order_type: trade.orderType || null, setup: trade.setup,
       risk: trade.risk, reward: trade.reward, rr: trade.rr, result: trade.result,
       pre_trade_notes: trade.preTradeNotes, post_trade_notes: trade.postTradeNotes,
       pre_trade_photos: trade.preTradePhotos, post_trade_photos: trade.postTradePhotos,
@@ -379,7 +379,7 @@ export default function App() {
       }).select().single();
       if (data) inserted.push({
         id: data.id, accountId: data.journal_id, journal_id: data.journal_id, user_id: data.user_id,
-        date: data.date, symbol: data.symbol, type: data.type, timeframe: data.timeframe, setup: data.setup,
+        date: data.date, symbol: data.symbol, type: data.type, timeframe: data.timeframe, orderType: data.order_type || undefined, setup: data.setup,
         risk: data.risk, reward: data.reward, rr: data.rr, result: data.result,
         preTradeNotes: data.pre_trade_notes || '', postTradeNotes: data.post_trade_notes || '',
         preTradePhotos: [], postTradePhotos: [],

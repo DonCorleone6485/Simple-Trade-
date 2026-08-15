@@ -4,7 +4,7 @@ import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
-import { Trade, MTFEntry, TradeResult } from '../types';
+import { Trade, MTFEntry, TradeResult, OrderType } from '../types';
 import MTFAnalysis from './MTFAnalysis';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
@@ -416,6 +416,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
   const [date, setDate] = useState(() => new Date().toISOString());
   const [symbol, setSymbol] = useState('EURUSD');
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
+  const [orderType, setOrderType] = useState<OrderType>('Market');
   const [setup, setSetup] = useState('');
   const [risk, setRisk] = useState('');
   const [reward, setReward] = useState('');
@@ -497,7 +498,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
     if (!date) { alert(t('pleaseSelectDate') || 'Lütfen tarih seçin'); return; }
     const newTrade: Trade = {
       id: Date.now().toString(),
-      date, symbol, type, setup,
+      date, symbol, type, orderType, setup,
       risk: parseFloat(risk) || 0, reward: parseFloat(reward) || 0,
       rr, result,
       preTradeNotes: preNotes, postTradeNotes: postNotes,
@@ -506,7 +507,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
     };
     onSave(newTrade);
     // Bir sonraki kayıt için tarihi tekrar "şu an"a al.
-    setDate(new Date().toISOString()); setSymbol('EURUSD');
+    setDate(new Date().toISOString()); setSymbol('EURUSD'); setOrderType('Market');
     setSetup(''); setRisk(''); setReward(''); setRr('');
     setPreNotes(''); setPostNotes('');
     setPrePhotos([]); setPostPhotos([]); setMtf([]);
@@ -544,6 +545,14 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
             <select value={type} onChange={e => setType(e.target.value as 'Buy' | 'Sell')} style={selStyle}>
               <option value="Buy" style={optStyle}>{t('buy')}</option>
               <option value="Sell" style={optStyle}>{t('sell')}</option>
+            </select>
+          </div>
+          <div>
+            <label style={lbl}>{t('orderType')}</label>
+            <select value={orderType} onChange={e => setOrderType(e.target.value as OrderType)} style={selStyle}>
+              <option value="Market" style={optStyle}>{t('orderMarket')}</option>
+              <option value="Limit" style={optStyle}>{t('orderLimit')}</option>
+              <option value="Stop" style={optStyle}>{t('orderStop')}</option>
             </select>
           </div>
           <div>
