@@ -1088,7 +1088,10 @@ export default function TradeHistory({
                       )}
                       <span className="w-16 sm:w-20 font-mono text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{getRRDisplay(trade)}</span>
                       <span className="ms-auto text-end font-mono font-medium" style={{ color: isW ? '#34d399' : isL ? '#f87171' : 'rgba(255,255,255,0.4)' }}>
-                        {isW ? `+${winAmount(trade)}$` : isL ? `-${lossAmount(trade)}$` : <span className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('openStatus')}</span>}
+                        {isW ? `+${winAmount(trade)}$`
+                          : isL ? `-${lossAmount(trade)}$`
+                          : trade.result === 'Başa Baş' ? <span style={{ color: 'rgba(255,255,255,0.45)' }}>0$</span>
+                          : <span className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('openStatus')}</span>}
                       </span>
 
                       <div className="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
