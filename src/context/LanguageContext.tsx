@@ -34,7 +34,7 @@ export const translations: Translations = {
   timeframe: { tr: 'Timeframe', en: 'Timeframe', fa: 'تایم‌فریم', ar: 'الإطار الزمني', ru: 'Таймфрейм', es: 'Marco temporal', pt: 'Tempo gráfico', de: 'Zeitrahmen', fr: 'Unité de temps' },
   setup: { tr: 'Strateji', en: 'Strategy', fa: 'استراتژی', ar: 'الاستراتيجية', ru: 'Стратегия', es: 'Estrategia', pt: 'Estratégia', de: 'Strategie', fr: 'Stratégie' },
   orderType: { tr: 'Emir Türü', en: 'Order Type', fa: 'نوع سفارش', ar: 'نوع الأمر', ru: 'Тип ордера', es: 'Tipo de orden', pt: 'Tipo de ordem', de: 'Orderart', fr: 'Type d\'ordre' },
-  orderMarket: { tr: 'Piyasa Emri', en: 'Market', fa: 'بازار', ar: 'سوق', ru: 'Рыночный', es: 'Mercado', pt: 'Mercado', de: 'Market', fr: 'Marché' },
+  orderMarket: { tr: 'Piyasa', en: 'Market', fa: 'بازار', ar: 'سوق', ru: 'Рыночный', es: 'Mercado', pt: 'Mercado', de: 'Market', fr: 'Marché' },
   orderLimit: { tr: 'Limit', en: 'Limit', fa: 'لیمیت', ar: 'حد', ru: 'Лимитный', es: 'Límite', pt: 'Limite', de: 'Limit', fr: 'Limite' },
   orderStop: { tr: 'Stop', en: 'Stop', fa: 'استاپ', ar: 'إيقاف', ru: 'Стоп', es: 'Stop', pt: 'Stop', de: 'Stop', fr: 'Stop' },
   rr: { tr: 'Risk/Reward (R/R)', en: 'Risk/Reward (R/R)', fa: 'ریسک/ریوارد (R/R)', ar: 'المخاطرة/المكافأة (R/R)', ru: 'Риск/Прибыль (R/R)', es: 'Riesgo/Recompensa (R/R)', pt: 'Risco/Retorno (R/R)', de: 'Risiko/Ertrag (R/R)', fr: 'Risque/Récompense (R/R)' },
