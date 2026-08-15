@@ -15,6 +15,8 @@ import { supabase } from '../lib/supabase';
 interface TradeFormProps {
   onSave: (trade: Trade) => void;
   isPro?: boolean;
+  /** Portal düzeninde sayfa başlığı üst barda durur. */
+  hideTitle?: boolean;
 }
 
 const OWNER_EMAIL = 'asgharjafari2007@outlook.com';
@@ -394,7 +396,7 @@ function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit, uploadi
 }
 
 // ── TRADE FORM ─────────────────────────────────────────────────────────────
-export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
+export default function TradeForm({ onSave, isPro = false, hideTitle = false }: TradeFormProps) {
   const { t, language } = useLanguage();
   const { user } = useUser();
 
@@ -532,10 +534,12 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
       </div>
 
       <div className="rounded-2xl overflow-hidden" style={card}>
-      <div className="p-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <h2 className="font-display text-[21px] text-white" style={{ letterSpacing: '-0.01em' }}>{t('formTitle')}</h2>
-        <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('formSubtitle')}</p>
-      </div>
+      {!hideTitle && (
+        <div className="p-6" style={{ borderBottom: hairline }}>
+          <h2 className="font-display text-[21px] text-white" style={{ letterSpacing: '-0.01em' }}>{t('formTitle')}</h2>
+          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('formSubtitle')}</p>
+        </div>
+      )}
 
       <div className="p-6 space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

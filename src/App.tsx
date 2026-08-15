@@ -26,7 +26,7 @@ import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, ha
 import { isWinTrade, isLossTrade, lossAmount, winAmount } from './lib/tradeMath';
 
 type View = 'dashboard' | 'expanded' | 'pricing';
-type JournalTab = 'trades' | 'calendar' | 'stats' | 'goals';
+type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals';
 type AuthView = 'signin' | 'signup';
 type AuthStage = 'landing' | 'auth';
 type Page = 'home' | 'journal';
@@ -63,7 +63,6 @@ export default function App() {
   const [authView, setAuthView] = useState<AuthView>('signin');
   const [authStage, setAuthStage] = useState<AuthStage>(getInitialAuthStage);
   const langMenuRef = useRef<HTMLDivElement>(null);
-  const [showTradeModal, setShowTradeModal] = useState(false);
   const [showNewJournalModal, setShowNewJournalModal] = useState(false);
   const [showCSVImport, setShowCSVImport] = useState(false);
   const [newJournalName, setNewJournalName] = useState('');
@@ -318,7 +317,8 @@ export default function App() {
         return;
       }
     }
-    setShowTradeModal(true);
+    setJournalTab('newTrade');
+    setView('expanded');
   };
 
   const handleAddTrade = async (trade: Trade) => {
@@ -343,7 +343,7 @@ export default function App() {
         checklist: data.checklist || [],
       };
       setTrades(prev => [newTrade, ...prev]);
-      setShowTradeModal(false);
+      setJournalTab('trades');
     }
   };
 
@@ -514,16 +514,21 @@ export default function App() {
     if (key === 'referral') { setShowReferral(true); return; }
     if (key === 'pricing') { setView('pricing'); return; }
     if (key === 'journals') { setView('dashboard'); setActiveJournal(null); return; }
+    // Yeni işlem, plan limitlerinden geçmeli.
+    if (key === 'newTrade') { handleNewTradeClick(); return; }
     if (activeJournal) { setView('expanded'); setJournalTab(key as JournalTab); }
   };
 
   const shellTitle =
     view === 'pricing' ? pricingLabel
+    : view === 'expanded' && journalTab === 'newTrade' ? t('newTradeTab')
     : view === 'expanded' && activeJournal ? activeJournal.name
     : t('myJournals');
 
   const shellSubtitle =
-    view === 'expanded' && activeJournal
+    view === 'expanded' && journalTab === 'newTrade' && activeJournal
+      ? activeJournal.name
+      : view === 'expanded' && activeJournal
       ? [formatDate(activeJournal.startDate), activeJournal.startingCapital ? `$${activeJournal.startingCapital.toLocaleString()}` : null]
           .filter(Boolean).join('  ·  ')
       : view === 'dashboard'
@@ -545,7 +550,7 @@ export default function App() {
         <PlusCircle className="w-4 h-4" />
         <span className="hidden sm:inline">{t('newJournal')}</span>
       </button>
-    ) : view === 'expanded' ? (
+    ) : view === 'expanded' && journalTab !== 'newTrade' ? (
       <>
         <button onClick={() => setShowCSVImport(true)}
           className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
@@ -934,22 +939,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Trade Form Modal */}
-        {showTradeModal && (
-          <div className="fixed inset-0 bg-black/80 flex items-start justify-center z-50 p-4 overflow-y-auto">
-            <div className="w-full max-w-4xl my-8">
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-display text-[18px] text-white" style={{ letterSpacing: '-0.01em' }}>{activeJournal?.name}</span>
-                <button onClick={() => setShowTradeModal(false)} className="p-2 rounded-lg transition-all"
-                  style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <TradeForm onSave={handleAddTrade} isPro={isPro} />
-            </div>
-          </div>
-        )}
-
         <AppShell
           active={navKey}
           onNavigate={handleNav}
@@ -988,7 +977,13 @@ export default function App() {
             />
           )}
 
-          {!loading && view === 'expanded' && activeJournal && activeStats && (
+          {!loading && view === 'expanded' && activeJournal && journalTab === 'newTrade' && (
+            <div className="max-w-4xl">
+              <TradeForm onSave={handleAddTrade} isPro={isPro} hideTitle />
+            </div>
+          )}
+
+          {!loading && view === 'expanded' && activeJournal && activeStats && journalTab !== 'newTrade' && (
             <div>
               {/* Journal özeti — kart yok, hizalı sayı sütunları */}
               <div className="flex items-baseline gap-8 sm:gap-14 flex-wrap mb-10 pb-10"
