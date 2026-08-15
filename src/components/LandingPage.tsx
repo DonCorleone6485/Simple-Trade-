@@ -202,7 +202,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: '#8b5cf6' }} />
-            <span className="font-bold tracking-tight text-sm sm:text-base">
+            <span className="font-semibold tracking-tight text-[13px] sm:text-base whitespace-nowrap">
               {t('Simple Trading Journal', 'Simple Trading Journal', 'سیمپل تریدینگ ژورنال')}
             </span>
           </div>
@@ -254,7 +254,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
 
             {!signedIn && (
               <button onClick={onSignIn}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-sm font-semibold transition-all"
+                className="hidden sm:block px-4 py-2 rounded-full text-sm font-medium transition-all"
                 style={{ color: 'rgba(255,255,255,0.8)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.8)'; }}>
@@ -262,7 +262,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               </button>
             )}
             <button onClick={onGetStarted}
-              className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-sm font-semibold transition-all"
+              className="flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-sm font-medium transition-all"
               style={{ background: '#8b5cf6', color: '#fff' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
@@ -274,121 +274,130 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       </header>
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden pt-32 sm:pt-40 pb-20 sm:pb-28">
+      <section className="relative overflow-hidden pt-36 sm:pt-44 pb-24 sm:pb-32">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full blur-3xl opacity-[0.18]"
+          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[700px] rounded-full blur-3xl opacity-[0.16]"
             style={{ background: 'radial-gradient(circle, #8b5cf6, transparent 70%)' }} />
-          <div className="absolute inset-0 opacity-[0.04]" style={{
+          <div className="absolute inset-0 opacity-[0.035]" style={{
             backgroundImage: 'linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)',
-            backgroundSize: '52px 52px',
+            backgroundSize: '64px 64px',
+            maskImage: 'radial-gradient(ellipse 80% 50% at 50% 0%, #000 40%, transparent 100%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 80% 50% at 50% 0%, #000 40%, transparent 100%)',
           }} />
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-14 lg:gap-10 items-center">
-          <motion.div initial="hidden" animate="visible" variants={stagger}>
-            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6"
-              style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', color: '#a78bfa' }}>
-              <Sparkles className="w-4 h-4" />
-              {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم ژورنال معاملاتی')}
-            </motion.div>
-
-            <motion.h1 variants={fadeUp} className="font-display text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.08] font-medium mb-6"
-              style={{ letterSpacing: '-0.01em' }}>
-              {t('Her kayıp bir yerde ', 'Every loss repeats ', 'هر ضرر جایی ')}
-              <span style={{ color: '#a78bfa', fontStyle: 'italic' }}>{t('tekrar eder', 'somewhere', 'تکرار می‌شود')}</span>
-              {t('. Biz o yeri gösteririz.', '. We show you where.', '. ما آن را نشان می‌دهیم.')}
-            </motion.h1>
-
-            <motion.p variants={fadeUp} className="text-lg mb-8 max-w-xl" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              {t(
-                'İşlemlerini kaydet, istatistiklerini gör, kendi kurallarına uy. Simple Trading Journal, trading\'ini duygudan çıkarıp veriye döker.',
-                'Log your trades, see the statistics, follow your own rules. Simple Trading Journal turns your trading from emotion into data.',
-                'معاملات خود را ثبت کنید، آمار را ببینید و از قوانین خود پیروی کنید.'
-              )}
-            </motion.p>
-
-            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <motion.button
-                onClick={onGetStarted}
-                whileHover={{ scale: shouldReduceMotion ? 1 : 1.03 }}
-                whileTap={{ scale: shouldReduceMotion ? 1 : 0.97 }}
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold"
-                style={{ background: '#8b5cf6', color: '#fff' }}>
-                {ctaLabel}
-                <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-              </motion.button>
-              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                {t('Kredi kartı gerekmez • 30 saniyede başla', 'No credit card required • Start in 30 seconds', 'نیازی به کارت اعتباری نیست')}
-              </span>
-            </motion.div>
+        <motion.div initial="hidden" animate="visible" variants={stagger}
+          className="relative max-w-4xl mx-auto px-6 text-center">
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] font-medium mb-8"
+            style={{ background: 'rgba(139,92,246,0.09)', color: '#a78bfa' }}>
+            <Sparkles className="w-3.5 h-3.5" />
+            {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم ژورنال معاملاتی')}
           </motion.div>
 
-          {/* Hero visual: real equity-curve chart */}
-          <motion.div
-            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: shouldReduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="relative"
-          >
-            <div className="relative rounded-2xl p-5 sm:p-6"
-              style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  {t('Kümülatif PnL', 'Cumulative PnL', 'سود/زیان انباشته')}
-                </span>
-                <span className="text-xs font-mono px-2 py-0.5 rounded-full" style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399' }}>
-                  +$1,840
-                </span>
-              </div>
+          {/* İki tonlu başlık: ilk cümle net, ikincisi geri planda */}
+          <motion.h1 variants={fadeUp}
+            className="font-display text-[2rem] sm:text-5xl lg:text-[4.25rem] leading-[1.08] sm:leading-[1.04] font-medium mb-7"
+            style={{ letterSpacing: '-0.025em' }}>
+            <span>
+              {t('Her kayıp bir yerde ', 'Every loss repeats ', 'هر ضرر جایی ')}
+              <span style={{ color: '#a78bfa', fontStyle: 'italic' }}>{t('tekrar eder', 'somewhere', 'تکرار می‌شود')}</span>.
+            </span>
+            <br />
+            <span style={{ color: 'rgba(255,255,255,0.32)' }}>
+              {t('Biz o yeri gösteririz.', 'We show you where.', 'ما آن را نشان می‌دهیم.')}
+            </span>
+          </motion.h1>
 
-              <motion.div
-                className="h-56 sm:h-64 w-full"
-                initial={{ clipPath: 'inset(0 100% 0 0)' }}
-                animate={{ clipPath: 'inset(0 0% 0 0)' }}
-                transition={{ duration: shouldReduceMotion ? 0 : 1.3, delay: shouldReduceMotion ? 0 : 0.8, ease: [0.65, 0, 0.35, 1] }}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={equityData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="heroGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
-                    <XAxis dataKey="i" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 11 }} dy={8} />
-                    <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 11 }} dx={-8} tickFormatter={v => `$${v}`} />
-                    <Tooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }}
-                      formatter={(value: number) => [`$${value}`, t('Kümülatif PnL', 'Cumulative PnL', 'سود/زیان انباشته')]}
-                      labelFormatter={label => `${t('İşlem', 'Trade', 'معامله')} #${label}`} />
-                    <Area type="monotone" dataKey="v" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#heroGradient)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </motion.div>
+          <motion.p variants={fadeUp} className="text-[17px] sm:text-lg mb-10 max-w-2xl mx-auto leading-relaxed"
+            style={{ color: 'rgba(255,255,255,0.5)' }}>
+            {t(
+              'İşlemlerini kaydet, istatistiklerini gör, kendi kurallarına uy. Simple Trading Journal, trading\'ini duygudan çıkarıp veriye döker.',
+              'Log your trades, see the statistics, follow your own rules. Simple Trading Journal turns your trading from emotion into data.',
+              'معاملات خود را ثبت کنید، آمار را ببینید و از قوانین خود پیروی کنید.'
+            )}
+          </motion.p>
+
+          <motion.div variants={fadeUp} className="flex flex-col items-center gap-4">
+            <motion.button
+              onClick={onGetStarted}
+              whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
+              whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
+              className="flex items-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-medium"
+              style={{ background: '#8b5cf6', color: '#fff' }}>
+              {ctaLabel}
+              <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+            </motion.button>
+            <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              {t('Kredi kartı gerekmez · 30 saniyede başla', 'No credit card required · Start in 30 seconds', 'نیازی به کارت اعتباری نیست')}
+            </span>
+          </motion.div>
+        </motion.div>
+
+        {/* Ürün görseli: gerçek kümülatif PnL grafiği */}
+        <motion.div
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: shouldReduceMotion ? 0 : 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="relative max-w-5xl mx-auto px-6 mt-20 sm:mt-24"
+        >
+          <div className="relative rounded-3xl p-6 sm:p-8"
+            style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))', boxShadow: '0 40px 120px -20px rgba(139,92,246,0.25)' }}>
+            <div className="flex items-center justify-between mb-6">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                {t('Kümülatif PnL', 'Cumulative PnL', 'سود/زیان انباشته')}
+              </span>
+              <div className="flex items-center gap-8 sm:gap-10">
+                <div className="text-end">
+                  <div className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    {t('Kazanma Oranı', 'Win Rate', 'نرخ برد')}
+                  </div>
+                  <div className="font-mono text-[15px]" style={{ color: '#fff', fontVariantNumeric: 'tabular-nums' }}>%68</div>
+                </div>
+                <div className="text-end">
+                  <div className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    {t('Net', 'Net', 'خالص')}
+                  </div>
+                  <div className="font-mono text-[15px]" style={{ color: '#34d399', fontVariantNumeric: 'tabular-nums' }}>+$1,840</div>
+                </div>
+              </div>
             </div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.6, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 18, delay: shouldReduceMotion ? 0 : 1.9 }}
-              className="absolute -bottom-5 -start-3 sm:-start-6 rounded-xl px-4 py-3 shadow-2xl"
-              style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.1)' }}
+              className="h-64 sm:h-80 w-full"
+              initial={{ clipPath: 'inset(0 100% 0 0)' }}
+              animate={{ clipPath: 'inset(0 0% 0 0)' }}
+              transition={{ duration: shouldReduceMotion ? 0 : 1.4, delay: shouldReduceMotion ? 0 : 0.9, ease: [0.65, 0, 0.35, 1] }}
             >
-              <div className="text-xs mb-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('Kazanma Oranı', 'Win Rate', 'نرخ برد')}</div>
-              <div className="text-2xl font-bold font-mono" style={{ color: '#34d399' }}>%68</div>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={equityData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="heroGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                  <XAxis dataKey="i" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.22)', fontSize: 11 }} dy={8} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.22)', fontSize: 11 }} dx={-8} tickFormatter={v => `$${v}`} />
+                  <Tooltip contentStyle={{ background: '#12131f', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }}
+                    formatter={(value: number) => [`$${value}`, t('Kümülatif PnL', 'Cumulative PnL', 'سود/زیان انباشته')]}
+                    labelFormatter={label => `${t('İşlem', 'Trade', 'معامله')} #${label}`} />
+                  <Area type="monotone" dataKey="v" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#heroGradient)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </motion.div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* ── NEDEN JOURNAL ── */}
       <motion.section
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={stagger}
-        className="py-20 sm:py-24 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}
+        className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div variants={fadeUp} className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="font-display text-3xl sm:text-4xl font-medium mb-4">
+            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium mb-5" style={{ letterSpacing: '-0.02em' }}>
               {t('Neden Journal Tutmak İşe Yarar?', 'Why Trade Journaling Works', 'چرا ثبت معاملات مؤثر است؟')}
             </h2>
             <p className="text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -399,7 +408,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           <div className="grid sm:grid-cols-3 gap-6">
             {whyItems.map((item, i) => (
               <motion.div key={i} variants={fadeUp} className="rounded-2xl p-6"
-                style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                style={{ background: 'rgba(255,255,255,0.025)' }}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: 'rgba(139,92,246,0.12)', color: '#a78bfa' }}>
                   {item.icon}
                 </div>
@@ -412,11 +421,11 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       </motion.section>
 
       {/* ── ÖZELLİKLER (BENTO) ── */}
-      <section id="features" className="py-20 sm:py-24 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+      <section id="features" className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
             className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="font-display text-3xl sm:text-4xl font-medium mb-4">
+            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium mb-5" style={{ letterSpacing: '-0.02em' }}>
               {t('İhtiyacın Olan Her Araç, Tek Ekranda', 'Every Tool You Need, One Screen', 'هر ابزاری که نیاز دارید، در یک صفحه')}
             </h2>
             <p className="text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -429,7 +438,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             {features.map((f, i) => (
               <motion.div key={i} variants={fadeUp} whileHover={{ y: shouldReduceMotion ? 0 : -4 }}
                 className={`rounded-2xl p-6 relative ${f.span}`}
-                style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                style={{ background: 'rgba(255,255,255,0.025)' }}>
                 {f.pro && (
                   <span className="absolute top-5 end-5 px-2 py-0.5 rounded-full text-xs font-semibold"
                     style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
@@ -448,11 +457,11 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       </section>
 
       {/* ── NASIL ÇALIŞIR ── */}
-      <section id="how-it-works" className="py-20 sm:py-24 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+      <section id="how-it-works" className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
             className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="font-display text-3xl sm:text-4xl font-medium mb-4">
+            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium mb-5" style={{ letterSpacing: '-0.02em' }}>
               {t('4 Adımda Başla', 'Get Started in 4 Steps', 'در ۴ مرحله شروع کنید')}
             </h2>
           </motion.div>
@@ -475,11 +484,11 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       </section>
 
       {/* ── FİYATLANDIRMA ÖNİZLEME ── */}
-      <section id="pricing" className="py-20 sm:py-24 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+      <section id="pricing" className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
             className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="font-display text-3xl sm:text-4xl font-medium mb-4">
+            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium mb-5" style={{ letterSpacing: '-0.02em' }}>
               {t('Sade ve Şeffaf Fiyatlandırma', 'Simple & Transparent Pricing', 'قیمت‌گذاری ساده و شفاف')}
             </h2>
             <p className="text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -489,7 +498,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={stagger}
             className="max-w-3xl mx-auto grid sm:grid-cols-2 gap-6">
-            <motion.div variants={fadeUp} className="rounded-2xl p-8" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <motion.div variants={fadeUp} className="rounded-2xl p-8" style={{ background: 'rgba(255,255,255,0.025)' }}>
               <h3 className="text-lg font-bold mb-1">{t('Ücretsiz', 'Free', 'رایگان')}</h3>
               <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('Başlamak için ideal', 'Perfect to get started', 'ایده‌آل برای شروع')}</p>
               <div className="mb-6">
@@ -509,7 +518,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                 ))}
               </div>
               <button onClick={onGetStarted}
-                className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
+                className="w-full py-3 rounded-full text-sm font-medium transition-all"
                 style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
@@ -543,7 +552,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                 ))}
               </div>
               <button onClick={onGetStarted}
-                className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
+                className="w-full py-3 rounded-full text-sm font-medium transition-all"
                 style={{ background: '#8b5cf6', color: '#fff' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
@@ -555,11 +564,11 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       </section>
 
       {/* ── SSS ── */}
-      <section className="py-20 sm:py-24 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+      <section className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
             className="text-center mb-12">
-            <h2 className="font-display text-3xl sm:text-4xl font-medium">
+            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium" style={{ letterSpacing: '-0.02em' }}>
               {t('Sıkça Sorulan Sorular', 'Frequently Asked Questions', 'سؤالات متداول')}
             </h2>
           </motion.div>
@@ -569,7 +578,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               const isOpen = openFAQ === i;
               return (
                 <motion.div key={i} variants={fadeUp} className="rounded-2xl overflow-hidden"
-                  style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  style={{ background: 'rgba(255,255,255,0.025)' }}>
                   <button onClick={() => setOpenFAQ(isOpen ? null : i)}
                     className="w-full flex items-center justify-between gap-4 px-6 py-5 text-start">
                     <span className="font-medium text-sm sm:text-base">{faq.q}</span>
@@ -588,14 +597,14 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       </section>
 
       {/* ── KAPANIŞ CTA ── */}
-      <section className="py-20 sm:py-24 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+      <section className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
             className="relative rounded-3xl px-6 sm:px-16 py-16 text-center overflow-hidden"
             style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.18), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
             <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full blur-3xl opacity-25"
               style={{ background: 'radial-gradient(circle, #8b5cf6, transparent 70%)' }} />
-            <h2 className="font-display text-3xl sm:text-4xl font-medium mb-4 relative">
+            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium mb-5 relative" style={{ letterSpacing: '-0.02em' }}>
               {t('Trading\'ini Bugün Kaydetmeye Başla', 'Start Logging Your Trading Today', 'همین امروز معاملات خود را ثبت کنید')}
             </h2>
             <p className="text-base mb-8 relative" style={{ color: 'rgba(255,255,255,0.6)' }}>
@@ -603,7 +612,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             </p>
             <motion.button onClick={onGetStarted}
               whileHover={{ scale: shouldReduceMotion ? 1 : 1.03 }} whileTap={{ scale: shouldReduceMotion ? 1 : 0.97 }}
-              className="relative inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-semibold"
+              className="relative inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-[15px] font-medium"
               style={{ background: '#8b5cf6', color: '#fff' }}>
               {ctaLabel}
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
