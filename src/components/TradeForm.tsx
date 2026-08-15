@@ -459,21 +459,12 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
     ? t('reward')
     : t('rewardOrLossLabel');
 
+  /** Sonuç yalnızca tutar alanını yönetir — R/R kullanıcının girdiği gibi kalır. */
   const handleResultChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value as TradeResult | '';
     setResult(val);
-    if (val === 'Başa Baş') {
-      // Ne kâr ne zarar: tutar da R/R de sıfırdır.
-      setRr('0');
-      setReward('0');
-    } else if (val === 'Başarısız' || val === 'Manuel Zararda') {
-      if (reward === '0') setReward('');
-      if (!rr) setRr('-1');
-      else if (parseFloat(rr) > 0) setRr((parseFloat(rr) * -1).toString());
-    } else {
-      if (reward === '0') setReward('');
-      if (rr && parseFloat(rr) < 0) setRr(Math.abs(parseFloat(rr)).toString());
-    }
+    if (val === 'Başa Baş') setReward('0');
+    else if (reward === '0') setReward('');
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
