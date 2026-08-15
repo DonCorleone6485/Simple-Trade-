@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Plus, X, Pencil, Check, Square, CheckSquare } from 'lucide-react';
+import { Plus, X, Pencil, Check, Square, CheckSquare, RotateCcw } from 'lucide-react';
 import { ChecklistItem } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
@@ -154,6 +154,12 @@ export default function Checklist({ value, onChange, syncTemplate = false }: Che
     cancelDraft();
   };
 
+  const loadSamples = () => {
+    const samples = (language === 'tr' ? SAMPLE_ITEMS.tr : SAMPLE_ITEMS.en).map(i => ({ ...i, checked: false }));
+    commit(samples);
+    persistTemplate(samples);
+  };
+
   const removeItem = (id: string) => {
     const next = itemsRef.current.filter(i => i.id !== id);
     commit(next);
@@ -238,14 +244,28 @@ export default function Checklist({ value, onChange, syncTemplate = false }: Che
       {adding && draftBox}
 
       {!adding && !editingId && (
-        <button type="button" onClick={startAdd}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
-          style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.16)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
-          <Plus className="w-4 h-4" />
-          {tr('Madde Ekle', 'Add Item')}
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button type="button" onClick={startAdd}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+            style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.16)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
+            <Plus className="w-4 h-4" />
+            {tr('Madde Ekle', 'Add Item')}
+          </button>
+
+          {/* Maddelerin hepsi silinmişse örneklere dönüş yolu açık kalsın. */}
+          {items.length === 0 && (
+            <button type="button" onClick={loadSamples}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
+              style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.1)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.09)'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.55)'; }}>
+              <RotateCcw className="w-4 h-4" />
+              {tr('Örnek maddeleri yükle', 'Load sample items')}
+            </button>
+          )}
+        </div>
       )}
 
       {syncTemplate && items.length > 0 && (
