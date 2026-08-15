@@ -54,7 +54,9 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
   const grossProfit = wins.reduce((s, t) => s + (t.reward || 0), 0);
   const grossLoss = losses.reduce((s, t) => s + (t.risk || 0), 0);
   const monthlyPnL = grossProfit - grossLoss;
-  const currentWinRate = monthTrades.length > 0 ? ((wins.length / monthTrades.length) * 100) : 0;
+  // Başa baş işlemler oranın paydasına girmez.
+  const decidedTrades = wins.length + losses.length;
+  const currentWinRate = decidedTrades > 0 ? ((wins.length / decidedTrades) * 100) : 0;
 
   const todayTrades = trades.filter(t => {
     const d = new Date(t.date);

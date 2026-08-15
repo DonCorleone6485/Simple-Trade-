@@ -68,6 +68,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
     if (result === 'Başarısız') return t('lossStatus');
     if (result === 'Manuel Karda') return t('resultManualWin');
     if (result === 'Manuel Zararda') return t('resultManualLoss');
+    if (result === 'Başa Baş') return t('resultBreakeven');
     return t('openStatus');
   };
 
@@ -90,7 +91,9 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
   const monthProfit = monthWins.reduce((s, t) => s + (t.reward || 0), 0);
   const monthLoss = monthLosses.reduce((s, t) => s + (t.risk || 0), 0);
   const monthNetPnL = monthProfit - monthLoss;
-  const monthWinRate = monthTrades.length > 0 ? ((monthWins.length / monthTrades.length) * 100).toFixed(0) : '0';
+  // Başa baş işlemler oranın paydasına girmez.
+  const monthDecided = monthWins.length + monthLosses.length;
+  const monthWinRate = monthDecided > 0 ? ((monthWins.length / monthDecided) * 100).toFixed(0) : '0';
 
   return (
     <div className="space-y-6">

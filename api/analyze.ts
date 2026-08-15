@@ -17,7 +17,8 @@ export default async function handler(req: any, res: any) {
 
     const wins = trades.filter((t: any) => t.result === 'Başarılı' || t.result === 'Manuel Karda');
     const losses = trades.filter((t: any) => t.result === 'Başarısız' || t.result === 'Manuel Zararda');
-    const winRate = ((wins.length / trades.length) * 100).toFixed(1);
+    const decided = wins.length + losses.length;
+    const winRate = decided > 0 ? ((wins.length / decided) * 100).toFixed(1) : '0.0';
     const grossProfit = wins.reduce((s: number, t: any) => s + (t.reward || 0), 0);
     const grossLoss = losses.reduce((s: number, t: any) => s + (t.risk || 0), 0);
     const netPnL = grossProfit - grossLoss;

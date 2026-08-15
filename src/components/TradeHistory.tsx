@@ -64,7 +64,6 @@ export default function TradeHistory({
   };
 
   const SETUPS = ['FVG', 'OB', 'BOS / ChoCH', 'Liquidity Sweep', 'EQH / EQL', 'Breaker Block', 'Mitigation', 'VWAP', 'Trend Pullback', 'Range Breakout', 'Diğer'];
-  const TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1'];
 
   const runAiAnalysis = async () => {
     setAiLoading(true);
@@ -92,6 +91,7 @@ export default function TradeHistory({
     if (result === 'Başarısız') return t('lossStatus');
     if (result === 'Manuel Karda') return t('resultManualWin');
     if (result === 'Manuel Zararda') return t('resultManualLoss');
+    if (result === 'Başa Baş') return t('resultBreakeven');
     return t('openStatus');
   };
 
@@ -121,7 +121,9 @@ export default function TradeHistory({
   const winningTrades = closedTrades.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda');
   const losingTrades = closedTrades.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda');
   const totalClosed = closedTrades.length;
-  const winRate = totalClosed > 0 ? ((winningTrades.length / totalClosed) * 100).toFixed(1) : '0.0';
+  // Başa baş işlemler ne kazanç ne kayıp — oranın paydasına girmezler.
+  const decidedTrades = winningTrades.length + losingTrades.length;
+  const winRate = decidedTrades > 0 ? ((winningTrades.length / decidedTrades) * 100).toFixed(1) : '0.0';
   const getLossAmount = (t: Trade) => (t.reward || 0) < 0 ? Math.abs(t.reward || 0) : (t.risk || 0);
   const grossProfit = winningTrades.reduce((sum, t) => sum + (t.reward || 0), 0);
   const grossLoss = losingTrades.reduce((sum, t) => sum + getLossAmount(t), 0);
@@ -135,7 +137,9 @@ export default function TradeHistory({
 
   const chartData = sortedByDate.reduce((acc: any[], trade, index) => {
     const prevTotal = index > 0 ? acc[index - 1].cumulative : 0;
-    const pnl = (trade.result === 'Başarılı' || trade.result === 'Manuel Karda') ? (trade.reward || 0) : -getLossAmount(trade);
+    const isWinTrade = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
+    const isLossTrade = trade.result === 'Başarısız' || trade.result === 'Manuel Zararda';
+    const pnl = isWinTrade ? (trade.reward || 0) : isLossTrade ? -getLossAmount(trade) : 0;
     acc.push({ name: index + 1, date: getDayDate(trade.date), pnl, cumulative: prevTotal + pnl, isWin: pnl >= 0 });
     return acc;
   }, []);
@@ -150,7 +154,9 @@ export default function TradeHistory({
     if (sortedByDate.length === 0) return { current: 0, currentType: 'win' as 'win' | 'loss', bestWin: 0, bestLoss: 0 };
     let current = 0, currentType: 'win' | 'loss' = 'win', bestWin = 0, bestLoss = 0, tempStreak = 0;
     let tempType: 'win' | 'loss' = 'win';
-    sortedByDate.forEach((trade, i) => {
+    const decided = sortedByDate.filter(t => t.result !== 'Başa Baş');
+    if (decided.length === 0) return { current: 0, currentType: 'win' as 'win' | 'loss', bestWin: 0, bestLoss: 0 };
+    decided.forEach((trade, i) => {
       const isWin = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
       const tradeType: 'win' | 'loss' = isWin ? 'win' : 'loss';
       if (i === 0) { tempStreak = 1; tempType = tradeType; }
@@ -160,7 +166,7 @@ export default function TradeHistory({
         else bestLoss = Math.max(bestLoss, tempStreak);
         tempStreak = 1; tempType = tradeType;
       }
-      if (i === sortedByDate.length - 1) {
+      if (i === decided.length - 1) {
         current = tempStreak; currentType = tempType;
         if (tempType === 'win') bestWin = Math.max(bestWin, tempStreak);
         else bestLoss = Math.max(bestLoss, tempStreak);
@@ -181,8 +187,9 @@ export default function TradeHistory({
     const st = closedTrades.filter(t => getSession(t.date) === session);
     const wins = st.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').length;
     const profit = st.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').reduce((s, t) => s + (t.reward || 0), 0);
+    const lossCount = st.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda').length;
     const loss = st.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda').reduce((s, t) => s + (t.risk || 0), 0);
-    return { session, rate: st.length > 0 ? ((wins / st.length) * 100).toFixed(0) : 0, total: st.length, pnl: profit - loss };
+    return { session, rate: wins + lossCount > 0 ? ((wins / (wins + lossCount)) * 100).toFixed(0) : 0, total: st.length, pnl: profit - loss };
   });
 
   const getDayKey = (dateStr: string) => {
@@ -194,36 +201,37 @@ export default function TradeHistory({
     const dt = closedTrades.filter(t => getDayKey(t.date) === day);
     const wins = dt.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').length;
     const profit = dt.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').reduce((s, t) => s + (t.reward || 0), 0);
+    const lossCount = dt.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda').length;
     const loss = dt.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda').reduce((s, t) => s + (t.risk || 0), 0);
-    return { day, rate: dt.length > 0 ? ((wins / dt.length) * 100).toFixed(0) : 0, total: dt.length, pnl: profit - loss };
+    return { day, rate: wins + lossCount > 0 ? ((wins / (wins + lossCount)) * 100).toFixed(0) : 0, total: dt.length, pnl: profit - loss };
   }).filter(d => d.total > 0);
 
   const setupStats = (() => {
-    const map: Record<string, { wins: number; total: number; pnl: number }> = {};
+    const map: Record<string, { wins: number; losses: number; total: number; pnl: number }> = {};
     closedTrades.forEach(trade => {
       const key = trade.setup || 'Diğer';
-      if (!map[key]) map[key] = { wins: 0, total: 0, pnl: 0 };
+      if (!map[key]) map[key] = { wins: 0, losses: 0, total: 0, pnl: 0 };
       map[key].total++;
       const isWin = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
       const isLoss = trade.result === 'Başarısız' || trade.result === 'Manuel Zararda';
       if (isWin) { map[key].wins++; map[key].pnl += (trade.reward || 0); }
-      if (isLoss) { map[key].pnl -= getLossAmount(trade); }
+      if (isLoss) { map[key].losses++; map[key].pnl -= getLossAmount(trade); }
     });
-    return Object.entries(map).map(([setup, s]) => ({ setup, ...s, winRate: ((s.wins / s.total) * 100).toFixed(0) })).sort((a, b) => b.pnl - a.pnl);
+    return Object.entries(map).map(([setup, s]) => ({ setup, ...s, winRate: s.wins + s.losses > 0 ? ((s.wins / (s.wins + s.losses)) * 100).toFixed(0) : '0' })).sort((a, b) => b.pnl - a.pnl);
   })();
 
   const symbolStats = (() => {
-    const map: Record<string, { wins: number; total: number; pnl: number }> = {};
+    const map: Record<string, { wins: number; losses: number; total: number; pnl: number }> = {};
     closedTrades.forEach(trade => {
       const key = trade.symbol;
-      if (!map[key]) map[key] = { wins: 0, total: 0, pnl: 0 };
+      if (!map[key]) map[key] = { wins: 0, losses: 0, total: 0, pnl: 0 };
       map[key].total++;
       const isWin = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
       const isLoss = trade.result === 'Başarısız' || trade.result === 'Manuel Zararda';
       if (isWin) { map[key].wins++; map[key].pnl += (trade.reward || 0); }
-      if (isLoss) { map[key].pnl -= getLossAmount(trade); }
+      if (isLoss) { map[key].losses++; map[key].pnl -= getLossAmount(trade); }
     });
-    return Object.entries(map).map(([symbol, s]) => ({ symbol, ...s, winRate: ((s.wins / s.total) * 100).toFixed(0) })).sort((a, b) => b.pnl - a.pnl).slice(0, 8);
+    return Object.entries(map).map(([symbol, s]) => ({ symbol, ...s, winRate: s.wins + s.losses > 0 ? ((s.wins / (s.wins + s.losses)) * 100).toFixed(0) : '0' })).sort((a, b) => b.pnl - a.pnl).slice(0, 8);
   })();
 
   const heatMapData = (() => {
@@ -631,13 +639,6 @@ export default function TradeHistory({
               </select>
             </div>
             <div>
-              <label style={lbl}>{t('timeframe')}</label>
-              <select style={{ ...inp, cursor: 'pointer' }} value={editForm.timeframe || ''} onChange={e => setEditForm(f => ({ ...f, timeframe: e.target.value }))}>
-                <option value="" style={{ background: '#1a1b2e' }}>—</option>
-                {TIMEFRAMES.map(tf => <option key={tf} value={tf} style={{ background: '#1a1b2e' }}>{tf}</option>)}
-              </select>
-            </div>
-            <div>
               <label style={lbl}>{t('setup')}</label>
               <select style={{ ...inp, cursor: 'pointer' }} value={editForm.setup || ''} onChange={e => setEditForm(f => ({ ...f, setup: e.target.value }))}>
                 <option value="" style={{ background: '#1a1b2e' }}>—</option>
@@ -663,6 +664,7 @@ export default function TradeHistory({
                 <option value="Başarısız" style={{ background: '#1a1b2e' }}>{t('resultLoss')}</option>
                 <option value="Manuel Karda" style={{ background: '#1a1b2e' }}>{t('resultManualWin')}</option>
                 <option value="Manuel Zararda" style={{ background: '#1a1b2e' }}>{t('resultManualLoss')}</option>
+                <option value="Başa Baş" style={{ background: '#1a1b2e' }}>{t('resultBreakeven')}</option>
               </select>
             </div>
           </div>
@@ -821,11 +823,6 @@ export default function TradeHistory({
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-lg font-bold text-white">{selectedTrade.symbol}</span>
-                    {selectedTrade.timeframe && (
-                      <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
-                        {selectedTrade.timeframe}
-                      </span>
-                    )}
                     {selectedTrade.setup && (
                       <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa' }}>
                         {selectedTrade.setup}
@@ -1022,11 +1019,6 @@ export default function TradeHistory({
                       <span className="w-10 sm:w-14 text-sm font-medium" style={{ color: trade.type === 'Buy' ? '#34d399' : '#f87171' }}>
                         {trade.type === 'Buy' ? t('buy') : t('sell')}
                       </span>
-                      {trade.timeframe && (
-                        <span className="hidden sm:block text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.35)' }}>
-                          {trade.timeframe}
-                        </span>
-                      )}
                       {trade.setup && (
                         <span className="hidden md:block text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa' }}>
                           {trade.setup}

@@ -43,6 +43,7 @@ export const translations: Translations = {
   resultLoss: { tr: 'Başarısız', en: 'Loss', fa: 'ناموفق', ar: 'خسارة', ru: 'Убыток', es: 'Perdida', pt: 'Perdida', de: 'Verlust', fr: 'Perdu' },
   resultManualWin: { tr: 'Karda manuel kapattım', en: 'Closed Manually (Profit)', fa: 'بسته شده دستی (سود)', ar: 'أغلقت يدوياً (ربح)', ru: 'Закрыта вручную (прибыль)', es: 'Cerrada manualmente (beneficio)', pt: 'Fechada manualmente (lucro)', de: 'Manuell geschlossen (Gewinn)', fr: 'Fermée manuellement (profit)' },
   resultManualLoss: { tr: 'Zararda manuel kapattım', en: 'Closed Manually (Loss)', fa: 'بسته شده دستی (ضرر)', ar: 'أغلقت يدوياً (خسارة)', ru: 'Закрыта вручную (убыток)', es: 'Cerrada manualmente (pérdida)', pt: 'Fechada manualmente (perda)', de: 'Manuell geschlossen (Verlust)', fr: 'Fermée manuellement (perte)' },
+  resultBreakeven: { tr: 'Başa baş kapattım', en: 'Breakeven', fa: 'سر به سر', ar: 'تعادل', ru: 'Безубыток', es: 'Sin pérdida ni ganancia', pt: 'Empate', de: 'Break-even', fr: 'Seuil de rentabilité' },
   preTrade: { tr: 'İşlem Öncesi', en: 'Pre-Trade', fa: 'قبل از معامله', ar: 'قبل الصفقة', ru: 'До сделки', es: 'Pre-operación', pt: 'Pré-operação', de: 'Vor dem Trade', fr: 'Avant le trade' },
   postTrade: { tr: 'İşlem Sonrası', en: 'Post-Trade', fa: 'بعد از معامله', ar: 'بعد الصفقة', ru: 'После сделки', es: 'Post-operación', pt: 'Pós-operação', de: 'Nach dem Trade', fr: 'Après le trade' },
   photos: { tr: 'Fotoğraflar', en: 'Photos', fa: 'عکس‌ها', ar: 'الصور', ru: 'Фото', es: 'Fotos', pt: 'Fotos', de: 'Fotos', fr: 'Photos' },

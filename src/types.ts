@@ -16,6 +16,14 @@ export interface JournalGoals {
   noTradeHoursEnd?: number;
 }
 
+/** "Başa Baş" ne kâr ne zarar sayılır — kazanma oranı paydasına da girmez. */
+export type TradeResult =
+  | 'Başarılı'
+  | 'Başarısız'
+  | 'Manuel Karda'
+  | 'Manuel Zararda'
+  | 'Başa Baş';
+
 export type MTFBias = 'bullish' | 'bearish' | 'consolidation';
 
 /** Tek bir timeframe için multi-timeframe analiz kaydı. */
@@ -38,7 +46,7 @@ export interface Trade {
   risk: number;
   reward: number;
   rr: string;
-  result: 'Başarılı' | 'Başarısız' | 'Manuel Karda' | 'Manuel Zararda';
+  result: TradeResult;
   preTradeNotes: string;
   postTradeNotes: string;
   preTradePhotos: string[];

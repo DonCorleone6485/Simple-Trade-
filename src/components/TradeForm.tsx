@@ -4,7 +4,7 @@ import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
-import { Trade, MTFEntry } from '../types';
+import { Trade, MTFEntry, TradeResult } from '../types';
 import MTFAnalysis from './MTFAnalysis';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
@@ -84,8 +84,6 @@ const DEFAULT_SETUPS = [
   'EQH / EQL', 'Breaker Block', 'Mitigation',
   'VWAP', 'Trend Pullback', 'Range Breakout',
 ];
-
-const TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1'];
 
 // ── SYMBOL PICKER ──────────────────────────────────────────────────────────
 function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -415,15 +413,14 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
   const isOwner = user?.primaryEmailAddress?.emailAddress === OWNER_EMAIL;
   const photoLimit = isOwner ? Infinity : isPro ? PHOTO_LIMIT_PRO : PHOTO_LIMIT_FREE;
 
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(() => new Date().toISOString());
   const [symbol, setSymbol] = useState('EURUSD');
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
-  const [timeframe, setTimeframe] = useState('H1');
   const [setup, setSetup] = useState('');
   const [risk, setRisk] = useState('');
   const [reward, setReward] = useState('');
   const [rr, setRr] = useState('');
-  const [result, setResult] = useState<'Başarılı' | 'Başarısız' | 'Manuel Karda' | 'Manuel Zararda'>('Başarılı');
+  const [result, setResult] = useState<TradeResult>('Başarılı');
   const [preNotes, setPreNotes] = useState('');
   const [postNotes, setPostNotes] = useState('');
   const [mtf, setMtf] = useState<MTFEntry[]>([]);
@@ -444,9 +441,12 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
   };
 
   const handleResultChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = e.target.value as 'Başarılı' | 'Başarısız' | 'Manuel Karda' | 'Manuel Zararda';
+    const val = e.target.value as TradeResult;
     setResult(val);
-    if (val === 'Başarısız' || val === 'Manuel Zararda') {
+    if (val === 'Başa Baş') {
+      // Ne kâr ne zarar: R/R sıfırdır.
+      setRr('0');
+    } else if (val === 'Başarısız' || val === 'Manuel Zararda') {
       if (!rr) setRr('-1');
       else if (parseFloat(rr) > 0) setRr((parseFloat(rr) * -1).toString());
     } else {
@@ -497,7 +497,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
     if (!date) { alert(t('pleaseSelectDate') || 'Lütfen tarih seçin'); return; }
     const newTrade: Trade = {
       id: Date.now().toString(),
-      date, symbol, type, timeframe, setup,
+      date, symbol, type, setup,
       risk: parseFloat(risk) || 0, reward: parseFloat(reward) || 0,
       rr, result,
       preTradeNotes: preNotes, postTradeNotes: postNotes,
@@ -505,7 +505,8 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
       mtfAnalysis: mtf.length > 0 ? mtf : undefined,
     };
     onSave(newTrade);
-    setDate(''); setSymbol('EURUSD'); setTimeframe('H1');
+    // Bir sonraki kayıt için tarihi tekrar "şu an"a al.
+    setDate(new Date().toISOString()); setSymbol('EURUSD');
     setSetup(''); setRisk(''); setReward(''); setRr('');
     setPreNotes(''); setPostNotes('');
     setPrePhotos([]); setPostPhotos([]); setMtf([]);
@@ -546,12 +547,6 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
             </select>
           </div>
           <div>
-            <label style={lbl}>{t('timeframe')}</label>
-            <select value={timeframe} onChange={e => setTimeframe(e.target.value)} style={selStyle}>
-              {TIMEFRAMES.map(tf => <option key={tf} value={tf} style={optStyle}>{tf}</option>)}
-            </select>
-          </div>
-          <div>
             <label style={lbl}>{t('setup')}</label>
             <SetupPicker value={setup} onChange={setSetup} />
           </div>
@@ -587,6 +582,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
                 <option value="Başarısız" style={optStyle}>{t('resultLoss')}</option>
                 <option value="Manuel Karda" style={optStyle}>{t('resultManualWin')}</option>
                 <option value="Manuel Zararda" style={optStyle}>{t('resultManualLoss')}</option>
+                <option value="Başa Baş" style={optStyle}>{t('resultBreakeven')}</option>
               </select>
             </div>
           </div>

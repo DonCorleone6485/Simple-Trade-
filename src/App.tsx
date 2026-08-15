@@ -457,7 +457,9 @@ export default function App() {
     const jt = trades.filter(tr => tr.accountId === accountId);
     const wins = jt.filter(tr => tr.result === 'Başarılı' || tr.result === 'Manuel Karda');
     const losses = jt.filter(tr => tr.result === 'Başarısız' || tr.result === 'Manuel Zararda');
-    const winRate = jt.length > 0 ? ((wins.length / jt.length) * 100).toFixed(0) : '0';
+    // Başa baş işlemler ne kazanç ne kayıp — oranın paydasına girmezler.
+    const decided = wins.length + losses.length;
+    const winRate = decided > 0 ? ((wins.length / decided) * 100).toFixed(0) : '0';
     const grossProfit = wins.reduce((s, tr) => s + (tr.reward || 0), 0);
     const grossLoss = losses.reduce((s, tr) => s + (tr.risk || 0), 0);
     const netPnL = grossProfit - grossLoss;
