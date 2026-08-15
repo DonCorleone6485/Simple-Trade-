@@ -237,6 +237,21 @@ export default function App() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // ── YENİ JOURNAL VARSAYILANLARI ──
+  /** Mevcut isimlerle çakışmayan ilk "Journal N". */
+  const suggestJournalName = () => {
+    let n = 1;
+    while (accounts.some(a => a.name.trim().toLowerCase() === `journal ${n}`)) n++;
+    return `Journal ${n}`;
+  };
+
+  /** input[type=date] için yerel saate göre bugünün tarihi. */
+  const todayForDateInput = () => {
+    const d = new Date();
+    const pad = (v: number) => String(v).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  };
+
   // ── JOURNAL LİMİT KONTROLÜ ──
   const handleNewJournalClick = () => {
     if (!isPro && accounts.length >= 1) {
@@ -244,6 +259,9 @@ export default function App() {
       setShowUpgradeModal(true);
       return;
     }
+    setNewJournalName(suggestJournalName());
+    setNewJournalStartDate(todayForDateInput());
+    setNewJournalCapital('10000');
     setShowNewJournalModal(true);
   };
 
@@ -787,6 +805,7 @@ export default function App() {
                 <div>
                   <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('journalName')}</label>
                   <input type="text" value={newJournalName} onChange={e => setNewJournalName(e.target.value)} placeholder={t('journalNamePlaceholder')} autoFocus
+                    onFocus={e => e.target.select()}
                     className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
                     style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
                 </div>
