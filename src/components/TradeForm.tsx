@@ -427,7 +427,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
   const [risk, setRisk] = useState('');
   const [reward, setReward] = useState('');
   const [rr, setRr] = useState('');
-  const [result, setResult] = useState<TradeResult>('Başarılı');
+  const [result, setResult] = useState<TradeResult | ''>('');
   const [preNotes, setPreNotes] = useState('');
   const [postNotes, setPostNotes] = useState('');
   const [mtf, setMtf] = useState<MTFEntry[]>([]);
@@ -448,16 +448,30 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
     return { url: urlData.publicUrl };
   };
 
+  const isLossResult = result === 'Başarısız' || result === 'Manuel Zararda';
+  const isWinResult = result === 'Başarılı' || result === 'Manuel Karda';
+  const isBreakevenResult = result === 'Başa Baş';
+
+  /** Tutar alanının başlığı sonuca göre değişir; sonuç seçilmeden ikisi de yazar. */
+  const amountLabel = isLossResult
+    ? t('lossAmountLabel')
+    : isWinResult
+    ? t('reward')
+    : t('rewardOrLossLabel');
+
   const handleResultChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = e.target.value as TradeResult;
+    const val = e.target.value as TradeResult | '';
     setResult(val);
     if (val === 'Başa Baş') {
-      // Ne kâr ne zarar: R/R sıfırdır.
+      // Ne kâr ne zarar: tutar da R/R de sıfırdır.
       setRr('0');
+      setReward('0');
     } else if (val === 'Başarısız' || val === 'Manuel Zararda') {
+      if (reward === '0') setReward('');
       if (!rr) setRr('-1');
       else if (parseFloat(rr) > 0) setRr((parseFloat(rr) * -1).toString());
     } else {
+      if (reward === '0') setReward('');
       if (rr && parseFloat(rr) < 0) setRr(Math.abs(parseFloat(rr)).toString());
     }
   };
@@ -506,8 +520,10 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
     const newTrade: Trade = {
       id: Date.now().toString(),
       date, symbol, type, orderType, setup,
-      risk: parseFloat(risk) || 0, reward: parseFloat(reward) || 0,
-      rr, result,
+      risk: parseFloat(risk) || 0,
+      // Kullanıcı her zaman pozitif yazar; kayıpta değeri negatife çeviriyoruz.
+      reward: isBreakevenResult ? 0 : (isLossResult ? -1 : 1) * Math.abs(parseFloat(reward) || 0),
+      rr, result: result as TradeResult,
       preTradeNotes: preNotes, postTradeNotes: postNotes,
       preTradePhotos: prePhotos, postTradePhotos: postPhotos,
       mtfAnalysis: mtf.length > 0 ? mtf : undefined,
@@ -520,7 +536,7 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
     setPreNotes(''); setPostNotes('');
     setPrePhotos([]); setPostPhotos([]); setMtf([]);
     setChecklist(prev => prev.map(i => ({ ...i, checked: false })));
-    setResult('Başarılı');
+    setResult('');
   };
 
   return (
@@ -604,22 +620,30 @@ export default function TradeForm({ onSave, isPro = false }: TradeFormProps) {
               </div>
             </div>
             <div>
-              <label style={lbl}>{t('reward')}<Req /></label>
-              <div className="relative">
-                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                <input type="number" step="0.01" required value={reward} onChange={e => setReward(e.target.value)}
-                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
-              </div>
-            </div>
-            <div>
               <label style={lbl}>{t('result')}<Req /></label>
-              <select value={result} onChange={handleResultChange} style={selStyle}>
+              <select value={result} onChange={handleResultChange} required style={selStyle}>
+                <option value="" style={optStyle}>{t('selectPlaceholder')}</option>
                 <option value="Başarılı" style={optStyle}>{t('resultWin')}</option>
                 <option value="Başarısız" style={optStyle}>{t('resultLoss')}</option>
                 <option value="Manuel Karda" style={optStyle}>{t('resultManualWin')}</option>
                 <option value="Manuel Zararda" style={optStyle}>{t('resultManualLoss')}</option>
                 <option value="Başa Baş" style={optStyle}>{t('resultBreakeven')}</option>
               </select>
+            </div>
+            <div>
+              <label style={lbl}>
+                <span style={{ color: isLossResult ? '#f87171' : isWinResult ? '#34d399' : 'rgba(255,255,255,0.55)' }}>
+                  {amountLabel}
+                </span>
+                <Req />
+              </label>
+              <div className="relative">
+                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                <input type="number" min="0" step="0.01" required readOnly={isBreakevenResult}
+                  value={reward} onChange={e => setReward(e.target.value)}
+                  style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace', opacity: isBreakevenResult ? 0.6 : 1 }}
+                  placeholder="0.00" />
+              </div>
             </div>
           </div>
         </div>

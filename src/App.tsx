@@ -20,6 +20,7 @@ import LandingPage from './components/LandingPage';
 import { Trade, Account, JournalGoals } from './types';
 import { useLanguage } from './context/LanguageContext';
 import { supabase } from './lib/supabase';
+import { isWinTrade, isLossTrade, lossAmount, winAmount } from './lib/tradeMath';
 
 type View = 'dashboard' | 'expanded' | 'pricing';
 type JournalTab = 'trades' | 'calendar' | 'stats' | 'goals';
@@ -459,13 +460,13 @@ export default function App() {
 
   const getJournalStats = (accountId: string) => {
     const jt = trades.filter(tr => tr.accountId === accountId);
-    const wins = jt.filter(tr => tr.result === 'Başarılı' || tr.result === 'Manuel Karda');
-    const losses = jt.filter(tr => tr.result === 'Başarısız' || tr.result === 'Manuel Zararda');
+    const wins = jt.filter(isWinTrade);
+    const losses = jt.filter(isLossTrade);
     // Başa baş işlemler ne kazanç ne kayıp — oranın paydasına girmezler.
     const decided = wins.length + losses.length;
     const winRate = decided > 0 ? ((wins.length / decided) * 100).toFixed(0) : '0';
-    const grossProfit = wins.reduce((s, tr) => s + (tr.reward || 0), 0);
-    const grossLoss = losses.reduce((s, tr) => s + (tr.risk || 0), 0);
+    const grossProfit = wins.reduce((s, tr) => s + winAmount(tr), 0);
+    const grossLoss = losses.reduce((s, tr) => s + lossAmount(tr), 0);
     const netPnL = grossProfit - grossLoss;
     const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : grossProfit > 0 ? '∞' : '0.00';
     return { total: jt.length, winRate, netPnL, profitFactor };

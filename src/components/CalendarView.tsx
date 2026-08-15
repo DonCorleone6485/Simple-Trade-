@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL } from '../lib/tradeMath';
 
 
 interface CalendarViewProps {
@@ -45,10 +46,10 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
   const getDayStats = (day: number) => {
     const dayTrades = getTradesForDay(day);
     if (dayTrades.length === 0) return null;
-    const wins = dayTrades.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda');
-    const losses = dayTrades.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda');
-    const grossProfit = wins.reduce((s, t) => s + (t.reward || 0), 0);
-    const grossLoss = losses.reduce((s, t) => s + (t.risk || 0), 0);
+    const wins = dayTrades.filter(isWinTrade);
+    const losses = dayTrades.filter(isLossTrade);
+    const grossProfit = wins.reduce((s, t) => s + winAmount(t), 0);
+    const grossLoss = losses.reduce((s, t) => s + lossAmount(t), 0);
     const netPnL = grossProfit - grossLoss;
     return { total: dayTrades.length, netPnL, wins: wins.length, losses: losses.length };
   };
@@ -86,10 +87,10 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
     const d = new Date(t.date);
     return d.getFullYear() === year && d.getMonth() === month;
   });
-  const monthWins = monthTrades.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda');
-  const monthLosses = monthTrades.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda');
-  const monthProfit = monthWins.reduce((s, t) => s + (t.reward || 0), 0);
-  const monthLoss = monthLosses.reduce((s, t) => s + (t.risk || 0), 0);
+  const monthWins = monthTrades.filter(isWinTrade);
+  const monthLosses = monthTrades.filter(isLossTrade);
+  const monthProfit = monthWins.reduce((s, t) => s + winAmount(t), 0);
+  const monthLoss = monthLosses.reduce((s, t) => s + lossAmount(t), 0);
   const monthNetPnL = monthProfit - monthLoss;
   // Başa baş işlemler oranın paydasına girmez.
   const monthDecided = monthWins.length + monthLosses.length;
@@ -110,7 +111,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
                 const key = tr.date.split('T')[0];
                 const isW = tr.result === 'Başarılı' || tr.result === 'Manuel Karda';
                 const isL = tr.result === 'Başarısız' || tr.result === 'Manuel Zararda';
-                days[key] = (days[key] || 0) + (isW ? (tr.reward || 0) : isL ? -(tr.risk || 0) : 0);
+                days[key] = (days[key] || 0) + tradePnL(tr);
               });
               const best = Math.max(...Object.values(days));
               return best > 0 ? `+$${best.toFixed(0)}` : '-';
@@ -260,7 +261,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
             {selectedTrades.map(trade => {
               const isWin = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
               const isLoss = trade.result === 'Başarısız' || trade.result === 'Manuel Zararda';
-              const pnl = isWin ? (trade.reward || 0) : isLoss ? -(trade.risk || 0) : 0;
+              const pnl = tradePnL(trade);
 
               return (
                 <div key={trade.id} className="px-6 py-4 flex items-center gap-6">

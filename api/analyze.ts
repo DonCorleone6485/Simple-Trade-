@@ -19,35 +19,34 @@ export default async function handler(req: any, res: any) {
     const losses = trades.filter((t: any) => t.result === 'Başarısız' || t.result === 'Manuel Zararda');
     const decided = wins.length + losses.length;
     const winRate = decided > 0 ? ((wins.length / decided) * 100).toFixed(1) : '0.0';
-    const grossProfit = wins.reduce((s: number, t: any) => s + (t.reward || 0), 0);
-    const grossLoss = losses.reduce((s: number, t: any) => s + (t.risk || 0), 0);
+    // Kayıp tutarı: yeni kayıtlarda reward negatif, eskilerde risk alanında.
+    const lossOf = (t: any) => ((t.reward || 0) < 0 ? Math.abs(t.reward || 0) : (t.risk || 0));
+    const grossProfit = wins.reduce((s: number, t: any) => s + Math.abs(t.reward || 0), 0);
+    const grossLoss = losses.reduce((s: number, t: any) => s + lossOf(t), 0);
     const netPnL = grossProfit - grossLoss;
     const validRRs = trades.map((t: any) => parseFloat(t.rr)).filter((n: number) => !isNaN(n));
     const avgRR = validRRs.length > 0 ? (validRRs.reduce((a: number, b: number) => a + b, 0) / validRRs.length).toFixed(2) : '0';
+
+    const isWin = (t: any) => t.result === 'Başarılı' || t.result === 'Manuel Karda';
+    const isLoss = (t: any) => t.result === 'Başarısız' || t.result === 'Manuel Zararda';
+    // Başa baş işlemler ne kâr ne zarar yazar.
+    const pnlOf = (t: any) => (isWin(t) ? Math.abs(t.reward || 0) : isLoss(t) ? -lossOf(t) : 0);
 
     const setupMap: Record<string, { wins: number; total: number; pnl: number }> = {};
     trades.forEach((t: any) => {
       const key = t.setup || 'Belirtilmemiş';
       if (!setupMap[key]) setupMap[key] = { wins: 0, total: 0, pnl: 0 };
       setupMap[key].total++;
-      if (t.result === 'Başarılı' || t.result === 'Manuel Karda') {
-        setupMap[key].wins++;
-        setupMap[key].pnl += (t.reward || 0);
-      } else {
-        setupMap[key].pnl -= (t.risk || 0);
-      }
+      if (isWin(t)) setupMap[key].wins++;
+      setupMap[key].pnl += pnlOf(t);
     });
 
     const symbolMap: Record<string, { wins: number; total: number; pnl: number }> = {};
     trades.forEach((t: any) => {
       if (!symbolMap[t.symbol]) symbolMap[t.symbol] = { wins: 0, total: 0, pnl: 0 };
       symbolMap[t.symbol].total++;
-      if (t.result === 'Başarılı' || t.result === 'Manuel Karda') {
-        symbolMap[t.symbol].wins++;
-        symbolMap[t.symbol].pnl += (t.reward || 0);
-      } else {
-        symbolMap[t.symbol].pnl -= (t.risk || 0);
-      }
+      if (isWin(t)) symbolMap[t.symbol].wins++;
+      symbolMap[t.symbol].pnl += pnlOf(t);
     });
 
     const hourMap: Record<number, { wins: number; total: number }> = {};

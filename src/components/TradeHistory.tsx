@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Trade, OrderType } from '../types';
+import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL } from '../lib/tradeMath';
 import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
@@ -132,12 +133,12 @@ export default function TradeHistory({
   // Başa baş işlemler ne kazanç ne kayıp — oranın paydasına girmezler.
   const decidedTrades = winningTrades.length + losingTrades.length;
   const winRate = decidedTrades > 0 ? ((winningTrades.length / decidedTrades) * 100).toFixed(1) : '0.0';
-  const getLossAmount = (t: Trade) => (t.reward || 0) < 0 ? Math.abs(t.reward || 0) : (t.risk || 0);
-  const grossProfit = winningTrades.reduce((sum, t) => sum + (t.reward || 0), 0);
+  const getLossAmount = lossAmount;
+  const grossProfit = winningTrades.reduce((sum, t) => sum + winAmount(t), 0);
   const grossLoss = losingTrades.reduce((sum, t) => sum + getLossAmount(t), 0);
   const netProfit = grossProfit - grossLoss;
   const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : (grossProfit > 0 ? '∞' : '0.00');
-  const bestTrade = winningTrades.length > 0 ? Math.max(...winningTrades.map(t => t.reward || 0)) : 0;
+  const bestTrade = winningTrades.length > 0 ? Math.max(...winningTrades.map(winAmount)) : 0;
   const worstTrade = losingTrades.length > 0 ? Math.max(...losingTrades.map(getLossAmount)) : 0;
   const validRRs = closedTrades.map(t => parseFloat(t.rr)).filter(n => !isNaN(n));
   const avgRR = validRRs.length > 0 ? (validRRs.reduce((a, b) => a + b, 0) / validRRs.length).toFixed(2) : '0.00';
@@ -145,9 +146,7 @@ export default function TradeHistory({
 
   const chartData = sortedByDate.reduce((acc: any[], trade, index) => {
     const prevTotal = index > 0 ? acc[index - 1].cumulative : 0;
-    const isWinTrade = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
-    const isLossTrade = trade.result === 'Başarısız' || trade.result === 'Manuel Zararda';
-    const pnl = isWinTrade ? (trade.reward || 0) : isLossTrade ? -getLossAmount(trade) : 0;
+    const pnl = tradePnL(trade);
     acc.push({ name: index + 1, date: getDayDate(trade.date), pnl, cumulative: prevTotal + pnl, isWin: pnl >= 0 });
     return acc;
   }, []);
@@ -194,9 +193,9 @@ export default function TradeHistory({
   const sessionStats = ['asianSession', 'londonSession', 'nySession'].map(session => {
     const st = closedTrades.filter(t => getSession(t.date) === session);
     const wins = st.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').length;
-    const profit = st.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').reduce((s, t) => s + (t.reward || 0), 0);
-    const lossCount = st.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda').length;
-    const loss = st.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda').reduce((s, t) => s + (t.risk || 0), 0);
+    const profit = st.filter(isWinTrade).reduce((s, t) => s + winAmount(t), 0);
+    const lossCount = st.filter(isLossTrade).length;
+    const loss = st.filter(isLossTrade).reduce((s, t) => s + lossAmount(t), 0);
     return { session, rate: wins + lossCount > 0 ? ((wins / (wins + lossCount)) * 100).toFixed(0) : 0, total: st.length, pnl: profit - loss };
   });
 
@@ -208,9 +207,9 @@ export default function TradeHistory({
   const dayStats = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => {
     const dt = closedTrades.filter(t => getDayKey(t.date) === day);
     const wins = dt.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').length;
-    const profit = dt.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda').reduce((s, t) => s + (t.reward || 0), 0);
-    const lossCount = dt.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda').length;
-    const loss = dt.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda').reduce((s, t) => s + (t.risk || 0), 0);
+    const profit = dt.filter(isWinTrade).reduce((s, t) => s + winAmount(t), 0);
+    const lossCount = dt.filter(isLossTrade).length;
+    const loss = dt.filter(isLossTrade).reduce((s, t) => s + lossAmount(t), 0);
     return { day, rate: wins + lossCount > 0 ? ((wins / (wins + lossCount)) * 100).toFixed(0) : 0, total: dt.length, pnl: profit - loss };
   }).filter(d => d.total > 0);
 
@@ -222,7 +221,7 @@ export default function TradeHistory({
       map[key].total++;
       const isWin = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
       const isLoss = trade.result === 'Başarısız' || trade.result === 'Manuel Zararda';
-      if (isWin) { map[key].wins++; map[key].pnl += (trade.reward || 0); }
+      if (isWin) { map[key].wins++; map[key].pnl += winAmount(trade); }
       if (isLoss) { map[key].losses++; map[key].pnl -= getLossAmount(trade); }
     });
     return Object.entries(map).map(([setup, s]) => ({ setup, ...s, winRate: s.wins + s.losses > 0 ? ((s.wins / (s.wins + s.losses)) * 100).toFixed(0) : '0' })).sort((a, b) => b.pnl - a.pnl);
@@ -236,7 +235,7 @@ export default function TradeHistory({
       map[key].total++;
       const isWin = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
       const isLoss = trade.result === 'Başarısız' || trade.result === 'Manuel Zararda';
-      if (isWin) { map[key].wins++; map[key].pnl += (trade.reward || 0); }
+      if (isWin) { map[key].wins++; map[key].pnl += winAmount(trade); }
       if (isLoss) { map[key].losses++; map[key].pnl -= getLossAmount(trade); }
     });
     return Object.entries(map).map(([symbol, s]) => ({ symbol, ...s, winRate: s.wins + s.losses > 0 ? ((s.wins / (s.wins + s.losses)) * 100).toFixed(0) : '0' })).sort((a, b) => b.pnl - a.pnl).slice(0, 8);
@@ -256,9 +255,7 @@ export default function TradeHistory({
             return d.getDay() === dayIndex && d.getHours() >= hour && d.getHours() < hour + 4;
           });
           const pnl = filtered.reduce((s, t) => {
-            const isW = t.result === 'Başarılı' || t.result === 'Manuel Karda';
-            const isL = t.result === 'Başarısız' || t.result === 'Manuel Zararda';
-            return s + (isW ? (t.reward || 0) : isL ? -getLossAmount(t) : 0);
+            return s + tradePnL(t);
           }, 0);
           return { hour: `${String(hour).padStart(2, '0')}:00`, total: filtered.length, pnl };
         }),
@@ -604,6 +601,8 @@ export default function TradeHistory({
 
   // ── EDIT VIEW ──────────────────────────────────────────────────────────────
   if (editingTrade) {
+    const editLossResult = editForm.result === 'Başarısız' || editForm.result === 'Manuel Zararda';
+    const editWinResult = editForm.result === 'Başarılı' || editForm.result === 'Manuel Karda';
     const lbl: React.CSSProperties = { display: 'block', fontSize: '12px', fontWeight: 500, marginBottom: '4px', color: 'rgba(255,255,255,0.5)' };
     return (
       <div className="space-y-6 max-w-3xl mx-auto">
@@ -666,8 +665,17 @@ export default function TradeHistory({
               <input type="number" step="0.01" style={inp} value={editForm.risk || ''} onChange={e => setEditForm(f => ({ ...f, risk: parseFloat(e.target.value) || 0 }))} placeholder="0.00" />
             </div>
             <div>
-              <label style={lbl}>{t('reward')}</label>
-              <input type="number" step="0.01" style={inp} value={editForm.reward || ''} onChange={e => setEditForm(f => ({ ...f, reward: parseFloat(e.target.value) || 0 }))} placeholder="0.00" />
+              <label style={lbl}>
+                {editLossResult ? t('lossAmountLabel') : editWinResult ? t('reward') : t('rewardOrLossLabel')}
+              </label>
+              {/* Kullanıcı pozitif görür ve girer; işareti sonuç belirler. */}
+              <input type="number" min="0" step="0.01" style={inp}
+                value={editForm.reward === undefined ? '' : Math.abs(editForm.reward)}
+                onChange={e => {
+                  const amount = Math.abs(parseFloat(e.target.value) || 0);
+                  setEditForm(f => ({ ...f, reward: editLossResult ? -amount : amount }));
+                }}
+                placeholder="0.00" />
             </div>
             <div>
               <label style={lbl}>{t('rr')}</label>
@@ -675,7 +683,17 @@ export default function TradeHistory({
             </div>
             <div>
               <label style={lbl}>{t('result')}</label>
-              <select style={{ ...inp, cursor: 'pointer' }} value={editForm.result || 'Başarılı'} onChange={e => setEditForm(f => ({ ...f, result: e.target.value as any }))}>
+              <select style={{ ...inp, cursor: 'pointer' }} value={editForm.result || 'Başarılı'}
+                onChange={e => {
+                  const val = e.target.value as Trade['result'];
+                  const amount = Math.abs(editForm.reward || 0);
+                  const isLossVal = val === 'Başarısız' || val === 'Manuel Zararda';
+                  setEditForm(f => ({
+                    ...f,
+                    result: val,
+                    reward: val === 'Başa Baş' ? 0 : (isLossVal ? -amount : amount),
+                  }));
+                }}>
                 <option value="Başarılı" style={{ background: '#1a1b2e' }}>{t('resultWin')}</option>
                 <option value="Başarısız" style={{ background: '#1a1b2e' }}>{t('resultLoss')}</option>
                 <option value="Manuel Karda" style={{ background: '#1a1b2e' }}>{t('resultManualWin')}</option>
@@ -867,7 +885,7 @@ export default function TradeHistory({
               <div className="flex items-center gap-6 flex-wrap">
                 <div className="text-end">
                   <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('riskRewardLabel')}</div>
-                  <div className="font-semibold text-white">${selectedTrade.risk} <span className="mx-1" style={{ color: 'rgba(255,255,255,0.2)' }}>/</span> ${selectedTrade.reward}</div>
+                  <div className="font-semibold text-white">${selectedTrade.risk} <span className="mx-1" style={{ color: 'rgba(255,255,255,0.2)' }}>/</span> ${isLossTrade(selectedTrade) ? lossAmount(selectedTrade) : winAmount(selectedTrade)}</div>
                 </div>
                 <div className="text-end">
                   <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>R/R</div>
@@ -1070,7 +1088,7 @@ export default function TradeHistory({
                       )}
                       <span className="w-16 sm:w-20 font-mono text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{getRRDisplay(trade)}</span>
                       <span className="ms-auto text-end font-mono font-medium" style={{ color: isW ? '#34d399' : isL ? '#f87171' : 'rgba(255,255,255,0.4)' }}>
-                        {isW ? `+${trade.reward}$` : isL ? `-${trade.risk}$` : <span className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('openStatus')}</span>}
+                        {isW ? `+${winAmount(trade)}$` : isL ? `-${lossAmount(trade)}$` : <span className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('openStatus')}</span>}
                       </span>
 
                       <div className="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"

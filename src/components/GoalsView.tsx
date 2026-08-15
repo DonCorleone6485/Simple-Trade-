@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Trade, Account, JournalGoals } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { isWinTrade, isLossTrade, lossAmount, winAmount } from '../lib/tradeMath';
 import { Target, TrendingUp, DollarSign, Activity, Clock, AlertTriangle, CheckCircle, Edit3, Save, X } from 'lucide-react';
 
 interface GoalsViewProps {
@@ -49,10 +50,10 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
     return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
   });
 
-  const wins = monthTrades.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda');
-  const losses = monthTrades.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda');
-  const grossProfit = wins.reduce((s, t) => s + (t.reward || 0), 0);
-  const grossLoss = losses.reduce((s, t) => s + (t.risk || 0), 0);
+  const wins = monthTrades.filter(isWinTrade);
+  const losses = monthTrades.filter(isLossTrade);
+  const grossProfit = wins.reduce((s, t) => s + winAmount(t), 0);
+  const grossLoss = losses.reduce((s, t) => s + lossAmount(t), 0);
   const monthlyPnL = grossProfit - grossLoss;
   // Başa baş işlemler oranın paydasına girmez.
   const decidedTrades = wins.length + losses.length;
