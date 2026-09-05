@@ -113,7 +113,9 @@ ${notes.length > 0 ? notes.map((n: any) => `- ${n.symbol} (${n.result}): "${n.pr
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        // llama-3.3-70b-versatile Groq'ta Enterprise erişimi istiyor; bu hesap
+        // 403 alıyordu. gpt-oss-120b genel erişime açık.
+        model: 'openai/gpt-oss-120b',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 2048,
         temperature: 0.7,
