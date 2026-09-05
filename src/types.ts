@@ -52,6 +52,8 @@ export interface Trade {
   journal_id?: string;
   user_id?: string;
   date: string;
+  /** İşlemin kapandığı an; eski kayıtlarda yok. */
+  exitDate?: string;
   symbol: string;
   type: 'Buy' | 'Sell';
   timeframe?: string;

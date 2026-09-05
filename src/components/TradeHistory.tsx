@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Trade, OrderType } from '../types';
-import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL } from '../lib/tradeMath';
+import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration } from '../lib/tradeMath';
 import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
@@ -143,6 +143,8 @@ export default function TradeHistory({
   const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : (grossProfit > 0 ? '∞' : '0.00');
   const bestTrade = winningTrades.length > 0 ? Math.max(...winningTrades.map(winAmount)) : 0;
   const worstTrade = losingTrades.length > 0 ? Math.max(...losingTrades.map(getLossAmount)) : 0;
+  const holdTimes = closedTrades.map(holdMinutes).filter((n): n is number => n != null);
+  const avgHold = holdTimes.length > 0 ? Math.round(holdTimes.reduce((a, b) => a + b, 0) / holdTimes.length) : null;
   const validRRs = closedTrades.map(t => parseFloat(t.rr)).filter(n => !isNaN(n));
   const avgRR = validRRs.length > 0 ? (validRRs.reduce((a, b) => a + b, 0) / validRRs.length).toFixed(2) : '0.00';
   const sortedByDate = [...closedTrades].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -371,6 +373,7 @@ export default function TradeHistory({
             { label: t('bestTrade'), value: `+$${bestTrade.toFixed(2)}`, color: '#34d399' },
             { label: t('worstTrade'), value: `\u2212$${worstTrade.toFixed(2)}`, color: '#f87171' },
             { label: t('maxDrawdown'), value: `$${Math.abs(maxDrawdown).toFixed(2)}`, color: '#f87171' },
+            ...(avgHold != null ? [{ label: t('avgDuration'), value: formatDuration(avgHold, language), color: 'rgba(255,255,255,0.9)' }] : []),
           ].map((s, i) => (
             <div key={i}>
               <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{s.label}</div>
@@ -646,6 +649,12 @@ export default function TradeHistory({
               </select>
             </div>
             <div>
+              <label style={lbl}>{t('exitDateTime')}</label>
+              <input type="datetime-local" style={{ ...inp, colorScheme: 'dark' }}
+                value={editForm.exitDate ? new Date(new Date(editForm.exitDate).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                onChange={e => setEditForm(f => ({ ...f, exitDate: e.target.value ? new Date(e.target.value).toISOString() : undefined }))} />
+            </div>
+            <div>
               <label style={lbl}>{t('orderType')}</label>
               <select style={{ ...inp, cursor: 'pointer' }} value={editForm.orderType || 'Market'} onChange={e => setEditForm(f => ({ ...f, orderType: e.target.value as OrderType }))}>
                 <option value="Market" style={{ background: '#1a1b2e' }}>{t('orderMarket')}</option>
@@ -886,9 +895,21 @@ export default function TradeHistory({
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  <div className="flex items-center gap-2 text-sm mt-1 flex-wrap" style={{ color: 'rgba(255,255,255,0.4)' }}>
                     <Calendar className="w-4 h-4" />
-                    {getFullDateTime(selectedTrade.date)}
+                    <span>{getFullDateTime(selectedTrade.date)}</span>
+                    {selectedTrade.exitDate && (
+                      <>
+                        <span style={{ color: 'rgba(255,255,255,0.2)' }}>→</span>
+                        <span>{getFullDateTime(selectedTrade.exitDate)}</span>
+                      </>
+                    )}
+                    {holdMinutes(selectedTrade) != null && (
+                      <span className="px-2 py-0.5 rounded-lg text-xs"
+                        style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.55)' }}>
+                        {formatDuration(holdMinutes(selectedTrade), language)}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

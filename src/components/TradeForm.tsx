@@ -404,6 +404,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
   const photoLimit = isOwner ? Infinity : isPro ? PHOTO_LIMIT_PRO : PHOTO_LIMIT_FREE;
 
   const [date, setDate] = useState(() => new Date().toISOString());
+  const [exitDate, setExitDate] = useState(() => new Date().toISOString());
   const [symbol, setSymbol] = useState('EURUSD');
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
   const [orderType, setOrderType] = useState<OrderType>('Market');
@@ -492,9 +493,15 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!date) { alert(t('pleaseSelectDate') || 'Lütfen tarih seçin'); return; }
+    if (exitDate && new Date(exitDate).getTime() < new Date(date).getTime()) {
+      alert(language === 'tr'
+        ? 'Çıkış tarihi, giriş tarihinden önce olamaz.'
+        : 'Exit time cannot be earlier than entry time.');
+      return;
+    }
     const newTrade: Trade = {
       id: Date.now().toString(),
-      date, symbol, type, orderType, setup,
+      date, exitDate: exitDate || undefined, symbol, type, orderType, setup,
       risk: parseFloat(risk) || 0,
       // Kullanıcı her zaman pozitif yazar; kayıpta değeri negatife çeviriyoruz.
       reward: isBreakevenResult ? 0 : (isLossResult ? -1 : 1) * Math.abs(parseFloat(reward) || 0),
@@ -506,7 +513,8 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
     };
     onSave(newTrade);
     // Bir sonraki kayıt için tarihi tekrar "şu an"a al.
-    setDate(new Date().toISOString()); setSymbol('EURUSD'); setOrderType('Market');
+    setDate(new Date().toISOString()); setExitDate(new Date().toISOString());
+    setSymbol('EURUSD'); setOrderType('Market');
     setSetup(''); setRisk(''); setReward(''); setRr('');
     setPreNotes(''); setPostNotes('');
     setPrePhotos([]); setPostPhotos([]); setMtf([]);
@@ -548,6 +556,19 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
             <DatePicker
               value={date ? new Date(date) : null}
               onChange={(dateObj: DateObject | null) => { if (dateObj) setDate(dateObj.toDate().toISOString()); else setDate(''); }}
+              format="YYYY/MM/DD HH:mm"
+              plugins={[<TimePicker position="bottom" />]}
+              calendar={language === 'fa' ? persian : undefined}
+              locale={language === 'fa' ? persian_fa : undefined}
+              inputClass="dark-dp-input"
+              containerClassName="w-full"
+            />
+          </div>
+          <div>
+            <label style={lbl}>{t('exitDateTime')}<Req /></label>
+            <DatePicker
+              value={exitDate ? new Date(exitDate) : null}
+              onChange={(dateObj: DateObject | null) => { if (dateObj) setExitDate(dateObj.toDate().toISOString()); else setExitDate(''); }}
               format="YYYY/MM/DD HH:mm"
               plugins={[<TimePicker position="bottom" />]}
               calendar={language === 'fa' ? persian : undefined}
