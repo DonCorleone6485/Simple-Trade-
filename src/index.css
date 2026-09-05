@@ -21,3 +21,22 @@ html {
   outline: none !important;
   font-size: 14px !important;
 }
+
+/* ── YAZDIRMA / PDF ────────────────────────────────────────────────────────
+   Rapor açık zeminde basılır; ekrandaki koyu arayüz gizlenir. */
+@media print {
+  body * { visibility: hidden !important; }
+  #print-root, #print-root * { visibility: visible !important; }
+  #print-root {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    width: 100%;
+    background: #fff !important;
+    color: #111 !important;
+  }
+  .print-break { break-inside: avoid; page-break-inside: avoid; }
+  .print-page-break { break-before: page; page-break-before: always; }
+}
+
+@page { margin: 14mm; }

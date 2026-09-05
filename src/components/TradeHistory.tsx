@@ -5,7 +5,7 @@ import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
   Award, AlertTriangle, Zap, TrendingDown, Edit2, Eye,
-  CheckSquare, Square, X, Save, Upload, Loader, Sparkles
+  CheckSquare, Square, X, Save, Upload, Loader, Sparkles, Printer
 } from 'lucide-react';
 import MTFAnalysis, { MTFAnalysisView } from './MTFAnalysis';
 import Checklist, { ChecklistView } from './Checklist';
@@ -24,6 +24,8 @@ interface TradeHistoryProps {
   onDeleteMultiple?: (ids: string[]) => void;
   onUpdate?: (trade: Trade) => void;
   statsOnly?: boolean;
+  /** Tek bir işlemi PDF/yazdırma görünümüne gönderir. */
+  onPrintTrade?: (trade: Trade) => void;
 }
 
 export default function TradeHistory({
@@ -31,7 +33,8 @@ export default function TradeHistory({
   onDelete,
   onDeleteMultiple,
   onUpdate,
-  statsOnly = false
+  statsOnly = false,
+  onPrintTrade,
 }: TradeHistoryProps) {
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
   const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
@@ -829,8 +832,18 @@ export default function TradeHistory({
               {t('backToList')}
             </button>
             <div className="flex items-center gap-2">
+              {onPrintTrade && (
+                <button onClick={() => onPrintTrade(selectedTrade)} title={t('printTrade')}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }}>
+                  <Printer className="w-4 h-4" />
+                  {t('printPdf')}
+                </button>
+              )}
               <button onClick={e => startEdit(selectedTrade, e)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
                 style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.2)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
@@ -838,7 +851,7 @@ export default function TradeHistory({
                 {language === 'tr' ? 'Düzenle' : 'Edit'}
               </button>
               <button onClick={() => { onDelete(selectedTrade.id); setSelectedTrade(null); }}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
                 style={{ background: 'rgba(248,113,113,0.1)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.2)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.1)'; }}>

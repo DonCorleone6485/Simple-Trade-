@@ -4,7 +4,7 @@ import {
   Trash2, BookOpen, Clock, TrendingUp, X,
   Target, DollarSign, Activity, PieChart,
   CalendarDays, BarChart2, List, LogOut, User,
-  Upload, Check, Shield, Home
+  Upload, Check, Shield, Home, Printer
 } from 'lucide-react';
 import {
   SignIn, SignUp, useUser, useClerk, SignedIn, SignedOut
@@ -19,6 +19,7 @@ import CSVImport from './components/CSVImport';
 import LandingPage from './components/LandingPage';
 import JournalDashboard from './components/JournalDashboard';
 import AppShell, { NavKey } from './components/AppShell';
+import PrintableReport from './components/PrintableReport';
 import { Trade, Account, JournalGoals } from './types';
 import { useLanguage } from './context/LanguageContext';
 import { supabase } from './lib/supabase';
@@ -70,6 +71,8 @@ export default function App() {
   const [newJournalCapital, setNewJournalCapital] = useState('');
   const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
   const [editingJournal, setEditingJournal] = useState<Account | null>(null);
+  /** Yazdırma/PDF görünümüne gönderilen işlemler; null ise rapor kapalı. */
+  const [printJob, setPrintJob] = useState<{ trades: Trade[]; single: boolean } | null>(null);
   const [loading, setLoading] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [hasPaid, setHasPaid] = useState(false);
@@ -594,6 +597,16 @@ export default function App() {
       </button>
     ) : view === 'expanded' && journalTab !== 'newTrade' ? (
       <>
+        <button onClick={() => setPrintJob({ trades: filteredTrades, single: false })}
+          disabled={filteredTrades.length === 0}
+          title={t('printJournal')}
+          className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+          style={pillBtn}
+          onMouseEnter={e => { if (filteredTrades.length) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+          <Printer className="w-4 h-4" />
+          <span className="hidden md:inline">{t('printPdf')}</span>
+        </button>
         <button onClick={() => setShowCSVImport(true)}
           className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
           style={pillBtn}
@@ -801,6 +814,15 @@ export default function App() {
           </div>
         )}
       </SignedOut>
+
+      {printJob && activeJournal && (
+        <PrintableReport
+          journal={activeJournal}
+          trades={printJob.trades}
+          single={printJob.single}
+          onDone={() => setPrintJob(null)}
+        />
+      )}
 
       <SignedIn>
         {page === 'home' ? (
@@ -1050,7 +1072,7 @@ export default function App() {
                 ))}
               </div>
 
-              {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} />}
+              {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} onPrintTrade={trade => setPrintJob({ trades: [trade], single: true })} />}
               {journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
               {journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} statsOnly />}
               {journalTab === 'goals' && <GoalsView trades={filteredTrades} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
