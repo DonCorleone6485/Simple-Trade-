@@ -744,17 +744,17 @@ export default function TradeHistory({
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-5">
             <div>
               <label style={lbl}>{t('preTrade')} {t('notes')}</label>
-              <textarea rows={4} style={{ ...inp, resize: 'none', padding: '10px' }}
+              <textarea style={{ ...inp, height: '190px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
                 value={editForm.preTradeNotes || ''}
                 onChange={e => setEditForm(f => ({ ...f, preTradeNotes: e.target.value }))}
                 placeholder={t('preNotesPlaceholder')} />
             </div>
             <div>
               <label style={lbl}>{t('postTrade')} {t('notes')}</label>
-              <textarea rows={4} style={{ ...inp, resize: 'none', padding: '10px' }}
+              <textarea style={{ ...inp, height: '190px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
                 value={editForm.postTradeNotes || ''}
                 onChange={e => setEditForm(f => ({ ...f, postTradeNotes: e.target.value }))}
                 placeholder={t('postNotesPlaceholder')} />

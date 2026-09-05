@@ -363,22 +363,26 @@ function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit, uploadi
   const canUploadMore = isUnlimited ? true : photos.length < limit;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {canUploadMore && (
         <div onClick={() => !uploading && fileInputRef.current?.click()}
-          className="w-full h-40 flex flex-col items-center justify-center transition-all"
-          style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.6 : 1, transition: TRANSITION }}
+          className="w-full flex items-center justify-center gap-2.5 py-4"
+          style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '14px', cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.6 : 1, transition: TRANSITION }}
           onMouseEnter={e => { if (!uploading) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}>
           {uploading
-            ? <><Loader className="w-5 h-5 mb-2 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Yükleniyor...</span></>
-            : <><Upload className="w-5 h-5 mb-2" style={{ color: 'rgba(255,255,255,0.25)' }} /><span className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span>{isUnlimited && <span className="text-xs mt-1" style={{ color: 'rgba(139,92,246,0.7)' }}>∞ limitsiz</span>}</>
+            ? <><Loader className="w-4 h-4 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Yükleniyor...</span></>
+            : <>
+                <Upload className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} />
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('photoUpload')}</span>
+                {isUnlimited && <span className="text-xs" style={{ color: 'rgba(139,92,246,0.7)' }}>∞</span>}
+              </>
           }
           <input type="file" ref={fileInputRef} onChange={onUpload} accept="image/*" multiple className="hidden" disabled={uploading} />
         </div>
       )}
       {photos.length > 0 && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
           {photos.map((photo, index) => (
             <div key={index} className="relative aspect-square rounded-xl overflow-hidden group" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
               <img src={photo} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
@@ -652,30 +656,32 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
 
         <div style={divider}>
           <p style={sectionTitle}>{t('preTrade')}</p>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <label style={lbl}>{t('photos')} <span style={optHint}>({t('optionalLabel')})</span></label>
-              <PhotoUploader photos={prePhotos} onUpload={e => handlePhotoUpload(e, 'pre')} onRemove={i => removePhoto(i, 'pre')} isUnlimited={isOwner} limit={photoLimit} uploading={uploadingPre} />
-            </div>
+          <div className="space-y-6">
             <div>
               <label style={lbl}>{t('notes')}<Req /></label>
               <textarea required value={preNotes} onChange={e => setPreNotes(e.target.value)}
-                style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }} placeholder={t('preNotesPlaceholder')} />
+                style={{ ...inp, height: '200px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
+                placeholder={t('preNotesPlaceholder')} />
+            </div>
+            <div>
+              <label style={lbl}>{t('photos')} <span style={optHint}>({t('optionalLabel')})</span></label>
+              <PhotoUploader photos={prePhotos} onUpload={e => handlePhotoUpload(e, 'pre')} onRemove={i => removePhoto(i, 'pre')} isUnlimited={isOwner} limit={photoLimit} uploading={uploadingPre} />
             </div>
           </div>
         </div>
 
         <div style={divider}>
           <p style={sectionTitle}>{t('postTrade')}</p>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <label style={lbl}>{t('photos')} <span style={optHint}>({t('optionalLabel')})</span></label>
-              <PhotoUploader photos={postPhotos} onUpload={e => handlePhotoUpload(e, 'post')} onRemove={i => removePhoto(i, 'post')} isUnlimited={isOwner} limit={photoLimit} uploading={uploadingPost} />
-            </div>
+          <div className="space-y-6">
             <div>
               <label style={lbl}>{t('notes')}<Req /></label>
               <textarea required value={postNotes} onChange={e => setPostNotes(e.target.value)}
-                style={{ ...inp, height: '160px', resize: 'none', padding: '12px' }} placeholder={t('postNotesPlaceholder')} />
+                style={{ ...inp, height: '200px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
+                placeholder={t('postNotesPlaceholder')} />
+            </div>
+            <div>
+              <label style={lbl}>{t('photos')} <span style={optHint}>({t('optionalLabel')})</span></label>
+              <PhotoUploader photos={postPhotos} onUpload={e => handlePhotoUpload(e, 'post')} onRemove={i => removePhoto(i, 'post')} isUnlimited={isOwner} limit={photoLimit} uploading={uploadingPost} />
             </div>
           </div>
         </div>
