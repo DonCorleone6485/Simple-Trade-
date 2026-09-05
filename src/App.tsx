@@ -394,6 +394,7 @@ export default function App() {
 
   const handleUpdateTrade = async (trade: Trade) => {
     const { error } = await supabase.from('trades').update({
+      date: trade.date,
       exit_date: trade.exitDate || null,
       symbol: trade.symbol, type: trade.type, timeframe: trade.timeframe, order_type: trade.orderType || null, setup: trade.setup,
       risk: trade.risk, reward: trade.reward, rr: trade.rr, result: trade.result,

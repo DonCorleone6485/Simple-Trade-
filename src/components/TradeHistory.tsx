@@ -304,7 +304,14 @@ export default function TradeHistory({
 
   const saveEdit = () => {
     if (!editingTrade || !onUpdate) return;
-    onUpdate({ ...editingTrade, ...editForm } as Trade);
+    const merged = { ...editingTrade, ...editForm } as Trade;
+    if (merged.exitDate && new Date(merged.exitDate).getTime() < new Date(merged.date).getTime()) {
+      alert(language === 'tr'
+        ? 'Çıkış tarihi, giriş tarihinden önce olamaz.'
+        : 'Exit time cannot be earlier than entry time.');
+      return;
+    }
+    onUpdate(merged);
     setEditingTrade(null);
     setEditForm({});
   };
@@ -604,6 +611,9 @@ export default function TradeHistory({
 
   // ── EDIT VIEW ──────────────────────────────────────────────────────────────
   if (editingTrade) {
+    /** ISO -> datetime-local (yerel saat). */
+    const toLocalInput = (iso?: string) =>
+      iso ? new Date(new Date(iso).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '';
     const editLossResult = editForm.result === 'Başarısız' || editForm.result === 'Manuel Zararda';
     const editWinResult = editForm.result === 'Başarılı' || editForm.result === 'Manuel Karda';
     const lbl: React.CSSProperties = { display: 'block', fontSize: '12px', fontWeight: 500, marginBottom: '4px', color: 'rgba(255,255,255,0.5)' };
@@ -638,6 +648,12 @@ export default function TradeHistory({
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
+              <label style={lbl}>{t('dateTime')}</label>
+              <input type="datetime-local" style={{ ...inp, colorScheme: 'dark' }}
+                value={toLocalInput(editForm.date)}
+                onChange={e => setEditForm(f => ({ ...f, date: e.target.value ? new Date(e.target.value).toISOString() : f.date }))} />
+            </div>
+            <div>
               <label style={lbl}>{t('symbol')}</label>
               <input style={inp} value={editForm.symbol || ''} onChange={e => setEditForm(f => ({ ...f, symbol: e.target.value }))} />
             </div>
@@ -647,12 +663,6 @@ export default function TradeHistory({
                 <option value="Buy" style={{ background: '#1a1b2e' }}>Buy</option>
                 <option value="Sell" style={{ background: '#1a1b2e' }}>Sell</option>
               </select>
-            </div>
-            <div>
-              <label style={lbl}>{t('exitDateTime')}</label>
-              <input type="datetime-local" style={{ ...inp, colorScheme: 'dark' }}
-                value={editForm.exitDate ? new Date(new Date(editForm.exitDate).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
-                onChange={e => setEditForm(f => ({ ...f, exitDate: e.target.value ? new Date(e.target.value).toISOString() : undefined }))} />
             </div>
             <div>
               <label style={lbl}>{t('orderType')}</label>
@@ -709,6 +719,12 @@ export default function TradeHistory({
                 <option value="Manuel Zararda" style={{ background: '#1a1b2e' }}>{t('resultManualLoss')}</option>
                 <option value="Başa Baş" style={{ background: '#1a1b2e' }}>{t('resultBreakeven')}</option>
               </select>
+            </div>
+            <div>
+              <label style={lbl}>{t('exitDateTime')}</label>
+              <input type="datetime-local" style={{ ...inp, colorScheme: 'dark' }}
+                value={toLocalInput(editForm.exitDate)}
+                onChange={e => setEditForm(f => ({ ...f, exitDate: e.target.value ? new Date(e.target.value).toISOString() : undefined }))} />
             </div>
           </div>
 
