@@ -69,6 +69,7 @@ export default function App() {
   const [newJournalStartDate, setNewJournalStartDate] = useState('');
   const [newJournalCapital, setNewJournalCapital] = useState('');
   const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
+  const [editingJournal, setEditingJournal] = useState<Account | null>(null);
   const [loading, setLoading] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [hasPaid, setHasPaid] = useState(false);
@@ -256,6 +257,20 @@ export default function App() {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   };
 
+  const openEditJournal = (account: Account) => {
+    setEditingJournal(account);
+    setNewJournalName(account.name);
+    setNewJournalStartDate(account.startDate ? String(account.startDate).slice(0, 10) : '');
+    setNewJournalCapital(account.startingCapital != null ? String(account.startingCapital) : '');
+    setShowNewJournalModal(true);
+  };
+
+  const closeJournalModal = () => {
+    setShowNewJournalModal(false);
+    setEditingJournal(null);
+    setNewJournalName(''); setNewJournalStartDate(''); setNewJournalCapital('');
+  };
+
   // ── JOURNAL LİMİT KONTROLÜ ──
   const handleNewJournalClick = () => {
     if (!isPro && accounts.length >= 1) {
@@ -263,14 +278,41 @@ export default function App() {
       setShowUpgradeModal(true);
       return;
     }
+    setEditingJournal(null);
     setNewJournalName(suggestJournalName());
     setNewJournalStartDate(todayForDateInput());
     setNewJournalCapital('10000');
     setShowNewJournalModal(true);
   };
 
-  const createJournal = async () => {
+  const saveJournal = async () => {
     if (!newJournalName.trim() || !newJournalStartDate || !newJournalCapital || !user) return;
+
+    // Düzenleme
+    if (editingJournal) {
+      const patch = {
+        name: newJournalName.trim(),
+        start_date: newJournalStartDate,
+        starting_capital: parseFloat(newJournalCapital),
+      };
+      const { error } = await supabase.from('journals').update(patch).eq('id', editingJournal.id);
+      if (error) {
+        alert(language === 'tr' ? 'Journal güncellenemedi: ' + error.message : 'Could not update journal: ' + error.message);
+        return;
+      }
+      const updated: Account = {
+        ...editingJournal,
+        name: patch.name,
+        startDate: patch.start_date,
+        startingCapital: patch.starting_capital,
+      };
+      setAccounts(prev => prev.map(a => (a.id === updated.id ? updated : a)));
+      setActiveJournal(prev => (prev && prev.id === updated.id ? updated : prev));
+      closeJournalModal();
+      return;
+    }
+
+    // Yeni kayıt
     const { data } = await supabase.from('journals').insert({
       user_id: user.id, name: newJournalName.trim(),
       start_date: newJournalStartDate, starting_capital: parseFloat(newJournalCapital),
@@ -282,8 +324,8 @@ export default function App() {
       };
       setAccounts(prev => [...prev, newAccount]);
       setActiveJournal(newAccount);
-      setShowNewJournalModal(false);
-      setNewJournalName(''); setNewJournalStartDate(''); setNewJournalCapital('');
+      closeJournalModal();
+      setJournalTab('trades');
       setView('expanded');
     }
   };
@@ -904,8 +946,12 @@ export default function App() {
         {showNewJournalModal && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="p-7 w-full max-w-md" style={modalCard}>
-              <h3 className="font-display text-[22px] mb-1.5" style={{ letterSpacing: '-0.01em' }}>{t('newJournal')}</h3>
-              <p className="text-sm mb-7" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('newJournalDesc')}</p>
+              <h3 className="font-display text-[22px] mb-1.5" style={{ letterSpacing: '-0.01em' }}>
+                {editingJournal ? t('editJournal') : t('newJournal')}
+              </h3>
+              <p className="text-sm mb-7" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {editingJournal ? t('editJournalDesc') : t('newJournalDesc')}
+              </p>
               <div className="space-y-4">
                 <div>
                   <label style={uiLabel}>{t('journalName')}</label>
@@ -929,11 +975,10 @@ export default function App() {
                 </div>
               </div>
               <div className="flex justify-end gap-3 mt-6">
-                <button onClick={() => { setShowNewJournalModal(false); setNewJournalName(''); setNewJournalStartDate(''); setNewJournalCapital(''); }}
-                  style={quietBtn}>{t('cancel')}</button>
-                <button onClick={createJournal} disabled={!newJournalName.trim() || !newJournalStartDate || !newJournalCapital}
+                <button onClick={closeJournalModal} style={quietBtn}>{t('cancel')}</button>
+                <button onClick={saveJournal} disabled={!newJournalName.trim() || !newJournalStartDate || !newJournalCapital}
                   className="rounded-full disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={primaryBtn}>{t('newJournal')}</button>
+                  style={primaryBtn}>{editingJournal ? t('save') : t('newJournal')}</button>
               </div>
             </div>
           </div>
@@ -974,6 +1019,7 @@ export default function App() {
               onNewJournal={handleNewJournalClick}
               onOpen={openJournal}
               onDelete={setAccountToDelete}
+              onEdit={openEditJournal}
             />
           )}
 

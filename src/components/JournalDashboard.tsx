@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Trash2, ArrowUpRight } from 'lucide-react';
+import { Plus, Trash2, Pencil, ArrowUpRight } from 'lucide-react';
 import { Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -17,6 +17,7 @@ interface JournalDashboardProps {
   onNewJournal: () => void;
   onOpen: (account: Account) => void;
   onDelete: (accountId: string) => void;
+  onEdit: (account: Account) => void;
   userLabel?: string;
   /** Portal düzeninde başlık ve buton üst barda durur. */
   hideHeader?: boolean;
@@ -44,7 +45,7 @@ function ColumnHead({ children, width, className = '' }: { children: React.React
 }
 
 export default function JournalDashboard({
-  accounts, getStats, formatDate, onNewJournal, onOpen, onDelete, userLabel, hideHeader = false,
+  accounts, getStats, formatDate, onNewJournal, onOpen, onDelete, onEdit, userLabel, hideHeader = false,
 }: JournalDashboardProps) {
   const { t, language } = useLanguage();
 
@@ -126,7 +127,7 @@ export default function JournalDashboard({
               <ColumnHead width={COL.winRate} className="hidden sm:block">{t('winRate')}</ColumnHead>
               <ColumnHead width={COL.net}>{t('netProfit')}</ColumnHead>
             </div>
-            <div className="w-8" />
+            <div className="w-[72px]" />
           </div>
 
           {/* ── Journal listesi: kutu yok, satır ve ince ayraç ── */}
@@ -164,6 +165,15 @@ export default function JournalDashboard({
                       <Cell width={COL.net} value={money(stats.netPnL)}
                         color={stats.netPnL >= 0 ? '#34d399' : '#f87171'} />
                     </div>
+
+                    <button onClick={e => { e.stopPropagation(); onEdit(acc); }}
+                      className="p-2 rounded-lg opacity-0 group-hover:opacity-100 flex-shrink-0"
+                      style={{ color: 'rgba(255,255,255,0.25)', transition: 'all 150ms' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#a78bfa'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.25)'; }}
+                      title={t('editJournal')}>
+                      <Pencil className="w-4 h-4" />
+                    </button>
 
                     <button onClick={e => { e.stopPropagation(); onDelete(acc.id); }}
                       className="p-2 rounded-lg opacity-0 group-hover:opacity-100 flex-shrink-0 w-8"
