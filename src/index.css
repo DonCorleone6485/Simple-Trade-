@@ -32,7 +32,11 @@ html {
     background: #fff !important;
     color: #111 !important;
   }
-  .print-break { break-inside: avoid; page-break-inside: avoid; }
+  /* Bölünmemesi gereken küçük birimler. İşlem bloğunun tamamına uygulanırsa
+     sayfaya sığmayan blok komple sonraki sayfaya itilir ve öncesi boş kalır. */
+  .print-keep { break-inside: avoid; page-break-inside: avoid; }
+  .print-heading { break-after: avoid; page-break-after: avoid; }
+  .print-new-page { break-before: page; page-break-before: always; }
 }
 
-@page { margin: 14mm; }
+@page { size: A4 portrait; margin: 14mm; }

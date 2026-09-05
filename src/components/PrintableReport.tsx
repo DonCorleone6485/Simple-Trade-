@@ -95,11 +95,34 @@ export default function PrintableReport({ journal, trades, single = false, onDon
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
-    <tr>
-      <td style={{ padding: '3px 14px 3px 0', color: ink.faint, fontSize: 11, whiteSpace: 'nowrap', verticalAlign: 'top' }}>{label}</td>
-      <td style={{ padding: '3px 0', fontSize: 12, verticalAlign: 'top' }}>{value}</td>
-    </tr>
+  /** Belirgin başlıklı bölüm. */
+  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div style={{ marginBottom: 18 }}>
+      <h3 className="print-heading" style={{ fontSize: 13, fontWeight: 700, margin: '0 0 8px', color: ink.text }}>
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+
+  const Photos = ({ list }: { list: string[] }) => (
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      {list.map((src, i) => (
+        // Sabit yükseklikli çerçeve: baskıda img'nin max-height'i yok sayılıyor,
+        // görsel bir sayfayı yutuyordu.
+        <div key={i} className="print-keep"
+          style={{
+            width: list.length === 1 ? '80%' : 'calc(50% - 4px)',
+            height: '62mm',
+            border: `1px solid ${ink.rule}`,
+            borderRadius: 4,
+            overflow: 'hidden',
+          }}>
+          <img src={src} alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }} />
+        </div>
+      ))}
+    </div>
   );
 
   const report = (
@@ -146,101 +169,105 @@ export default function PrintableReport({ journal, trades, single = false, onDon
         const win = isWinTrade(trade);
         const loss = isLossTrade(trade);
         const pnl = tradePnL(trade);
-        const photos = [...(trade.preTradePhotos || []), ...(trade.postTradePhotos || [])];
-        return (
-          <div key={trade.id}
-            className="print-break"
-            style={{ paddingBottom: 18, marginBottom: 18, borderBottom: single ? 'none' : `1px solid ${ink.rule}` }}>
+        const pre = trade.preTradePhotos || [];
+        const post = trade.postTradePhotos || [];
 
-            {/* Satır başlığı */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 10 }}>
-              <div>
-                <span style={{ fontSize: 15, fontWeight: 600 }}>{trade.symbol}</span>
-                <span style={{ fontSize: 12, color: ink.soft, marginInlineStart: 8 }}>
-                  {trade.type === 'Buy' ? t('buy') : t('sell')}
-                  {trade.orderType ? ` · ${orderText(trade.orderType)}` : ''}
-                  {trade.setup ? ` · ${trade.setup}` : ''}
-                </span>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: win ? ink.win : loss ? ink.loss : ink.soft, fontVariantNumeric: 'tabular-nums' }}>
-                  {pnl === 0 ? '$0.00' : money(pnl)}
-                </div>
-                <div style={{ fontSize: 10, color: ink.faint }}>{resultText(trade.result)}</div>
-              </div>
+        const facts: [string, string][] = [
+          [t('symbol'), `${trade.symbol} · ${trade.type === 'Buy' ? t('buy') : t('sell')}`],
+          [t('reportEntry'), fmtDateTime(trade.date)],
+          ...(trade.orderType ? [[t('orderType'), orderText(trade.orderType)] as [string, string]] : []),
+          ...(trade.setup ? [[t('setup'), trade.setup] as [string, string]] : []),
+          [t('risk'), `$${(trade.risk || 0).toLocaleString()}`],
+          [
+            win ? t('reward') : loss ? t('lossAmountLabel') : t('rewardOrLossLabel'),
+            `$${(win ? winAmount(trade) : loss ? lossAmount(trade) : 0).toLocaleString()}`,
+          ],
+          [t('rr'), trade.rr || '-'],
+          [t('result'), resultText(trade.result)],
+        ];
+
+        return (
+          <div key={trade.id} className={!single && idx > 0 ? 'print-new-page' : undefined}
+            style={{ marginBottom: single ? 0 : 26 }}>
+
+            {/* Başlık şeridi */}
+            <div className="print-keep" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, borderBottom: `1px solid ${ink.rule}`, paddingBottom: 8, marginBottom: 14 }}>
+              <h2 style={{ fontSize: 15, fontWeight: 700, margin: 0, letterSpacing: '-0.01em' }}>
+                {t('reportTradeDetails')}
+              </h2>
+              <span style={{ fontSize: 15, fontWeight: 700, color: win ? ink.win : loss ? ink.loss : ink.soft, fontVariantNumeric: 'tabular-nums' }}>
+                {pnl === 0 ? '$0.00' : money(pnl)}
+              </span>
             </div>
 
-            {/* Künye */}
-            <table style={{ borderCollapse: 'collapse', marginBottom: photos.length || trade.preTradeNotes || trade.postTradeNotes ? 10 : 0 }}>
-              <tbody>
-                <Row label={t('dateTime')} value={fmtDateTime(trade.date)} />
-                <Row label={t('risk')} value={`$${(trade.risk || 0).toLocaleString()}`} />
-                <Row label={win ? t('reward') : loss ? t('lossAmountLabel') : t('rewardOrLossLabel')}
-                  value={`$${(win ? winAmount(trade) : loss ? lossAmount(trade) : 0).toLocaleString()}`} />
-                <Row label={t('rr')} value={trade.rr || '-'} />
-              </tbody>
-            </table>
+            {/* Künye — madde madde */}
+            <ul className="print-keep" style={{ listStyle: 'none', padding: 0, margin: '0 0 18px' }}>
+              {facts.map(([label, value]) => (
+                <li key={label} style={{ display: 'flex', gap: 8, fontSize: 12, lineHeight: 1.75 }}>
+                  <span style={{ color: ink.faint }}>•</span>
+                  <span style={{ color: ink.faint, minWidth: 130 }}>{label}</span>
+                  <span style={{ fontWeight: 500 }}>{value}</span>
+                </li>
+              ))}
+            </ul>
 
             {/* Checklist */}
             {trade.checklist && trade.checklist.length > 0 && (
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.1em', color: ink.faint, marginBottom: 5 }}>
-                  Checklist ({trade.checklist.filter(c => c.checked).length}/{trade.checklist.length})
-                </div>
-                {trade.checklist.map(item => (
-                  <div key={item.id} style={{ fontSize: 11, marginBottom: 2 }}>
-                    <span style={{ marginInlineEnd: 6 }}>{item.checked ? '☑' : '☐'}</span>
-                    <span style={{ color: item.checked ? ink.text : ink.soft }}>{item.title}</span>
-                  </div>
-                ))}
-              </div>
+              <Section title={`Checklist  (${trade.checklist.filter(c => c.checked).length}/${trade.checklist.length})`}>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {trade.checklist.map(item => (
+                    <li key={item.id} className="print-keep" style={{ fontSize: 12, lineHeight: 1.7, marginBottom: 3 }}>
+                      <span style={{ marginInlineEnd: 7 }}>{item.checked ? '☑' : '☐'}</span>
+                      <span style={{ color: item.checked ? ink.text : ink.soft }}>{item.title}</span>
+                      {item.desc && <div style={{ fontSize: 11, color: ink.faint, marginInlineStart: 20 }}>{item.desc}</div>}
+                    </li>
+                  ))}
+                </ul>
+              </Section>
             )}
 
             {/* Multi timeframe analiz */}
             {trade.mtfAnalysis && trade.mtfAnalysis.length > 0 && (
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.1em', color: ink.faint, marginBottom: 5 }}>
-                  {tr('Multi Timeframe Analiz', 'Multi-Timeframe Analysis')}
-                </div>
+              <Section title={tr('Multi Timeframe Analiz', 'Multi-Timeframe Analysis')}>
                 {trade.mtfAnalysis.map(e => (
-                  <div key={e.timeframe} style={{ fontSize: 11, marginBottom: 4 }}>
-                    <b>{e.timeframe}</b>
+                  <div key={e.timeframe} className="print-keep" style={{ fontSize: 12, marginBottom: 7 }}>
+                    <span style={{ fontWeight: 600 }}>{e.timeframe}</span>
                     <span style={{ color: ink.faint }}> ({tfLabel(e.timeframe)})</span>
-                    <span style={{ marginInlineStart: 6, color: e.bias === 'bullish' ? ink.win : e.bias === 'bearish' ? ink.loss : ink.soft }}>
+                    <span style={{ marginInlineStart: 8, fontWeight: 500, color: e.bias === 'bullish' ? ink.win : e.bias === 'bearish' ? ink.loss : ink.soft }}>
                       {biasText(e.bias)}
                     </span>
-                    {e.notes && <div style={{ color: ink.soft, marginTop: 1 }}>{e.notes}</div>}
+                    {e.notes && <div style={{ color: ink.soft, marginTop: 2, lineHeight: 1.6 }}>{e.notes}</div>}
                   </div>
                 ))}
-              </div>
+              </Section>
             )}
 
-            {/* Notlar */}
-            {(trade.preTradeNotes || trade.postTradeNotes) && (
-              <div style={{ display: 'flex', gap: 20, marginBottom: photos.length ? 10 : 0 }}>
-                {trade.preTradeNotes && (
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.1em', color: ink.faint, marginBottom: 4 }}>{t('preTrade')}</div>
-                    <div style={{ fontSize: 11, color: ink.soft, whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{trade.preTradeNotes}</div>
-                  </div>
-                )}
-                {trade.postTradeNotes && (
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.1em', color: ink.faint, marginBottom: 4 }}>{t('postTrade')}</div>
-                    <div style={{ fontSize: 11, color: ink.soft, whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{trade.postTradeNotes}</div>
-                  </div>
-                )}
-              </div>
+            {/* İşlem öncesi açıklamalar */}
+            {trade.preTradeNotes && (
+              <Section title={t('reportPreNotes')}>
+                <p style={{ fontSize: 12, color: ink.soft, whiteSpace: 'pre-wrap', lineHeight: 1.65, margin: 0 }}>{trade.preTradeNotes}</p>
+              </Section>
             )}
 
-            {/* Fotoğraflar */}
-            {photos.length > 0 && (
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {photos.map((src, i) => (
-                  <img key={i} src={src} alt=""
-                    style={{ width: photos.length === 1 ? '100%' : 'calc(50% - 4px)', maxHeight: 260, objectFit: 'contain', border: `1px solid ${ink.rule}`, borderRadius: 4 }} />
-                ))}
-              </div>
+            {/* İşlem öncesi fotoğraflar */}
+            {pre.length > 0 && (
+              <Section title={t('reportPrePhotos')}>
+                <Photos list={pre} />
+              </Section>
+            )}
+
+            {/* İşlem sonrası açıklamalar */}
+            {trade.postTradeNotes && (
+              <Section title={t('reportPostNotes')}>
+                <p style={{ fontSize: 12, color: ink.soft, whiteSpace: 'pre-wrap', lineHeight: 1.65, margin: 0 }}>{trade.postTradeNotes}</p>
+              </Section>
+            )}
+
+            {/* İşlem sonrası fotoğraflar */}
+            {post.length > 0 && (
+              <Section title={t('reportPostPhotos')}>
+                <Photos list={post} />
+              </Section>
             )}
           </div>
         );
