@@ -5,7 +5,7 @@ import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
   Award, AlertTriangle, Zap, TrendingDown, Edit2, Eye,
-  CheckSquare, Square, X, Save, Upload, Loader
+  CheckSquare, Square, X, Save, Upload, Loader, Sparkles
 } from 'lucide-react';
 import MTFAnalysis, { MTFAnalysisView } from './MTFAnalysis';
 import Checklist, { ChecklistView } from './Checklist';
@@ -560,8 +560,8 @@ export default function TradeHistory({
         <div style={{ ...statCard, padding: '20px' }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <span className="text-lg">🤖</span>
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.4)' }}>AI Analiz</span>
+              <Sparkles className="w-4 h-4" style={{ color: '#a78bfa' }} />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.3)' }}>AI Analiz</span>
             </div>
             <button onClick={runAiAnalysis} disabled={aiLoading}
               className="px-4 py-2 rounded-full text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"

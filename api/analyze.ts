@@ -104,7 +104,11 @@ ${notes.length > 0 ? notes.map((n: any) => `- ${n.symbol} (${n.result}): "${n.pr
 5. Zamanlama
 6. Psikolojik Patternler
 7. 5 Somut Öneri
-8. Özet`;
+8. Özet
+
+Biçim: Markdown tablo KULLANMA — arayüz tabloları render etmiyor, ham boru
+işaretleri olarak görünür. Bunun yerine "Etiket: değer" satırları ya da
+madde işaretli listeler kullan.`;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
