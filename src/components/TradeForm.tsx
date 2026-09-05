@@ -565,19 +565,6 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
             />
           </div>
           <div>
-            <label style={lbl}>{t('exitDateTime')}<Req /></label>
-            <DatePicker
-              value={exitDate ? new Date(exitDate) : null}
-              onChange={(dateObj: DateObject | null) => { if (dateObj) setExitDate(dateObj.toDate().toISOString()); else setExitDate(''); }}
-              format="YYYY/MM/DD HH:mm"
-              plugins={[<TimePicker position="bottom" />]}
-              calendar={language === 'fa' ? persian : undefined}
-              locale={language === 'fa' ? persian_fa : undefined}
-              inputClass="dark-dp-input"
-              containerClassName="w-full"
-            />
-          </div>
-          <div>
             <label style={lbl}>{t('symbol')}<Req /></label>
             <SymbolPicker value={symbol} onChange={setSymbol} />
           </div>
@@ -605,11 +592,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
             <input type="number" step="any" required value={rr} onChange={e => setRr(e.target.value)}
               style={{ ...inp, fontFamily: 'monospace' }} placeholder={t('rrPlaceholder')} />
           </div>
-        </div>
-
-        <div style={divider}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
+          <div>
               <label style={lbl}>{t('risk')}<Req /></label>
               <div className="relative">
                 <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
@@ -643,7 +626,20 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
                   placeholder="0.00" />
               </div>
             </div>
-          </div>
+
+            <div>
+              <label style={lbl}>{t('exitDateTime')}<Req /></label>
+              <DatePicker
+                value={exitDate ? new Date(exitDate) : null}
+                onChange={(dateObj: DateObject | null) => { if (dateObj) setExitDate(dateObj.toDate().toISOString()); else setExitDate(''); }}
+                format="YYYY/MM/DD HH:mm"
+                plugins={[<TimePicker position="bottom" />]}
+                calendar={language === 'fa' ? persian : undefined}
+                locale={language === 'fa' ? persian_fa : undefined}
+                inputClass="dark-dp-input"
+                containerClassName="w-full"
+              />
+            </div>
         </div>
 
         <div style={divider}>
