@@ -62,7 +62,8 @@ export interface Trade {
   risk: number;
   reward: number;
   rr: string;
-  result: TradeResult;
+  /** Boş: işlem henüz sonuçlanmadı (açık pozisyon). */
+  result: TradeResult | '';
   preTradeNotes: string;
   postTradeNotes: string;
   preTradePhotos: string[];

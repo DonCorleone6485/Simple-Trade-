@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Trade, OrderType } from '../types';
-import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration } from '../lib/tradeMath';
+import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade } from '../lib/tradeMath';
 import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
@@ -132,7 +132,8 @@ export default function TradeHistory({
   const closedTrades = trades;
   const winningTrades = closedTrades.filter(t => t.result === 'Başarılı' || t.result === 'Manuel Karda');
   const losingTrades = closedTrades.filter(t => t.result === 'Başarısız' || t.result === 'Manuel Zararda');
-  const totalClosed = closedTrades.length;
+  const openTrades = closedTrades.filter(isOpenTrade);
+  const totalClosed = closedTrades.length - openTrades.length;
   // Başa baş işlemler ne kazanç ne kayıp — oranın paydasına girmezler.
   const decidedTrades = winningTrades.length + losingTrades.length;
   const winRate = decidedTrades > 0 ? ((winningTrades.length / decidedTrades) * 100).toFixed(1) : '0.0';
@@ -381,6 +382,7 @@ export default function TradeHistory({
             { label: t('worstTrade'), value: `\u2212$${worstTrade.toFixed(2)}`, color: '#f87171' },
             { label: t('maxDrawdown'), value: `$${Math.abs(maxDrawdown).toFixed(2)}`, color: '#f87171' },
             ...(avgHold != null ? [{ label: t('avgDuration'), value: formatDuration(avgHold, language), color: 'rgba(255,255,255,0.9)' }] : []),
+            ...(openTrades.length > 0 ? [{ label: t('openTradesCount'), value: String(openTrades.length), color: '#fbbf24' }] : []),
           ].map((s, i) => (
             <div key={i}>
               <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{s.label}</div>
@@ -943,7 +945,7 @@ export default function TradeHistory({
                   border: isWin ? '1px solid rgba(52,211,153,0.2)' : isLoss ? '1px solid rgba(248,113,113,0.2)' : '1px solid rgba(251,191,36,0.2)',
                   color: isWin ? '#34d399' : isLoss ? '#f87171' : '#fbbf24',
                 }}>
-                  {getResultText(selectedTrade.result)}
+                  {isOpenTrade(selectedTrade) ? t('incompleteTrade') : getResultText(selectedTrade.result)}
                 </div>
               </div>
             </div>
@@ -1138,7 +1140,10 @@ export default function TradeHistory({
                         {isW ? `+${winAmount(trade)}$`
                           : isL ? `-${lossAmount(trade)}$`
                           : trade.result === 'Başa Baş' ? <span style={{ color: 'rgba(255,255,255,0.45)' }}>0$</span>
-                          : <span className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('openStatus')}</span>}
+                          : <span className="text-[11px] px-2 py-0.5 rounded-full whitespace-nowrap"
+                              style={{ background: 'rgba(251,191,36,0.12)', color: '#fbbf24' }}>
+                              {t('incompleteTrade')}
+                            </span>}
                       </span>
 
                       <div className="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"

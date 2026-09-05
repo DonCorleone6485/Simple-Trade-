@@ -8,6 +8,8 @@ export interface JournalStats {
   winRate: string;
   netPnL: number;
   profitFactor: string;
+  /** Sonucu henüz girilmemiş işlem sayısı. */
+  open?: number;
 }
 
 interface JournalDashboardProps {
@@ -149,11 +151,19 @@ export default function JournalDashboard({
                         <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 flex-shrink-0"
                           style={{ color: 'rgba(255,255,255,0.35)', transition: 'opacity 150ms' }} />
                       </div>
-                      <div className="text-[13px] mt-1.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                        {formatDate(acc.startDate)}
-                        {acc.startingCapital != null && (
-                          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {'  ·  '}${acc.startingCapital.toLocaleString()}
+                      <div className="text-[13px] mt-1.5 flex items-center gap-2.5 flex-wrap" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                        <span>
+                          {formatDate(acc.startDate)}
+                          {acc.startingCapital != null && (
+                            <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                              {'  ·  '}${acc.startingCapital.toLocaleString()}
+                            </span>
+                          )}
+                        </span>
+                        {(stats.open ?? 0) > 0 && (
+                          <span className="text-[11px] px-2 py-0.5 rounded-full"
+                            style={{ background: 'rgba(251,191,36,0.12)', color: '#fbbf24' }}>
+                            {stats.open} {t('incompleteTrade').toLowerCase()}
                           </span>
                         )}
                       </div>

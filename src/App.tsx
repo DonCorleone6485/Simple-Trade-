@@ -24,7 +24,7 @@ import { Trade, Account, JournalGoals } from './types';
 import { useLanguage } from './context/LanguageContext';
 import { supabase } from './lib/supabase';
 import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
-import { isWinTrade, isLossTrade, lossAmount, winAmount } from './lib/tradeMath';
+import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
 
 type View = 'dashboard' | 'expanded' | 'pricing';
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals';
@@ -519,7 +519,7 @@ export default function App() {
     const grossLoss = losses.reduce((s, tr) => s + lossAmount(tr), 0);
     const netPnL = grossProfit - grossLoss;
     const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : grossProfit > 0 ? '∞' : '0.00';
-    return { total: jt.length, winRate, netPnL, profitFactor };
+    return { total: jt.length, winRate, netPnL, profitFactor, open: jt.filter(isOpenTrade).length };
   };
 
   const languages = [

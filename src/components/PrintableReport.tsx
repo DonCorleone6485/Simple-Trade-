@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Trade, Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
-import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration } from '../lib/tradeMath';
+import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade } from '../lib/tradeMath';
 import { MTF_TIMEFRAMES } from './MTFAnalysis';
 
 interface PrintableReportProps {
@@ -61,6 +61,7 @@ export default function PrintableReport({ journal, trades, single = false, onDon
     if (r === 'Manuel Karda') return t('resultManualWin');
     if (r === 'Manuel Zararda') return t('resultManualLoss');
     if (r === 'Başa Baş') return t('resultBreakeven');
+    if (!r) return t('incompleteTrade');
     return r;
   };
   const orderText = (o?: string) =>
@@ -198,7 +199,7 @@ export default function PrintableReport({ journal, trades, single = false, onDon
                 {t('reportTradeDetails')}
               </h2>
               <span style={{ fontSize: 15, fontWeight: 700, color: win ? ink.win : loss ? ink.loss : ink.soft, fontVariantNumeric: 'tabular-nums' }}>
-                {pnl === 0 ? '$0.00' : money(pnl)}
+                {isOpenTrade(trade) ? t('incompleteTrade') : pnl === 0 ? '$0.00' : money(pnl)}
               </span>
             </div>
 

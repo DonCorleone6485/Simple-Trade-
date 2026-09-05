@@ -16,6 +16,9 @@ export const isLossTrade = (t: Pick<Trade, 'result'>) =>
 
 export const isBreakevenTrade = (t: Pick<Trade, 'result'>) => t.result === 'Başa Baş';
 
+/** Sonucu girilmemiş işlem — hâlâ açık ya da kaydı tamamlanmamış. */
+export const isOpenTrade = (t: Pick<Trade, 'result'>) => !t.result;
+
 /** Kaybedilen tutar — her zaman pozitif. */
 export const lossAmount = (t: Pick<Trade, 'reward' | 'risk'>) =>
   (t.reward || 0) < 0 ? Math.abs(t.reward || 0) : (t.risk || 0);

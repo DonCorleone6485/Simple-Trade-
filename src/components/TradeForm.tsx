@@ -440,6 +440,8 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
   const isLossResult = result === 'Başarısız' || result === 'Manuel Zararda';
   const isWinResult = result === 'Başarılı' || result === 'Manuel Karda';
   const isBreakevenResult = result === 'Başa Baş';
+  /** Sonuç seçilmemişse işlem hâlâ açık: kapanış alanları beklenmez. */
+  const isClosed = result !== '';
 
   /** Tutar alanının başlığı sonuca göre değişir; sonuç seçilmeden ikisi de yazar. */
   const amountLabel = isLossResult
@@ -497,6 +499,12 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!date) { alert(t('pleaseSelectDate') || 'Lütfen tarih seçin'); return; }
+    if (isClosed && !exitDate) {
+      alert(language === 'tr'
+        ? 'Sonuç girdiğin işlem için çıkış tarihi de gerekli.'
+        : 'A trade with a result needs an exit time as well.');
+      return;
+    }
     if (exitDate && new Date(exitDate).getTime() < new Date(date).getTime()) {
       alert(language === 'tr'
         ? 'Çıkış tarihi, giriş tarihinden önce olamaz.'
@@ -505,10 +513,13 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
     }
     const newTrade: Trade = {
       id: Date.now().toString(),
-      date, exitDate: exitDate || undefined, symbol, type, orderType, setup,
+      date,
+      // Açık işlemde çıkış ve tutar boş kalır; sonuç girilince tamamlanır.
+      exitDate: isClosed ? (exitDate || undefined) : undefined,
+      symbol, type, orderType, setup,
       risk: parseFloat(risk) || 0,
       // Kullanıcı her zaman pozitif yazar; kayıpta değeri negatife çeviriyoruz.
-      reward: isBreakevenResult ? 0 : (isLossResult ? -1 : 1) * Math.abs(parseFloat(reward) || 0),
+      reward: !isClosed ? 0 : isBreakevenResult ? 0 : (isLossResult ? -1 : 1) * Math.abs(parseFloat(reward) || 0),
       rr, result: result as TradeResult,
       preTradeNotes: preNotes, postTradeNotes: postNotes,
       preTradePhotos: prePhotos, postTradePhotos: postPhotos,
@@ -592,8 +603,8 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
             <SetupPicker value={setup} onChange={setSetup} />
           </div>
           <div>
-            <label style={lbl}>{t('rr')}<Req /></label>
-            <input type="number" step="any" required value={rr} onChange={e => setRr(e.target.value)}
+            <label style={lbl}>{t('rr')}{isClosed && <Req />}</label>
+            <input type="number" step="any" required={isClosed} value={rr} onChange={e => setRr(e.target.value)}
               style={{ ...inp, fontFamily: 'monospace' }} placeholder={t('rrPlaceholder')} />
           </div>
           <div>
@@ -605,8 +616,8 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
               </div>
             </div>
             <div>
-              <label style={lbl}>{t('result')}<Req /></label>
-              <select value={result} onChange={handleResultChange} required style={selStyle}>
+              <label style={lbl}>{t('result')}</label>
+              <select value={result} onChange={handleResultChange} style={selStyle}>
                 <option value="" style={optStyle}>{t('selectPlaceholder')}</option>
                 <option value="Başarılı" style={optStyle}>{t('resultWin')}</option>
                 <option value="Başarısız" style={optStyle}>{t('resultLoss')}</option>
@@ -614,17 +625,22 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
                 <option value="Manuel Zararda" style={optStyle}>{t('resultManualLoss')}</option>
                 <option value="Başa Baş" style={optStyle}>{t('resultBreakeven')}</option>
               </select>
+              {!isClosed && (
+                <p className="text-[11px] mt-2 leading-snug" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  {t('finishLater')}
+                </p>
+              )}
             </div>
             <div>
               <label style={lbl}>
                 <span style={{ color: isLossResult ? '#f87171' : isWinResult ? '#34d399' : 'rgba(255,255,255,0.55)' }}>
                   {amountLabel}
                 </span>
-                <Req />
+                {isClosed && <Req />}
               </label>
               <div className="relative">
                 <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                <input type="number" min="0" step="0.01" required readOnly={isBreakevenResult}
+                <input type="number" min="0" step="0.01" required={isClosed} readOnly={isBreakevenResult}
                   value={reward} onChange={e => setReward(e.target.value)}
                   style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace', opacity: isBreakevenResult ? 0.6 : 1 }}
                   placeholder="0.00" />
@@ -632,7 +648,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
             </div>
 
             <div>
-              <label style={lbl}>{t('exitDateTime')}<Req /></label>
+              <label style={lbl}>{t('exitDateTime')}{isClosed && <Req />}</label>
               <DatePicker
                 value={exitDate ? new Date(exitDate) : null}
                 onChange={(dateObj: DateObject | null) => { if (dateObj) setExitDate(dateObj.toDate().toISOString()); else setExitDate(''); }}
@@ -658,8 +674,8 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
           <p style={sectionTitle}>{t('preTrade')}</p>
           <div className="space-y-6">
             <div>
-              <label style={lbl}>{t('notes')}<Req /></label>
-              <textarea required value={preNotes} onChange={e => setPreNotes(e.target.value)}
+              <label style={lbl}>{t('notes')} <span style={optHint}>({t('optionalLabel')})</span></label>
+              <textarea value={preNotes} onChange={e => setPreNotes(e.target.value)}
                 style={{ ...inp, height: '200px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
                 placeholder={t('preNotesPlaceholder')} />
             </div>
@@ -674,8 +690,8 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
           <p style={sectionTitle}>{t('postTrade')}</p>
           <div className="space-y-6">
             <div>
-              <label style={lbl}>{t('notes')}<Req /></label>
-              <textarea required value={postNotes} onChange={e => setPostNotes(e.target.value)}
+              <label style={lbl}>{t('notes')}{isClosed && <Req />}</label>
+              <textarea required={isClosed} value={postNotes} onChange={e => setPostNotes(e.target.value)}
                 style={{ ...inp, height: '200px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
                 placeholder={t('postNotesPlaceholder')} />
             </div>
