@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Trade, Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL } from '../lib/tradeMath';
@@ -101,7 +102,7 @@ export default function PrintableReport({ journal, trades, single = false, onDon
     </tr>
   );
 
-  return (
+  const report = (
     <div id="print-root" style={{ display: 'none', fontFamily: 'Inter, system-ui, sans-serif', color: ink.text, background: '#fff', padding: '0 4px' }}>
       {/* ── Başlık ── */}
       <div style={{ borderBottom: `2px solid ${ink.text}`, paddingBottom: 12, marginBottom: 18 }}>
@@ -250,4 +251,7 @@ export default function PrintableReport({ journal, trades, single = false, onDon
       )}
     </div>
   );
+
+  // Uygulama ağacının dışına basılır; @media print yalnızca bunu gösterir.
+  return createPortal(report, document.body);
 }

@@ -23,20 +23,16 @@ html {
 }
 
 /* ── YAZDIRMA / PDF ────────────────────────────────────────────────────────
-   Rapor açık zeminde basılır; ekrandaki koyu arayüz gizlenir. */
+   Rapor body'ye portal ile basılır. Uygulama ağacı tamamen kaldırılır —
+   visibility ile gizlemek yer kaplamaya devam eder ve boş sayfa üretir. */
 @media print {
-  body * { visibility: hidden !important; }
-  #print-root, #print-root * { visibility: visible !important; }
+  #root { display: none !important; }
   #print-root {
-    position: absolute;
-    inset-inline-start: 0;
-    top: 0;
-    width: 100%;
+    display: block !important;
     background: #fff !important;
     color: #111 !important;
   }
   .print-break { break-inside: avoid; page-break-inside: avoid; }
-  .print-page-break { break-before: page; page-break-before: always; }
 }
 
 @page { margin: 14mm; }
