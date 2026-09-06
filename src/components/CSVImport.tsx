@@ -36,6 +36,23 @@ function parseCSVLine(line: string): string[] {
   return result;
 }
 
+/**
+ * MetaTrader'ın "Rapor kaydet" çıktısı CSV değil HTML'dir; tablo satırlarını
+ * CSV ile aynı biçime (satır -> hücre dizisi) çeviriyoruz.
+ */
+function parseHTMLTables(content: string): string[][] {
+  const doc = new DOMParser().parseFromString(content, 'text/html');
+  const rows: string[][] = [];
+  doc.querySelectorAll('tr').forEach(tr => {
+    const cells = Array.from(tr.querySelectorAll('td, th'))
+      .map(td => (td.textContent || '').replace(/\u00a0/g, ' ').trim());
+    if (cells.some(c => c !== '')) rows.push(cells);
+  });
+  return rows;
+}
+
+const isHTML = (content: string) => /<\s*table|<\s*html|<\s*tr[\s>]/i.test(content.slice(0, 4000));
+
 // ── PLATFORM DETECTION ─────────────────────────────────────────────────────
 function detectPlatform(headers: string[]): string {
   const h = headers.map(x => x.trim().toLowerCase());
@@ -106,8 +123,9 @@ function calcRR(openPrice: number, sl: number, tp: number, type: 'Buy' | 'Sell')
   return (reward / risk).toFixed(2);
 }
 
-function getResult(profit: number): 'Başarılı' | 'Başarısız' {
-  return profit >= 0 ? 'Başarılı' : 'Başarısız';
+function getResult(profit: number): 'Başarılı' | 'Başarısız' | 'Başa Baş' {
+  if (profit === 0) return 'Başa Baş';
+  return profit > 0 ? 'Başarılı' : 'Başarısız';
 }
 
 function getType(side: string): 'Buy' | 'Sell' {
@@ -122,35 +140,75 @@ function makeId(): string {
 
 function cleanSymbol(symbol: string): string {
   return symbol
+    .toUpperCase()
     .replace('FX:', '').replace('NASDAQ:', '').replace('NYSE:', '')
-    .replace('CME_MINI:', '').replace('.x', '').replace('.r', '')
+    .replace('CME_MINI:', '').replace('.X', '').replace('.R', '')
     .trim();
 }
 
-// ── MT4/MT5 PARSER — kolon indeksi bazlı ──────────────────────────────────
-// Header: Zaman(0), Pozisyon(1), Sembol(2), Tür(3), Hacim(4), Fiyat(5), S/L(6), T/P(7), Zaman(8), Fiyat(9), Komisyon(10), Swap(11), Kar(12)
-function parseMT4(rows: string[][], journalId: string, userId: string): Trade[] {
+// ── MT4/MT5 PARSER ────────────────────────────────────────────────────────
+// MT4 ve MT5 raporlarının sütun sırası aynı değil (MT4'te 4. sütun Size, MT5'te
+// Type), üstelik başlıklar dile göre değişiyor. Sabit indeks yerine başlıktan
+// eşliyoruz. MT5'te "Zaman"/"Fiyat" iki kez geçer: ilki açılış, ikincisi kapanış.
+interface MTCols {
+  openTime: number; closeTime: number; symbol: number; type: number;
+  openPrice: number; sl: number; tp: number; profit: number;
+}
+
+function mapMTColumns(headers: string[]): MTCols | null {
+  const h = headers.map(x => x.trim().toLowerCase().replace(/\s+/g, ' '));
+  const findAll = (...names: string[]) =>
+    h.map((v, i) => (names.includes(v) ? i : -1)).filter(i => i >= 0);
+  const first = (...names: string[]) => (findAll(...names)[0] ?? -1);
+
+  const times = findAll('open time', 'close time', 'time', 'zaman', 'açılış zamanı', 'kapanış zamanı');
+  const prices = findAll('price', 'fiyat');
+
+  const openTime = first('open time', 'açılış zamanı') >= 0 ? first('open time', 'açılış zamanı') : (times[0] ?? -1);
+  const closeTime = first('close time', 'kapanış zamanı') >= 0 ? first('close time', 'kapanış zamanı') : (times[1] ?? -1);
+  const openPrice = prices[0] ?? -1;
+
+  const cols: MTCols = {
+    openTime,
+    closeTime,
+    symbol: first('item', 'symbol', 'sembol', 'enstrüman'),
+    type: first('type', 'tür', 'tur', 'işlem türü'),
+    openPrice,
+    sl: first('s/l', 's / l', 'sl', 'stop loss'),
+    tp: first('t/p', 't / p', 'tp', 'take profit'),
+    profit: first('profit', 'kar', 'kâr', 'net kar', 'kar/zarar'),
+  };
+  if (cols.symbol < 0 || cols.type < 0 || cols.profit < 0) return null;
+  return cols;
+}
+
+function parseMT(rows: string[][], headers: string[], journalId: string, userId: string): Trade[] {
+  const c = mapMTColumns(headers);
+  if (!c) return [];
   const trades: Trade[] = [];
 
   for (const cols of rows) {
-    if (cols.length < 13) continue;
+    const typeRaw = (cols[c.type] || '').trim().toLowerCase();
+    // balance / credit gibi hesap hareketlerini atla
+    if (typeRaw !== 'buy' && typeRaw !== 'sell' && typeRaw !== 'al' && typeRaw !== 'sat') continue;
 
-    const typeRaw = cols[3]?.trim().toLowerCase();
-    if (typeRaw !== 'buy' && typeRaw !== 'sell') continue;
-
-    const symbol = cleanSymbol(cols[2] || '');
+    const symbol = cleanSymbol(cols[c.symbol] || '').toUpperCase();
     if (!symbol) continue;
 
     const type = getType(typeRaw);
-    const openDate = parseDate(cols[0] || '');
-    const openPrice = parseNumber(cols[5] || '0');
-    const sl = parseNumber(cols[6] || '0');
-    const tp = parseNumber(cols[7] || '0');
-    const profit = parseNumber(cols[12] || '0');
+    const openDate = parseDate(cols[c.openTime] || '');
+    const closeRaw = c.closeTime >= 0 ? (cols[c.closeTime] || '') : '';
+    const openPrice = parseNumber(cols[c.openPrice] || '0');
+    const sl = c.sl >= 0 ? parseNumber(cols[c.sl] || '0') : 0;
+    const tp = c.tp >= 0 ? parseNumber(cols[c.tp] || '0') : 0;
+    const profit = parseNumber(cols[c.profit] || '0');
 
-    const rr = calcRR(openPrice, sl, tp, type);
-    const reward = profit > 0 ? profit : 0;
-    const risk = profit < 0 ? Math.abs(profit) : 0;
+    // Kapanış zamanı yalnızca gerçek bir tarihse alınır.
+    let exitDate: string | undefined;
+    if (closeRaw && /\d{4}[.\-/]\d{2}[.\-/]\d{2}/.test(closeRaw)) {
+      const parsed = parseDate(closeRaw);
+      if (new Date(parsed).getTime() >= new Date(openDate).getTime()) exitDate = parsed;
+    }
 
     trades.push({
       id: makeId(),
@@ -158,13 +216,15 @@ function parseMT4(rows: string[][], journalId: string, userId: string): Trade[] 
       journal_id: journalId,
       user_id: userId,
       date: openDate,
+      exitDate,
       symbol,
       type,
       timeframe: '',
       setup: '',
-      risk,
-      reward,
-      rr,
+      // Gerçekleşen tutar işaretli tutulur; kayıpta risk de aynı tutardır.
+      risk: profit < 0 ? Math.abs(profit) : 0,
+      reward: profit,
+      rr: calcRR(openPrice, sl, tp, type),
       result: getResult(profit),
       preTradeNotes: '',
       postTradeNotes: '',
@@ -194,8 +254,8 @@ function parseCTrader(rows: Record<string, string>[], journalId: string, userId:
         type,
         timeframe: '',
         setup: '',
-        risk: 0,
-        reward: profit > 0 ? profit : 0,
+        risk: profit < 0 ? Math.abs(profit) : 0,
+        reward: profit,
         rr: '',
         result: getResult(profit),
         preTradeNotes: '',
@@ -225,8 +285,8 @@ function parseTradeLocker(rows: Record<string, string>[], journalId: string, use
       type,
       timeframe: '',
       setup: '',
-      risk: sl > 0 ? Math.abs(entryPrice - sl) : 0,
-      reward: profit > 0 ? profit : 0,
+      risk: profit < 0 ? Math.abs(profit) : 0,
+      reward: profit,
       rr,
       result: getResult(profit),
       preTradeNotes: '',
@@ -271,8 +331,8 @@ function parseTradovate(rows: Record<string, string>[], journalId: string, userI
         type: 'Buy',
         timeframe: '',
         setup: '',
-        risk: 0,
-        reward: profit > 0 ? profit : 0,
+        risk: profit < 0 ? Math.abs(profit) : 0,
+        reward: profit,
         rr: '',
         result: getResult(profit),
         preTradeNotes: '',
@@ -323,8 +383,8 @@ function parseNinjaTrader(rows: Record<string, string>[], journalId: string, use
         type,
         timeframe: '',
         setup: '',
-        risk: 0,
-        reward: profit > 0 ? profit : 0,
+        risk: profit < 0 ? Math.abs(profit) : 0,
+        reward: profit,
         rr: '',
         result: getResult(profit),
         preTradeNotes: '',
@@ -371,8 +431,8 @@ function parseTradingView(rows: Record<string, string>[], journalId: string, use
         type: 'Buy',
         timeframe: '',
         setup: '',
-        risk: 0,
-        reward: profit > 0 ? profit : 0,
+        risk: profit < 0 ? Math.abs(profit) : 0,
+        reward: profit,
         rr: '',
         result: getResult(profit),
         preTradeNotes: '',
@@ -402,8 +462,8 @@ function parseIBKR(rows: Record<string, string>[], journalId: string, userId: st
         type,
         timeframe: '',
         setup: '',
-        risk: 0,
-        reward: profit > 0 ? profit : 0,
+        risk: profit < 0 ? Math.abs(profit) : 0,
+        reward: profit,
         rr: '',
         result: getResult(profit),
         preTradeNotes: '',
@@ -452,8 +512,8 @@ function parseBinance(rows: Record<string, string>[], journalId: string, userId:
         type: 'Buy',
         timeframe: '',
         setup: '',
-        risk: 0,
-        reward: profit > 0 ? profit : 0,
+        risk: profit < 0 ? Math.abs(profit) : 0,
+        reward: profit,
         rr: '',
         result: getResult(profit),
         preTradeNotes: '',
@@ -490,12 +550,12 @@ function parseBybit(rows: Record<string, string>[], journalId: string, userId: s
         journal_id: journalId,
         user_id: userId,
         date: parseDate(row['Open Time'] || row['open time'] || row['Create Time'] || row['Time'] || ''),
-        symbol: cleanSymbol(row['Symbol'] || row['symbol'] || row['Contract'] || ''),
+        symbol: cleanSymbol(row['Symbol'] || row['symbol'] || row['Contract'] || row['Contracts'] || row['contracts'] || ''),
         type,
         timeframe: '',
         setup: '',
-        risk: sl > 0 ? Math.abs(entryPrice - sl) : 0,
-        reward: profit > 0 ? profit : 0,
+        risk: profit < 0 ? Math.abs(profit) : 0,
+        reward: profit,
         rr,
         result: getResult(profit),
         preTradeNotes: '',
@@ -510,15 +570,23 @@ function parseBybit(rows: Record<string, string>[], journalId: string, userId: s
 // ── MAIN PARSER ────────────────────────────────────────────────────────────
 function parseCSVFile(content: string, journalId: string, userId: string): ParseResult {
   const errors: string[] = [];
-  const rawLines = content.split('\n').filter(l => l.trim() !== '');
-  if (rawLines.length < 2) return { trades: [], platform: 'Unknown', errors: ['CSV dosyası boş veya geçersiz.'] };
 
-  // Her satırı proper CSV olarak parse et
-  const parsedLines = rawLines.map(l => parseCSVLine(l));
+  // HTML rapor mu, CSV mi?
+  let parsedLines: string[][];
+  if (isHTML(content)) {
+    parsedLines = parseHTMLTables(content);
+    if (parsedLines.length < 2) {
+      return { trades: [], platform: 'Unknown', errors: ['HTML raporunda tablo bulunamadı.'] };
+    }
+  } else {
+    const rawLines = content.split('\n').filter(l => l.trim() !== '');
+    if (rawLines.length < 2) return { trades: [], platform: 'Unknown', errors: ['Dosya boş veya geçersiz.'] };
+    parsedLines = rawLines.map(l => parseCSVLine(l));
+  }
 
   // Header satırını bul
   let headerIdx = 0;
-  for (let i = 0; i < Math.min(15, parsedLines.length); i++) {
+  for (let i = 0; i < Math.min(60, parsedLines.length); i++) {
     const cols = parsedLines[i].map(c => c.toLowerCase());
     if (cols.length >= 3 && (
       cols.includes('symbol') || cols.includes('sembol') ||
@@ -537,7 +605,7 @@ function parseCSVFile(content: string, journalId: string, userId: string): Parse
   let endIdx = parsedLines.length;
   for (let i = headerIdx + 1; i < parsedLines.length; i++) {
     const first = parsedLines[i][0]?.trim().toLowerCase() || '';
-    if (first === 'emirler' || first === 'orders') {
+    if (first === 'emirler' || first === 'orders' || first === 'deals' || first === 'işlemler') {
       endIdx = i;
       break;
     }
@@ -554,8 +622,8 @@ function parseCSVFile(content: string, journalId: string, userId: string): Parse
 
   try {
     if (platform === 'MT4/MT5') {
-      // MT4/MT5 için kolon indeksi bazlı parser kullan
-      trades = parseMT4(dataLines, journalId, userId);
+      // MT4/MT5: sütunlar başlıktan eşlenir
+      trades = parseMT(dataLines, headers, journalId, userId);
     } else {
       // Diğer platformlar için dict bazlı parser
       const rows: Record<string, string>[] = dataLines.map(cols => {
@@ -607,8 +675,9 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
   const [fileName, setFileName] = useState('');
 
   const processFile = (file: File) => {
-    if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
-      setParseResult({ trades: [], platform: 'Unknown', errors: ['Sadece .csv veya .txt dosyaları desteklenir.'] });
+    const name = file.name.toLowerCase();
+    if (!['.csv', '.txt', '.html', '.htm'].some(ext => name.endsWith(ext))) {
+      setParseResult({ trades: [], platform: 'Unknown', errors: ['Sadece .csv, .txt, .html veya .htm dosyaları desteklenir.'] });
       return;
     }
     setFileName(file.name);
@@ -695,7 +764,7 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
             padding: '48px 24px',
           }}
         >
-          <input ref={fileInputRef} type="file" accept=".csv,.txt" className="hidden" onChange={handleFileChange} />
+          <input ref={fileInputRef} type="file" accept=".csv,.txt,.html,.htm" className="hidden" onChange={handleFileChange} />
           <Upload className="w-10 h-10 mb-4" style={{ color: dragging ? '#8b5cf6' : 'rgba(255,255,255,0.2)' }} />
           <p className="font-medium text-white mb-1">
             {language === 'tr' ? 'CSV dosyasını sürükleyin veya tıklayın' :
