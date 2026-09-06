@@ -60,6 +60,13 @@ function detectPlatform(headers: string[]): string {
   // MetaTrader 4/5 — English
   if (h.includes('ticket') && (h.includes('open time') || h.includes('open_time'))) return 'MT4/MT5';
 
+  // S/L ve T/P sütunları yalnızca MetaTrader raporlarında birlikte bulunur;
+  // bu, dilden ve MT4/MT5 farkından bağımsız en güvenilir işaret.
+  const hasSL = h.includes('s / l') || h.includes('s/l');
+  const hasTP = h.includes('t / p') || h.includes('t/p');
+  if (hasSL && hasTP) return 'MT4/MT5';
+  if (h.includes('position') && h.includes('symbol') && h.includes('volume')) return 'MT4/MT5';
+
   // MetaTrader 4/5 — Turkish
   if (h.includes('sembol') && h.includes('hacim')) return 'MT4/MT5';
   if (h.includes('sembol') && h.includes('kar')) return 'MT4/MT5';
@@ -101,6 +108,11 @@ function parseDate(dateStr: string): string {
   const d = new Date(cleaned);
   if (!isNaN(d.getTime())) return d.toISOString();
   return new Date().toISOString();
+}
+
+/** Kayan nokta artıklarını temizler: 30.000000000001 -> 30 */
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
 }
 
 function parseNumber(val: string): number {
@@ -320,7 +332,7 @@ function parseTradovate(rows: Record<string, string>[], journalId: string, userI
       const entryPrice = parseNumber(entry['Avg Fill Price'] || entry['avgPrice'] || entry['Price'] || '0');
       const exitPrice = parseNumber(ex['Avg Fill Price'] || ex['avgPrice'] || ex['Price'] || '0');
       const qty = parseNumber(entry['Filled Qty'] || entry['filledQty'] || entry['Quantity'] || '1');
-      const profit = (exitPrice - entryPrice) * qty;
+      const profit = round2((exitPrice - entryPrice) * qty);
       trades.push({
         id: makeId(),
         accountId: journalId,
@@ -420,7 +432,7 @@ function parseTradingView(rows: Record<string, string>[], journalId: string, use
       const entryPrice = parseNumber(entry['Fill Price'] || entry['fill price'] || entry['Price'] || '0');
       const exitPrice = parseNumber(ex['Fill Price'] || ex['fill price'] || ex['Price'] || '0');
       const qty = parseNumber(entry['Qty'] || entry['qty'] || entry['Quantity'] || '1');
-      const profit = (exitPrice - entryPrice) * qty;
+      const profit = round2((exitPrice - entryPrice) * qty);
       trades.push({
         id: makeId(),
         accountId: journalId,
@@ -479,7 +491,7 @@ function parseBinance(rows: Record<string, string>[], journalId: string, userId:
   const entries: Record<string, string>[] = [];
   const exits: Record<string, string>[] = [];
   rows.forEach(row => {
-    const type = (row['Type'] || row['type'] || row['Side'] || row['side'] || '').toUpperCase();
+    const type = (row['Side'] || row['side'] || row['Type'] || row['type'] || '').toUpperCase();
     if (type === 'BUY' || type === 'B') entries.push(row);
     else exits.push(row);
   });
@@ -501,7 +513,7 @@ function parseBinance(rows: Record<string, string>[], journalId: string, userId:
       const entryPrice = parseNumber(entry['Price'] || entry['price'] || '0');
       const exitPrice = parseNumber(ex['Price'] || ex['price'] || '0');
       const qty = parseNumber(entry['Quantity'] || entry['quantity'] || entry['Amount'] || '1');
-      const profit = (exitPrice - entryPrice) * qty;
+      const profit = round2((exitPrice - entryPrice) * qty);
       trades.push({
         id: makeId(),
         accountId: journalId,
