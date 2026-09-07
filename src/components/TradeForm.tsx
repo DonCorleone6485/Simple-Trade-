@@ -610,7 +610,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
             <SetupPicker value={setup} onChange={setSetup} />
           </div>
           <div>
-            <label style={lbl}>{t('rr')}{isClosed && <Req />}</label>
+            <label style={lbl}>{t('plannedRR')}{isClosed && <Req />}</label>
             <input type="number" step="any" required={isClosed} value={rr} onChange={e => setRr(e.target.value)}
               style={{ ...inp, fontFamily: 'monospace' }} placeholder={t('rrPlaceholder')} />
           </div>

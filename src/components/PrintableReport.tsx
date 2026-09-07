@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Trade, Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
-import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade } from '../lib/tradeMath';
+import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
 import { MTF_TIMEFRAMES } from './MTFAnalysis';
 import { money, signedMoney, int } from '../lib/format';
 
@@ -183,7 +183,8 @@ export default function PrintableReport({ journal, trades, single = false, onDon
             win ? t('reward') : loss ? t('lossAmountLabel') : t('rewardOrLossLabel'),
             money(win ? winAmount(trade) : loss ? lossAmount(trade) : 0),
           ],
-          [t('rr'), trade.rr || '-'],
+          [t('plannedRR'), trade.rr ? `${trade.rr}R` : '-'],
+          ...(realizedR(trade) != null ? [[t('realizedR'), formatR(realizedR(trade))] as [string, string]] : []),
           [t('result'), resultText(trade.result)],
         ];
 

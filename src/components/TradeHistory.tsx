@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Trade, OrderType } from '../types';
-import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade } from '../lib/tradeMath';
+import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
 import { money, signedMoney } from '../lib/format';
 import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
@@ -147,8 +147,9 @@ export default function TradeHistory({
   const worstTrade = losingTrades.length > 0 ? Math.max(...losingTrades.map(getLossAmount)) : 0;
   const holdTimes = closedTrades.map(holdMinutes).filter((n): n is number => n != null);
   const avgHold = holdTimes.length > 0 ? Math.round(holdTimes.reduce((a, b) => a + b, 0) / holdTimes.length) : null;
-  const validRRs = closedTrades.map(t => parseFloat(t.rr)).filter(n => !isNaN(n));
-  const avgRR = validRRs.length > 0 ? (validRRs.reduce((a, b) => a + b, 0) / validRRs.length).toFixed(2) : '0.00';
+  // Planlanan R/R değil, gerçekleşen R'lerin ortalaması.
+  const realizedRs = closedTrades.map(realizedR).filter((n): n is number => n != null);
+  const avgR = realizedRs.length > 0 ? realizedRs.reduce((a, b) => a + b, 0) / realizedRs.length : null;
   const sortedByDate = [...closedTrades].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const chartData = sortedByDate.reduce((acc: any[], trade, index) => {
@@ -377,7 +378,7 @@ export default function TradeHistory({
             { label: t('winRate'), value: `%${winRate}`, color: 'rgba(255,255,255,0.9)' },
             { label: t('netProfit'), value: signedMoney(netProfit), color: netProfit >= 0 ? '#34d399' : '#f87171' },
             { label: t('profitFactor'), value: profitFactor, color: 'rgba(255,255,255,0.9)' },
-            { label: t('avgRR'), value: `${avgRR}R`, color: 'rgba(255,255,255,0.9)' },
+            { label: t('avgRealizedR'), value: formatR(avgR), color: avgR == null ? 'rgba(255,255,255,0.9)' : avgR >= 0 ? '#34d399' : '#f87171' },
             { label: t('totalTrades'), value: String(totalClosed), color: 'rgba(255,255,255,0.9)' },
             { label: t('bestTrade'), value: `+${money(bestTrade)}`, color: '#34d399' },
             { label: t('worstTrade'), value: `\u2212${money(worstTrade)}`, color: '#f87171' },
@@ -700,7 +701,7 @@ export default function TradeHistory({
                 placeholder="0.00" />
             </div>
             <div>
-              <label style={lbl}>{t('rr')}</label>
+              <label style={lbl}>{t('plannedRR')}</label>
               <input type="number" step="0.01" style={inp} value={editForm.rr || ''} onChange={e => setEditForm(f => ({ ...f, rr: e.target.value }))} placeholder="2.5" />
             </div>
             <div>
@@ -963,9 +964,18 @@ export default function TradeHistory({
                   <div className="font-semibold text-white">{money(selectedTrade.risk || 0)} <span className="mx-1" style={{ color: 'rgba(255,255,255,0.2)' }}>/</span> {money(isLossTrade(selectedTrade) ? lossAmount(selectedTrade) : winAmount(selectedTrade))}</div>
                 </div>
                 <div className="text-end">
-                  <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>R/R</div>
-                  <div className="font-mono font-semibold text-white">{selectedTrade.rr || '-'}</div>
+                  <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('plannedRR')}</div>
+                  <div className="font-mono font-semibold text-white">{selectedTrade.rr ? `${selectedTrade.rr}R` : '-'}</div>
                 </div>
+                {/* Planlanan hedefin yanında gerçekten olan. */}
+                {realizedR(selectedTrade) != null && (
+                  <div className="text-end">
+                    <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('realizedR')}</div>
+                    <div className="font-mono font-semibold" style={{ color: (realizedR(selectedTrade) as number) >= 0 ? '#34d399' : '#f87171' }}>
+                      {formatR(realizedR(selectedTrade))}
+                    </div>
+                  </div>
+                )}
                 <div className="px-4 py-1.5 rounded-full text-sm font-semibold" style={{
                   background: isWin ? 'rgba(52,211,153,0.1)' : isLoss ? 'rgba(248,113,113,0.1)' : 'rgba(251,191,36,0.1)',
                   border: isWin ? '1px solid rgba(52,211,153,0.2)' : isLoss ? '1px solid rgba(248,113,113,0.2)' : '1px solid rgba(251,191,36,0.2)',
@@ -1151,6 +1161,14 @@ export default function TradeHistory({
                           {trade.setup}
                         </span>
                       )}
+                      {(() => {
+                        const r = realizedR(trade);
+                        return (
+                          <span className="w-16 sm:w-20 font-mono text-sm text-end" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                            {r == null ? '' : formatR(r)}
+                          </span>
+                        );
+                      })()}
                       <span className="ms-auto text-end font-mono font-medium" style={{ color: isW ? '#34d399' : isL ? '#f87171' : 'rgba(255,255,255,0.4)' }}>
                         {isW ? signedMoney(winAmount(trade))
                           : isL ? signedMoney(-lossAmount(trade))

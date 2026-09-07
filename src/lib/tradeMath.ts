@@ -50,3 +50,24 @@ export const formatDuration = (minutes: number | null, lang: string): string => 
   if (h > 0) return m > 0 ? `${h}${H} ${m}${M}` : `${h}${H}`;
   return `${m}${M}`;
 };
+
+/**
+ * Gerçekleşen R — işlemin net sonucunun, göze alınan riske oranı.
+ *
+ * Formdaki `rr` alanı işleme girmeden önce yazılan *plandır*: 3R hedefleyip
+ * stop olan işlem 3R kaybetmez, 1R kaybeder. Gerçekten olanı görmek için
+ * kâr/zararı riske bölüyoruz.
+ *
+ * Risk girilmemişse (eski ya da içe aktarılmış bazı kayıtlar) oran
+ * hesaplanamaz; null döner ve ekranda çizgi gösterilir.
+ */
+export const realizedR = (t: Pick<Trade, 'result' | 'reward' | 'risk'>): number | null => {
+  if (isOpenTrade(t)) return null;
+  const risk = t.risk || 0;
+  if (risk <= 0) return null;
+  return tradePnL(t) / risk;
+};
+
+/** "+0.50R" / "−1.00R" — işaretli, tipografik eksi ile. */
+export const formatR = (r: number | null): string =>
+  r == null ? '-' : `${r >= 0 ? '+' : '−'}${Math.abs(r).toFixed(2)}R`;
