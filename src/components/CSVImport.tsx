@@ -3,10 +3,17 @@ import { Upload, X, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
+/** İçe aktarılan işlemlerin nereye yazılacağı. */
+export type ImportTarget =
+  | { kind: 'existing'; journalId: string }
+  | { kind: 'new'; name: string };
+
 interface CSVImportProps {
-  onImport: (trades: Trade[]) => void;
+  onImport: (trades: Trade[], target: ImportTarget) => void;
   onClose: () => void;
-  journalId: string;
+  /** Açık journal varsa onun kimliği; journal listesinden açıldığında boştur. */
+  journalId?: string;
+  journalName?: string;
   userId: string;
 }
 
@@ -678,8 +685,11 @@ const PLATFORM_COLORS: Record<string, string> = {
   'Bybit': '#fb923c',
 };
 
-export default function CSVImport({ onImport, onClose, journalId, userId }: CSVImportProps) {
-  const { language } = useLanguage();
+export default function CSVImport({ onImport, onClose, journalId, journalName, userId }: CSVImportProps) {
+  // Açık journal yoksa tek seçenek yeni journal oluşturmaktır.
+  const [target, setTarget] = useState<'existing' | 'new'>(journalId ? 'existing' : 'new');
+  const [newName, setNewName] = useState('');
+  const { language, t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
@@ -693,11 +703,15 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
       return;
     }
     setFileName(file.name);
+    if (!newName) {
+      const base = file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
+      setNewName(base.slice(0, 40) || (language === 'tr' ? 'İçe Aktarılan Journal' : 'Imported Journal'));
+    }
     setLoading(true);
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
-      const result = parseCSVFile(content, journalId, userId);
+      const result = parseCSVFile(content, journalId || '', userId);
       setParseResult(result);
       setLoading(false);
     };
@@ -716,11 +730,19 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
     if (file) processFile(file);
   };
 
+  const canImport =
+    !!parseResult && parseResult.trades.length > 0 &&
+    (target === 'existing' ? !!journalId : newName.trim().length > 0);
+
   const handleImport = () => {
-    if (parseResult && parseResult.trades.length > 0) {
-      onImport(parseResult.trades);
-      onClose();
-    }
+    if (!parseResult || parseResult.trades.length === 0 || !canImport) return;
+    onImport(
+      parseResult.trades,
+      target === 'existing' && journalId
+        ? { kind: 'existing', journalId }
+        : { kind: 'new', name: newName.trim() }
+    );
+    onClose();
   };
 
   const card: React.CSSProperties = {
@@ -738,7 +760,9 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
 
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-display text-[22px] font-medium text-white">CSV Import</h2>
+            <h2 className="font-display text-[22px] font-medium text-white">
+              {language === 'tr' ? 'İşlem Geçmişi İçe Aktar' : 'Import Trade History'}
+            </h2>
             <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {language === 'tr' ? 'Trade geçmişinizi otomatik içe aktarın' :
                language === 'fa' ? 'تاریخچه معاملات خود را وارد کنید' :
@@ -779,12 +803,14 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
           <input ref={fileInputRef} type="file" accept=".csv,.txt,.html,.htm" className="hidden" onChange={handleFileChange} />
           <Upload className="w-10 h-10 mb-4" style={{ color: dragging ? '#8b5cf6' : 'rgba(255,255,255,0.2)' }} />
           <p className="font-medium text-white mb-1">
-            {language === 'tr' ? 'CSV dosyasını sürükleyin veya tıklayın' :
-             language === 'fa' ? 'فایل CSV را بکشید یا کلیک کنید' :
-             'Drag & drop CSV or click to browse'}
+            {language === 'tr' ? 'Rapor dosyasını sürükleyin veya tıklayın' :
+             language === 'fa' ? 'فایل گزارش را بکشید یا کلیک کنید' :
+             'Drag & drop your report, or click to browse'}
           </p>
           <p className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            {language === 'tr' ? 'Platform otomatik tanınır' : 'Platform auto-detected'}
+            {language === 'tr'
+              ? 'CSV veya HTML · MetaTrader raporu doğrudan yüklenebilir · Platform otomatik tanınır'
+              : 'CSV or HTML · MetaTrader reports work as-is · Platform auto-detected'}
           </p>
         </div>
 
@@ -862,8 +888,10 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
                       </span>
                       <span className="font-mono font-medium text-white">{trade.symbol}</span>
                       <span style={{ color: trade.type === 'Buy' ? '#34d399' : '#f87171' }}>{trade.type}</span>
-                      <span style={{ color: trade.result === 'Başarılı' ? '#34d399' : '#f87171' }}>
-                        {trade.result === 'Başarılı' ? '✅ Win' : '❌ Loss'}
+                      <span style={{ color: trade.result === 'Başarılı' ? '#34d399' : trade.result === 'Başa Baş' ? 'rgba(255,255,255,0.45)' : '#f87171' }}>
+                        {trade.result === 'Başarılı' ? t('winStatus')
+                          : trade.result === 'Başa Baş' ? t('resultBreakeven')
+                          : t('lossStatus')}
                       </span>
                     </div>
                   ))}
@@ -872,6 +900,55 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
                       +{parseResult.trades.length - 50} {language === 'tr' ? 'daha...' : 'more...'}
                     </div>
                   )}
+                </div>
+
+                {/* Hedef: yeni journal mı, açık journal mı */}
+                <div className="mt-6">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3"
+                    style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    {t('importTarget')}
+                  </div>
+
+                  <div className="space-y-2">
+                    <button type="button" onClick={() => setTarget('new')}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all"
+                      style={target === 'new'
+                        ? { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)' }
+                        : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <span className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center"
+                        style={{ border: `2px solid ${target === 'new' ? '#8b5cf6' : 'rgba(255,255,255,0.25)'}` }}>
+                        {target === 'new' && <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#8b5cf6' }} />}
+                      </span>
+                      <span className="text-sm" style={{ color: target === 'new' ? '#fff' : 'rgba(255,255,255,0.6)' }}>
+                        {t('importToNew')}
+                      </span>
+                    </button>
+
+                    {target === 'new' && (
+                      <input type="text" value={newName} onChange={e => setNewName(e.target.value)}
+                        placeholder={t('journalNamePlaceholder')}
+                        className="w-full outline-none text-sm"
+                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                          color: '#fff', borderRadius: '12px', padding: '10px 14px', marginInlineStart: 0 }} />
+                    )}
+
+                    {journalId && (
+                      <button type="button" onClick={() => setTarget('existing')}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all"
+                        style={target === 'existing'
+                          ? { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)' }
+                          : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <span className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center"
+                          style={{ border: `2px solid ${target === 'existing' ? '#8b5cf6' : 'rgba(255,255,255,0.25)'}` }}>
+                          {target === 'existing' && <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#8b5cf6' }} />}
+                        </span>
+                        <span className="text-sm" style={{ color: target === 'existing' ? '#fff' : 'rgba(255,255,255,0.6)' }}>
+                          {t('importToExisting')}
+                          {journalName && <span style={{ color: 'rgba(255,255,255,0.4)' }}> — {journalName}</span>}
+                        </span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -883,10 +960,10 @@ export default function CSVImport({ onImport, onClose, journalId, userId }: CSVI
               </button>
               <button
                 onClick={handleImport}
-                disabled={parseResult.trades.length === 0}
+                disabled={!canImport}
                 className="px-6 py-2 text-sm font-semibold rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ background: '#8b5cf6', color: '#fff' }}
-                onMouseEnter={e => { if (parseResult.trades.length > 0) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+                onMouseEnter={e => { if (canImport) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
               >
                 {parseResult.trades.length > 0

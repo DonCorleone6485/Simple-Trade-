@@ -15,7 +15,7 @@ import CalendarView from './components/CalendarView';
 import GoalsView from './components/GoalsView';
 import PricingPage from './components/PricingPage';
 import PaymentModal from './components/PaymentModal';
-import CSVImport from './components/CSVImport';
+import CSVImport, { ImportTarget } from './components/CSVImport';
 import LandingPage from './components/LandingPage';
 import JournalDashboard from './components/JournalDashboard';
 import AppShell, { NavKey } from './components/AppShell';
@@ -414,8 +414,39 @@ export default function App() {
   };
 
 
-  const handleCSVImport = async (importedTrades: Trade[]) => {
-    if (!activeJournal || !user) return;
+  const handleCSVImport = async (importedTrades: Trade[], target: ImportTarget) => {
+    if (!user) return;
+
+    // Hedef journal: mevcut olan ya da dosya için yeni açılan
+    let targetJournal: Account | null = null;
+    if (target.kind === 'existing') {
+      targetJournal = accounts.find(a => a.id === target.journalId) || activeJournal;
+    } else {
+      if (!isPro && accounts.length >= 1) {
+        setUpgradeReason('journal');
+        setShowUpgradeModal(true);
+        return;
+      }
+      // Journal'ın başlangıcı, dosyadaki en eski işlemin tarihi olsun.
+      const earliest = importedTrades.reduce<string | null>((min, tr) =>
+        !min || new Date(tr.date) < new Date(min) ? tr.date : min, null);
+      const { data, error } = await supabase.from('journals').insert({
+        user_id: user.id,
+        name: target.name,
+        start_date: (earliest || new Date().toISOString()).slice(0, 10),
+        starting_capital: 10000,
+      }).select().single();
+      if (error || !data) {
+        alert(language === 'tr' ? 'Journal oluşturulamadı.' : 'Could not create the journal.');
+        return;
+      }
+      targetJournal = {
+        id: data.id, user_id: data.user_id, name: data.name,
+        startDate: data.start_date, startingCapital: data.starting_capital,
+      };
+      setAccounts(prev => [...prev, targetJournal as Account]);
+    }
+    if (!targetJournal) return;
     if (!isPro) {
       const currentCount = trades.filter(tr => tr.user_id === user.id).length;
       const remaining = 20 - currentCount;
@@ -425,7 +456,7 @@ export default function App() {
     const inserted: Trade[] = [];
     for (const trade of importedTrades) {
       const { data } = await supabase.from('trades').insert({
-        user_id: user.id, journal_id: activeJournal.id, date: trade.date, exit_date: trade.exitDate || null,
+        user_id: user.id, journal_id: targetJournal.id, date: trade.date, exit_date: trade.exitDate || null,
         symbol: trade.symbol, type: trade.type, timeframe: trade.timeframe || '',
         setup: trade.setup || '', risk: trade.risk || 0, reward: trade.reward || 0,
         rr: trade.rr || '', result: trade.result,
@@ -441,6 +472,12 @@ export default function App() {
       });
     }
     setTrades(prev => [...inserted, ...prev]);
+    // Yeni journal açıldıysa doğrudan içine gir.
+    if (target.kind === 'new') {
+      setActiveJournal(targetJournal);
+      setJournalTab('trades');
+      setView('expanded');
+    }
   };
 
   // ── STORAGE'DAN FOTOĞRAF SİL ──
@@ -589,6 +626,15 @@ export default function App() {
 
   const shellActions =
     view === 'dashboard' ? (
+      <>
+      <button onClick={() => setShowCSVImport(true)}
+        className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
+        style={pillBtn}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+        <Upload className="w-4 h-4" />
+        <span className="hidden md:inline">{importLabel}</span>
+      </button>
       <button onClick={handleNewJournalClick}
         className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium"
         style={{ background: '#8b5cf6', color: '#fff', transition: 'all 150ms cubic-bezier(0.4,0,0.2,1)' }}
@@ -597,6 +643,7 @@ export default function App() {
         <PlusCircle className="w-4 h-4" />
         <span className="hidden sm:inline">{t('newJournal')}</span>
       </button>
+      </>
     ) : view === 'expanded' && journalTab !== 'newTrade' ? (
       <>
         <button onClick={() => setPrintJob({ trades: filteredTrades, single: false })}
@@ -769,8 +816,14 @@ export default function App() {
       )}
 
       {/* CSV Import */}
-      {showCSVImport && activeJournal && user && (
-        <CSVImport onImport={handleCSVImport} onClose={() => setShowCSVImport(false)} journalId={activeJournal.id} userId={user.id} />
+      {showCSVImport && user && (
+        <CSVImport
+          onImport={handleCSVImport}
+          onClose={() => setShowCSVImport(false)}
+          journalId={view === 'expanded' ? activeJournal?.id : undefined}
+          journalName={view === 'expanded' ? activeJournal?.name : undefined}
+          userId={user.id}
+        />
       )}
 
       {/* AUTH */}
