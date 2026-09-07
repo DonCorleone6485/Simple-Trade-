@@ -1078,16 +1078,6 @@ export default function TradeHistory({
     return acc;
   }, {} as Record<string, Record<string, Trade[]>>);
 
-  const getRRDisplay = (trade: Trade) => {
-    if (!trade.rr) return '';
-    const rrNum = parseFloat(trade.rr);
-    if (isNaN(rrNum)) return `${trade.rr}R`;
-    const isWin = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
-    const isLoss = trade.result === 'Başarısız' || trade.result === 'Manuel Zararda';
-    if (isWin) return `+${Math.abs(rrNum).toFixed(2)}R`;
-    if (isLoss) return `-${Math.abs(rrNum).toFixed(2)}R`;
-    return `${trade.rr}R`;
-  };
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
@@ -1161,7 +1151,6 @@ export default function TradeHistory({
                           {trade.setup}
                         </span>
                       )}
-                      <span className="w-16 sm:w-20 font-mono text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{getRRDisplay(trade)}</span>
                       <span className="ms-auto text-end font-mono font-medium" style={{ color: isW ? '#34d399' : isL ? '#f87171' : 'rgba(255,255,255,0.4)' }}>
                         {isW ? signedMoney(winAmount(trade))
                           : isL ? signedMoney(-lossAmount(trade))
