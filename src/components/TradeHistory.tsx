@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Trade, OrderType } from '../types';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade } from '../lib/tradeMath';
+import { money, signedMoney } from '../lib/format';
 import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
@@ -374,13 +375,13 @@ export default function TradeHistory({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-9 pb-10" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           {[
             { label: t('winRate'), value: `%${winRate}`, color: 'rgba(255,255,255,0.9)' },
-            { label: t('netProfit'), value: `${netProfit >= 0 ? '+' : '\u2212'}$${Math.abs(netProfit).toFixed(2)}`, color: netProfit >= 0 ? '#34d399' : '#f87171' },
+            { label: t('netProfit'), value: signedMoney(netProfit), color: netProfit >= 0 ? '#34d399' : '#f87171' },
             { label: t('profitFactor'), value: profitFactor, color: 'rgba(255,255,255,0.9)' },
             { label: t('avgRR'), value: `${avgRR}R`, color: 'rgba(255,255,255,0.9)' },
             { label: t('totalTrades'), value: String(totalClosed), color: 'rgba(255,255,255,0.9)' },
-            { label: t('bestTrade'), value: `+$${bestTrade.toFixed(2)}`, color: '#34d399' },
-            { label: t('worstTrade'), value: `\u2212$${worstTrade.toFixed(2)}`, color: '#f87171' },
-            { label: t('maxDrawdown'), value: `$${Math.abs(maxDrawdown).toFixed(2)}`, color: '#f87171' },
+            { label: t('bestTrade'), value: `+${money(bestTrade)}`, color: '#34d399' },
+            { label: t('worstTrade'), value: `\u2212${money(worstTrade)}`, color: '#f87171' },
+            { label: t('maxDrawdown'), value: money(maxDrawdown), color: '#f87171' },
             ...(avgHold != null ? [{ label: t('avgDuration'), value: formatDuration(avgHold, language), color: 'rgba(255,255,255,0.9)' }] : []),
             ...(openTrades.length > 0 ? [{ label: t('openTradesCount'), value: String(openTrades.length), color: '#fbbf24' }] : []),
           ].map((s, i) => (
@@ -426,7 +427,7 @@ export default function TradeHistory({
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                   <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
                   <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `$${v}`} />
-                  <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [`$${value.toFixed(2)}`, t('cumulativePnl')]} labelFormatter={label => `Trade #${label}`} />
+                  <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [money(value), t('cumulativePnl')]} labelFormatter={label => `Trade #${label}`} />
                   <Area type="monotone" dataKey="cumulative" stroke={netProfit >= 0 ? '#10b981' : '#f43f5e'} strokeWidth={2} fillOpacity={1} fill="url(#colorCumulative)" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -439,7 +440,7 @@ export default function TradeHistory({
                 <BarChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                   <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
-                  <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [`$${value.toFixed(2)}`, 'PnL']} labelFormatter={label => `Trade #${label}`} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                  <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [money(value), 'PnL']} labelFormatter={label => `Trade #${label}`} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                   <Bar dataKey="pnl" radius={[4, 4, 4, 4]}>
                     {chartData.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.isWin ? '#10b981' : '#f43f5e'} />))}
                   </Bar>
@@ -451,7 +452,7 @@ export default function TradeHistory({
         <div style={{ ...statCard, padding: '20px' }}>
           <div className="flex items-center justify-between mb-6">
             <h4 className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('drawdownChart')}</h4>
-            <div className="text-sm font-mono" style={{ color: '#f87171' }}>{t('maxDrawdown')}: ${maxDrawdown.toFixed(2)}</div>
+            <div className="text-sm font-mono" style={{ color: '#f87171' }}>{t('maxDrawdown')}: {money(maxDrawdown)}</div>
           </div>
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -465,7 +466,7 @@ export default function TradeHistory({
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                 <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
                 <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `$${v}`} />
-                <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [`$${value.toFixed(2)}`, 'Drawdown']} labelFormatter={label => `Trade #${label}`} />
+                <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [money(value), 'Drawdown']} labelFormatter={label => `Trade #${label}`} />
                 <Area type="monotone" dataKey="drawdown" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#colorDrawdown)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -489,7 +490,7 @@ export default function TradeHistory({
                       <td key={i} className="px-1 py-1">
                         <div className="rounded-lg flex items-center justify-center text-xs font-mono"
                           style={{ background: getHeatColor(cell.pnl, cell.total), border: '1px solid rgba(255,255,255,0.04)', height: '40px', minWidth: '48px', color: cell.total > 0 ? (cell.pnl >= 0 ? '#34d399' : '#f87171') : 'rgba(255,255,255,0.15)' }}
-                          title={cell.total > 0 ? `${cell.total} trade, $${cell.pnl.toFixed(2)}` : ''}>
+                          title={cell.total > 0 ? `${cell.total} trade, ${signedMoney(cell.pnl)}` : ''}>
                           {cell.total > 0 ? `${cell.total}` : ''}
                         </div>
                       </td>
@@ -520,7 +521,7 @@ export default function TradeHistory({
                     <span className="text-sm font-medium truncate" style={{ color: '#818cf8', minWidth: '80px', maxWidth: '120px' }}>{setup}</span>
                     <div className="flex-1"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${winRate}%`, background: '#818cf8' }} /></div></div>
                     <span className="text-xs font-mono w-8 text-end" style={{ color: 'rgba(255,255,255,0.4)' }}>%{winRate}</span>
-                    <span className="text-xs font-mono w-16 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{pnl >= 0 ? '+' : '-'}${Math.abs(pnl).toFixed(0)}</span>
+                    <span className="text-xs font-mono w-16 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
                     <span className="text-xs w-8 text-end" style={{ color: 'rgba(255,255,255,0.3)' }}>{total}</span>
                   </div>
                 ))}
@@ -536,7 +537,7 @@ export default function TradeHistory({
                     <span className="text-sm font-medium font-mono" style={{ color: '#fff', minWidth: '80px' }}>{symbol}</span>
                     <div className="flex-1"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${winRate}%`, background: '#2dd4bf' }} /></div></div>
                     <span className="text-xs font-mono w-8 text-end" style={{ color: 'rgba(255,255,255,0.4)' }}>%{winRate}</span>
-                    <span className="text-xs font-mono w-16 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{pnl >= 0 ? '+' : '-'}${Math.abs(pnl).toFixed(0)}</span>
+                    <span className="text-xs font-mono w-16 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
                     <span className="text-xs w-8 text-end" style={{ color: 'rgba(255,255,255,0.3)' }}>{total}</span>
                   </div>
                 ))}
@@ -552,7 +553,7 @@ export default function TradeHistory({
                 <div key={session} className="flex items-center justify-between">
                   <span className="text-sm font-medium w-24 text-white">{t(session as any)} <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>({total})</span></span>
                   <div className="flex-1 mx-4"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${rate}%`, background: '#818cf8' }} /></div></div>
-                  <span className="text-xs font-mono w-12 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{pnl >= 0 ? '+' : '-'}${Math.abs(pnl).toFixed(0)}</span>
+                  <span className="text-xs font-mono w-12 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
                   <span className="text-sm font-semibold font-mono w-10 text-end text-white ms-2">%{rate}</span>
                 </div>
               ))}
@@ -565,7 +566,7 @@ export default function TradeHistory({
                 <div key={day} className="flex items-center justify-between">
                   <span className="text-sm font-medium w-24 text-white">{t(day as any)} <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>({total})</span></span>
                   <div className="flex-1 mx-4"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${rate}%`, background: '#2dd4bf' }} /></div></div>
-                  <span className="text-xs font-mono w-12 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{pnl >= 0 ? '+' : '-'}${Math.abs(pnl).toFixed(0)}</span>
+                  <span className="text-xs font-mono w-12 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
                   <span className="text-sm font-semibold font-mono w-10 text-end text-white ms-2">%{rate}</span>
                 </div>
               )) : <p className="text-sm italic" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('emptyDesc')}</p>}
@@ -934,7 +935,7 @@ export default function TradeHistory({
               <div className="flex items-center gap-6 flex-wrap">
                 <div className="text-end">
                   <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('riskRewardLabel')}</div>
-                  <div className="font-semibold text-white">${selectedTrade.risk} <span className="mx-1" style={{ color: 'rgba(255,255,255,0.2)' }}>/</span> ${isLossTrade(selectedTrade) ? lossAmount(selectedTrade) : winAmount(selectedTrade)}</div>
+                  <div className="font-semibold text-white">{money(selectedTrade.risk || 0)} <span className="mx-1" style={{ color: 'rgba(255,255,255,0.2)' }}>/</span> {money(isLossTrade(selectedTrade) ? lossAmount(selectedTrade) : winAmount(selectedTrade))}</div>
                 </div>
                 <div className="text-end">
                   <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>R/R</div>
@@ -1137,9 +1138,9 @@ export default function TradeHistory({
                       )}
                       <span className="w-16 sm:w-20 font-mono text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{getRRDisplay(trade)}</span>
                       <span className="ms-auto text-end font-mono font-medium" style={{ color: isW ? '#34d399' : isL ? '#f87171' : 'rgba(255,255,255,0.4)' }}>
-                        {isW ? `+${winAmount(trade)}$`
-                          : isL ? `-${lossAmount(trade)}$`
-                          : trade.result === 'Başa Baş' ? <span style={{ color: 'rgba(255,255,255,0.45)' }}>0$</span>
+                        {isW ? signedMoney(winAmount(trade))
+                          : isL ? signedMoney(-lossAmount(trade))
+                          : trade.result === 'Başa Baş' ? <span style={{ color: 'rgba(255,255,255,0.45)' }}>$0.00</span>
                           : <span className="text-[11px] px-2 py-0.5 rounded-full whitespace-nowrap"
                               style={{ background: 'rgba(251,191,36,0.12)', color: '#fbbf24' }}>
                               {t('incompleteTrade')}

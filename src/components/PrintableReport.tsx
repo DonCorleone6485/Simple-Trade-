@@ -4,6 +4,7 @@ import { Trade, Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade } from '../lib/tradeMath';
 import { MTF_TIMEFRAMES } from './MTFAnalysis';
+import { money, signedMoney, int } from '../lib/format';
 
 interface PrintableReportProps {
   journal: Account;
@@ -21,9 +22,6 @@ const ink = {
   win: '#0f7a4d',
   loss: '#b3261e',
 };
-
-const money = (v: number) =>
-  `${v >= 0 ? '+' : '−'}$${Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 /**
  * Yazdırma / PDF görünümü. Ekranda görünmez; @media print kuralları yalnızca
@@ -138,7 +136,7 @@ export default function PrintableReport({ journal, trades, single = false, onDon
                 ? tr('İşlem Raporu', 'Trade Report')
                 : `${tr('Journal Raporu', 'Journal Report')} · ${trades.length} ${tr('işlem', 'trades')}`}
               {journal.startDate ? ` · ${tr('Başlangıç', 'Start')}: ${fmtDate(journal.startDate)}` : ''}
-              {journal.startingCapital != null ? ` · ${tr('Sermaye', 'Capital')}: $${journal.startingCapital.toLocaleString()}` : ''}
+              {journal.startingCapital != null ? ` · ${tr('Sermaye', 'Capital')}: $${int(journal.startingCapital)}` : ''}
             </div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 10, color: ink.faint, lineHeight: 1.5 }}>
@@ -154,7 +152,7 @@ export default function PrintableReport({ journal, trades, single = false, onDon
           {[
             { l: t('totalTrades'), v: String(trades.length), c: ink.text },
             { l: t('winRate'), v: `%${winRate}`, c: ink.text },
-            { l: t('netProfit'), v: money(net), c: net >= 0 ? ink.win : ink.loss },
+            { l: t('netProfit'), v: signedMoney(net), c: net >= 0 ? ink.win : ink.loss },
             { l: t('profitFactor'), v: profitFactor, c: ink.text },
           ].map((s, i) => (
             <div key={i}>
@@ -180,10 +178,10 @@ export default function PrintableReport({ journal, trades, single = false, onDon
           ...(holdMinutes(trade) != null ? [[t('tradeDuration'), formatDuration(holdMinutes(trade), language)] as [string, string]] : []),
           ...(trade.orderType ? [[t('orderType'), orderText(trade.orderType)] as [string, string]] : []),
           ...(trade.setup ? [[t('setup'), trade.setup] as [string, string]] : []),
-          [t('risk'), `$${(trade.risk || 0).toLocaleString()}`],
+          [t('risk'), money(trade.risk || 0)],
           [
             win ? t('reward') : loss ? t('lossAmountLabel') : t('rewardOrLossLabel'),
-            `$${(win ? winAmount(trade) : loss ? lossAmount(trade) : 0).toLocaleString()}`,
+            money(win ? winAmount(trade) : loss ? lossAmount(trade) : 0),
           ],
           [t('rr'), trade.rr || '-'],
           [t('result'), resultText(trade.result)],
@@ -199,7 +197,7 @@ export default function PrintableReport({ journal, trades, single = false, onDon
                 {t('reportTradeDetails')}
               </h2>
               <span style={{ fontSize: 15, fontWeight: 700, color: win ? ink.win : loss ? ink.loss : ink.soft, fontVariantNumeric: 'tabular-nums' }}>
-                {isOpenTrade(trade) ? t('incompleteTrade') : pnl === 0 ? '$0.00' : money(pnl)}
+                {isOpenTrade(trade) ? t('incompleteTrade') : pnl === 0 ? '$0.00' : signedMoney(pnl)}
               </span>
             </div>
 

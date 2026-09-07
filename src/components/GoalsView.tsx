@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Trade, Account, JournalGoals } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { money, signedMoney } from '../lib/format';
 import { isWinTrade, isLossTrade, lossAmount, winAmount } from '../lib/tradeMath';
 import { Target, TrendingUp, DollarSign, Activity, Clock, AlertTriangle, CheckCircle, Check, Edit3, Save, X } from 'lucide-react';
 
@@ -166,7 +167,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                   <span className="text-xs font-medium uppercase tracking-wider">{t('monthlyPnLGoal')}</span>
                 </div>
                 <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  ${monthlyPnL.toFixed(0)} / ${goals.monthlyPnL}
+                  {signedMoney(monthlyPnL, 0)} / {money(goals.monthlyPnL, 0)}
                 </span>
               </div>
               <div className="font-mono text-[26px] mt-2" style={{ color: monthlyPnL >= goals.monthlyPnL ? '#34d399' : '#fff' }}>

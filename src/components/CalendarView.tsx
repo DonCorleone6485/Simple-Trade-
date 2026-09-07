@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { signedMoney } from '../lib/format';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL } from '../lib/tradeMath';
 
 
@@ -104,7 +105,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
           {[
             { label: t('totalTrades'), value: String(monthTrades.length), color: '#fff' },
             { label: t('winRate'), value: `%${monthWinRate}`, color: '#fff' },
-            { label: t('netProfit'), value: `${monthNetPnL >= 0 ? '+' : '-'}$${Math.abs(monthNetPnL).toFixed(2)}`, color: monthNetPnL >= 0 ? '#34d399' : '#f87171' },
+            { label: t('netProfit'), value: signedMoney(monthNetPnL), color: monthNetPnL >= 0 ? '#34d399' : '#f87171' },
             { label: t('bestDay'), value: (() => {
               const days: Record<string, number> = {};
               monthTrades.forEach(tr => {
@@ -114,7 +115,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
                 days[key] = (days[key] || 0) + tradePnL(tr);
               });
               const best = Math.max(...Object.values(days));
-              return best > 0 ? `+$${best.toFixed(0)}` : '-';
+              return best > 0 ? signedMoney(best, 0) : '-';
             })(), color: '#34d399' },
           ].map((s, i) => (
             <div key={i}>
@@ -215,7 +216,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
                 {stats && (
                   <div className="mt-auto space-y-0.5">
                     <div className="text-xs font-mono font-semibold" style={{ color: textColor }}>
-                      {stats.netPnL >= 0 ? '+' : '-'}${Math.abs(stats.netPnL).toFixed(0)}
+                      {signedMoney(stats.netPnL, 0)}
                     </div>
                     <div className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
                       {stats.total} {t('tradeCount')}
@@ -293,7 +294,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
                   </div>
                   <div className="text-end flex-shrink-0">
                     <div className="font-semibold font-mono" style={{ color: isWin ? '#34d399' : isLoss ? '#f87171' : '#fbbf24' }}>
-                      {pnl >= 0 ? '+' : '-'}${Math.abs(pnl).toFixed(2)}
+                      {signedMoney(pnl)}
                     </div>
                     <div className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
                       {getResultText(trade.result)}

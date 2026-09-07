@@ -25,6 +25,7 @@ import { useLanguage } from './context/LanguageContext';
 import { supabase } from './lib/supabase';
 import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
+import { signedMoney, int } from './lib/format';
 
 type View = 'dashboard' | 'expanded' | 'pricing';
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals';
@@ -613,7 +614,7 @@ export default function App() {
     view === 'expanded' && journalTab === 'newTrade' && activeJournal
       ? activeJournal.name
       : view === 'expanded' && activeJournal
-      ? [formatDate(activeJournal.startDate), activeJournal.startingCapital ? `$${activeJournal.startingCapital.toLocaleString()}` : null]
+      ? [formatDate(activeJournal.startDate), activeJournal.startingCapital ? `$${int(activeJournal.startingCapital)}` : null]
           .filter(Boolean).join('  ·  ')
       : view === 'dashboard'
       ? `${accounts.length} journal  ·  ${trades.length} ${language === 'tr' ? 'işlem' : 'trades'}`
@@ -1114,7 +1115,7 @@ export default function App() {
                 {[
                   { label: t('totalTrades'), value: String(activeStats.total), color: 'rgba(255,255,255,0.85)' },
                   { label: t('winRate'), value: `%${activeStats.winRate}`, color: 'rgba(255,255,255,0.85)' },
-                  { label: t('netProfit'), value: `${activeStats.netPnL >= 0 ? '+' : '\u2212'}$${Math.abs(activeStats.netPnL).toFixed(2)}`, color: activeStats.netPnL >= 0 ? '#34d399' : '#f87171' },
+                  { label: t('netProfit'), value: signedMoney(activeStats.netPnL), color: activeStats.netPnL >= 0 ? '#34d399' : '#f87171' },
                   { label: t('profitFactor'), value: activeStats.profitFactor, color: 'rgba(255,255,255,0.85)' },
                 ].map((s, i) => (
                   <div key={i}>

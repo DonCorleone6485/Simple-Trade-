@@ -2,6 +2,7 @@ import React from 'react';
 import { Plus, Trash2, Pencil, ArrowUpRight } from 'lucide-react';
 import { Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { signedMoney, int } from '../lib/format';
 
 export interface JournalStats {
   total: number;
@@ -24,8 +25,6 @@ interface JournalDashboardProps {
   /** Portal düzeninde başlık ve buton üst barda durur. */
   hideHeader?: boolean;
 }
-
-const money = (v: number) => `${v >= 0 ? '+' : '−'}$${Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 /** Sayı hücresi — sütunlar hizalı kalsın diye sabit genişlik ve tabular-nums. */
 function Cell({ value, color = 'rgba(255,255,255,0.85)', width }: { value: string; color?: string; width: string }) {
@@ -100,7 +99,7 @@ export default function JournalDashboard({
               </div>
               <div className="font-mono text-3xl sm:text-4xl"
                 style={{ color: totals.net >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
-                {money(totals.net)}
+                {signedMoney(totals.net)}
               </div>
             </div>
             <div>
@@ -156,7 +155,7 @@ export default function JournalDashboard({
                           {formatDate(acc.startDate)}
                           {acc.startingCapital != null && (
                             <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                              {'  ·  '}${acc.startingCapital.toLocaleString()}
+                              {'  ·  '}${int(acc.startingCapital)}
                             </span>
                           )}
                         </span>
@@ -172,7 +171,7 @@ export default function JournalDashboard({
                     <div className="flex items-center gap-7 sm:gap-12 flex-shrink-0">
                       <div className="hidden md:block"><Cell width={COL.trades} value={String(stats.total)} /></div>
                       <div className="hidden sm:block"><Cell width={COL.winRate} value={`%${stats.winRate}`} /></div>
-                      <Cell width={COL.net} value={money(stats.netPnL)}
+                      <Cell width={COL.net} value={signedMoney(stats.netPnL)}
                         color={stats.netPnL >= 0 ? '#34d399' : '#f87171'} />
                     </div>
 
