@@ -725,8 +725,17 @@ export default function TradeHistory({
             </div>
             <div>
               <label style={lbl}>{t('exitDateTime')}</label>
+              {/* Takvim girişten önce açılmasın: boşken de giriş anını gösterir. */}
               <input type="datetime-local" style={{ ...inp, colorScheme: 'dark' }}
+                min={toLocalInput(editForm.date)}
                 value={toLocalInput(editForm.exitDate)}
+                onFocus={() => {
+                  // Kapanmış işlemde çıkış alanı boşsa girişten başlat — genelde
+                  // sadece saat ve dakika değişir, gün aynı kalır.
+                  if (!editForm.exitDate && editForm.result && editForm.date) {
+                    setEditForm(f => ({ ...f, exitDate: f.date }));
+                  }
+                }}
                 onChange={e => setEditForm(f => ({ ...f, exitDate: e.target.value ? new Date(e.target.value).toISOString() : undefined }))} />
             </div>
           </div>
@@ -814,6 +823,22 @@ export default function TradeHistory({
               </div>
             );
           })}
+
+          {/* Düzenleme uzun bir form; kaydet aşağıda da dursun ki başa dönmek
+              gerekmesin. */}
+          <div className="flex items-center justify-end gap-3 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <button onClick={() => setEditingTrade(null)} className="px-4 py-2 text-sm rounded-xl"
+              style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
+              {t('cancel')}
+            </button>
+            <button onClick={saveEdit} className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl"
+              style={{ background: '#8b5cf6', color: '#fff' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+              <Save className="w-4 h-4" />
+              {t('save')}
+            </button>
+          </div>
         </div>
       </div>
     );

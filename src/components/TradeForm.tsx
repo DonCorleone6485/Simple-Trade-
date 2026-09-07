@@ -409,6 +409,9 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
 
   const [date, setDate] = useState(() => new Date().toISOString());
   const [exitDate, setExitDate] = useState(() => new Date().toISOString());
+  /** Çıkış saati, kullanıcı ona dokunana kadar girişi izler — genelde aynı gün
+      içinde kapanır, sadece saat-dakika değişir. */
+  const [exitTouched, setExitTouched] = useState(false);
   const [symbol, setSymbol] = useState('EURUSD');
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
   const [orderType, setOrderType] = useState<OrderType>('Market');
@@ -528,7 +531,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
     };
     onSave(newTrade);
     // Bir sonraki kayıt için tarihi tekrar "şu an"a al.
-    setDate(new Date().toISOString()); setExitDate(new Date().toISOString());
+    setDate(new Date().toISOString()); setExitDate(new Date().toISOString()); setExitTouched(false);
     setSymbol('EURUSD'); setOrderType('Market');
     setSetup(''); setRisk(''); setReward(''); setRr('');
     setPreNotes(''); setPostNotes('');
@@ -570,7 +573,11 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
             <label style={lbl}>{t('dateTime')}<Req /></label>
             <DatePicker
               value={date ? new Date(date) : null}
-              onChange={(dateObj: DateObject | null) => { if (dateObj) setDate(dateObj.toDate().toISOString()); else setDate(''); }}
+              onChange={(dateObj: DateObject | null) => {
+                const iso = dateObj ? dateObj.toDate().toISOString() : '';
+                setDate(iso);
+                if (!exitTouched && iso) setExitDate(iso);
+              }}
               format="YYYY/MM/DD HH:mm"
               plugins={[<TimePicker position="bottom" />]}
               calendar={language === 'fa' ? persian : undefined}
@@ -651,7 +658,10 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
               <label style={lbl}>{t('exitDateTime')}{isClosed && <Req />}</label>
               <DatePicker
                 value={exitDate ? new Date(exitDate) : null}
-                onChange={(dateObj: DateObject | null) => { if (dateObj) setExitDate(dateObj.toDate().toISOString()); else setExitDate(''); }}
+                onChange={(dateObj: DateObject | null) => {
+                  setExitTouched(true);
+                  setExitDate(dateObj ? dateObj.toDate().toISOString() : '');
+                }}
                 format="YYYY/MM/DD HH:mm"
                 plugins={[<TimePicker position="bottom" />]}
                 calendar={language === 'fa' ? persian : undefined}
