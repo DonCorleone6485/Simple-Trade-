@@ -35,13 +35,42 @@ type AuthStage = 'landing' | 'auth';
 type Page = 'home' | 'journal';
 
 const JOURNAL_PATH = '/journal';
+const JOURNAL_TABS: JournalTab[] = ['newTrade', 'trades', 'calendar', 'stats', 'goals'];
+
+/** Adres satırındaki yolun parçaları: ['journal', '<id>', 'trades'] gibi. */
+function pathParts(): string[] {
+  return window.location.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+}
 
 function getInitialPage(): Page {
-  return window.location.pathname.replace(/\/+$/, '') === JOURNAL_PATH ? 'journal' : 'home';
+  return pathParts()[0] === 'journal' ? 'journal' : 'home';
 }
 
 function pathForPage(page: Page): string {
   return page === 'journal' ? JOURNAL_PATH : '/';
+}
+
+/**
+ * Journal içindeki her görünümün kendi adresi var.
+ *
+ * Bunlar React state'i olarak kalsaydı tarayıcının geri tuşu uygulamadan
+ * tamamen çıkarırdı: kullanıcı işlem listesinden geri dediğinde ana sayfaya
+ * düşerdi.
+ */
+function pathForView(view: View, journalId?: string, tab: JournalTab = 'trades'): string {
+  if (view === 'pricing') return `${JOURNAL_PATH}/pricing`;
+  if (view === 'expanded' && journalId) return `${JOURNAL_PATH}/${journalId}/${tab}`;
+  return JOURNAL_PATH;
+}
+
+function parseView(): { view: View; journalId?: string; tab: JournalTab } {
+  const [, second, third] = pathParts();
+  if (second === 'pricing') return { view: 'pricing', tab: 'trades' };
+  if (second) {
+    const tab = JOURNAL_TABS.includes(third as JournalTab) ? (third as JournalTab) : 'trades';
+    return { view: 'expanded', journalId: second, tab };
+  }
+  return { view: 'dashboard', tab: 'trades' };
 }
 
 function getInitialAuthStage(): AuthStage {
@@ -220,11 +249,62 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
+  /**
+   * Journal içinde gezinme. State'i değiştirmekle kalmaz, adresi de yazar —
+   * böylece tarayıcının geri tuşu bir önceki ekrana döner.
+   */
+  const goTo = (
+    next: { view: View; journal?: Account | null; tab?: JournalTab },
+    replace = false,
+  ) => {
+    const journal = next.journal !== undefined ? next.journal : activeJournal;
+    const tab = next.tab || journalTab;
+    setView(next.view);
+    if (next.journal !== undefined) setActiveJournal(next.journal);
+    if (next.tab) setJournalTab(next.tab);
+    const path = pathForView(next.view, journal?.id, tab);
+    if (window.location.pathname !== path) {
+      window.history[replace ? 'replaceState' : 'pushState']({}, '', path);
+    }
+    window.scrollTo(0, 0);
+  };
+
+  // Geri/ileri tuşu: adres ne diyorsa görünümü ona getir. Journal listesi
+  // dinleyicinin içinde tazeyken okunsun diye ref'te tutuluyor.
+  const accountsRef = useRef<Account[]>([]);
+  useEffect(() => { accountsRef.current = accounts; }, [accounts]);
+
   useEffect(() => {
-    const onPopState = () => setPage(getInitialPage());
+    const onPopState = () => {
+      const target = getInitialPage();
+      setPage(target);
+      if (target !== 'journal') return;
+      const r = parseView();
+      if (r.view === 'expanded') {
+        const acc = accountsRef.current.find(a => a.id === r.journalId);
+        // Journal silinmişse listeye düş; olmayan bir journal'ı açamayız.
+        if (!acc) { setView('dashboard'); setActiveJournal(null); return; }
+        setActiveJournal(acc);
+        setJournalTab(r.tab);
+        setView('expanded');
+        return;
+      }
+      if (r.view === 'dashboard') setActiveJournal(null);
+      setView(r.view);
+    };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
+
+  // Sayfa doğrudan /journal/<id>/<sekme> adresiyle açıldıysa, journal'lar
+  // yüklendiği anda o ekrana git.
+  useEffect(() => {
+    if (page !== 'journal' || accounts.length === 0 || activeJournal) return;
+    const r = parseView();
+    if (r.view !== 'expanded') return;
+    const acc = accounts.find(a => a.id === r.journalId);
+    if (acc) { setActiveJournal(acc); setJournalTab(r.tab); setView('expanded'); }
+  }, [accounts, page, activeJournal]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -329,10 +409,8 @@ export default function App() {
         startDate: data.start_date, startingCapital: data.starting_capital,
       };
       setAccounts(prev => [...prev, newAccount]);
-      setActiveJournal(newAccount);
       closeJournalModal();
-      setJournalTab('trades');
-      setView('expanded');
+      goTo({ view: 'expanded', journal: newAccount, tab: 'trades' });
     }
   };
 
@@ -365,8 +443,7 @@ export default function App() {
         return;
       }
     }
-    setJournalTab('newTrade');
-    setView('expanded');
+    goTo({ view: 'expanded', tab: 'newTrade' });
   };
 
   const handleAddTrade = async (trade: Trade) => {
@@ -391,7 +468,7 @@ export default function App() {
         checklist: data.checklist || [],
       };
       setTrades(prev => [newTrade, ...prev]);
-      setJournalTab('trades');
+      goTo({ view: 'expanded', tab: 'trades' });
     }
   };
 
@@ -488,9 +565,7 @@ export default function App() {
     setTrades(prev => [...inserted, ...prev]);
     // Yeni journal açıldıysa doğrudan içine gir.
     if (target.kind === 'new') {
-      setActiveJournal(targetJournal);
-      setJournalTab('trades');
-      setView('expanded');
+      goTo({ view: 'expanded', journal: targetJournal, tab: 'trades' });
     }
   };
 
@@ -553,11 +628,12 @@ export default function App() {
     await supabase.from('journals').delete().eq('id', accountToDelete);
     setAccounts(prev => prev.filter(a => a.id !== accountToDelete));
     setTrades(prev => prev.filter(tr => tr.accountId !== accountToDelete));
-    if (activeJournal?.id === accountToDelete) { setView('dashboard'); setActiveJournal(null); }
+    // Silinen journal'ın adresi geçmişte kalmasın: geri tuşu oraya dönmesin.
+    if (activeJournal?.id === accountToDelete) goTo({ view: 'dashboard', journal: null }, true);
     setAccountToDelete(null);
   };
 
-  const openJournal = (account: Account) => { setActiveJournal(account); setView('expanded'); setJournalTab('trades'); };
+  const openJournal = (account: Account) => goTo({ view: 'expanded', journal: account, tab: 'trades' });
 
   const goToAuth = (targetView: AuthView) => {
     // Clear any in-page anchor hash left by the landing page (#features etc.)
@@ -630,11 +706,11 @@ export default function App() {
   const handleNav = (key: NavKey) => {
     if (key === 'home') { navigate('home'); return; }
     if (key === 'referral') { setShowReferral(true); return; }
-    if (key === 'pricing') { setView('pricing'); return; }
-    if (key === 'journals') { setView('dashboard'); setActiveJournal(null); return; }
+    if (key === 'pricing') { goTo({ view: 'pricing' }); return; }
+    if (key === 'journals') { goTo({ view: 'dashboard', journal: null }); return; }
     // Yeni işlem, plan limitlerinden geçmeli.
     if (key === 'newTrade') { handleNewTradeClick(); return; }
-    if (activeJournal) { setView('expanded'); setJournalTab(key as JournalTab); }
+    if (activeJournal) goTo({ view: 'expanded', tab: key as JournalTab });
   };
 
   const shellTitle =
@@ -1119,7 +1195,7 @@ export default function App() {
 
           {!loading && view === 'pricing' && (
             <PricingPage
-              onFreeStart={() => setView('dashboard')}
+              onFreeStart={() => goTo({ view: 'dashboard', journal: null })}
               onProStart={() => setShowPaymentModal(true)}
             />
           )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Trade, OrderType } from '../types';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
 import { money, signedMoney } from '../lib/format';
@@ -50,13 +50,50 @@ export default function TradeHistory({
   /** Taşınacak işlemler; hedef journal seçilene kadar açık kalır. */
   const [movingIds, setMovingIds] = useState<string[] | null>(null);
 
+  /**
+   * Detay ve düzenleme ekranları da tarayıcı geçmişine yazılır.
+   *
+   * Bunlar yalnızca state olsaydı geri tuşu doğrudan journal'dan çıkarırdı;
+   * oysa kullanıcının beklediği, açtığı ekranın kapanıp listeye dönmesi.
+   * Aynı adrese bir kayıt ekliyoruz — geri tuşu onu tüketince ekranı kapatıyoruz.
+   */
+  const overlayPushed = useRef(false);
+
+  const openOverlay = (open: () => void) => {
+    if (!overlayPushed.current) {
+      window.history.pushState({ tradeOverlay: true }, '');
+      overlayPushed.current = true;
+    }
+    open();
+  };
+
+  /** Ekranı kapatır. Geçmişe kayıt eklediysek geri giderek kapatırız ki
+      geçmişte ölü bir adım kalmasın. */
+  const closeOverlay = () => {
+    if (overlayPushed.current) { window.history.back(); return; }
+    setEditingTrade(null);
+    setSelectedTrade(null);
+  };
+
+  useEffect(() => {
+    const onPop = () => {
+      if (!overlayPushed.current) return;
+      overlayPushed.current = false;
+      setEditingTrade(null);
+      setSelectedTrade(null);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
   const canMove = !!onMoveTrades && otherJournals.length > 0;
 
   const doMove = (targetId: string) => {
     if (movingIds && onMoveTrades) onMoveTrades(movingIds, targetId);
     setMovingIds(null);
     setSelectedIds(new Set());
-    setSelectedTrade(null);
+    // Taşınan işlem artık bu journal'da değil; açıksa detayını kapat.
+    if (selectedTrade) closeOverlay();
   };
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
   const [uploadingEditPhoto, setUploadingEditPhoto] = useState(false);
@@ -353,9 +390,13 @@ export default function TradeHistory({
   // ── EDIT ──────────────────────────────────────────────────────────────────
   const startEdit = (trade: Trade, e: React.MouseEvent) => {
     e.stopPropagation();
-    setEditingTrade(trade);
-    setEditForm({ ...trade });
-    setSelectedTrade(null);
+    // Detaydan geliyorsa geçmişte zaten bir kaydımız var; ikinciyi eklemeyiz,
+    // yoksa geri tuşu bir kez boşa basılmış olur.
+    openOverlay(() => {
+      setEditingTrade(trade);
+      setEditForm({ ...trade });
+      setSelectedTrade(null);
+    });
   };
 
   const saveEdit = () => {
@@ -368,8 +409,8 @@ export default function TradeHistory({
       return;
     }
     onUpdate(merged);
-    setEditingTrade(null);
     setEditForm({});
+    closeOverlay();
   };
 
   const handleEditPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
@@ -677,7 +718,7 @@ export default function TradeHistory({
     return (
       <div className="space-y-6 max-w-3xl mx-auto">
         <div className="flex items-center justify-between">
-          <button onClick={() => setEditingTrade(null)}
+          <button onClick={closeOverlay}
             className="flex items-center gap-2 text-sm font-medium"
             style={{ color: 'rgba(255,255,255,0.5)' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
@@ -686,7 +727,7 @@ export default function TradeHistory({
             {language === 'tr' ? 'Geri' : 'Back'}
           </button>
           <div className="flex items-center gap-3">
-            <button onClick={() => setEditingTrade(null)} className="px-4 py-2 text-sm rounded-xl"
+            <button onClick={closeOverlay} className="px-4 py-2 text-sm rounded-xl"
               style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
               {t('cancel')}
             </button>
@@ -876,7 +917,7 @@ export default function TradeHistory({
           {/* Düzenleme uzun bir form; kaydet aşağıda da dursun ki başa dönmek
               gerekmesin. */}
           <div className="flex items-center justify-end gap-3 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <button onClick={() => setEditingTrade(null)} className="px-4 py-2 text-sm rounded-xl"
+            <button onClick={closeOverlay} className="px-4 py-2 text-sm rounded-xl"
               style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
               {t('cancel')}
             </button>
@@ -926,7 +967,7 @@ export default function TradeHistory({
 
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <button onClick={() => setSelectedTrade(null)}
+            <button onClick={closeOverlay}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all"
               style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
@@ -964,7 +1005,7 @@ export default function TradeHistory({
                 <Edit2 className="w-4 h-4" />
                 {language === 'tr' ? 'Düzenle' : 'Edit'}
               </button>
-              <button onClick={() => { onDelete(selectedTrade.id); setSelectedTrade(null); }}
+              <button onClick={() => { onDelete(selectedTrade.id); closeOverlay(); }}
                 className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
                 style={{ background: 'rgba(248,113,113,0.1)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.2)'; }}
@@ -1212,7 +1253,7 @@ export default function TradeHistory({
                       }}
                       onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
                       onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-                      onClick={() => setSelectedTrade(trade)}
+                      onClick={() => openOverlay(() => setSelectedTrade(trade))}
                     >
                       <div onClick={e => toggleSelect(trade.id, e)} className="flex-shrink-0 transition-opacity"
                         style={{ opacity: isSelected ? 1 : 0 }}
@@ -1262,7 +1303,7 @@ export default function TradeHistory({
                           title={language === 'tr' ? 'Düzenle' : 'Edit'}>
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={e => { e.stopPropagation(); setSelectedTrade(trade); }}
+                        <button onClick={e => { e.stopPropagation(); openOverlay(() => setSelectedTrade(trade)); }}
                           className="p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                           style={{ color: 'rgba(255,255,255,0.5)' }}
                           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'; }}
