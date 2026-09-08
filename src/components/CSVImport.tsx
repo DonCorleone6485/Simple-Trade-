@@ -1,8 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, CheckCircle, AlertTriangle, FileText, Columns } from 'lucide-react';
 import { Trade, TradeResult } from '../types';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage, detectLanguage } from '../context/LanguageContext';
 import { tradeKey } from '../lib/tradeKey';
+
+/**
+ * Ayrıştırıcılar bileşenin dışında çalışır, bu yüzden dili context'ten
+ * alamazlar; seçilen dil kalıcı olduğu için doğrudan okuyoruz.
+ */
+const msg = (tr: string, en: string) => (detectLanguage() === 'tr' ? tr : en);
 
 /** İçe aktarılan işlemlerin nereye yazılacağı. */
 export type ImportTarget =
@@ -387,11 +393,11 @@ const SECTION_BREAKS = [
 function findRows(content: string): { rows: string[][]; error?: string } {
   if (isHTML(content)) {
     const rows = parseHTMLTables(content);
-    if (rows.length < 2) return { rows: [], error: 'HTML raporunda tablo bulunamadı.' };
+    if (rows.length < 2) return { rows: [], error: msg('HTML raporunda tablo bulunamadı.', 'No table found in the HTML report.') };
     return { rows };
   }
   const raw = content.split('\n').filter(l => l.trim() !== '');
-  if (raw.length < 2) return { rows: [], error: 'Dosya boş veya geçersiz.' };
+  if (raw.length < 2) return { rows: [], error: msg('Dosya boş veya geçersiz.', 'The file is empty or unreadable.') };
   return { rows: raw.map(l => parseCSVLine(l)) };
 }
 
@@ -444,7 +450,7 @@ export function parseCSVFile(
   const base = { platform, headers, rows: dataLines, map };
 
   if (dataLines.length === 0) {
-    return { ...base, trades: [], errors: ['Dosyada işlem satırı bulunamadı.'] };
+    return { ...base, trades: [], errors: [msg('Dosyada işlem satırı bulunamadı.', 'No trade rows found in the file.')] };
   }
   if (!mapIsUsable(map)) {
     return { ...base, trades: [], errors: [], needsMapping: true };
@@ -455,7 +461,7 @@ export function parseCSVFile(
   try {
     trades = parseRows(dataLines, map, journalId, userId, platform === 'Unknown' ? 'Manuel' : platform);
   } catch (e) {
-    errors.push(`Dosya okunurken hata: ${e}`);
+    errors.push(`${msg('Dosya okunurken hata', 'Error while reading the file')}: ${e}`);
   }
 
   trades = trades.filter(t => t.symbol && t.symbol.length > 0 && t.date);
@@ -545,7 +551,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
     const name = file.name.toLowerCase();
     if (!['.csv', '.txt', '.html', '.htm'].some(ext => name.endsWith(ext))) {
       setParseResult({ trades: [], platform: 'Unknown', headers: [], rows: [], map: EMPTY_MAP,
-        errors: ['Sadece .csv, .txt, .html veya .htm dosyaları desteklenir.'] });
+        errors: [msg('Sadece .csv, .txt, .html veya .htm dosyaları desteklenir.', 'Only .csv, .txt, .html and .htm files are supported.')] });
       return;
     }
     setFileName(file.name);

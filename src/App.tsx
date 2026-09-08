@@ -409,7 +409,9 @@ export default function App() {
 
     if (error) {
       alert(language === 'tr'
+        ? (language === 'tr'
         ? 'Kayıt başarısız. Fotoğraflar çok büyük olabilir, daha küçük fotoğraflar deneyin.'
+        : 'Could not save. The photos may be too large — try smaller ones.')
         : 'Save failed. Photos may be too large, try smaller images.');
       return;
     }

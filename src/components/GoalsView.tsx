@@ -286,7 +286,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                 value={goals.monthlyPnL || ''}
                 onChange={e => setGoals({ ...goals, monthlyPnL: parseFloat(e.target.value) || undefined })}
                 style={inp}
-                placeholder="Örn: 500"
+                placeholder={language === 'tr' ? 'Örn: 500' : 'e.g. 500'}
               />
             </div>
             <div>
@@ -296,7 +296,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                 value={goals.winRate || ''}
                 onChange={e => setGoals({ ...goals, winRate: parseFloat(e.target.value) || undefined })}
                 style={inp}
-                placeholder="Örn: 60"
+                placeholder={language === 'tr' ? 'Örn: 60' : 'e.g. 60'}
               />
             </div>
             <div>
@@ -306,7 +306,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                 value={goals.maxDailyTrades || ''}
                 onChange={e => setGoals({ ...goals, maxDailyTrades: parseInt(e.target.value) || undefined })}
                 style={inp}
-                placeholder="Örn: 3"
+                placeholder={language === 'tr' ? 'Örn: 3' : 'e.g. 3'}
               />
             </div>
             <div>
@@ -316,7 +316,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                 value={goals.maxRiskPerTrade || ''}
                 onChange={e => setGoals({ ...goals, maxRiskPerTrade: parseFloat(e.target.value) || undefined })}
                 style={inp}
-                placeholder="Örn: 50"
+                placeholder={language === 'tr' ? 'Örn: 50' : 'e.g. 50'}
               />
             </div>
             <div>

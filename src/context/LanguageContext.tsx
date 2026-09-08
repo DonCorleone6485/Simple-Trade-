@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Language = 'tr' | 'en' | 'fa' | 'ar' | 'ru' | 'es' | 'pt' | 'de' | 'fr';
 
@@ -172,8 +172,44 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+const LANGUAGES: Language[] = ['tr', 'en', 'fa', 'ar', 'ru', 'es', 'pt', 'de', 'fr'];
+const STORAGE_KEY = 'language';
+const RTL: Language[] = ['fa', 'ar'];
+
+/**
+ * Açılışta hangi dil?
+ *
+ * 1. Kullanıcının daha önce seçtiği dil (tarayıcıda saklanır)
+ * 2. Yoksa tarayıcının dili
+ * 3. O da tutmazsa İngilizce
+ *
+ * Varsayılanı Türkçe yapmak, siteyi Türkçe bilmeyen herkese Türkçe açar.
+ */
+export function detectLanguage(): Language {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY) as Language | null;
+    if (saved && LANGUAGES.includes(saved)) return saved;
+  } catch { /* gizli sekmede localStorage kapalı olabilir */ }
+  const nav = typeof navigator !== 'undefined' ? navigator.language.slice(0, 2).toLowerCase() : '';
+  return (LANGUAGES as string[]).includes(nav) ? (nav as Language) : 'en';
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('tr');
+  const [language, setLanguageState] = useState<Language>(detectLanguage);
+
+  /** Seçim kalıcı olsun: yenilemede ya da ertesi gün sıfırlanmasın. */
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch { /* önemsiz */ }
+  };
+
+  // Sayfanın kendi dil ve yön bilgisi de takip etsin: yazım denetimi,
+  // ekran okuyucular ve Arapça/Farsça için sağdan sola akış buna bakar.
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = RTL.includes(language) ? 'rtl' : 'ltr';
+  }, [language]);
+
   const t = (key: keyof typeof translations) => translations[key]?.[language] || key;
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

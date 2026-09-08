@@ -86,7 +86,7 @@ export default function TradeHistory({
       if (data.error) throw new Error(data.error);
       setAiAnalysis(data.analysis);
     } catch (e) {
-      setAiError('Analiz yapılamadı. Lütfen tekrar deneyin.');
+      setAiError((language === 'tr' ? 'Analiz yapılamadı. Lütfen tekrar deneyin.' : 'The analysis could not be completed. Please try again.'));
     } finally {
       setAiLoading(false);
     }
@@ -323,7 +323,7 @@ export default function TradeHistory({
     const files = Array.from(e.target.files || []) as File[];
     const current = kind === 'pre' ? (editForm.preTradePhotos || []) : (editForm.postTradePhotos || []);
     if (!isOwner && current.length + files.length > 3) {
-      alert('En fazla 3 fotoğraf yükleyebilirsiniz.');
+      alert((language === 'tr' ? 'En fazla 3 fotoğraf yükleyebilirsiniz.' : 'You can upload at most 3 photos.'));
       return;
     }
     setUploadingEditPhoto(true);

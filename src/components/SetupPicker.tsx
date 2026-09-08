@@ -71,7 +71,7 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
       <button type="button" onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all"
         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}>
-        <span style={{ color: value ? '#fff' : 'rgba(255,255,255,0.4)' }}>{value || '— Seçin —'}</span>
+        <span style={{ color: value ? '#fff' : 'rgba(255,255,255,0.4)' }}>{value || (language === 'tr' ? '— Seçin —' : '— Select —')}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.4)' }} />
       </button>
 
@@ -86,7 +86,7 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
               style={{ color: 'rgba(255,255,255,0.35)' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-              — Seçin —
+              {language === 'tr' ? '— Seçin —' : '— Select —'}
             </button>
 
             {/* Varsayılan setuplar */}

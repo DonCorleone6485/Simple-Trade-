@@ -72,6 +72,7 @@ const ALL_CATEGORIES = ['Forex', 'Crypto', 'Indices', 'Metals', 'Futures'];
 
 // ── SYMBOL PICKER ──────────────────────────────────────────────────────────
 function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { language } = useLanguage();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('Forex');
@@ -115,7 +116,7 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
       <button type="button" onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-mono font-medium transition-all"
         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}>
-        <span>{value || 'Sembol seç...'}</span>
+        <span>{value || (language === 'tr' ? 'Sembol seç...' : 'Pick a symbol...')}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.4)' }} />
       </button>
       {open && (
@@ -125,7 +126,7 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <Search className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
               <input ref={searchRef} type="text" value={search} onChange={e => setSearch(e.target.value)} onKeyDown={handleKeyDown}
-                placeholder="Sembol ara veya yaz... (Enter ile ekle)"
+                placeholder={language === 'tr' ? 'Sembol ara veya yaz... (Enter ile ekle)' : 'Search or type a symbol... (Enter to add)'}
                 className="flex-1 bg-transparent outline-none text-sm text-white placeholder-gray-500" style={{ color: '#fff' }} />
               {search && <button type="button" onClick={() => setSearch('')}><X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} /></button>}
             </div>
@@ -144,7 +145,7 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
           <div className="overflow-y-auto" style={{ maxHeight: '280px' }}>
             {!search && recentlyUsed.length > 0 && (
               <div>
-                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>Son Kullanılanlar</div>
+                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{language === 'tr' ? 'Son Kullanılanlar' : 'Recently Used'}</div>
                 {recentlyUsed.map(symbol => (
                   <button key={`recent-${symbol}`} type="button" onClick={() => handleSelect(symbol)}
                     className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all" style={{ color: '#fff' }}
@@ -159,7 +160,9 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
                 <div className="mx-4 my-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
               </div>
             )}
-            {search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{filteredSymbols.length > 0 ? 'Sonuçlar' : 'Bulunamadı — Enter ile ekle'}</div>}
+            {search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{filteredSymbols.length > 0
+                ? (language === 'tr' ? 'Sonuçlar' : 'Results')
+                : (language === 'tr' ? 'Bulunamadı — Enter ile ekle' : 'No match — press Enter to add')}</div>}
             {!search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{category}</div>}
             {filteredSymbols.map(symbol => (
               <button key={symbol} type="button" onClick={() => handleSelect(symbol)}
@@ -341,7 +344,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!date) { alert(t('pleaseSelectDate') || 'Lütfen tarih seçin'); return; }
+    if (!date) { alert(t('pleaseSelectDate')); return; }
     if (isClosed && !exitDate) {
       alert(language === 'tr'
         ? 'Sonuç girdiğin işlem için çıkış tarihi de gerekli.'
@@ -562,7 +565,9 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
           style={primaryBtn}
           onMouseEnter={e => { if (!uploadingPre && !uploadingPost) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
-          {uploadingPre || uploadingPost ? 'Fotoğraflar yükleniyor...' : t('saveButton')}
+          {uploadingPre || uploadingPost
+            ? (language === 'tr' ? 'Fotoğraflar yükleniyor...' : 'Uploading photos...')
+            : t('saveButton')}
         </button>
       </div>
       </div>
