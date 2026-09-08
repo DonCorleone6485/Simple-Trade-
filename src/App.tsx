@@ -815,7 +815,7 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen font-sans" style={{ background: '#0d0e1a', color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="app-ground min-h-screen font-sans" style={{ color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
 
       {/* ── PRO SÜRESİ DOLDU EKRANI ── */}
       {showExpiredPricing && page === 'journal' && (

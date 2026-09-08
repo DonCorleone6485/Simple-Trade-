@@ -188,7 +188,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
   const navLink: React.CSSProperties = { color: 'rgba(255,255,255,0.6)' };
 
   return (
-    <div className="min-h-screen" style={{ background: '#0d0e1a', color: '#fff' }}>
+    <div className="app-ground min-h-screen" style={{ color: '#fff' }}>
 
       {/* ── NAV ── */}
       <header
@@ -294,16 +294,17 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم ژورنال معاملاتی')}
           </motion.div>
 
-          {/* İki tonlu başlık: ilk cümle net, ikincisi geri planda */}
+          {/* İki cümlelik başlık. İkincisi cümlenin cevabı — soluk yazılırsa
+              pasif metin gibi okunur; onun yerine biraz küçültüp öne alıyoruz. */}
           <motion.h1 variants={fadeUp}
-            className="font-display text-[2rem] sm:text-5xl lg:text-[4.25rem] leading-[1.08] sm:leading-[1.04] font-medium mb-7"
-            style={{ letterSpacing: '-0.025em' }}>
+            className="font-display text-[2rem] sm:text-5xl lg:text-[4.5rem] leading-[1.06] sm:leading-[1.02] font-medium mb-7"
+            style={{ letterSpacing: '-0.035em' }}>
             <span>
               {t('Her kayıp bir yerde ', 'Every loss repeats ', 'هر ضرر جایی ')}
               <span style={{ color: '#a78bfa', fontStyle: 'italic' }}>{t('tekrar eder', 'somewhere', 'تکرار می‌شود')}</span>.
             </span>
             <br />
-            <span style={{ color: 'rgba(255,255,255,0.32)' }}>
+            <span className="text-[0.82em]" style={{ color: 'rgba(255,255,255,0.72)' }}>
               {t('Biz o yeri gösteririz.', 'We show you where.', 'ما آن را نشان می‌دهیم.')}
             </span>
           </motion.h1>
@@ -396,24 +397,27 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
         className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <motion.div variants={fadeUp} className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium mb-5" style={{ letterSpacing: '-0.02em' }}>
+          {/* Sayfanın en büyük cümlesi. Ortalanmış bir başlık yığını yerine
+              tek başına duran bir ifade — bölümler arası ritmi burada kırıyoruz. */}
+          <motion.div variants={fadeUp} className="max-w-3xl mb-20 sm:mb-24">
+            <h2 className="font-display text-[2.6rem] sm:text-[3.6rem] leading-[1.06] font-medium"
+              style={{ letterSpacing: '-0.035em' }}>
               {t('Neden Journal Tutmak İşe Yarar?', 'Why Trade Journaling Works', 'چرا ثبت معاملات مؤثر است؟')}
             </h2>
-            <p className="text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <p className="text-[17px] leading-relaxed mt-6 max-w-xl" style={{ color: 'rgba(255,255,255,0.45)' }}>
               {t('Trading kaybı çoğunlukla kötü bir setup\'tan değil, aynı hatanın fark edilmeden tekrarından gelir.', 'Trading losses usually come not from a bad setup, but from the same mistake repeating unnoticed.', 'ضررهای معاملاتی معمولاً از تکرار ناخودآگاه یک اشتباه می‌آید.')}
             </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-3 gap-6">
+          {/* Kutu yok: sütunları ince bir çizgi ayırıyor. */}
+          <div className="grid sm:grid-cols-3">
             {whyItems.map((item, i) => (
-              <motion.div key={i} variants={fadeUp} className="rounded-2xl p-6"
-                style={{ background: 'rgba(255,255,255,0.025)' }}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: 'rgba(139,92,246,0.12)', color: '#a78bfa' }}>
-                  {item.icon}
-                </div>
-                <h3 className="font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{item.desc}</p>
+              <motion.div key={i} variants={fadeUp}
+                className={`py-2 ${i > 0 ? 'sm:ps-10' : ''} ${i < whyItems.length - 1 ? 'sm:pe-10' : ''} mb-10 sm:mb-0`}
+                style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
+                <div className="mb-5" style={{ color: '#a78bfa' }}>{item.icon}</div>
+                <h3 className="text-[17px] font-medium mb-2.5" style={{ letterSpacing: '-0.01em' }}>{item.title}</h3>
+                <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -424,11 +428,11 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       <section id="features" className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
-            className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium mb-5" style={{ letterSpacing: '-0.02em' }}>
+            className="max-w-2xl mb-14">
+            <h2 className="font-display text-[2.1rem] sm:text-[2.6rem] leading-[1.1] font-medium mb-4" style={{ letterSpacing: '-0.03em' }}>
               {t('İhtiyacın Olan Her Araç, Tek Ekranda', 'Every Tool You Need, One Screen', 'هر ابزاری که نیاز دارید، در یک صفحه')}
             </h2>
-            <p className="text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
               {t('Kayıttan analize, hedeften disipline — trading sürecinin her adımı burada.', 'From logging to analysis, from goals to discipline — every step of your process lives here.', 'از ثبت تا تحلیل، هر مرحله در اینجاست.')}
             </p>
           </motion.div>
@@ -436,20 +440,22 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={stagger}
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             {features.map((f, i) => (
-              <motion.div key={i} variants={fadeUp} whileHover={{ y: shouldReduceMotion ? 0 : -4 }}
-                className={`rounded-2xl p-6 relative ${f.span}`}
-                style={{ background: 'rgba(255,255,255,0.025)' }}>
+              <motion.div key={i} variants={fadeUp} whileHover={{ y: shouldReduceMotion ? 0 : -3 }}
+                className={`rounded-2xl p-7 relative h-full ${f.span}`}
+                style={{
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset',
+                }}>
                 {f.pro && (
                   <span className="absolute top-5 end-5 px-2 py-0.5 rounded-full text-xs font-semibold"
                     style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
                     PRO
                   </span>
                 )}
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: `${f.accent}1f`, color: f.accent }}>
-                  {f.icon}
-                </div>
-                <h3 className="font-semibold mb-2 pe-10">{f.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{f.desc}</p>
+                <div className="mb-5" style={{ color: f.accent }}>{f.icon}</div>
+                <h3 className="text-[16px] font-medium mb-2.5 pe-10" style={{ letterSpacing: '-0.01em' }}>{f.title}</h3>
+                <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{f.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -460,23 +466,25 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       <section id="how-it-works" className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
-            className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium mb-5" style={{ letterSpacing: '-0.02em' }}>
+            className="max-w-2xl mb-16">
+            <h2 className="font-display text-[2.1rem] sm:text-[2.6rem] leading-[1.1] font-medium" style={{ letterSpacing: '-0.03em' }}>
               {t('4 Adımda Başla', 'Get Started in 4 Steps', 'در ۴ مرحله شروع کنید')}
             </h2>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={stagger}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 relative">
-            <div className="hidden lg:block absolute top-6 start-0 end-0 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-10">
             {steps.map((s, i) => (
-              <motion.div key={i} variants={fadeUp} className="relative">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center font-mono font-semibold text-sm mb-5 relative z-10"
-                  style={{ background: '#1a1b2e', border: '1px solid rgba(139,92,246,0.3)', color: '#a78bfa' }}>
+              <motion.div key={i} variants={fadeUp}
+                className={i > 0 ? 'lg:ps-10' : ''}
+                style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
+                {/* Numara rozet değil, tipografi: sayfanın serifiyle büyük ve sessiz. */}
+                <div className="font-display leading-none mb-6"
+                  style={{ fontSize: '46px', color: 'rgba(255,255,255,0.16)', letterSpacing: '-0.03em' }}>
                   {s.n}
                 </div>
-                <h3 className="font-semibold mb-2">{s.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.desc}</p>
+                <h3 className="text-[16px] font-medium mb-2.5" style={{ letterSpacing: '-0.01em' }}>{s.title}</h3>
+                <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.desc}</p>
               </motion.div>
             ))}
           </motion.div>

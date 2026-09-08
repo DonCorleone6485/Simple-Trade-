@@ -135,7 +135,7 @@ export default function AppShell({
   );
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#0d0e1a', color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="app-ground min-h-screen flex" style={{ color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Masaüstü yan menü */}
       <aside className="hidden lg:block fixed inset-y-0 z-30"
         style={{ insetInlineStart: 0, borderInlineEnd: '1px solid rgba(255,255,255,0.05)' }}>
