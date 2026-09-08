@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
-import { Trade } from '../types';
+import { Trade, TradeResult } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
 /** İçe aktarılan işlemlerin nereye yazılacağı. */
@@ -207,6 +207,26 @@ function mapMTColumns(headers: string[]): MTCols | null {
   return cols;
 }
 
+/**
+ * İşlem stopta mı kapandı, elle mi?
+ *
+ * Kâr/zararın işareti tek başına yetmez: stop olan işlem bir R kaybeder, elle
+ * kapatılan ise ne kadar götürdüyse onu. Kapanış fiyatını stop ve hedef
+ * seviyelerine bakarak ayırıyoruz — alışta stopun altında, satışta üstünde
+ * kapandıysa stop yemiştir.
+ */
+function mtResult(profit: number, type: 'Buy' | 'Sell', close: number, sl: number, tp: number): TradeResult {
+  if (profit === 0) return 'Başa Baş';
+  const buy = type === 'Buy';
+  if (close > 0) {
+    if (sl > 0 && (buy ? close <= sl : close >= sl)) return 'Başarısız';
+    if (tp > 0 && (buy ? close >= tp : close <= tp)) return 'Başarılı';
+    // Seviyelerin hiçbirine değmeden kapanmış: elle kapatılmış.
+    if (sl > 0 || tp > 0) return profit > 0 ? 'Manuel Karda' : 'Manuel Zararda';
+  }
+  return profit > 0 ? 'Başarılı' : 'Başarısız';
+}
+
 function parseMT(rows: string[][], headers: string[], journalId: string, userId: string): Trade[] {
   const c = mapMTColumns(headers);
   if (!c) return [];
@@ -261,7 +281,7 @@ function parseMT(rows: string[][], headers: string[], journalId: string, userId:
       risk: riskFromStop > 0 ? riskFromStop : (profit < 0 ? Math.abs(profit) : 0),
       reward: profit,
       rr: calcRR(openPrice, sl, tp, type),
-      result: getResult(profit),
+      result: mtResult(profit, type, closePrice, sl, tp),
       preTradeNotes: '',
       postTradeNotes: '',
       preTradePhotos: [],
