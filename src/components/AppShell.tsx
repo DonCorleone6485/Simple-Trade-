@@ -27,6 +27,16 @@ interface AppShellProps {
 
 const SIDEBAR_W = 248;
 
+/**
+ * Uygulamanın tek içerik ölçüsü.
+ *
+ * Her ekran kendi genişliğini seçtiğinde biri sola yaslı, öteki ortalanmış
+ * çıkıyor; sayfalar arasında gezerken içerik sağa sola kayıyor ve geniş
+ * ekranda bir yanda kocaman bir boşluk kalıyordu. Başlık çubuğu da aynı kabı
+ * kullanır, böylece başlık ile içeriğin sol kenarı üst üste gelir.
+ */
+const CONTENT = 'w-full max-w-[1140px] mx-auto px-5 sm:px-8';
+
 export default function AppShell({
   active, onNavigate, activeJournalName, title, subtitle, actions,
   isPro, userLabel, userImage, onSignOut, languageMenu, children,
@@ -152,25 +162,28 @@ export default function AppShell({
 
       <div className="flex-1 min-w-0 lg:ps-[248px]">
         {/* Üst bar */}
-        <header className="sticky top-0 z-20 h-16 flex items-center gap-4 px-5 sm:px-8"
+        <header className="sticky top-0 z-20 h-16"
           style={{ background: 'rgba(13,14,26,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 -ms-2 rounded-lg"
-            style={{ color: 'rgba(255,255,255,0.6)' }}>
-            <Menu className="w-5 h-5" />
-          </button>
+          {/* Başlık ve içerik aynı kaba oturur — ikisinin sol kenarı çakışsın. */}
+          <div className={`${CONTENT} h-full flex items-center gap-4`}>
+            <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 -ms-2 rounded-lg"
+              style={{ color: 'rgba(255,255,255,0.6)' }}>
+              <Menu className="w-5 h-5" />
+            </button>
 
-          <div className="flex-1 min-w-0">
-            <h1 className="font-display text-[19px] leading-tight truncate" style={{ letterSpacing: '-0.01em' }}>{title}</h1>
-            {subtitle && <p className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>{subtitle}</p>}
-          </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="font-display text-[19px] leading-tight truncate" style={{ letterSpacing: '-0.01em' }}>{title}</h1>
+              {subtitle && <p className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>{subtitle}</p>}
+            </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {actions}
-            {languageMenu}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {actions}
+              {languageMenu}
+            </div>
           </div>
         </header>
 
-        <div className="px-5 sm:px-8 py-8 sm:py-10">{children}</div>
+        <div className={`${CONTENT} py-8 sm:py-10`}>{children}</div>
       </div>
 
       {mobileOpen && (

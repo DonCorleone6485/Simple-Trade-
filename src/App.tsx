@@ -1221,7 +1221,10 @@ export default function App() {
 
           {!loading && view === 'expanded' && activeJournal && activeStats && journalTab !== 'newTrade' && (
             <div>
-              {/* Journal özeti — kart yok, hizalı sayı sütunları */}
+              {/* Journal özeti — kart yok, hizalı sayı sütunları.
+                  Takvim ve istatistikler kendi özetlerini gösterir; ikisini üst
+                  üste koymak aynı dört sayıyı iki kez okutur. */}
+              {journalTab !== 'stats' && journalTab !== 'calendar' && (
               <div className="flex items-baseline gap-8 sm:gap-14 flex-wrap mb-10 pb-10"
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 {[
@@ -1239,6 +1242,7 @@ export default function App() {
                   </div>
                 ))}
               </div>
+              )}
 
               {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} onPrintTrade={trade => setPrintJob({ trades: [trade], single: true })}
                 otherJournals={accounts.filter(a => a.id !== activeJournal.id).map(a => ({ id: a.id, name: a.name }))}

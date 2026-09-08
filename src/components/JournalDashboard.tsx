@@ -62,7 +62,7 @@ export default function JournalDashboard({
   const tr = (a: string, b: string) => (language === 'tr' ? a : b);
 
   return (
-    <main className={hideHeader ? 'max-w-5xl' : 'max-w-5xl mx-auto px-6 sm:px-8 py-14 sm:py-20'}>
+    <main className={hideHeader ? '' : 'max-w-5xl mx-auto px-6 sm:px-8 py-14 sm:py-20'}>
 
       {/* ── Başlık ── */}
       {!hideHeader && (

@@ -896,7 +896,7 @@ export default function TradeHistory({
     const editWinResult = editForm.result === 'Başarılı' || editForm.result === 'Manuel Karda';
     const lbl: React.CSSProperties = { display: 'block', fontSize: '12px', fontWeight: 500, marginBottom: '4px', color: 'rgba(255,255,255,0.5)' };
     return (
-      <div className="space-y-6 max-w-3xl mx-auto">
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
           <button onClick={closeOverlay}
             className="flex items-center gap-2 text-sm font-medium"
@@ -1371,7 +1371,7 @@ export default function TradeHistory({
 
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-6">
       {movePicker}
       <div className="flex items-center justify-between">
         <button onClick={toggleSelectAll} className="flex items-center gap-2 text-sm transition-all"
@@ -1445,6 +1445,11 @@ export default function TradeHistory({
                       </div>
 
                       <span style={{ color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace' }}>-</span>
+                      {/* Saat: gün başlığı hangi gün olduğunu söylüyor, bu da
+                          günün neresinde olduğunu. Satırdaki boşluğu da doldurur. */}
+                      <span className="hidden sm:inline w-12 font-mono text-[13px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                        {new Date(trade.date).toLocaleTimeString(language === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                       <span className="w-20 sm:w-24 font-medium">{trade.symbol}</span>
                       <span className="w-10 sm:w-14 text-sm font-medium" style={{ color: trade.type === 'Buy' ? '#34d399' : '#f87171' }}>
                         {trade.type === 'Buy' ? t('buy') : t('sell')}
