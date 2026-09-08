@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
+import { Upload, X, CheckCircle, AlertTriangle, FileText, Columns } from 'lucide-react';
 import { Trade, TradeResult } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -21,6 +21,12 @@ interface ParseResult {
   trades: Trade[];
   platform: string;
   errors: string[];
+  /** Eşleştirme ekranı için ham veri. */
+  headers: string[];
+  rows: string[][];
+  map: ColumnMap;
+  /** Sütunlar tanınamadı — kullanıcının eşleştirmesi gerekiyor. */
+  needsMapping?: boolean;
 }
 
 // ── PROPER CSV PARSER (handles quoted commas) ──────────────────────────────
@@ -65,48 +71,33 @@ function parseHTMLTables(content: string): string[][] {
 
 const isHTML = (content: string) => /<\s*table|<\s*html|<\s*tr[\s>]/i.test(content.slice(0, 4000));
 
-// ── PLATFORM DETECTION ─────────────────────────────────────────────────────
+// ── PLATFORM TANIMA ────────────────────────────────────────────────────────
+// Yalnızca etiket içindir: dosyanın hangi programdan geldiğini kullanıcıya
+// söyler. Sütunları okuma işi tanımadan bağımsız çalışır, bu yüzden tanınmayan
+// bir dosya da elle eşleştirilerek aktarılabilir.
+export const SUPPORTED_PLATFORMS = ['MT5', 'MT4', 'cTrader', 'TradeLocker', 'DXtrade', 'Match-Trader'] as const;
+
 function detectPlatform(headers: string[]): string {
   const h = headers.map(x => x.trim().toLowerCase());
+  const has = (...names: string[]) => names.some(n => h.includes(n));
 
-  // MetaTrader 4/5 — English
-  if (h.includes('ticket') && (h.includes('open time') || h.includes('open_time'))) return 'MT4/MT5';
+  // MetaTrader: S/L ve T/P sütunlarının birlikte bulunması en güvenilir işaret;
+  // dilden de MT4/MT5 farkından da bağımsız.
+  const mt = (has('s / l', 's/l') && has('t / p', 't/p'))
+    || (has('ticket') && has('open time', 'open_time', 'açılış zamanı'))
+    || (has('sembol') && has('hacim'))
+    || (has('zaman') && has('sembol'));
+  if (mt) {
+    // MT5 pozisyon raporunda "Pozisyon" numarası vardır, MT4'te "Ticket".
+    if (has('position', 'pozisyon')) return 'MT5';
+    if (has('ticket', 'bilet')) return 'MT4';
+    return 'MT4/MT5';
+  }
 
-  // S/L ve T/P sütunları yalnızca MetaTrader raporlarında birlikte bulunur;
-  // bu, dilden ve MT4/MT5 farkından bağımsız en güvenilir işaret.
-  const hasSL = h.includes('s / l') || h.includes('s/l');
-  const hasTP = h.includes('t / p') || h.includes('t/p');
-  if (hasSL && hasTP) return 'MT4/MT5';
-  if (h.includes('position') && h.includes('symbol') && h.includes('volume')) return 'MT4/MT5';
-
-  // MetaTrader 4/5 — Turkish
-  if (h.includes('sembol') && h.includes('hacim')) return 'MT4/MT5';
-  if (h.includes('sembol') && h.includes('kar')) return 'MT4/MT5';
-  if (h.includes('zaman') && h.includes('sembol')) return 'MT4/MT5';
-
-  // cTrader
-  if (h.includes('opening direction') || (h.includes('opening time') && h.includes('closing time') && h.includes('entry price'))) return 'cTrader';
-
-  // TradeLocker
-  if ((h.includes('position id') || h.includes('positionid')) && (h.includes('net profit') || h.includes('netprofit'))) return 'TradeLocker';
-
-  // Tradovate
-  if ((h.includes('orderid') || h.includes('order id')) && (h.includes('b/s') || h.includes('contract') || h.includes('fill time'))) return 'Tradovate';
-
-  // NinjaTrader
-  if (h.includes('instrument') && h.includes('action') && h.includes('e/x')) return 'NinjaTrader';
-
-  // TradingView
-  if (h.includes('fill price') && (h.includes('closing time') || h.includes('side'))) return 'TradingView';
-
-  // IBKR
-  if (h.includes('ibcommission') || h.includes('fifopnlrealized') || (h.includes('tradeprice') && h.includes('buy/sell'))) return 'IBKR';
-
-  // Binance
-  if (h.includes('base-asset') || h.includes('fee-currency') || h.includes('base asset') || h.includes('fee currency')) return 'Binance';
-
-  // Bybit
-  if (h.includes('realized pnl') || h.includes('realized p&l') || (h.includes('entry price') && h.includes('exit price'))) return 'Bybit';
+  if (has('opening direction') || (has('opening time') && has('closing time') && has('entry price'))) return 'cTrader';
+  if (has('position id', 'positionid') && has('net profit', 'netprofit')) return 'TradeLocker';
+  if (has('dxtrade') || (has('instrument') && has('gross p/l', 'gross pl') && has('net p/l', 'net pl'))) return 'DXtrade';
+  if (has('open time') && has('close time') && has('swap') && has('net profit')) return 'Match-Trader';
 
   return 'Unknown';
 }
@@ -152,9 +143,15 @@ function getResult(profit: number): 'Başarılı' | 'Başarısız' | 'Başa Baş
   return profit > 0 ? 'Başarılı' : 'Başarısız';
 }
 
+/** Bir satırın işlem satırı sayılması için yön sütununda bulunabilecek değerler. */
+const SIDE_WORDS = [
+  'buy', 'sell', 'b', 's', 'long', 'short',
+  'al', 'sat', 'alış', 'satış', 'alis', 'satis', 'uzun', 'kısa',
+];
+
 function getType(side: string): 'Buy' | 'Sell' {
   const s = side.trim().toLowerCase();
-  if (s === 'buy' || s === 'b' || s === 'long' || s === 'al' || s === 'alış') return 'Buy';
+  if (['buy', 'b', 'long', 'al', 'alış', 'alis', 'uzun'].includes(s)) return 'Buy';
   return 'Sell';
 }
 
@@ -174,42 +171,100 @@ function cleanSymbol(symbol: string): string {
 // MT4 ve MT5 raporlarının sütun sırası aynı değil (MT4'te 4. sütun Size, MT5'te
 // Type), üstelik başlıklar dile göre değişiyor. Sabit indeks yerine başlıktan
 // eşliyoruz. MT5'te "Zaman"/"Fiyat" iki kez geçer: ilki açılış, ikincisi kapanış.
-interface MTCols {
+/**
+ * Bir dosyanın hangi sütununun ne olduğu. Otomatik tahmin de, kullanıcının
+ * elle yaptığı eşleştirme de aynı yapıyı üretir; işlemleri kuran kod ikisini
+ * ayırt etmez. -1 "bu sütun yok" demektir.
+ */
+export interface ColumnMap {
   openTime: number; closeTime: number; symbol: number; type: number;
   openPrice: number; closePrice: number; sl: number; tp: number; profit: number;
   commission: number; swap: number; fee: number;
 }
 
-function mapMTColumns(headers: string[]): MTCols | null {
+export const EMPTY_MAP: ColumnMap = {
+  openTime: -1, closeTime: -1, symbol: -1, type: -1, openPrice: -1,
+  closePrice: -1, sl: -1, tp: -1, profit: -1, commission: -1, swap: -1, fee: -1,
+};
+
+/** İşlem kurabilmek için en az bunlar gerekli. */
+export const REQUIRED_FIELDS: (keyof ColumnMap)[] = ['openTime', 'symbol', 'type', 'profit'];
+
+/**
+ * Sütun başlıklarından ne olduklarını tahmin eder.
+ *
+ * Platform başına ayrı ayrıştırıcı yazmak yerine başlık isimlerinin ortak
+ * sözlüğünü tutuyoruz: broker'lar aynı şeye "Symbol", "Instrument", "Sembol"
+ * diyor ama isim havuzu dar. Tanımadığımız bir program bile çoğu zaman buraya
+ * düşer; düşmezse kullanıcı elle eşleştirir.
+ */
+const FIELD_NAMES: Record<keyof ColumnMap, string[]> = {
+  openTime: ['open time', 'opening time', 'open date', 'entry time', 'time', 'date', 'date/time', 'open_time',
+             'açılış zamanı', 'zaman', 'tarih', 'giriş zamanı', 'açılış saati'],
+  closeTime: ['close time', 'closing time', 'close date', 'exit time', 'close_time',
+              'kapanış zamanı', 'çıkış zamanı', 'kapanış saati'],
+  symbol: ['symbol', 'instrument', 'item', 'contract', 'market', 'pair', 'ticker',
+           'sembol', 'enstrüman', 'parite'],
+  type: ['type', 'side', 'direction', 'action', 'b/s', 'buy/sell', 'opening direction', 'position type',
+         'tür', 'tur', 'yön', 'işlem türü', 'alış/satış'],
+  openPrice: ['open price', 'opening price', 'entry price', 'price', 'fill price', 'avg entry price',
+              'açılış fiyatı', 'giriş fiyatı', 'fiyat'],
+  closePrice: ['close price', 'closing price', 'exit price', 'avg exit price',
+               'kapanış fiyatı', 'çıkış fiyatı'],
+  sl: ['s / l', 's/l', 'sl', 'stop loss', 'stoploss', 'stop', 'zarar durdur'],
+  tp: ['t / p', 't/p', 'tp', 'take profit', 'takeprofit', 'kar al', 'hedef'],
+  profit: ['profit', 'net profit', 'net p/l', 'net pl', 'gross p/l', 'gross pl', 'p/l', 'pnl', 'p&l',
+           'realized pnl', 'realized p&l', 'result', 'gain',
+           'kar', 'kâr', 'net kar', 'kar/zarar', 'kazanç'],
+  commission: ['commission', 'commissions', 'ibcommission', 'komisyon'],
+  swap: ['swap', 'swaps', 'rollover', 'takas'],
+  fee: ['taxes', 'tax', 'fee', 'fees', 'ücret', 'vergi', 'masraf'],
+};
+
+export function guessColumns(headers: string[]): ColumnMap {
   const h = headers.map(x => x.trim().toLowerCase().replace(/\s+/g, ' '));
-  const findAll = (...names: string[]) =>
+  const used = new Set<number>();
+
+  // Aynı başlık birden fazla geçebilir (MT5'te "Zaman" ve "Fiyat" iki kez):
+  // ilki açılış, ikincisi kapanıştır.
+  const occurrences = (names: string[]) =>
     h.map((v, i) => (names.includes(v) ? i : -1)).filter(i => i >= 0);
-  const first = (...names: string[]) => (findAll(...names)[0] ?? -1);
 
-  const times = findAll('open time', 'close time', 'time', 'zaman', 'açılış zamanı', 'kapanış zamanı');
-  const prices = findAll('price', 'fiyat');
-
-  const openTime = first('open time', 'açılış zamanı') >= 0 ? first('open time', 'açılış zamanı') : (times[0] ?? -1);
-  const closeTime = first('close time', 'kapanış zamanı') >= 0 ? first('close time', 'kapanış zamanı') : (times[1] ?? -1);
-  const openPrice = prices[0] ?? -1;
-
-  const cols: MTCols = {
-    openTime,
-    closeTime,
-    symbol: first('item', 'symbol', 'sembol', 'enstrüman'),
-    type: first('type', 'tür', 'tur', 'işlem türü'),
-    openPrice,
-    closePrice: prices[1] ?? -1,
-    sl: first('s/l', 's / l', 'sl', 'stop loss'),
-    tp: first('t/p', 't / p', 'tp', 'take profit'),
-    profit: first('profit', 'kar', 'kâr', 'net kar', 'kar/zarar'),
-    commission: first('commission', 'komisyon'),
-    swap: first('swap', 'takas'),
-    fee: first('taxes', 'fee', 'ücret', 'vergi'),
+  const pick = (field: keyof ColumnMap, second = false): number => {
+    const hits = occurrences(FIELD_NAMES[field]);
+    const idx = second ? (hits[1] ?? -1) : (hits.find(i => !used.has(i)) ?? -1);
+    if (idx >= 0) used.add(idx);
+    return idx;
   };
-  if (cols.symbol < 0 || cols.type < 0 || cols.profit < 0) return null;
-  return cols;
+
+  const map = { ...EMPTY_MAP };
+  // Sırası önemli: dar isimler ("close time") geniş olanlardan ("time") önce.
+  map.closeTime = pick('closeTime');
+  map.openTime = pick('openTime');
+  map.symbol = pick('symbol');
+  map.type = pick('type');
+  map.sl = pick('sl');
+  map.tp = pick('tp');
+  map.closePrice = pick('closePrice');
+  map.openPrice = pick('openPrice');
+  map.commission = pick('commission');
+  map.swap = pick('swap');
+  map.fee = pick('fee');
+  map.profit = pick('profit');
+
+  // MT tarzı raporda tek isimli tekrarlar: ikinci "Zaman"/"Fiyat" kapanıştır.
+  if (map.closeTime < 0) {
+    const t = occurrences(FIELD_NAMES.openTime);
+    if (t.length > 1) map.closeTime = t[1];
+  }
+  if (map.closePrice < 0) {
+    const pr = occurrences(FIELD_NAMES.openPrice);
+    if (pr.length > 1) map.closePrice = pr[1];
+  }
+  return map;
 }
+
+export const mapIsUsable = (m: ColumnMap) => REQUIRED_FIELDS.every(f => m[f] >= 0);
 
 /**
  * İşlem stopta mı kapandı, elle mi?
@@ -232,15 +287,18 @@ function mtResult(net: number, type: 'Buy' | 'Sell', close: number, sl: number, 
   return (sl > 0 || tp > 0) && close > 0 ? 'Manuel Karda' : 'Başarılı';
 }
 
-function parseMT(rows: string[][], headers: string[], journalId: string, userId: string): Trade[] {
-  const c = mapMTColumns(headers);
-  if (!c) return [];
+/**
+ * Satırları işlemlere çevirir. Sütunların nereden geldiği önemli değil:
+ * otomatik tahmin de elle eşleştirme de aynı ColumnMap'i verir.
+ */
+function parseRows(rows: string[][], c: ColumnMap, journalId: string, userId: string, source: string): Trade[] {
   const trades: Trade[] = [];
 
   for (const cols of rows) {
     const typeRaw = (cols[c.type] || '').trim().toLowerCase();
-    // balance / credit gibi hesap hareketlerini atla
-    if (typeRaw !== 'buy' && typeRaw !== 'sell' && typeRaw !== 'al' && typeRaw !== 'sat') continue;
+    // Yalnızca alış/satış satırları işlemdir; balance, credit, deposit gibi
+    // hesap hareketleri ve toplam satırları buradan elenir.
+    if (!SIDE_WORDS.includes(typeRaw)) continue;
 
     const symbol = cleanSymbol(cols[c.symbol] || '').toUpperCase();
     if (!symbol) continue;
@@ -299,441 +357,147 @@ function parseMT(rows: string[][], headers: string[], journalId: string, userId:
       postTradeNotes: '',
       preTradePhotos: [],
       postTradePhotos: [],
-      importSource: 'MT4/MT5',
+      importSource: source,
     } as Trade);
   }
 
   return trades;
 }
 
-// ── DİĞER PARSER'LAR (dict bazlı) ─────────────────────────────────────────
-function parseCTrader(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
-  return rows
-    .filter(row => row['Opening Direction'] || row['opening direction'])
-    .map(row => {
-      const profit = parseNumber(row['Profit'] || row['profit'] || row['Net Profit'] || row['net profit'] || '0');
-      const type = getType(row['Opening Direction'] || row['opening direction'] || 'buy');
-      return {
-        id: makeId(),
-        accountId: journalId,
-        journal_id: journalId,
-        user_id: userId,
-        date: parseDate(row['Opening Time'] || row['opening time'] || ''),
-        symbol: cleanSymbol(row['Symbol'] || row['symbol'] || ''),
-        type,
-        timeframe: '',
-        setup: '',
-        risk: profit < 0 ? Math.abs(profit) : 0,
-        reward: profit,
-        rr: '',
-        result: getResult(profit),
-        preTradeNotes: '',
-        postTradeNotes: '',
-        preTradePhotos: [],
-        postTradePhotos: [],
-        importSource: 'cTrader',
-      } as Trade;
-    });
-}
-
-function parseTradeLocker(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
-  return rows.map(row => {
-    const profit = parseNumber(row['Net Profit'] || row['net profit'] || row['NetProfit'] || row['netprofit'] || '0');
-    const entryPrice = parseNumber(row['Entry Price'] || row['entry price'] || row['EntryPrice'] || '0');
-    const sl = parseNumber(row['SL'] || row['sl'] || row['Stop Loss'] || '0');
-    const tp = parseNumber(row['TP'] || row['tp'] || row['Take Profit'] || '0');
-    const type = getType(row['Side'] || row['side'] || row['Direction'] || row['direction'] || 'buy');
-    const rr = calcRR(entryPrice, sl, tp, type);
-    return {
-      id: makeId(),
-      accountId: journalId,
-      journal_id: journalId,
-      user_id: userId,
-      date: parseDate(row['Open Time'] || row['open time'] || row['OpenTime'] || row['opentime'] || ''),
-      symbol: cleanSymbol(row['Symbol'] || row['symbol'] || row['Instrument'] || ''),
-      type,
-      timeframe: '',
-      setup: '',
-      risk: profit < 0 ? Math.abs(profit) : 0,
-      reward: profit,
-      rr,
-      result: getResult(profit),
-      preTradeNotes: '',
-      postTradeNotes: '',
-      preTradePhotos: [],
-      postTradePhotos: [],
-      importSource: 'TradeLocker',
-    } as Trade;
-  });
-}
-
-function parseTradovate(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
-  const trades: Trade[] = [];
-  const entries: Record<string, string>[] = [];
-  const exits: Record<string, string>[] = [];
-  rows.forEach(row => {
-    const bs = (row['B/S'] || row['b/s'] || row['Side'] || '').trim().toUpperCase();
-    if (bs === 'B' || bs === 'BUY') entries.push(row);
-    else if (bs === 'S' || bs === 'SELL') exits.push(row);
-  });
-  const used = new Set<number>();
-  entries.forEach(entry => {
-    const contract = entry['Contract'] || entry['Product'] || entry['Symbol'] || '';
-    const exitIdx = exits.findIndex((ex, i) => {
-      if (used.has(i)) return false;
-      return (ex['Contract'] || ex['Product'] || ex['Symbol'] || '') === contract;
-    });
-    if (exitIdx >= 0) {
-      used.add(exitIdx);
-      const ex = exits[exitIdx];
-      const entryPrice = parseNumber(entry['Avg Fill Price'] || entry['avgPrice'] || entry['Price'] || '0');
-      const exitPrice = parseNumber(ex['Avg Fill Price'] || ex['avgPrice'] || ex['Price'] || '0');
-      const qty = parseNumber(entry['Filled Qty'] || entry['filledQty'] || entry['Quantity'] || '1');
-      const profit = round2((exitPrice - entryPrice) * qty);
-      trades.push({
-        id: makeId(),
-        accountId: journalId,
-        journal_id: journalId,
-        user_id: userId,
-        date: parseDate(entry['Fill Time'] || entry['Timestamp'] || entry['Date'] || ''),
-        symbol: cleanSymbol(contract),
-        type: 'Buy',
-        timeframe: '',
-        setup: '',
-        risk: profit < 0 ? Math.abs(profit) : 0,
-        reward: profit,
-        rr: '',
-        result: getResult(profit),
-        preTradeNotes: '',
-        postTradeNotes: '',
-        preTradePhotos: [],
-        postTradePhotos: [],
-        importSource: 'Tradovate',
-      } as Trade);
-    }
-  });
-  return trades;
-}
-
-function parseNinjaTrader(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
-  const trades: Trade[] = [];
-  const entries: Record<string, string>[] = [];
-  const exits: Record<string, string>[] = [];
-  rows.forEach(row => {
-    const ex = (row['E/X'] || row['e/x'] || '').trim().toUpperCase();
-    if (ex === 'E' || ex === 'ENTRY') entries.push(row);
-    else if (ex === 'X' || ex === 'EXIT') exits.push(row);
-  });
-  const used = new Set<number>();
-  entries.forEach(entry => {
-    const instrument = entry['Instrument'] || entry['instrument'] || entry['Symbol'] || '';
-    const exitIdx = exits.findIndex((ex, i) => {
-      if (used.has(i)) return false;
-      return (ex['Instrument'] || ex['instrument'] || ex['Symbol'] || '') === instrument;
-    });
-    if (exitIdx >= 0) {
-      used.add(exitIdx);
-      const ex = exits[exitIdx];
-      const entryPrice = parseNumber(entry['Price'] || entry['price'] || '0');
-      const exitPrice = parseNumber(ex['Price'] || ex['price'] || '0');
-      const qty = parseNumber(entry['Quantity'] || entry['quantity'] || '1');
-      const action = (entry['Action'] || entry['action'] || 'Buy').trim();
-      const type = getType(action);
-      const profit = type === 'Buy'
-        ? (exitPrice - entryPrice) * qty
-        : (entryPrice - exitPrice) * qty;
-      trades.push({
-        id: makeId(),
-        accountId: journalId,
-        journal_id: journalId,
-        user_id: userId,
-        date: parseDate(entry['Time'] || entry['time'] || ''),
-        symbol: cleanSymbol(instrument),
-        type,
-        timeframe: '',
-        setup: '',
-        risk: profit < 0 ? Math.abs(profit) : 0,
-        reward: profit,
-        rr: '',
-        result: getResult(profit),
-        preTradeNotes: '',
-        postTradeNotes: '',
-        preTradePhotos: [],
-        postTradePhotos: [],
-        importSource: 'NinjaTrader',
-      } as Trade);
-    }
-  });
-  return trades;
-}
-
-function parseTradingView(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
-  const entries: Record<string, string>[] = [];
-  const exits: Record<string, string>[] = [];
-  rows.forEach(row => {
-    const side = (row['Side'] || row['side'] || row['Type'] || '').trim().toUpperCase();
-    if (side === 'BUY' || side === 'B') entries.push(row);
-    else exits.push(row);
-  });
-  const trades: Trade[] = [];
-  const used = new Set<number>();
-  entries.forEach(entry => {
-    const sym = entry['Symbol'] || entry['symbol'] || '';
-    const exitIdx = exits.findIndex((ex, i) => {
-      if (used.has(i)) return false;
-      return (ex['Symbol'] || ex['symbol'] || '') === sym;
-    });
-    if (exitIdx >= 0) {
-      used.add(exitIdx);
-      const ex = exits[exitIdx];
-      const entryPrice = parseNumber(entry['Fill Price'] || entry['fill price'] || entry['Price'] || '0');
-      const exitPrice = parseNumber(ex['Fill Price'] || ex['fill price'] || ex['Price'] || '0');
-      const qty = parseNumber(entry['Qty'] || entry['qty'] || entry['Quantity'] || '1');
-      const profit = round2((exitPrice - entryPrice) * qty);
-      trades.push({
-        id: makeId(),
-        accountId: journalId,
-        journal_id: journalId,
-        user_id: userId,
-        date: parseDate(entry['Closing Time'] || entry['closing time'] || entry['Time'] || ''),
-        symbol: cleanSymbol(sym),
-        type: 'Buy',
-        timeframe: '',
-        setup: '',
-        risk: profit < 0 ? Math.abs(profit) : 0,
-        reward: profit,
-        rr: '',
-        result: getResult(profit),
-        preTradeNotes: '',
-        postTradeNotes: '',
-        preTradePhotos: [],
-        postTradePhotos: [],
-        importSource: 'TradingView',
-      } as Trade);
-    }
-  });
-  return trades;
-}
-
-function parseIBKR(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
-  return rows
-    .filter(row => row['Buy/Sell'] || row['buy/sell'])
-    .map(row => {
-      const profit = parseNumber(row['FifoPnlRealized'] || row['fifopnlrealized'] || row['Realized P/L'] || '0');
-      const type = getType(row['Buy/Sell'] || row['buy/sell'] || 'buy');
-      return {
-        id: makeId(),
-        accountId: journalId,
-        journal_id: journalId,
-        user_id: userId,
-        date: parseDate(row['DateTime'] || row['datetime'] || row['Date/Time'] || ''),
-        symbol: cleanSymbol(row['Symbol'] || row['symbol'] || ''),
-        type,
-        timeframe: '',
-        setup: '',
-        risk: profit < 0 ? Math.abs(profit) : 0,
-        reward: profit,
-        rr: '',
-        result: getResult(profit),
-        preTradeNotes: '',
-        postTradeNotes: '',
-        preTradePhotos: [],
-        postTradePhotos: [],
-        importSource: 'IBKR',
-      } as Trade;
-    });
-}
-
-function parseBinance(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
-  const entries: Record<string, string>[] = [];
-  const exits: Record<string, string>[] = [];
-  rows.forEach(row => {
-    const type = (row['Side'] || row['side'] || row['Type'] || row['type'] || '').toUpperCase();
-    if (type === 'BUY' || type === 'B') entries.push(row);
-    else exits.push(row);
-  });
-  const trades: Trade[] = [];
-  const used = new Set<number>();
-  entries.forEach(entry => {
-    const base = entry['Base Asset'] || entry['base-asset'] || entry['base asset'] || '';
-    const quote = entry['Quote Asset'] || entry['quote-asset'] || entry['quote asset'] || 'USDT';
-    const symbol = `${base}${quote}`;
-    const exitIdx = exits.findIndex((ex, i) => {
-      if (used.has(i)) return false;
-      const exBase = ex['Base Asset'] || ex['base-asset'] || ex['base asset'] || '';
-      const exQuote = ex['Quote Asset'] || ex['quote-asset'] || ex['quote asset'] || 'USDT';
-      return `${exBase}${exQuote}` === symbol;
-    });
-    if (exitIdx >= 0) {
-      used.add(exitIdx);
-      const ex = exits[exitIdx];
-      const entryPrice = parseNumber(entry['Price'] || entry['price'] || '0');
-      const exitPrice = parseNumber(ex['Price'] || ex['price'] || '0');
-      const qty = parseNumber(entry['Quantity'] || entry['quantity'] || entry['Amount'] || '1');
-      const profit = round2((exitPrice - entryPrice) * qty);
-      trades.push({
-        id: makeId(),
-        accountId: journalId,
-        journal_id: journalId,
-        user_id: userId,
-        date: parseDate(entry['Time'] || entry['time'] || entry['Date'] || ''),
-        symbol,
-        type: 'Buy',
-        timeframe: '',
-        setup: '',
-        risk: profit < 0 ? Math.abs(profit) : 0,
-        reward: profit,
-        rr: '',
-        result: getResult(profit),
-        preTradeNotes: '',
-        postTradeNotes: '',
-        preTradePhotos: [],
-        postTradePhotos: [],
-        importSource: 'Binance',
-      } as Trade);
-    }
-  });
-  return trades;
-}
-
-function parseBybit(rows: Record<string, string>[], journalId: string, userId: string): Trade[] {
-  return rows
-    .filter(row => {
-      const pnl = row['Realized PNL'] || row['Realized P&L'] || row['realized pnl'] || row['Realized Profit'] || '';
-      const side = row['Side'] || row['side'] || '';
-      return pnl !== '' || side !== '';
-    })
-    .map(row => {
-      const profit = parseNumber(
-        row['Realized PNL'] || row['Realized P&L'] || row['realized pnl'] ||
-        row['Realized Profit'] || row['Closed PnL'] || '0'
-      );
-      const entryPrice = parseNumber(row['Entry Price'] || row['entry price'] || row['Avg Entry Price'] || '0');
-      const sl = parseNumber(row['SL'] || row['Stop Loss'] || row['stop loss'] || '0');
-      const tp = parseNumber(row['TP'] || row['Take Profit'] || row['take profit'] || '0');
-      const type = getType(row['Side'] || row['side'] || row['Direction'] || 'buy');
-      const rr = calcRR(entryPrice, sl, tp, type);
-      return {
-        id: makeId(),
-        accountId: journalId,
-        journal_id: journalId,
-        user_id: userId,
-        date: parseDate(row['Open Time'] || row['open time'] || row['Create Time'] || row['Time'] || ''),
-        symbol: cleanSymbol(row['Symbol'] || row['symbol'] || row['Contract'] || row['Contracts'] || row['contracts'] || ''),
-        type,
-        timeframe: '',
-        setup: '',
-        risk: profit < 0 ? Math.abs(profit) : 0,
-        reward: profit,
-        rr,
-        result: getResult(profit),
-        preTradeNotes: '',
-        postTradeNotes: '',
-        preTradePhotos: [],
-        postTradePhotos: [],
-        importSource: 'Bybit',
-      } as Trade;
-    });
-}
-
 // ── MAIN PARSER ────────────────────────────────────────────────────────────
-function parseCSVFile(content: string, journalId: string, userId: string): ParseResult {
-  const errors: string[] = [];
+/** Sonraki bölüm başlığı: buradan sonrası artık kapanmış işlem değildir. */
+const SECTION_BREAKS = [
+  // MT5
+  'emirler', 'orders', 'deals', 'işlemler',
+  // MT4 raporu kapanmış işlemlerden sonra bunları listeler
+  'açık işlemler', 'open trades', 'bekleyen emirler', 'working orders',
+  'closed transactions', 'kapalı işlemler', 'summary', 'özet',
+];
 
-  // HTML rapor mu, CSV mi?
-  let parsedLines: string[][];
+function findRows(content: string): { rows: string[][]; error?: string } {
   if (isHTML(content)) {
-    parsedLines = parseHTMLTables(content);
-    if (parsedLines.length < 2) {
-      return { trades: [], platform: 'Unknown', errors: ['HTML raporunda tablo bulunamadı.'] };
-    }
-  } else {
-    const rawLines = content.split('\n').filter(l => l.trim() !== '');
-    if (rawLines.length < 2) return { trades: [], platform: 'Unknown', errors: ['Dosya boş veya geçersiz.'] };
-    parsedLines = rawLines.map(l => parseCSVLine(l));
+    const rows = parseHTMLTables(content);
+    if (rows.length < 2) return { rows: [], error: 'HTML raporunda tablo bulunamadı.' };
+    return { rows };
   }
+  const raw = content.split('\n').filter(l => l.trim() !== '');
+  if (raw.length < 2) return { rows: [], error: 'Dosya boş veya geçersiz.' };
+  return { rows: raw.map(l => parseCSVLine(l)) };
+}
 
-  // Header satırını bul
-  let headerIdx = 0;
-  for (let i = 0; i < Math.min(60, parsedLines.length); i++) {
-    const cols = parsedLines[i].map(c => c.toLowerCase());
-    if (cols.length >= 3 && (
-      cols.includes('symbol') || cols.includes('sembol') ||
-      cols.includes('instrument') || cols.includes('contract') ||
-      cols.includes('ticket') || cols.includes('zaman') ||
-      cols.includes('hacim') || cols.includes('base-asset') ||
-      cols.includes('side') || cols.includes('b/s') ||
-      cols.includes('opening direction') || cols.includes('buy/sell')
-    )) {
-      headerIdx = i;
-      break;
-    }
+/**
+ * Başlık satırını bulur. Sabit bir isim listesi yerine "hangi satır işlem
+ * tablosunun başlığına en çok benziyor" diye bakıyoruz: tahmin edilebilen
+ * alan sayısı en yüksek olan satır kazanır. Böylece tanımadığımız
+ * platformlarda da başlık doğru yerde bulunur.
+ */
+function findHeader(rows: string[][]): number {
+  let best = -1, bestScore = -Infinity;
+  for (let i = 0; i < Math.min(60, rows.length); i++) {
+    const cells = rows[i];
+    if (cells.length < 3) continue;                       // başlık en az üç sütundur
+    const m = guessColumns(cells);
+    const guessed = (Object.keys(m) as (keyof ColumnMap)[]).filter(k => m[k] >= 0).length;
+    // Tanınan alan en güçlü işaret; hiçbiri tanınmasa bile bir tablonun
+    // başlığı, altındaki satırlarla aynı sütun sayısına sahip olur.
+    const matchesBelow = rows[i + 1] && rows[i + 1].length === cells.length ? 2 : 0;
+    const score = guessed * 3 + matchesBelow + (mapIsUsable(m) ? 10 : 0) - i * 0.01;
+    if (score > bestScore) { bestScore = score; best = i; }
   }
+  return best >= 0 ? best : 0;
+}
 
-  // MT5'te "Emirler" bölümünü atla
-  let endIdx = parsedLines.length;
-  for (let i = headerIdx + 1; i < parsedLines.length; i++) {
-    const first = parsedLines[i][0]?.trim().toLowerCase() || '';
-    if (first === 'emirler' || first === 'orders' || first === 'deals' || first === 'işlemler') {
-      endIdx = i;
-      break;
-    }
-  }
+export function parseCSVFile(
+  content: string,
+  journalId: string,
+  userId: string,
+  overrideMap?: ColumnMap,
+): ParseResult {
+  const { rows: parsedLines, error } = findRows(content);
+  if (error) return { trades: [], platform: 'Unknown', errors: [error], headers: [], rows: [], map: EMPTY_MAP };
 
+  const headerIdx = findHeader(parsedLines);
   const headers = parsedLines[headerIdx];
   const platform = detectPlatform(headers);
 
-  const dataLines = parsedLines.slice(headerIdx + 1, endIdx).filter(cols => cols.length >= 3);
+  // Kapanmış işlemler tablosu bitince duruyoruz; sonrasında gelen açık
+  // işlemler, bekleyen emirler ve özet satırları işlem değildir.
+  let endIdx = parsedLines.length;
+  for (let i = headerIdx + 1; i < parsedLines.length; i++) {
+    const first = (parsedLines[i][0] || '').trim().toLowerCase();
+    if (SECTION_BREAKS.includes(first)) { endIdx = i; break; }
+  }
 
-  if (dataLines.length === 0) return { trades: [], platform, errors: ['Dosyada işlem satırı bulunamadı.'] };
+  const dataLines = parsedLines.slice(headerIdx + 1, endIdx).filter(cols => cols.length >= 3);
+  const map = overrideMap || guessColumns(headers);
+
+  const base = { platform, headers, rows: dataLines, map };
+
+  if (dataLines.length === 0) {
+    return { ...base, trades: [], errors: ['Dosyada işlem satırı bulunamadı.'] };
+  }
+  if (!mapIsUsable(map)) {
+    return { ...base, trades: [], errors: [], needsMapping: true };
+  }
 
   let trades: Trade[] = [];
-
+  const errors: string[] = [];
   try {
-    if (platform === 'MT4/MT5') {
-      // MT4/MT5: sütunlar başlıktan eşlenir
-      trades = parseMT(dataLines, headers, journalId, userId);
-    } else {
-      // Diğer platformlar için dict bazlı parser
-      const rows: Record<string, string>[] = dataLines.map(cols => {
-        const row: Record<string, string> = {};
-        headers.forEach((h, idx) => { row[h] = cols[idx] || ''; });
-        return row;
-      });
-
-      switch (platform) {
-        case 'cTrader': trades = parseCTrader(rows, journalId, userId); break;
-        case 'TradeLocker': trades = parseTradeLocker(rows, journalId, userId); break;
-        case 'Tradovate': trades = parseTradovate(rows, journalId, userId); break;
-        case 'NinjaTrader': trades = parseNinjaTrader(rows, journalId, userId); break;
-        case 'TradingView': trades = parseTradingView(rows, journalId, userId); break;
-        case 'IBKR': trades = parseIBKR(rows, journalId, userId); break;
-        case 'Binance': trades = parseBinance(rows, journalId, userId); break;
-        case 'Bybit': trades = parseBybit(rows, journalId, userId); break;
-        default:
-          errors.push('Platform otomatik tanınamadı. Broker\'ından aldığın işlem geçmişi raporunu ya da CSV dosyasını yüklediğinden emin ol.');
-      }
-    }
+    trades = parseRows(dataLines, map, journalId, userId, platform === 'Unknown' ? 'Manuel' : platform);
   } catch (e) {
-    errors.push(`Parse hatası: ${e}`);
+    errors.push(`Dosya okunurken hata: ${e}`);
   }
 
   trades = trades.filter(t => t.symbol && t.symbol.length > 0 && t.date);
-  return { trades, platform, errors };
+  // Sütunlar eşleşiyor ama tek satır bile işleme dönüşmediyse eşleştirme
+  // yanlıştır; kullanıcıya sormak, sessizce boş dönmekten iyidir.
+  if (trades.length === 0 && errors.length === 0) {
+    return { ...base, trades: [], errors: [], needsMapping: true };
+  }
+  return { ...base, trades, errors };
 }
 
 // ── UI ─────────────────────────────────────────────────────────────────────
 const PLATFORM_COLORS: Record<string, string> = {
+  'MT5': '#818cf8',
+  'MT4': '#818cf8',
   'MT4/MT5': '#818cf8',
   'cTrader': '#34d399',
   'TradeLocker': '#f59e0b',
-  'Tradovate': '#60a5fa',
-  'NinjaTrader': '#f87171',
-  'TradingView': '#a78bfa',
-  'IBKR': '#2dd4bf',
-  'Binance': '#fbbf24',
-  'Bybit': '#fb923c',
+  'DXtrade': '#60a5fa',
+  'Match-Trader': '#a78bfa',
+  'Manuel': '#94a3b8',
 };
+
+/** Eşleştirme ekranında gösterilecek alanlar ve etiketleri. */
+const MAP_FIELDS: { key: keyof ColumnMap; tr: string; en: string; required?: boolean }[] = [
+  { key: 'openTime',   tr: 'Giriş tarihi',     en: 'Entry date',     required: true },
+  { key: 'symbol',     tr: 'Sembol',           en: 'Symbol',         required: true },
+  { key: 'type',       tr: 'Yön (alış/satış)', en: 'Side (buy/sell)', required: true },
+  { key: 'profit',     tr: 'Kâr / Zarar',      en: 'Profit / Loss',  required: true },
+  { key: 'closeTime',  tr: 'Çıkış tarihi',     en: 'Exit date' },
+  { key: 'openPrice',  tr: 'Giriş fiyatı',     en: 'Entry price' },
+  { key: 'closePrice', tr: 'Çıkış fiyatı',     en: 'Exit price' },
+  { key: 'sl',         tr: 'Stop (S/L)',       en: 'Stop loss' },
+  { key: 'tp',         tr: 'Hedef (T/P)',      en: 'Take profit' },
+  { key: 'commission', tr: 'Komisyon',         en: 'Commission' },
+  { key: 'swap',       tr: 'Swap',             en: 'Swap' },
+  { key: 'fee',        tr: 'Ücret / Vergi',    en: 'Fees / Taxes' },
+];
+
+/** Aynı dosya tekrar yüklenirse kullanıcının eşleştirmesi hatırlansın. */
+const mapKey = (headers: string[]) => 'importMap:' + headers.join('|').toLowerCase().slice(0, 200);
+
+function loadSavedMap(headers: string[]): ColumnMap | null {
+  try {
+    const raw = localStorage.getItem(mapKey(headers));
+    return raw ? { ...EMPTY_MAP, ...JSON.parse(raw) } : null;
+  } catch { return null; }
+}
+
+function saveMap(headers: string[], map: ColumnMap) {
+  try { localStorage.setItem(mapKey(headers), JSON.stringify(map)); } catch { /* kotayı doldurduysa önemsiz */ }
+}
 
 export default function CSVImport({ onImport, onClose, journalId, journalName, userId }: CSVImportProps) {
   // Açık journal yoksa tek seçenek yeni journal oluşturmaktır.
@@ -745,6 +509,9 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [fileName, setFileName] = useState('');
+  /** Dosya içeriği elde tutulur: eşleştirme değişince yeniden ayrıştırılır. */
+  const [content, setContent] = useState('');
+  const [showMapping, setShowMapping] = useState(false);
 
   /**
    * MetaTrader raporları UTF-8 değildir: MT5 UTF-16 (BOM'lu), MT4 ise
@@ -766,7 +533,8 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
   const processFile = (file: File) => {
     const name = file.name.toLowerCase();
     if (!['.csv', '.txt', '.html', '.htm'].some(ext => name.endsWith(ext))) {
-      setParseResult({ trades: [], platform: 'Unknown', errors: ['Sadece .csv, .txt, .html veya .htm dosyaları desteklenir.'] });
+      setParseResult({ trades: [], platform: 'Unknown', headers: [], rows: [], map: EMPTY_MAP,
+        errors: ['Sadece .csv, .txt, .html veya .htm dosyaları desteklenir.'] });
       return;
     }
     setFileName(file.name);
@@ -776,12 +544,33 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
     }
     setLoading(true);
     readFileText(file)
-      .then(content => setParseResult(parseCSVFile(content, journalId || '', userId)))
+      .then(text => {
+        setContent(text);
+        // Önce otomatik tahmin; bu dosya için daha önce elle eşleştirme
+        // yapıldıysa o kullanılır.
+        const first = parseCSVFile(text, journalId || '', userId);
+        const saved = first.headers.length ? loadSavedMap(first.headers) : null;
+        const result = saved
+          ? parseCSVFile(text, journalId || '', userId, saved)
+          : first;
+        setParseResult(result);
+        setShowMapping(!!result.needsMapping);
+      })
       .catch(() => setParseResult({
-        trades: [], platform: 'Unknown',
+        trades: [], platform: 'Unknown', headers: [], rows: [], map: EMPTY_MAP,
         errors: [language === 'tr' ? 'Dosya okunamadı.' : 'The file could not be read.'],
       }))
       .finally(() => setLoading(false));
+  };
+
+  /** Kullanıcı bir sütun seçtiğinde dosyayı o eşleştirmeyle yeniden okur. */
+  const updateMap = (field: keyof ColumnMap, index: number) => {
+    if (!parseResult) return;
+    const next = { ...parseResult.map, [field]: index };
+    const result = parseCSVFile(content, journalId || '', userId, next);
+    // needsMapping yeniden okumada tekrar dolabilir; panel açık kalsın.
+    setParseResult({ ...result, map: next });
+    if (mapIsUsable(next)) saveMap(result.headers, next);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -818,7 +607,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
     padding: '20px',
   };
 
-  const supportedPlatforms = ['MT4/MT5', 'cTrader', 'TradeLocker', 'Tradovate', 'NinjaTrader', 'TradingView', 'IBKR', 'Binance', 'Bybit'];
+  const supportedPlatforms = [...SUPPORTED_PLATFORMS];
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-start justify-center z-50 p-4 overflow-y-auto">
@@ -905,6 +694,88 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                   }}>
                   {parseResult.platform}
                 </span>
+              </div>
+            )}
+
+            {/* Sütun eşleştirme — tanınmayan dosyalar burada kurtarılır. */}
+            {(showMapping || parseResult.needsMapping) && parseResult.headers.length > 0 && (
+              <div className="rounded-xl p-4 space-y-3"
+                style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.2)' }}>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Columns className="w-4 h-4" style={{ color: '#a78bfa' }} />
+                    <span className="text-sm font-semibold text-white">
+                      {language === 'tr' ? 'Sütunları Eşleştir' : 'Match the columns'}
+                    </span>
+                  </div>
+                  <p className="text-xs mt-1.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                    {language === 'tr'
+                      ? 'Dosyandaki hangi sütunun ne olduğunu seç. Bir kere seçmen yeterli — aynı biçimdeki dosyalarda hatırlanır.'
+                      : 'Tell us which column is which. You only do this once — the same file format is remembered.'}
+                  </p>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-2.5">
+                  {MAP_FIELDS.map(f => (
+                    <label key={f.key} className="block">
+                      <span className="block text-[11px] mb-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                        {language === 'tr' ? f.tr : f.en}
+                        {f.required && <span style={{ color: '#f87171' }}> *</span>}
+                      </span>
+                      <select
+                        value={parseResult.map[f.key]}
+                        onChange={e => updateMap(f.key, parseInt(e.target.value, 10))}
+                        className="w-full outline-none text-sm"
+                        style={{
+                          background: 'rgba(255,255,255,0.05)',
+                          border: `1px solid ${f.required && parseResult.map[f.key] < 0 ? 'rgba(248,113,113,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                          color: '#fff', borderRadius: '10px', padding: '7px 10px', cursor: 'pointer',
+                        }}>
+                        <option value={-1} style={{ background: '#1a1b2e' }}>—</option>
+                        {parseResult.headers.map((h, i) => (
+                          <option key={i} value={i} style={{ background: '#1a1b2e' }}>
+                            {h.trim() || `${language === 'tr' ? 'Sütun' : 'Column'} ${i + 1}`}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Seçim doğru mu, ilk satırla göster. */}
+                {parseResult.rows.length > 0 && (
+                  <div className="rounded-lg p-3 text-[11px] leading-relaxed"
+                    style={{ background: 'rgba(0,0,0,0.25)', color: 'rgba(255,255,255,0.5)' }}>
+                    <span style={{ color: 'rgba(255,255,255,0.35)' }}>
+                      {language === 'tr' ? 'İlk satır: ' : 'First row: '}
+                    </span>
+                    {MAP_FIELDS.filter(f => parseResult.map[f.key] >= 0).map((f, i) => (
+                      <span key={f.key}>
+                        {i > 0 && ' · '}
+                        <span style={{ color: 'rgba(255,255,255,0.35)' }}>{(language === 'tr' ? f.tr : f.en)}: </span>
+                        <span className="font-mono" style={{ color: '#fff' }}>
+                          {parseResult.rows[0][parseResult.map[f.key]] || '—'}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {parseResult.needsMapping && (
+              <div className="rounded-xl p-4" style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)' }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertTriangle className="w-4 h-4" style={{ color: '#fbbf24' }} />
+                  <span className="text-sm font-semibold" style={{ color: '#fbbf24' }}>
+                    {language === 'tr' ? 'Bu dosyayı otomatik tanıyamadım' : 'This file was not recognised automatically'}
+                  </span>
+                </div>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  {language === 'tr'
+                    ? 'Yukarıdan sütunları kendin eşleştirirsen dosya yine de aktarılır.'
+                    : 'Match the columns above and the file will import all the same.'}
+                </p>
               </div>
             )}
 
@@ -1019,8 +890,16 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
               </div>
             )}
 
-            <div className="flex justify-end gap-3 pt-2">
-              <button onClick={() => { setParseResult(null); setFileName(''); }}
+            <div className="flex justify-end items-center gap-3 pt-2">
+              {parseResult.headers.length > 0 && !showMapping && !parseResult.needsMapping && (
+                <button onClick={() => setShowMapping(true)}
+                  className="me-auto flex items-center gap-1.5 text-sm"
+                  style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  <Columns className="w-3.5 h-3.5" />
+                  {language === 'tr' ? 'Sütunları kendim eşleştir' : 'Match columns myself'}
+                </button>
+              )}
+              <button onClick={() => { setParseResult(null); setFileName(''); setContent(''); setShowMapping(false); }}
                 className="px-4 py-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {language === 'tr' ? 'Temizle' : 'Clear'}
               </button>
