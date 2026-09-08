@@ -495,67 +495,85 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       <section id="pricing" className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
-            className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium mb-5" style={{ letterSpacing: '-0.02em' }}>
+            className="max-w-2xl mb-14">
+            <h2 className="font-display text-[2.1rem] sm:text-[2.6rem] leading-[1.1] font-medium mb-4" style={{ letterSpacing: '-0.03em' }}>
               {t('Sade ve Şeffaf Fiyatlandırma', 'Simple & Transparent Pricing', 'قیمت‌گذاری ساده و شفاف')}
             </h2>
-            <p className="text-base" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
               {t('Ücretsiz başla, büyüdükçe yükselt.', 'Start free, upgrade as you grow.', 'رایگان شروع کنید، با رشد ارتقا دهید.')}
             </p>
           </motion.div>
 
+          {/* İki plan tek yüzey üstünde, aralarında ince bir çizgi. Pro'yu
+              doygun mor bir kutuya koymak fiyatı değil reklamı öne çıkarıyordu. */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={stagger}
-            className="max-w-3xl mx-auto grid sm:grid-cols-2 gap-6">
-            <motion.div variants={fadeUp} className="rounded-2xl p-8" style={{ background: 'rgba(255,255,255,0.025)' }}>
-              <h3 className="text-lg font-bold mb-1">{t('Ücretsiz', 'Free', 'رایگان')}</h3>
-              <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('Başlamak için ideal', 'Perfect to get started', 'ایده‌آل برای شروع')}</p>
-              <div className="mb-6">
-                <span className="text-4xl font-bold">$0</span>
-                <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('/ sonsuza kadar', '/ forever', '/ برای همیشه')}</span>
+            className="max-w-4xl rounded-3xl overflow-hidden grid sm:grid-cols-2"
+            style={{
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))',
+              border: '1px solid rgba(255,255,255,0.06)',
+            }}>
+
+            <motion.div variants={fadeUp} className="p-8 sm:p-10">
+              <h3 className="text-[15px] font-medium tracking-wide" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                {t('Ücretsiz', 'Free', 'رایگان')}
+              </h3>
+              <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                {t('Başlamak için ideal', 'Perfect to get started', 'ایده‌آل برای شروع')}
+              </p>
+              <div className="mt-7 mb-8 flex items-baseline gap-2">
+                <span className="font-display" style={{ fontSize: '52px', letterSpacing: '-0.04em', lineHeight: 1 }}>$0</span>
+                <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('/ sonsuza kadar', '/ forever', '/ برای همیشه')}</span>
               </div>
-              <div className="space-y-2.5 mb-8">
+              <div className="space-y-3 mb-9">
                 {[
                   t('1 Journal', '1 Journal', '۱ ژورنال'),
                   t('Günde 1 / Toplam 20 Trade', '1/Day, 20 Total Trades', 'روزانه ۱ / مجموعاً ۲۰ معامله'),
                   t('Tüm İstatistikler & Takvim', 'All Statistics & Calendar', 'همه آمارها و تقویم'),
                 ].map((f, i) => (
-                  <div key={i} className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
-                    <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{f}</span>
+                  <div key={i} className="flex items-start gap-3">
+                    <Check className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }} />
+                    <span className="text-[14.5px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{f}</span>
                   </div>
                 ))}
               </div>
               <button onClick={onGetStarted}
                 className="w-full py-3 rounded-full text-sm font-medium transition-all"
-                style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+                style={{ background: 'transparent', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.14)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                 {ctaLabel}
               </button>
             </motion.div>
 
-            <motion.div variants={fadeUp} className="rounded-2xl p-8 relative"
-              style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="px-4 py-1 rounded-full text-xs font-semibold" style={{ background: '#8b5cf6', color: '#fff' }}>
+            <motion.div variants={fadeUp} className="p-8 sm:p-10 relative"
+              style={{
+                borderInlineStart: '1px solid rgba(255,255,255,0.06)',
+                background: 'linear-gradient(180deg, rgba(139,92,246,0.07), transparent 70%)',
+              }}>
+              {/* Vurgu: kutunun tamamını boyamak yerine üstte tek bir çizgi. */}
+              <span className="absolute top-0 start-0 end-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #8b5cf6, transparent)' }} />
+              <div className="flex items-baseline justify-between">
+                <h3 className="text-[15px] font-medium tracking-wide">Pro</h3>
+                <span className="text-[10px] uppercase tracking-[0.16em]" style={{ color: '#a78bfa' }}>
                   {t('En Popüler', 'Most Popular', 'محبوب‌ترین')}
                 </span>
               </div>
-              <h3 className="text-lg font-bold mb-1">Pro</h3>
-              <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('Ciddi traderlar için', 'For serious traders', 'برای معامله‌گران جدی')}</p>
-              <div className="mb-6">
-                <span className="text-4xl font-bold">$8.25</span>
-                <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('/ ay (yıllık)', '/ mo (yearly)', '/ ماه')}</span>
+              <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                {t('Ciddi traderlar için', 'For serious traders', 'برای معامله‌گران جدی')}
+              </p>
+              <div className="mt-7 mb-8 flex items-baseline gap-2">
+                <span className="font-display" style={{ fontSize: '52px', letterSpacing: '-0.04em', lineHeight: 1 }}>$8.25</span>
+                <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('/ ay (yıllık)', '/ mo (yearly)', '/ ماه')}</span>
               </div>
-              <div className="space-y-2.5 mb-8">
+              <div className="space-y-3 mb-9">
                 {[
                   t('Sınırsız Journal & Trade', 'Unlimited Journals & Trades', 'ژورنال و معامله نامحدود'),
                   t('AI Analiz & Gelişmiş İstatistik', 'AI Analysis & Advanced Stats', 'تحلیل هوش مصنوعی'),
                   t('Isı Haritası & Setup Analizi', 'Heat Map & Setup Analysis', 'نقشه حرارتی و تحلیل ستاپ'),
                 ].map((f, i) => (
-                  <div key={i} className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#a78bfa' }} />
-                    <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{f}</span>
+                  <div key={i} className="flex items-start gap-3">
+                    <Check className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#a78bfa' }} />
+                    <span className="text-[14.5px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{f}</span>
                   </div>
                 ))}
               </div>
@@ -573,54 +591,63 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
 
       {/* ── SSS ── */}
       <section className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
-            className="text-center mb-12">
-            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium" style={{ letterSpacing: '-0.02em' }}>
-              {t('Sıkça Sorulan Sorular', 'Frequently Asked Questions', 'سؤالات متداول')}
-            </h2>
-          </motion.div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          {/* Başlık solda kalır, sorular sağda akar — sayfadaki tek iki
+              sütunlu bölüm; ritmi burada bir kez daha değiştiriyoruz. */}
+          <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] gap-10 lg:gap-16">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}>
+              <h2 className="font-display text-[2.1rem] sm:text-[2.6rem] leading-[1.1] font-medium lg:sticky lg:top-28"
+                style={{ letterSpacing: '-0.03em' }}>
+                {t('Sıkça Sorulan Sorular', 'Frequently Asked Questions', 'سؤالات متداول')}
+              </h2>
+            </motion.div>
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={stagger} className="space-y-3">
-            {faqs.map((faq, i) => {
-              const isOpen = openFAQ === i;
-              return (
-                <motion.div key={i} variants={fadeUp} className="rounded-2xl overflow-hidden"
-                  style={{ background: 'rgba(255,255,255,0.025)' }}>
-                  <button onClick={() => setOpenFAQ(isOpen ? null : i)}
-                    className="w-full flex items-center justify-between gap-4 px-6 py-5 text-start">
-                    <span className="font-medium text-sm sm:text-base">{faq.q}</span>
-                    <ChevronDown className={`w-4 h-4 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                      style={{ color: 'rgba(255,255,255,0.4)' }} />
-                  </button>
-                  <motion.div initial={false} animate={{ height: isOpen ? 'auto' : 0 }} className="overflow-hidden"
-                    transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}>
-                    <p className="px-6 pb-5 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{faq.a}</p>
+            {/* Kutu yok: sorular tek bir sütun, aralarında ince çizgi. */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={stagger}>
+              {faqs.map((faq, i) => {
+                const isOpen = openFAQ === i;
+                return (
+                  <motion.div key={i} variants={fadeUp}
+                    style={{ borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.07)' }}>
+                    <button onClick={() => setOpenFAQ(isOpen ? null : i)}
+                      className="w-full flex items-start justify-between gap-6 py-6 text-start group">
+                      <span className="text-[16px] leading-snug transition-colors"
+                        style={{ color: isOpen ? '#fff' : 'rgba(255,255,255,0.78)' }}>
+                        {faq.q}
+                      </span>
+                      <ChevronDown className={`w-4 h-4 flex-shrink-0 mt-1 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        style={{ color: isOpen ? '#a78bfa' : 'rgba(255,255,255,0.3)' }} />
+                    </button>
+                    <motion.div initial={false} animate={{ height: isOpen ? 'auto' : 0 }} className="overflow-hidden"
+                      transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}>
+                      <p className="pb-7 pe-10 text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{faq.a}</p>
+                    </motion.div>
                   </motion.div>
-                </motion.div>
-              );
-            })}
-          </motion.div>
+                );
+              })}
+            </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── KAPANIŞ CTA ── */}
-      <section className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
-            className="relative rounded-3xl px-6 sm:px-16 py-16 text-center overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.18), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
-            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full blur-3xl opacity-25"
-              style={{ background: 'radial-gradient(circle, #8b5cf6, transparent 70%)' }} />
-            <h2 className="font-display text-[2.1rem] sm:text-[2.75rem] leading-tight font-medium mb-5 relative" style={{ letterSpacing: '-0.02em' }}>
+      <section className="relative overflow-hidden border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+        {/* Kutu değil, sayfanın kendisi. Mor gradyanlı bir pano yerine sessiz
+            bir alan ve tek bir cümle — kapanış daha ağır durur. */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px]"
+          style={{ background: 'radial-gradient(620px 300px at 50% 0%, rgba(139,92,246,0.16), transparent 70%)' }} />
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-28 sm:py-36 text-center">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}>
+            <h2 className="font-display text-[2.3rem] sm:text-[3.2rem] leading-[1.06] font-medium mb-6"
+              style={{ letterSpacing: '-0.035em' }}>
               {t('Trading\'ini Bugün Kaydetmeye Başla', 'Start Logging Your Trading Today', 'همین امروز معاملات خود را ثبت کنید')}
             </h2>
-            <p className="text-base mb-8 relative" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <p className="text-[16px] mb-10" style={{ color: 'rgba(255,255,255,0.45)' }}>
               {t('Ücretsiz, kart bilgisi olmadan, 30 saniyede.', 'Free, no card required, in 30 seconds.', 'رایگان، بدون کارت، در ۳۰ ثانیه.')}
             </p>
             <motion.button onClick={onGetStarted}
               whileHover={{ scale: shouldReduceMotion ? 1 : 1.03 }} whileTap={{ scale: shouldReduceMotion ? 1 : 0.97 }}
-              className="relative inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-[15px] font-medium"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-[15px] font-medium"
               style={{ background: '#8b5cf6', color: '#fff' }}>
               {ctaLabel}
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
@@ -630,23 +657,52 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="py-10 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4" style={{ color: '#8b5cf6' }} />
-            <span className="text-sm font-semibold">{t('Simple Trading Journal', 'Simple Trading Journal', 'سیمپل تریدینگ ژورنال')}</span>
+      <footer className="border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
+          {/* Marka üstte tek başına, bağlantılar altta: tek satıra sıkışmış
+              bir footer sitenin sonunu aceleye getirilmiş gösteriyordu. */}
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-10">
+            <div className="max-w-xs">
+              <div className="flex items-center gap-2.5 mb-3">
+                <TrendingUp className="w-[18px] h-[18px]" style={{ color: '#8b5cf6' }} />
+                <span className="font-display text-[15px]" style={{ letterSpacing: '-0.01em' }}>
+                  {t('Simple Trading Journal', 'Simple Trading Journal', 'سیمپل تریدینگ ژورنال')}
+                </span>
+              </div>
+              <p className="text-[13.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم دفترچه معاملات')}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+              {[
+                { label: t('Özellikler', 'Features', 'ویژگی‌ها'), href: '#features' },
+                { label: t('Nasıl Çalışır', 'How It Works', 'چگونه کار می‌کند'), href: '#how-it-works' },
+                { label: t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری'), href: '#pricing' },
+              ].map(l => (
+                <a key={l.href} href={l.href} className="text-[13.5px] transition-colors"
+                  style={{ color: 'rgba(255,255,255,0.4)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+                  {l.label}
+                </a>
+              ))}
+              {!signedIn && (
+                <button onClick={onSignIn} className="text-[13.5px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  {t('Giriş Yap', 'Sign In', 'ورود')}
+                </button>
+              )}
+              <button onClick={onGetStarted} className="text-[13.5px]" style={{ color: '#a78bfa' }}>
+                {signedIn ? ctaLabel : t('Ücretsiz Başla', 'Get Started', 'شروع رایگان')}
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-6">
-            {!signedIn && (
-              <button onClick={onSignIn} className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('Giriş Yap', 'Sign In', 'ورود')}</button>
-            )}
-            <button onClick={onGetStarted} className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {signedIn ? ctaLabel : t('Ücretsiz Başla', 'Get Started', 'شروع رایگان')}
-            </button>
+
+          <div className="mt-12 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+            <p className="text-[12px]" style={{ color: 'rgba(255,255,255,0.22)' }}>
+              © {new Date().getFullYear()} Simple Trading Journal
+            </p>
           </div>
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
-            © {new Date().getFullYear()} Simple Trading Journal
-          </p>
         </div>
       </footer>
     </div>
