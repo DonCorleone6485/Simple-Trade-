@@ -145,7 +145,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
     {
       icon: <Upload className="w-5 h-5" />,
       title: t('Geçmişini Bir Tıkla Aktar', 'Import Your History in One Click', 'تاریخچه خود را با یک کلیک وارد کنید'),
-      desc: t('Broker\'ından aldığın CSV dosyasını yükle, işlemlerin otomatik olarak journal\'ına eklensin.', 'Upload the CSV export from your broker and every trade lands in your journal automatically.', 'فایل CSV کارگزار خود را آپلود کنید.'),
+      desc: t('Broker\'ından aldığın işlem geçmişi raporunu yükle, işlemlerin otomatik olarak journal\'ına eklensin.', 'Upload the trade history your broker gives you and every trade lands in your journal automatically.', 'گزارش تاریخچه معاملات کارگزار خود را آپلود کنید.'),
       span: '',
       accent: '#f87171',
     },
@@ -153,7 +153,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
 
   const steps = [
     { n: '01', title: t('Journal Oluştur', 'Create a Journal', 'یک ژورنال بسازید'), desc: t('Başlangıç sermayeni ve tarihi gir, hesabını tanımla.', 'Set your starting capital and date to define your account.', 'سرمایه اولیه و تاریخ را وارد کنید.') },
-    { n: '02', title: t('İşlemlerini Gir', 'Log Your Trades', 'معاملات خود را ثبت کنید'), desc: t('Tek tek kaydet ya da broker CSV\'ni tek seferde aktar.', 'Log them one by one, or import your broker\'s CSV in one go.', 'یک به یک ثبت کنید یا CSV را وارد کنید.') },
+    { n: '02', title: t('İşlemlerini Gir', 'Log Your Trades', 'معاملات خود را ثبت کنید'), desc: t('Tek tek kaydet ya da broker raporunu tek seferde aktar.', 'Log them one by one, or import your broker\'s report in one go.', 'یک به یک ثبت کنید یا گزارش کارگزار را وارد کنید.') },
     { n: '03', title: t('Örüntünü İncele', 'Review Your Patterns', 'الگوهای خود را بررسی کنید'), desc: t('İstatistikler, takvim ve grafiklerle nerede güçlü nerede zayıf olduğunu gör.', 'See where you\'re strong and where you leak, through stats, calendar and charts.', 'با آمار و نمودارها نقاط قوت و ضعف را ببینید.') },
     { n: '04', title: t('Kurallarına Uy, Geliş', 'Follow the Rules, Improve', 'به قوانین پایبند باشید و پیشرفت کنید'), desc: t('Hedef koy, ihlalleri takip et, her ay bir öncekinden daha disiplinli ol.', 'Set goals, track violations, be more disciplined every month than the last.', 'اهداف تعیین کنید و نقض‌ها را دنبال کنید.') },
   ];
@@ -176,8 +176,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       a: t('Herhangi birinde. Sembolü elle giriyorsun — forex, hisse, kripto, emtia; hiçbir borsaya veya brokere bağlı değiliz.', 'Any of them. You enter the symbol yourself — forex, stocks, crypto, commodities; we\'re not tied to any exchange or broker.', 'در هر بازاری — فارکس، سهام، ارز دیجیتال.'),
     },
     {
-      q: t('CSV içe aktarma nasıl çalışır?', 'How does CSV import work?', 'وارد کردن CSV چگونه کار می‌کند؟'),
-      a: t('Broker\'ından indirdiğin CSV dosyasını yükle; işlemlerin otomatik olarak seçtiğin journal\'a eklenir, tek tek elle girmene gerek kalmaz.', 'Upload the CSV file you export from your broker and every trade is added to the journal you pick — no manual re-entry.', 'فایل CSV کارگزار خود را آپلود کنید.'),
+      q: t('İçe aktarma nasıl çalışır?', 'How does importing work?', 'وارد کردن چگونه کار می‌کند؟'),
+      a: t('Broker\'ından indirdiğin dosyayı yükle — MetaTrader raporu (HTML) ya da CSV olabilir. Platform otomatik tanınır ve işlemlerin seçtiğin journal\'a eklenir; tek tek elle girmene gerek kalmaz.', 'Upload the file your broker gives you — a MetaTrader report (HTML) or a CSV. The platform is detected automatically and every trade is added to the journal you pick, with no manual re-entry.', 'فایلی که کارگزار به شما می‌دهد آپلود کنید — گزارش متاتریدر (HTML) یا CSV.'),
     },
     {
       q: t('Mobil uygulaması var mı?', 'Is there a mobile app?', 'آیا اپلیکیشن موبایل دارید؟'),

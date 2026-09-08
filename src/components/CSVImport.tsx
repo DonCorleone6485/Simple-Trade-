@@ -685,7 +685,7 @@ function parseCSVFile(content: string, journalId: string, userId: string): Parse
 
   const dataLines = parsedLines.slice(headerIdx + 1, endIdx).filter(cols => cols.length >= 3);
 
-  if (dataLines.length === 0) return { trades: [], platform, errors: ['CSV dosyasında veri bulunamadı.'] };
+  if (dataLines.length === 0) return { trades: [], platform, errors: ['Dosyada işlem satırı bulunamadı.'] };
 
   let trades: Trade[] = [];
 
@@ -711,7 +711,7 @@ function parseCSVFile(content: string, journalId: string, userId: string): Parse
         case 'Binance': trades = parseBinance(rows, journalId, userId); break;
         case 'Bybit': trades = parseBybit(rows, journalId, userId); break;
         default:
-          errors.push('Platform otomatik tanınamadı. Lütfen doğru CSV formatında olduğunu kontrol edin.');
+          errors.push('Platform otomatik tanınamadı. Broker\'ından aldığın işlem geçmişi raporunu ya da CSV dosyasını yüklediğinden emin ol.');
       }
     }
   } catch (e) {

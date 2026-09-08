@@ -586,7 +586,8 @@ export default function App() {
   const signUpLabel = language === 'tr' ? 'Kayıt Ol' : language === 'fa' ? 'ثبت نام' : 'Sign Up';
   const pricingLabel = language === 'tr' ? 'Fiyatlar' : language === 'fa' ? 'قیمت‌ها' : 'Pricing';
   const homeLabel = language === 'tr' ? 'Ana Sayfa' : language === 'fa' ? 'صفحه اصلی' : 'Home';
-  const importLabel = language === 'tr' ? 'CSV İçe Aktar' : 'Import CSV';
+  // Dosya biçimi butonun işi değil: CSV de HTML de kabul ediliyor.
+  const importLabel = language === 'tr' ? 'İçe Aktar' : 'Import';
 
   // ── PORTAL KABUĞU ──
   const navKey: NavKey =
