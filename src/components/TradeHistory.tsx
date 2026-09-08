@@ -809,69 +809,65 @@ export default function TradeHistory({
             />
           </div>
 
-          <div className="space-y-5">
-            <div>
-              <label style={lbl}>{t('preTrade')} {t('notes')}</label>
-              <textarea style={{ ...inp, height: '190px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
-                value={editForm.preTradeNotes || ''}
-                onChange={e => setEditForm(f => ({ ...f, preTradeNotes: e.target.value }))}
-                placeholder={t('preNotesPlaceholder')} />
-            </div>
-            <div>
-              <label style={lbl}>{t('postTrade')} {t('notes')}</label>
-              <textarea style={{ ...inp, height: '190px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
-                value={editForm.postTradeNotes || ''}
-                onChange={e => setEditForm(f => ({ ...f, postTradeNotes: e.target.value }))}
-                placeholder={t('postNotesPlaceholder')} />
-            </div>
-          </div>
-
-          {/* Fotoğraflar */}
+          {/* Not ve fotoğraflar, işlemin akışına göre: önce işleme girerken
+              düşündüklerin ve baktığın grafik, sonra kapandıktan sonrakiler. */}
           {(['pre', 'post'] as const).map(kind => {
             const photos = (kind === 'pre' ? editForm.preTradePhotos : editForm.postTradePhotos) || [];
             const canUpload = isOwner || photos.length < 3;
             const fileRef = React.createRef<HTMLInputElement>();
             return (
-              <div key={kind}>
-                <label style={lbl}>
-                  {kind === 'pre' ? t('preTrade') : t('postTrade')} {t('photos')}
-                  {!isOwner && <span style={{ color: 'rgba(255,255,255,0.25)', marginLeft: 6 }}>({photos.length}/3)</span>}
-                </label>
-                <div className="space-y-3">
-                                      {canUpload && (
-                    <div
-                      onClick={() => !uploadingEditPhoto && fileRef.current?.click()}
-                      className="w-full h-24 flex flex-col items-center justify-center rounded-xl transition-all"
-                      style={{
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1px dashed rgba(255,255,255,0.12)',
-                        cursor: uploadingEditPhoto ? 'not-allowed' : 'pointer',
-                        opacity: uploadingEditPhoto ? 0.6 : 1,
-                      }}
-                      onMouseEnter={e => { if (!uploadingEditPhoto) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}
-                    >
-                      {uploadingEditPhoto
-                        ? <><Loader className="w-4 h-4 mb-1 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Yükleniyor...</span></>
-                        : <><Upload className="w-4 h-4 mb-1" style={{ color: 'rgba(255,255,255,0.25)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span></>
-                      }
-                      <input type="file" ref={fileRef} onChange={e => handleEditPhotoUpload(e, kind)} accept="image/*" multiple className="hidden" disabled={uploadingEditPhoto} />
-                    </div>
-                  )}
-                  {photos.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2">
-                      {photos.map((photo, i) => (
-                        <div key={i} className="relative aspect-square rounded-xl overflow-hidden group" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
-                          <img src={photo} alt={`photo-${i}`} className="w-full h-full object-cover" />
-                          <button type="button" onClick={() => removeEditPhoto(i, kind)}
-                            className="absolute top-1 end-1 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
-                            style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}>
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+              <div key={kind} className="space-y-5">
+                <div>
+                  <label style={lbl}>{kind === 'pre' ? t('preTrade') : t('postTrade')} {t('notes')}</label>
+                  <textarea style={{ ...inp, height: '190px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
+                    value={(kind === 'pre' ? editForm.preTradeNotes : editForm.postTradeNotes) || ''}
+                    onChange={e => setEditForm(f => kind === 'pre'
+                      ? { ...f, preTradeNotes: e.target.value }
+                      : { ...f, postTradeNotes: e.target.value })}
+                    placeholder={kind === 'pre' ? t('preNotesPlaceholder') : t('postNotesPlaceholder')} />
+                </div>
+
+                <div>
+                  <label style={lbl}>
+                    {kind === 'pre' ? t('preTrade') : t('postTrade')} {t('photos')}
+                    {!isOwner && <span style={{ color: 'rgba(255,255,255,0.25)', marginLeft: 6 }}>({photos.length}/3)</span>}
+                  </label>
+                  <div className="space-y-3">
+                    {canUpload && (
+                      <div
+                        onClick={() => !uploadingEditPhoto && fileRef.current?.click()}
+                        className="w-full h-24 flex flex-col items-center justify-center rounded-xl transition-all"
+                        style={{
+                          background: 'rgba(255,255,255,0.03)',
+                          border: '1px dashed rgba(255,255,255,0.12)',
+                          cursor: uploadingEditPhoto ? 'not-allowed' : 'pointer',
+                          opacity: uploadingEditPhoto ? 0.6 : 1,
+                        }}
+                        onMouseEnter={e => { if (!uploadingEditPhoto) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}
+                      >
+                        {uploadingEditPhoto
+                          ? <><Loader className="w-4 h-4 mb-1 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{language === 'tr' ? 'Yükleniyor...' : 'Uploading...'}</span></>
+                          : <><Upload className="w-4 h-4 mb-1" style={{ color: 'rgba(255,255,255,0.25)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span></>
+                        }
+                        <input type="file" ref={fileRef} onChange={e => handleEditPhotoUpload(e, kind)} accept="image/*" multiple className="hidden" disabled={uploadingEditPhoto} />
+                      </div>
+                    )}
+                    {photos.length > 0 && (
+                      <div className="grid grid-cols-3 gap-2">
+                        {photos.map((photo, i) => (
+                          <div key={i} className="relative aspect-square rounded-xl overflow-hidden group" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <img src={photo} alt={`photo-${i}`} className="w-full h-full object-cover" />
+                            <button type="button" onClick={() => removeEditPhoto(i, kind)}
+                              className="absolute top-1 end-1 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                              style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}>
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );
