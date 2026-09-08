@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { signedMoney } from '../lib/format';
-import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL } from '../lib/tradeMath';
+import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, dayKey } from '../lib/tradeMath';
 
 
 interface CalendarViewProps {
@@ -41,7 +41,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
 
   const getTradesForDay = (day: number) => {
     const key = getDayKey(day);
-    return trades.filter(t => t.date.startsWith(key));
+    return trades.filter(t => dayKey(t.date) === key);
   };
 
   const getDayStats = (day: number) => {
@@ -62,7 +62,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
     : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   const selectedTrades = selectedDay
-    ? trades.filter(t => t.date.startsWith(selectedDay))
+    ? trades.filter(t => dayKey(t.date) === selectedDay)
     : [];
 
   const getResultText = (result: string) => {
@@ -109,7 +109,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
             { label: t('bestDay'), value: (() => {
               const days: Record<string, number> = {};
               monthTrades.forEach(tr => {
-                const key = tr.date.split('T')[0];
+                const key = dayKey(tr.date);
                 const isW = tr.result === 'Başarılı' || tr.result === 'Manuel Karda';
                 const isL = tr.result === 'Başarısız' || tr.result === 'Manuel Zararda';
                 days[key] = (days[key] || 0) + tradePnL(tr);

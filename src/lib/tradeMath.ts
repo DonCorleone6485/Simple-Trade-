@@ -71,3 +71,18 @@ export const realizedR = (t: Pick<Trade, 'result' | 'reward' | 'risk'>): number 
 /** "+0.50R" / "−1.00R" — işaretli, tipografik eksi ile. */
 export const formatR = (r: number | null): string =>
   r == null ? '-' : `${r >= 0 ? '+' : '−'}${Math.abs(r).toFixed(2)}R`;
+
+/**
+ * Bir işlemin düştüğü yerel takvim günü: "2026-09-07".
+ *
+ * `trade.date` bir ISO metnidir ve UTC'dir. Baştan on karakterini kesmek
+ * (ya da startsWith ile karşılaştırmak) kullanıcının saat dilimini yok sayar:
+ * Türkiye'de 7 Eylül 01:02'de açılan işlem "2026-09-06T22:02Z" olarak
+ * saklanır ve 6 Eylül'e düşer. İşlem listesi yerel saatle gruplandığı için
+ * takvimle listenin gün sayısı birbirini tutmazdı.
+ */
+export const dayKey = (iso: string): string => {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
