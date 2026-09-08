@@ -36,6 +36,8 @@ interface ParseResult {
   map: ColumnMap;
   /** Sütunlar tanınamadı — kullanıcının eşleştirmesi gerekiyor. */
   needsMapping?: boolean;
+  /** Sütunlar okundu ama dosyada kapanmış işlem yok. */
+  noTrades?: boolean;
 }
 
 // ── PROPER CSV PARSER (handles quoted commas) ──────────────────────────────
@@ -465,10 +467,11 @@ export function parseCSVFile(
   }
 
   trades = trades.filter(t => t.symbol && t.symbol.length > 0 && t.date);
-  // Sütunlar eşleşiyor ama tek satır bile işleme dönüşmediyse eşleştirme
-  // yanlıştır; kullanıcıya sormak, sessizce boş dönmekten iyidir.
+  // Sütunlar okunabildiği hâlde tek işlem çıkmadıysa sorun eşleştirmede değil,
+  // dosyanın kendisindedir — çoğunlukla yanlış rapor türü indirilmiştir.
+  // Kullanıcıyı sütun eşleştirmeye yollamak burada yardımcı olmaz.
   if (trades.length === 0 && errors.length === 0) {
-    return { ...base, trades: [], errors: [], needsMapping: true };
+    return { ...base, trades: [], errors: [], noTrades: true };
   }
   return { ...base, trades, errors };
 }
@@ -792,6 +795,31 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
               </div>
             )}
 
+            {parseResult.noTrades && (
+              <div className="rounded-xl p-4" style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)' }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: '#fbbf24' }} />
+                  <span className="text-sm font-semibold" style={{ color: '#fbbf24' }}>
+                    {language === 'tr' ? 'Bu dosyada işlem geçmişi yok' : 'This file has no trade history'}
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  {parseResult.platform.startsWith('MT')
+                    ? (language === 'tr'
+                        ? 'Dosya okundu ama içinde kapanmış işlem yok — büyük ihtimalle "İşlem Hesabı Raporu" indirilmiş; o rapor sadece açık pozisyonları ve bakiyeyi içerir. Doğrusu için MetaTrader\'da Araç Kutusu → Geçmiş sekmesine sağ tıkla → Rapor.'
+                        : 'The file was read but holds no closed trades — this looks like the account report, which only carries open positions and balances. In MetaTrader use Toolbox → History, right-click → Report.')
+                    : (language === 'tr'
+                        ? 'Dosya okundu ama içinde kapanmış işlem bulunamadı. Sütunlar yanlış eşleşmiş olabilir; aşağıdan kendin eşleştirebilirsin.'
+                        : 'The file was read but no closed trades were found. If the columns were matched wrongly you can set them yourself below.')}
+                </p>
+                <button onClick={() => setShowMapping(true)}
+                  className="mt-3 flex items-center gap-1.5 text-sm" style={{ color: '#a78bfa' }}>
+                  <Columns className="w-3.5 h-3.5" />
+                  {language === 'tr' ? 'Yine de sütunları eşleştir' : 'Match the columns anyway'}
+                </button>
+              </div>
+            )}
+
             {parseResult.needsMapping && (
               <div className="rounded-xl p-4" style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)' }}>
                 <div className="flex items-center gap-2 mb-1">
@@ -928,7 +956,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
             )}
 
             <div className="flex justify-end items-center gap-3 pt-2">
-              {parseResult.headers.length > 0 && !showMapping && !parseResult.needsMapping && (
+              {parseResult.headers.length > 0 && !showMapping && !parseResult.needsMapping && !parseResult.noTrades && (
                 <button onClick={() => setShowMapping(true)}
                   className="me-auto flex items-center gap-1.5 text-sm"
                   style={{ color: 'rgba(255,255,255,0.4)' }}>
