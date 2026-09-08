@@ -6,7 +6,7 @@ import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
   Award, AlertTriangle, Zap, TrendingDown, Edit2, Eye,
-  CheckSquare, Square, X, Save, Upload, Loader, Sparkles, Printer
+  CheckSquare, Square, X, Save, Upload, Loader, Sparkles, Printer, FolderInput
 } from 'lucide-react';
 import MTFAnalysis, { MTFAnalysisView } from './MTFAnalysis';
 import Checklist, { ChecklistView } from './Checklist';
@@ -24,6 +24,9 @@ interface TradeHistoryProps {
   trades: Trade[];
   onDelete: (id: string) => void;
   onDeleteMultiple?: (ids: string[]) => void;
+  /** Bu journal dışındaki journal'lar — işlem taşımak için. */
+  otherJournals?: { id: string; name: string }[];
+  onMoveTrades?: (ids: string[], targetJournalId: string) => void;
   onUpdate?: (trade: Trade) => void;
   statsOnly?: boolean;
   /** Tek bir işlemi PDF/yazdırma görünümüne gönderir. */
@@ -34,6 +37,8 @@ export default function TradeHistory({
   trades,
   onDelete,
   onDeleteMultiple,
+  otherJournals = [],
+  onMoveTrades,
   onUpdate,
   statsOnly = false,
   onPrintTrade,
@@ -42,6 +47,17 @@ export default function TradeHistory({
   const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
   const [editForm, setEditForm] = useState<Partial<Trade>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  /** Taşınacak işlemler; hedef journal seçilene kadar açık kalır. */
+  const [movingIds, setMovingIds] = useState<string[] | null>(null);
+
+  const canMove = !!onMoveTrades && otherJournals.length > 0;
+
+  const doMove = (targetId: string) => {
+    if (movingIds && onMoveTrades) onMoveTrades(movingIds, targetId);
+    setMovingIds(null);
+    setSelectedIds(new Set());
+    setSelectedTrade(null);
+  };
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
   const [uploadingEditPhoto, setUploadingEditPhoto] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
@@ -49,6 +65,43 @@ export default function TradeHistory({
   const [aiError, setAiError] = useState('');
   const [showAi, setShowAi] = useState(false);
   const { t, language } = useLanguage();
+
+  /** Hedef journal seçimi. Liste ve detay görünümlerinin ikisinde de görünür. */
+  const movePicker = movingIds && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.8)' }} onClick={() => setMovingIds(null)}>
+      <div className="w-full max-w-sm rounded-2xl p-5" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}
+        onClick={e => e.stopPropagation()}>
+        <h3 className="font-display text-[18px] text-white">
+          {language === 'tr' ? "Başka Journal'a Taşı" : 'Move to Another Journal'}
+        </h3>
+        <p className="text-sm mt-1.5 mb-4" style={{ color: 'rgba(255,255,255,0.45)' }}>
+          {movingIds.length === 1
+            ? (language === 'tr' ? 'Bu işlem seçtiğin journal\'a taşınacak.' : 'This trade will move to the journal you pick.')
+            : (language === 'tr'
+                ? `${movingIds.length} işlem seçtiğin journal'a taşınacak.`
+                : `${movingIds.length} trades will move to the journal you pick.`)}
+        </p>
+        <div className="space-y-2">
+          {otherJournals.map(j => (
+            <button key={j.id} onClick={() => doMove(j.id)}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start text-sm transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#fff' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.15)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}>
+              <FolderInput className="w-4 h-4 flex-shrink-0" style={{ color: '#a78bfa' }} />
+              <span className="truncate">{j.name}</span>
+            </button>
+          ))}
+        </div>
+        <button onClick={() => setMovingIds(null)} className="w-full mt-4 py-2 text-sm"
+          style={{ color: 'rgba(255,255,255,0.45)' }}>
+          {t('cancel')}
+        </button>
+      </div>
+    </div>
+  );
+
   const { user } = useUser();
   const isOwner = user?.primaryEmailAddress?.emailAddress === 'asgharjafari2007@outlook.com';
 
@@ -850,6 +903,7 @@ export default function TradeHistory({
     const isLoss = selectedTrade.result === 'Başarısız' || selectedTrade.result === 'Manuel Zararda';
     return (
       <>
+        {movePicker}
         {/* ── LIGHTBOX ── */}
         {lightboxPhoto && (
           <div
@@ -893,6 +947,17 @@ export default function TradeHistory({
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }}>
                   <Printer className="w-4 h-4" />
                   {t('printPdf')}
+                </button>
+              )}
+              {canMove && (
+                <button onClick={() => setMovingIds([selectedTrade.id])}
+                  title={language === 'tr' ? "Başka journal'a taşı" : 'Move to another journal'}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }}>
+                  <FolderInput className="w-4 h-4" />
+                  {language === 'tr' ? 'Taşı' : 'Move'}
                 </button>
               )}
               <button onClick={e => startEdit(selectedTrade, e)}
@@ -1090,6 +1155,7 @@ export default function TradeHistory({
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
+      {movePicker}
       <div className="flex items-center justify-between">
         <button onClick={toggleSelectAll} className="flex items-center gap-2 text-sm transition-all"
           style={{ color: 'rgba(255,255,255,0.5)' }}
@@ -1102,6 +1168,17 @@ export default function TradeHistory({
             ? (language === 'tr' ? 'Tümünü Kaldır' : 'Deselect All')
             : (language === 'tr' ? 'Tümünü Seç' : 'Select All')}</span>
         </button>
+
+        {selectedIds.size > 0 && canMove && (
+          <button onClick={() => setMovingIds(Array.from(selectedIds))}
+            className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ms-auto me-3"
+            style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.2)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
+            <FolderInput className="w-4 h-4" />
+            {selectedIds.size} {language === 'tr' ? 'işlemi taşı' : 'trades — move'}
+          </button>
+        )}
 
         {selectedIds.size > 0 && (
           <button onClick={handleDeleteSelected}
@@ -1197,6 +1274,16 @@ export default function TradeHistory({
                           title={language === 'tr' ? 'Detaylar' : 'Details'}>
                           <Eye className="w-3.5 h-3.5" />
                         </button>
+                        {canMove && (
+                          <button onClick={e => { e.stopPropagation(); setMovingIds([trade.id]); }}
+                            className="p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
+                            style={{ color: 'rgba(255,255,255,0.5)' }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                            title={language === 'tr' ? "Başka journal'a taşı" : 'Move to another journal'}>
+                            <FolderInput className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                         <button onClick={e => { e.stopPropagation(); onDelete(trade.id); }}
                           className="p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                           style={{ color: '#f87171' }}

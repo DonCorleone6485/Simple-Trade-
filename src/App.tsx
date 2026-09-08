@@ -517,6 +517,25 @@ export default function App() {
     setTrades(prev => prev.filter(tr => tr.id !== id));
   };
 
+  /** İşlemleri başka bir journal'a taşır; not, fotoğraf, checklist hepsi gider. */
+  const handleMoveTrades = async (ids: string[], targetJournalId: string) => {
+    if (!user || ids.length === 0) return;
+    const { error } = await supabase
+      .from('trades')
+      .update({ journal_id: targetJournalId })
+      .in('id', ids)
+      .eq('user_id', user.id);
+    if (error) {
+      alert(language === 'tr' ? 'İşlemler taşınamadı.' : 'The trades could not be moved.');
+      return;
+    }
+    setTrades(prev => prev.map(tr =>
+      ids.includes(tr.id)
+        ? { ...tr, journal_id: targetJournalId, accountId: targetJournalId }
+        : tr
+    ));
+  };
+
   const handleDeleteMultiple = async (ids: string[]) => {
     const toDelete = trades.filter(tr => ids.includes(tr.id));
     for (const trade of toDelete) {
@@ -1145,7 +1164,9 @@ export default function App() {
                 ))}
               </div>
 
-              {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} onPrintTrade={trade => setPrintJob({ trades: [trade], single: true })} />}
+              {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} onPrintTrade={trade => setPrintJob({ trades: [trade], single: true })}
+                otherJournals={accounts.filter(a => a.id !== activeJournal.id).map(a => ({ id: a.id, name: a.name }))}
+                onMoveTrades={handleMoveTrades} />}
               {journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
               {journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} statsOnly />}
               {journalTab === 'goals' && <GoalsView trades={filteredTrades} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
