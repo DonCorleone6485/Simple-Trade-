@@ -193,9 +193,13 @@ const RTL: Language[] = ['fa', 'ar'];
  * başına tarayıcı dili o kullanıcıyı İngilizce'ye düşürür.
  */
 const COUNTRY_LANGUAGE: Record<string, Language> = {
-  TR: 'tr', CY: 'tr',
-  IR: 'fa', AF: 'fa', TJ: 'fa',
-  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru', UZ: 'ru', TM: 'ru',
+  TR: 'tr',
+  // Afganistan'da Derice Farsça'nın bir kolu ve aynı Arap alfabesiyle yazılır.
+  IR: 'fa', AF: 'fa',
+  // Tacikçe de Farsça'nın bir kolu ama Kiril alfabesiyle yazılır — Arap
+  // alfabesindeki Farsça metni Tacik bir okur çözemez. Ülkede yaygın ikinci
+  // dil olan Rusça daha isabetli.
+  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru', UZ: 'ru', TM: 'ru', TJ: 'ru',
   SA: 'ar', AE: 'ar', EG: 'ar', QA: 'ar', KW: 'ar', BH: 'ar', OM: 'ar',
   JO: 'ar', LB: 'ar', IQ: 'ar', SY: 'ar', YE: 'ar', PS: 'ar', LY: 'ar',
   MA: 'ar', DZ: 'ar', TN: 'ar', SD: 'ar', MR: 'ar',
