@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { useLanguage } from '../context/LanguageContext';
+import { supabase } from '../lib/supabase';
 
 /**
  * Strateji seçici — hazır setuplar ve kullanıcının kendi ekledikleri.
@@ -25,11 +26,51 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Tarayıcıdaki eski liste yalnızca ilk açılışta okunur: hesap yüklenene
+  // kadar boş bir seçici göstermemek ve daha önce eklenmiş setupları
+  // kaybetmemek için.
   const storageKey = `customSetups_${user?.id || 'guest'}`;
-
-  const [customSetups, setCustomSetups] = useState<string[]>(() => {
+  const readLocal = (): string[] => {
     try { return JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch { return []; }
-  });
+  };
+
+  const [customSetups, setCustomSetups] = useState<string[]>(readLocal);
+  /** Kullanıcı listeye dokunduysa, geç gelen hesap verisi onu ezmesin. */
+  const edited = useRef(false);
+
+  /** Liste hesaba yazılır — her cihazda aynı setuplar görünsün. */
+  const persist = async (next: string[]) => {
+    edited.current = true;
+    try { localStorage.setItem(storageKey, JSON.stringify(next)); } catch { /* önemsiz */ }
+    if (!user) return;
+    await supabase
+      .from('users')
+      .upsert({ user_id: user.id, setups: next }, { onConflict: 'user_id' });
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('users')
+        .select('setups')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (cancelled || edited.current) return;
+      const saved = data?.setups as string[] | null | undefined;
+      if (saved) {
+        setCustomSetups(saved);
+        try { localStorage.setItem(storageKey, JSON.stringify(saved)); } catch { /* önemsiz */ }
+        return;
+      }
+      // Hesapta hiç kayıt yok: bu tarayıcıdakileri bir defaya mahsus taşı.
+      const local = readLocal();
+      if (local.length > 0) persist(local);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -54,7 +95,7 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
     if (!name || customSetups.includes(name) || DEFAULT_SETUPS.includes(name)) return;
     const updated = [...customSetups, name];
     setCustomSetups(updated);
-    localStorage.setItem(storageKey, JSON.stringify(updated));
+    persist(updated);
     handleSelect(name);
   };
 
@@ -62,7 +103,7 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
     e.stopPropagation();
     const updated = customSetups.filter(s => s !== name);
     setCustomSetups(updated);
-    localStorage.setItem(storageKey, JSON.stringify(updated));
+    persist(updated);
     if (value === name) onChange('');
   };
 
