@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { signedMoney } from '../lib/format';
-import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, dayKey } from '../lib/tradeMath';
+import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, dayKey, isOpenTrade } from '../lib/tradeMath';
 
 
 interface CalendarViewProps {
@@ -44,15 +44,22 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
     return trades.filter(t => dayKey(t.date) === key);
   };
 
+  /**
+   * Günün özeti. Sonucu girilmiş işlemler ile hâlâ açık olanlar ayrı tutulur:
+   * açık bir işlemin kâr/zararını bilemeyiz, onu sıfır sayıp "+$0" yazmak
+   * "bugün başa baş kapattım" gibi okunur ve yanlış olur.
+   */
   const getDayStats = (day: number) => {
     const dayTrades = getTradesForDay(day);
     if (dayTrades.length === 0) return null;
+    const open = dayTrades.filter(isOpenTrade).length;
+    const closed = dayTrades.length - open;
     const wins = dayTrades.filter(isWinTrade);
     const losses = dayTrades.filter(isLossTrade);
     const grossProfit = wins.reduce((s, t) => s + winAmount(t), 0);
     const grossLoss = losses.reduce((s, t) => s + lossAmount(t), 0);
     const netPnL = grossProfit - grossLoss;
-    return { total: dayTrades.length, netPnL, wins: wins.length, losses: losses.length };
+    return { total: dayTrades.length, closed, open, netPnL, wins: wins.length, losses: losses.length };
   };
 
   const weekDays = language === 'tr'
@@ -176,7 +183,12 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
             let border = '1px solid transparent';
             let textColor = 'rgba(255,255,255,0.3)';
 
-            if (stats) {
+            if (stats && stats.closed === 0) {
+              // Sadece açık işlem var: ne kâr ne zarar — beklemede.
+              bg = isSelected ? 'rgba(251,191,36,0.2)' : 'rgba(255,255,255,0.03)';
+              border = '1px solid rgba(251,191,36,0.25)';
+              textColor = '#fbbf24';
+            } else if (stats) {
               if (stats.netPnL > 0) {
                 bg = isSelected ? 'rgba(52,211,153,0.25)' : 'rgba(52,211,153,0.1)';
                 border = isSelected ? '1px solid rgba(52,211,153,0.6)' : '1px solid rgba(52,211,153,0.2)';
@@ -215,11 +227,17 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
                 </span>
                 {stats && (
                   <div className="mt-auto space-y-0.5">
-                    <div className="text-xs font-mono font-semibold" style={{ color: textColor }}>
-                      {signedMoney(stats.netPnL, 0)}
-                    </div>
+                    {stats.closed > 0 && (
+                      <div className="text-xs font-mono font-semibold" style={{ color: textColor }}>
+                        {signedMoney(stats.netPnL, 0)}
+                      </div>
+                    )}
                     <div className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                      {stats.total} {t('tradeCount')}
+                      {stats.closed > 0 && `${stats.closed} ${t('tradeCount')}`}
+                      {stats.closed > 0 && stats.open > 0 && ' · '}
+                      {stats.open > 0 && (
+                        <span style={{ color: '#fbbf24' }}>{stats.open} {t('openShort')}</span>
+                      )}
                     </div>
                   </div>
                 )}
@@ -293,11 +311,12 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
                     </div>
                   </div>
                   <div className="text-end flex-shrink-0">
+                    {/* Açık işlemde tutar yok; "+$0.00" yazmak başa baş sanılır. */}
                     <div className="font-semibold font-mono" style={{ color: isWin ? '#34d399' : isLoss ? '#f87171' : '#fbbf24' }}>
-                      {signedMoney(pnl)}
+                      {isOpenTrade(trade) ? '—' : signedMoney(pnl)}
                     </div>
-                    <div className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                      {getResultText(trade.result)}
+                    <div className="text-xs mt-1" style={{ color: isOpenTrade(trade) ? '#fbbf24' : 'rgba(255,255,255,0.35)' }}>
+                      {isOpenTrade(trade) ? t('incompleteTrade') : getResultText(trade.result)}
                     </div>
                   </div>
                   <button
