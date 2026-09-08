@@ -162,7 +162,7 @@ export default function JournalDashboard({
                         {(stats.open ?? 0) > 0 && (
                           <span className="text-[11px] px-2 py-0.5 rounded-full"
                             style={{ background: 'rgba(251,191,36,0.12)', color: '#fbbf24' }}>
-                            {stats.open} {t('incompleteTrade').toLowerCase()}
+                            {stats.open} {t('incompleteTrade').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
                           </span>
                         )}
                       </div>

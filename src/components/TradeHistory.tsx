@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trade, OrderType } from '../types';
-import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
+import { isWinTrade, isLossTrade, isBreakevenTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
 import { money, signedMoney } from '../lib/format';
 import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
@@ -24,6 +24,8 @@ interface TradeHistoryProps {
   trades: Trade[];
   onDelete: (id: string) => void;
   onDeleteMultiple?: (ids: string[]) => void;
+  /** İstatistiklerde hesap bakiyesi ve getiri için başlangıç sermayesi. */
+  account?: { startingCapital?: number | null };
   /** Bu journal dışındaki journal'lar — işlem taşımak için. */
   otherJournals?: { id: string; name: string }[];
   onMoveTrades?: (ids: string[], targetJournalId: string) => void;
@@ -33,10 +35,50 @@ interface TradeHistoryProps {
   onPrintTrade?: (trade: Trade) => void;
 }
 
+/** İstatistik başlığı — ince, aralıklı, sayfayı bölümlere ayırır. */
+const figureLabel: React.CSSProperties = {
+  fontSize: '11px',
+  textTransform: 'uppercase',
+  letterSpacing: '0.14em',
+  color: 'rgba(255,255,255,0.3)',
+  marginBottom: '10px',
+};
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <h3 className="font-display text-[15px] mb-6 pb-3"
+        style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.02em', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        {title}
+      </h3>
+      {children}
+    </section>
+  );
+}
+
+/** Kutu yok, hizalı sayılar — sayfanın geri kalanıyla aynı sakin dil. */
+function StatGrid({ items }: { items: { label: string; value: string; color?: string; hint?: string }[] }) {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-8">
+      {items.map((s, i) => (
+        <div key={i}>
+          <div style={figureLabel} className="truncate">{s.label}</div>
+          <div className="font-mono text-[24px]"
+            style={{ color: s.color || 'rgba(255,255,255,0.92)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
+            {s.value}
+          </div>
+          {s.hint && <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>{s.hint}</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function TradeHistory({
   trades,
   onDelete,
   onDeleteMultiple,
+  account,
   otherJournals = [],
   onMoveTrades,
   onUpdate,
@@ -240,7 +282,58 @@ export default function TradeHistory({
   // Planlanan R/R değil, gerçekleşen R'lerin ortalaması.
   const realizedRs = closedTrades.map(realizedR).filter((n): n is number => n != null);
   const avgR = realizedRs.length > 0 ? realizedRs.reduce((a, b) => a + b, 0) / realizedRs.length : null;
+  const maxR = realizedRs.length > 0 ? Math.max(...realizedRs) : null;
+
+  // Ortalama kazanç ve kayıp — beklenti hesabının iki bacağı.
+  const avgWin = winningTrades.length > 0 ? grossProfit / winningTrades.length : 0;
+  const avgLoss = losingTrades.length > 0 ? grossLoss / losingTrades.length : 0;
+  /** Kazanan bir işlem, kaybeden bir işlemin kaç katını getiriyor. */
+  const payoff = avgLoss > 0 ? avgWin / avgLoss : null;
+  /**
+   * Beklenti: uzun vadede işlem başına ortalama kaç dolar.
+   * Kazanma oranı tek başına yanıltır — %30 isabetle de para kazanılır,
+   * %70 isabetle de kaybedilir. Bu ikisini tek sayıda birleştirir.
+   */
+  const expectancy = decidedTrades > 0
+    ? ((winningTrades.length / decidedTrades) * avgWin) - ((losingTrades.length / decidedTrades) * avgLoss)
+    : 0;
+  const breakevenCount = closedTrades.filter(isBreakevenTrade).length;
+
+  // Hesabın bugünkü hali: journal'ın başlangıç sermayesi + net sonuç.
+  const startingCapital = account?.startingCapital ?? null;
+  const balance = startingCapital != null ? startingCapital + netProfit : null;
+  const returnPct = startingCapital && startingCapital > 0 ? (netProfit / startingCapital) * 100 : null;
+
+  // Yöne göre: alışta mı satışta mı daha iyisin.
+  const directionStats = (['Buy', 'Sell'] as const).map(dir => {
+    const dt = closedTrades.filter(t => t.type === dir && !isOpenTrade(t));
+    const w = dt.filter(isWinTrade).length;
+    const l = dt.filter(isLossTrade).length;
+    return {
+      dir,
+      total: dt.length,
+      rate: w + l > 0 ? ((w / (w + l)) * 100).toFixed(0) : '0',
+      pnl: dt.reduce((sum, t) => sum + tradePnL(t), 0),
+    };
+  });
+
   const sortedByDate = [...closedTrades].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  /** Ay ay net sonuç — hangi ayların iyi gittiği tek bakışta görünsün. */
+  const monthlyStats = (() => {
+    const map = new Map<string, { label: string; pnl: number; total: number }>();
+    sortedByDate.forEach(t => {
+      const d = new Date(t.date);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const label = new Intl.DateTimeFormat(language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US',
+        { month: 'short', year: '2-digit' }).format(d);
+      const cur = map.get(key) || { label, pnl: 0, total: 0 };
+      cur.pnl += tradePnL(t);
+      cur.total += 1;
+      map.set(key, cur);
+    });
+    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([, v]) => v);
+  })();
 
   const chartData = sortedByDate.reduce((acc: any[], trade, index) => {
     const prevTotal = index > 0 ? acc[index - 1].cumulative : 0;
@@ -465,48 +558,88 @@ export default function TradeHistory({
       );
     }
     return (
-      <div className="space-y-10">
-        {/* Ana metrikler — kutu yok, hizalı sayılar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-9 pb-10" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          {[
-            { label: t('winRate'), value: `%${winRate}`, color: 'rgba(255,255,255,0.9)' },
-            { label: t('netProfit'), value: signedMoney(netProfit), color: netProfit >= 0 ? '#34d399' : '#f87171' },
-            { label: t('profitFactor'), value: profitFactor, color: 'rgba(255,255,255,0.9)' },
-            { label: t('avgRealizedR'), value: formatR(avgR), color: avgR == null ? 'rgba(255,255,255,0.9)' : avgR >= 0 ? '#34d399' : '#f87171' },
-            { label: t('totalTrades'), value: String(totalClosed), color: 'rgba(255,255,255,0.9)' },
-            { label: t('bestTrade'), value: `+${money(bestTrade)}`, color: '#34d399' },
-            { label: t('worstTrade'), value: `\u2212${money(worstTrade)}`, color: '#f87171' },
-            { label: t('maxDrawdown'), value: money(maxDrawdown), color: '#f87171' },
-            ...(avgHold != null ? [{ label: t('avgDuration'), value: formatDuration(avgHold, language), color: 'rgba(255,255,255,0.9)' }] : []),
-            ...(openTrades.length > 0 ? [{ label: t('openTradesCount'), value: String(openTrades.length), color: '#fbbf24' }] : []),
-          ].map((s, i) => (
-            <div key={i}>
-              <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{s.label}</div>
-              <div className="font-mono text-[26px]" style={{ color: s.color, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>{s.value}</div>
+      <div className="space-y-12">
+
+        {/* ── Hesabın bugünkü hali ── */}
+        <div className="flex flex-wrap items-end gap-x-14 gap-y-8 pb-10"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          {balance != null && (
+            <div>
+              <div style={figureLabel}>{t('accountBalance')}</div>
+              <div className="font-mono" style={{ fontSize: '38px', letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>
+                {money(balance)}
+              </div>
             </div>
-          ))}
+          )}
+          <div>
+            <div style={figureLabel}>{t('netProfit')}</div>
+            <div className="font-mono" style={{ fontSize: '38px', letterSpacing: '-0.03em', color: netProfit >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
+              {signedMoney(netProfit)}
+            </div>
+          </div>
+          {returnPct != null && (
+            <div>
+              <div style={figureLabel}>{t('totalReturn')}</div>
+              <div className="font-mono" style={{ fontSize: '38px', letterSpacing: '-0.03em', color: returnPct >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
+                {returnPct >= 0 ? '+' : '\u2212'}%{Math.abs(returnPct).toFixed(1)}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Seriler */}
-        <div className="grid grid-cols-3 gap-x-8 pb-10" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <div>
-            <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('currentStreak')}</div>
-            <div className="flex items-baseline gap-2.5">
-              <span className="font-mono text-[26px]" style={{ color: streak.currentType === 'win' ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>{streak.current}</span>
-              <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                {streak.currentType === 'win' ? t('winStatus') : t('lossStatus')}
-              </span>
-            </div>
+        {/* ── Kazanan / kaybeden dağılımı ── */}
+        <div>
+          <div className="flex items-baseline justify-between mb-3">
+            <span style={figureLabel}>{t('winRate')}</span>
+            <span className="font-mono text-[15px]" style={{ fontVariantNumeric: 'tabular-nums' }}>%{winRate}</span>
           </div>
-          <div>
-            <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('bestWinStreak')}</div>
-            <div className="font-mono text-[26px]" style={{ color: '#34d399', fontVariantNumeric: 'tabular-nums' }}>{streak.bestWin}</div>
+          <div className="flex h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+            {[
+              { n: winningTrades.length, c: '#34d399' },
+              { n: breakevenCount, c: 'rgba(255,255,255,0.25)' },
+              { n: losingTrades.length, c: '#f87171' },
+            ].map((seg, i) => seg.n > 0 && (
+              <div key={i} style={{ width: `${(seg.n / Math.max(totalClosed, 1)) * 100}%`, background: seg.c }} />
+            ))}
           </div>
-          <div>
-            <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5 truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('bestLossStreak')}</div>
-            <div className="font-mono text-[26px]" style={{ color: '#f87171', fontVariantNumeric: 'tabular-nums' }}>{streak.bestLoss}</div>
+          <div className="flex gap-6 mt-3 text-[12px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <span><span style={{ color: '#34d399' }}>●</span> {winningTrades.length} {t('winnersCount')}</span>
+            {breakevenCount > 0 && <span><span style={{ color: 'rgba(255,255,255,0.35)' }}>●</span> {breakevenCount} {t('breakevenCount')}</span>}
+            <span><span style={{ color: '#f87171' }}>●</span> {losingTrades.length} {t('losersCount')}</span>
+            <span className="ms-auto">{totalClosed} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
           </div>
         </div>
+
+        {/* ── Risk ve getiri ── */}
+        <Section title={t('riskMetrics')}>
+          <StatGrid items={[
+            { label: t('expectancy'), value: signedMoney(expectancy), color: expectancy >= 0 ? '#34d399' : '#f87171',
+              hint: language === 'tr' ? 'İşlem başına uzun vadeli ortalama' : 'Long-run average per trade' },
+            { label: t('profitFactor'), value: profitFactor },
+            { label: t('avgRealizedR'), value: formatR(avgR), color: avgR == null ? undefined : avgR >= 0 ? '#34d399' : '#f87171' },
+            { label: t('payoffRatio'), value: payoff != null ? `${payoff.toFixed(2)}x` : '-' },
+            { label: t('avgWin'), value: `+${money(avgWin)}`, color: '#34d399' },
+            { label: t('avgLoss'), value: `\u2212${money(avgLoss)}`, color: '#f87171' },
+            { label: t('bestTrade'), value: `+${money(bestTrade)}`, color: '#34d399' },
+            { label: t('worstTrade'), value: `\u2212${money(worstTrade)}`, color: '#f87171' },
+            { label: t('maxRealizedR'), value: formatR(maxR), color: maxR != null && maxR >= 0 ? '#34d399' : undefined },
+            { label: t('maxDrawdown'), value: money(maxDrawdown), color: '#f87171' },
+            ...(avgHold != null ? [{ label: t('avgDuration'), value: formatDuration(avgHold, language) }] : []),
+            ...(openTrades.length > 0 ? [{ label: t('openTradesCount'), value: String(openTrades.length), color: '#fbbf24' }] : []),
+          ]} />
+        </Section>
+
+        {/* ── Seriler ── */}
+        <Section title={t('streaks')}>
+          <StatGrid items={[
+            { label: t('currentStreak'), value: String(streak.current),
+              color: streak.currentType === 'win' ? '#34d399' : '#f87171',
+              hint: streak.currentType === 'win' ? t('winStatus') : t('lossStatus') },
+            { label: t('bestWinStreak'), value: String(streak.bestWin), color: '#34d399' },
+            { label: t('bestLossStreak'), value: String(streak.bestLoss), color: '#f87171' },
+          ]} />
+        </Section>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div style={{ ...statCard, padding: '20px' }} className="lg:col-span-2">
             <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('cumulativePnl')}</h4>
@@ -567,6 +700,53 @@ export default function TradeHistory({
             </ResponsiveContainer>
           </div>
         </div>
+        {/* ── Aylık performans ── */}
+        {monthlyStats.length > 1 && (
+          <div style={{ ...statCard, padding: '20px' }}>
+            <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('monthlyPerformance')}</h4>
+            <div className="h-56 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyStats} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                  <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `$${v}`} />
+                  <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }}
+                    formatter={(value: number) => [signedMoney(value), t('netProfit')]} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                  <Bar dataKey="pnl" radius={[6, 6, 0, 0]}>
+                    {monthlyStats.map((m, i) => (<Cell key={i} fill={m.pnl >= 0 ? '#10b981' : '#f43f5e'} />))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+
+        {/* ── Yöne göre: alış mı satış mı ── */}
+        <div style={{ ...statCard, padding: '20px' }}>
+          <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('directionStats')}</h4>
+          <div className="grid grid-cols-2 gap-8">
+            {directionStats.map(({ dir, total, rate, pnl }) => (
+              <div key={dir}>
+                <div className="flex items-baseline justify-between mb-2">
+                  <span className="text-sm font-medium" style={{ color: dir === 'Buy' ? '#34d399' : '#f87171' }}>
+                    {dir === 'Buy' ? t('buy') : t('sell')}
+                  </span>
+                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    {total} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
+                  </span>
+                </div>
+                <div className="w-full h-1.5 rounded-full mb-3" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  <div className="h-full rounded-full" style={{ width: `${rate}%`, background: dir === 'Buy' ? '#34d399' : '#f87171' }} />
+                </div>
+                <div className="flex items-baseline justify-between font-mono text-sm" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.5)' }}>%{rate}</span>
+                  <span style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div style={{ ...statCard, padding: '20px' }}>
           <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('heatMap')}</h4>
           <div className="overflow-x-auto">
