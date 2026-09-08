@@ -71,4 +71,6 @@ export interface Trade {
   mtfAnalysis?: MTFEntry[];
   checklist?: ChecklistItem[];
   importSource?: string;
+  /** Platformun işleme verdiği numara — tekrar içe aktarmayı önler. */
+  externalId?: string;
 }

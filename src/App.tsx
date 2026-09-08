@@ -16,6 +16,7 @@ import GoalsView from './components/GoalsView';
 import PricingPage from './components/PricingPage';
 import PaymentModal from './components/PaymentModal';
 import CSVImport, { ImportTarget } from './components/CSVImport';
+import { tradeKey } from './lib/tradeKey';
 import LandingPage from './components/LandingPage';
 import JournalDashboard from './components/JournalDashboard';
 import AppShell, { NavKey } from './components/AppShell';
@@ -201,6 +202,7 @@ export default function App() {
         preTradePhotos: t.pre_trade_photos || [], postTradePhotos: t.post_trade_photos || [],
         mtfAnalysis: t.mtf_analysis || [],
         checklist: t.checklist || [],
+        externalId: t.external_id || undefined,
       })));
     }
   };
@@ -454,6 +456,13 @@ export default function App() {
       if (remaining <= 0) { setUpgradeReason('total'); setShowUpgradeModal(true); return; }
       importedTrades = importedTrades.slice(0, remaining);
     }
+    // Ekran zaten mevcutları eliyor; burada bir kez daha süzüyoruz ki iki
+    // sekmeden aynı rapor yüklendiğinde de kopya oluşmasın.
+    const known = new Set(
+      trades.filter(tr => tr.journal_id === targetJournal!.id).map(tradeKey)
+    );
+    importedTrades = importedTrades.filter(tr => !known.has(tradeKey(tr)));
+
     const inserted: Trade[] = [];
     for (const trade of importedTrades) {
       const { data } = await supabase.from('trades').insert({
@@ -463,8 +472,10 @@ export default function App() {
         rr: trade.rr || '', result: trade.result,
         pre_trade_notes: trade.preTradeNotes || '', post_trade_notes: trade.postTradeNotes || '',
         pre_trade_photos: [], post_trade_photos: [],
+        external_id: trade.externalId || null,
       }).select().single();
       if (data) inserted.push({
+        externalId: data.external_id || undefined,
         id: data.id, accountId: data.journal_id, journal_id: data.journal_id, user_id: data.user_id,
         date: data.date, exitDate: data.exit_date || undefined, symbol: data.symbol, type: data.type, timeframe: data.timeframe, orderType: data.order_type || undefined, setup: data.setup,
         risk: data.risk, reward: data.reward, rr: data.rr, result: data.result,
@@ -825,6 +836,9 @@ export default function App() {
           journalId={view === 'expanded' ? activeJournal?.id : undefined}
           journalName={view === 'expanded' ? activeJournal?.name : undefined}
           userId={user.id}
+          existingKeys={view === 'expanded' && activeJournal
+            ? trades.filter(tr => tr.journal_id === activeJournal.id).map(tradeKey)
+            : []}
         />
       )}
 

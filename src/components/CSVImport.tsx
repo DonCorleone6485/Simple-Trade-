@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Upload, X, CheckCircle, AlertTriangle, FileText, Columns } from 'lucide-react';
 import { Trade, TradeResult } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { tradeKey } from '../lib/tradeKey';
 
 /** İçe aktarılan işlemlerin nereye yazılacağı. */
 export type ImportTarget =
@@ -15,6 +16,8 @@ interface CSVImportProps {
   journalId?: string;
   journalName?: string;
   userId: string;
+  /** Açık journal'da hâlihazırda bulunan işlemlerin anahtarları. */
+  existingKeys?: string[];
 }
 
 interface ParseResult {
@@ -180,11 +183,14 @@ export interface ColumnMap {
   openTime: number; closeTime: number; symbol: number; type: number;
   openPrice: number; closePrice: number; sl: number; tp: number; profit: number;
   commission: number; swap: number; fee: number;
+  /** Platformun işlem numarası — aynı raporu tekrar yüklemeyi güvenli kılar. */
+  ticket: number;
 }
 
 export const EMPTY_MAP: ColumnMap = {
   openTime: -1, closeTime: -1, symbol: -1, type: -1, openPrice: -1,
   closePrice: -1, sl: -1, tp: -1, profit: -1, commission: -1, swap: -1, fee: -1,
+  ticket: -1,
 };
 
 /** İşlem kurabilmek için en az bunlar gerekli. */
@@ -219,6 +225,8 @@ const FIELD_NAMES: Record<keyof ColumnMap, string[]> = {
   commission: ['commission', 'commissions', 'ibcommission', 'komisyon'],
   swap: ['swap', 'swaps', 'rollover', 'takas'],
   fee: ['taxes', 'tax', 'fee', 'fees', 'ücret', 'vergi', 'masraf'],
+  ticket: ['ticket', 'position', 'position id', 'positionid', 'order id', 'orderid',
+           'deal id', 'trade id', 'transaction id', 'pozisyon', 'bilet', 'emir no', 'işlem no'],
 };
 
 export function guessColumns(headers: string[]): ColumnMap {
@@ -251,6 +259,7 @@ export function guessColumns(headers: string[]): ColumnMap {
   map.swap = pick('swap');
   map.fee = pick('fee');
   map.profit = pick('profit');
+  map.ticket = pick('ticket');
 
   // MT tarzı raporda tek isimli tekrarlar: ikinci "Zaman"/"Fiyat" kapanıştır.
   if (map.closeTime < 0) {
@@ -358,6 +367,7 @@ function parseRows(rows: string[][], c: ColumnMap, journalId: string, userId: st
       preTradePhotos: [],
       postTradePhotos: [],
       importSource: source,
+      externalId: c.ticket >= 0 ? (cols[c.ticket] || '').trim() || undefined : undefined,
     } as Trade);
   }
 
@@ -483,6 +493,7 @@ const MAP_FIELDS: { key: keyof ColumnMap; tr: string; en: string; required?: boo
   { key: 'commission', tr: 'Komisyon',         en: 'Commission' },
   { key: 'swap',       tr: 'Swap',             en: 'Swap' },
   { key: 'fee',        tr: 'Ücret / Vergi',    en: 'Fees / Taxes' },
+  { key: 'ticket',     tr: 'İşlem no',         en: 'Trade / ticket no' },
 ];
 
 /** Aynı dosya tekrar yüklenirse kullanıcının eşleştirmesi hatırlansın. */
@@ -499,7 +510,7 @@ function saveMap(headers: string[], map: ColumnMap) {
   try { localStorage.setItem(mapKey(headers), JSON.stringify(map)); } catch { /* kotayı doldurduysa önemsiz */ }
 }
 
-export default function CSVImport({ onImport, onClose, journalId, journalName, userId }: CSVImportProps) {
+export default function CSVImport({ onImport, onClose, journalId, journalName, userId, existingKeys = [] }: CSVImportProps) {
   // Açık journal yoksa tek seçenek yeni journal oluşturmaktır.
   const [target, setTarget] = useState<'existing' | 'new'>(journalId ? 'existing' : 'new');
   const [newName, setNewName] = useState('');
@@ -585,14 +596,26 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
     if (file) processFile(file);
   };
 
+  // Mevcut journal'a eklerken zaten kayıtlı olanları ayır: aynı raporu tekrar
+  // yüklemek işlemleri ikinci kez eklememeli.
+  const known = React.useMemo(() => new Set(existingKeys), [existingKeys]);
+  const checkDuplicates = target === 'existing' && !!journalId && known.size > 0;
+  const freshTrades = React.useMemo(
+    () => !parseResult ? []
+      : checkDuplicates ? parseResult.trades.filter(t => !known.has(tradeKey(t)))
+      : parseResult.trades,
+    [parseResult, checkDuplicates, known],
+  );
+  const skipped = (parseResult?.trades.length || 0) - freshTrades.length;
+
   const canImport =
-    !!parseResult && parseResult.trades.length > 0 &&
+    !!parseResult && freshTrades.length > 0 &&
     (target === 'existing' ? !!journalId : newName.trim().length > 0);
 
   const handleImport = () => {
-    if (!parseResult || parseResult.trades.length === 0 || !canImport) return;
+    if (!canImport) return;
     onImport(
-      parseResult.trades,
+      freshTrades,
       target === 'existing' && journalId
         ? { kind: 'existing', journalId }
         : { kind: 'new', name: newName.trim() }
@@ -794,15 +817,23 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
             )}
 
             {parseResult.trades.length > 0 && (
-              <div className="rounded-xl p-4" style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}>
+              <div className="rounded-xl p-4" style={freshTrades.length > 0
+                ? { background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }
+                : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                 <div className="flex items-center gap-2 mb-1">
-                  <CheckCircle className="w-4 h-4" style={{ color: '#34d399' }} />
-                  <span className="text-sm font-semibold" style={{ color: '#34d399' }}>
-                    {parseResult.trades.length} {language === 'tr' ? 'trade bulundu' : 'trades found'}
+                  <CheckCircle className="w-4 h-4" style={{ color: freshTrades.length > 0 ? '#34d399' : 'rgba(255,255,255,0.4)' }} />
+                  <span className="text-sm font-semibold" style={{ color: freshTrades.length > 0 ? '#34d399' : 'rgba(255,255,255,0.6)' }}>
+                    {freshTrades.length > 0
+                      ? `${freshTrades.length} ${language === 'tr' ? 'yeni işlem' : freshTrades.length === 1 ? 'new trade' : 'new trades'}`
+                      : (language === 'tr' ? 'Yeni işlem yok' : 'Nothing new to import')}
                   </span>
                 </div>
                 <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {language === 'tr' ? "Journal'ınıza eklenecek:" : 'Will be added to your journal:'}
+                  {skipped > 0
+                    ? (language === 'tr'
+                        ? `${skipped} işlem bu journal'da zaten var, atlanacak — notların ve fotoğrafların olduğu gibi kalır.`
+                        : `${skipped} already in this journal and will be skipped — your notes and photos stay as they are.`)
+                    : (language === 'tr' ? "Journal'ınıza eklenecek:" : 'Will be added to your journal:')}
                 </p>
               </div>
             )}
@@ -817,7 +848,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                   <span>Sonuç</span>
                 </div>
                 <div className="max-h-48 overflow-y-auto">
-                  {parseResult.trades.slice(0, 50).map((trade, i) => (
+                  {(freshTrades.length > 0 ? freshTrades : parseResult.trades).slice(0, 50).map((trade, i) => (
                     <div key={i} className="px-4 py-2 grid grid-cols-4 gap-2 text-sm"
                       style={{ borderTop: i > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
                       <span style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -832,9 +863,9 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                       </span>
                     </div>
                   ))}
-                  {parseResult.trades.length > 50 && (
+                  {(freshTrades.length > 0 ? freshTrades : parseResult.trades).length > 50 && (
                     <div className="px-4 py-2 text-sm text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                      +{parseResult.trades.length - 50} {language === 'tr' ? 'daha...' : 'more...'}
+                      +{(freshTrades.length > 0 ? freshTrades : parseResult.trades).length - 50} {language === 'tr' ? 'daha...' : 'more...'}
                     </div>
                   )}
                 </div>
@@ -911,9 +942,12 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                 onMouseEnter={e => { if (canImport) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
               >
-                {parseResult.trades.length > 0
-                  ? `${parseResult.trades.length} ${language === 'tr' ? 'Trade İçe Aktar' : 'Trades Import'}`
-                  : (language === 'tr' ? 'Trade Bulunamadı' : 'No Trades Found')}
+                {/* Sayı gerçekten eklenecek olanı gösterir; dosyadaki toplamı değil. */}
+                {freshTrades.length > 0
+                  ? `${freshTrades.length} ${language === 'tr' ? 'İşlem İçe Aktar' : freshTrades.length === 1 ? 'Trade — Import' : 'Trades — Import'}`
+                  : parseResult.trades.length > 0
+                  ? (language === 'tr' ? 'Hepsi Zaten Ekli' : 'Already Imported')
+                  : (language === 'tr' ? 'İşlem Bulunamadı' : 'No Trades Found')}
               </button>
             </div>
           </div>
