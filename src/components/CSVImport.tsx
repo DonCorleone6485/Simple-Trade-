@@ -52,6 +52,11 @@ function parseHTMLTables(content: string): string[][] {
   const rows: string[][] = [];
   doc.querySelectorAll('tr').forEach(tr => {
     const cells = Array.from(tr.querySelectorAll('td, th'))
+      // MT5 veri satırlarına görünmez bir dolgu hücresi koyar
+      // (<td class="hidden" colspan="8">). Başlıkta karşılığı yoktur; sayılırsa
+      // ondan sonraki bütün sütunlar bir kayar ve kâr sütunu swap'ı okur.
+      .filter(td => !td.classList.contains('hidden')
+        && !/display\s*:\s*none/i.test(td.getAttribute('style') || ''))
       .map(td => (td.textContent || '').replace(/\u00a0/g, ' ').trim());
     if (cells.some(c => c !== '')) rows.push(cells);
   });
@@ -171,7 +176,7 @@ function cleanSymbol(symbol: string): string {
 // eşliyoruz. MT5'te "Zaman"/"Fiyat" iki kez geçer: ilki açılış, ikincisi kapanış.
 interface MTCols {
   openTime: number; closeTime: number; symbol: number; type: number;
-  openPrice: number; sl: number; tp: number; profit: number;
+  openPrice: number; closePrice: number; sl: number; tp: number; profit: number;
 }
 
 function mapMTColumns(headers: string[]): MTCols | null {
@@ -193,6 +198,7 @@ function mapMTColumns(headers: string[]): MTCols | null {
     symbol: first('item', 'symbol', 'sembol', 'enstrüman'),
     type: first('type', 'tür', 'tur', 'işlem türü'),
     openPrice,
+    closePrice: prices[1] ?? -1,
     sl: first('s/l', 's / l', 'sl', 'stop loss'),
     tp: first('t/p', 't / p', 'tp', 'take profit'),
     profit: first('profit', 'kar', 'kâr', 'net kar', 'kar/zarar'),
@@ -218,9 +224,19 @@ function parseMT(rows: string[][], headers: string[], journalId: string, userId:
     const openDate = parseDate(cols[c.openTime] || '');
     const closeRaw = c.closeTime >= 0 ? (cols[c.closeTime] || '') : '';
     const openPrice = parseNumber(cols[c.openPrice] || '0');
+    const closePrice = c.closePrice >= 0 ? parseNumber(cols[c.closePrice] || '0') : 0;
     const sl = c.sl >= 0 ? parseNumber(cols[c.sl] || '0') : 0;
     const tp = c.tp >= 0 ? parseNumber(cols[c.tp] || '0') : 0;
     const profit = parseNumber(cols[c.profit] || '0');
+
+    // Rapor kaç para riske atıldığını yazmaz, ama stop seviyesini yazar.
+    // Kâr fiyat mesafesiyle doğru orantılı olduğu için stop mesafesini
+    // gerçekleşen mesafeye oranlayınca risk tutarı birebir çıkar.
+    const moved = Math.abs(openPrice - closePrice);
+    const toStop = Math.abs(openPrice - sl);
+    const riskFromStop = (sl > 0 && openPrice > 0 && closePrice > 0 && moved > 0 && profit !== 0)
+      ? round2((toStop / moved) * Math.abs(profit))
+      : 0;
 
     // Kapanış zamanı yalnızca gerçek bir tarihse alınır.
     let exitDate: string | undefined;
@@ -240,8 +256,9 @@ function parseMT(rows: string[][], headers: string[], journalId: string, userId:
       type,
       timeframe: '',
       setup: '',
-      // Gerçekleşen tutar işaretli tutulur; kayıpta risk de aynı tutardır.
-      risk: profit < 0 ? Math.abs(profit) : 0,
+      // Gerçekleşen tutar işaretli tutulur. Risk stop mesafesinden hesaplanır;
+      // stop yoksa kayıplarda kaybedilen tutarı riske eşitliyoruz.
+      risk: riskFromStop > 0 ? riskFromStop : (profit < 0 ? Math.abs(profit) : 0),
       reward: profit,
       rr: calcRR(openPrice, sl, tp, type),
       result: getResult(profit),
@@ -696,6 +713,23 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
   const [loading, setLoading] = useState(false);
   const [fileName, setFileName] = useState('');
 
+  /**
+   * MetaTrader raporları UTF-8 değildir: MT5 UTF-16 (BOM'lu), MT4 ise
+   * Windows kod sayfası yazar. UTF-8 varsayılırsa dosya baştan sona bozuk
+   * okunur ve hiçbir sütun tanınmaz.
+   */
+  const readFileText = async (file: File): Promise<string> => {
+    const buf = await file.arrayBuffer();
+    const b = new Uint8Array(buf);
+    if (b[0] === 0xff && b[1] === 0xfe) return new TextDecoder('utf-16le').decode(buf);
+    if (b[0] === 0xfe && b[1] === 0xff) return new TextDecoder('utf-16be').decode(buf);
+    // BOM'suz UTF-16: ASCII karakterlerin arasında sıfır bayt kalır.
+    if (b.length > 3 && b[1] === 0x00 && b[3] === 0x00) return new TextDecoder('utf-16le').decode(buf);
+    const utf8 = new TextDecoder('utf-8').decode(buf);
+    if (!utf8.includes('\ufffd')) return utf8;
+    try { return new TextDecoder('windows-1254').decode(buf); } catch { return utf8; }
+  };
+
   const processFile = (file: File) => {
     const name = file.name.toLowerCase();
     if (!['.csv', '.txt', '.html', '.htm'].some(ext => name.endsWith(ext))) {
@@ -708,14 +742,13 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
       setNewName(base.slice(0, 40) || (language === 'tr' ? 'İçe Aktarılan Journal' : 'Imported Journal'));
     }
     setLoading(true);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target?.result as string;
-      const result = parseCSVFile(content, journalId || '', userId);
-      setParseResult(result);
-      setLoading(false);
-    };
-    reader.readAsText(file, 'UTF-8');
+    readFileText(file)
+      .then(content => setParseResult(parseCSVFile(content, journalId || '', userId)))
+      .catch(() => setParseResult({
+        trades: [], platform: 'Unknown',
+        errors: [language === 'tr' ? 'Dosya okunamadı.' : 'The file could not be read.'],
+      }))
+      .finally(() => setLoading(false));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
