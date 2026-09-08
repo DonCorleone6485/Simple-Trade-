@@ -177,6 +177,7 @@ function cleanSymbol(symbol: string): string {
 interface MTCols {
   openTime: number; closeTime: number; symbol: number; type: number;
   openPrice: number; closePrice: number; sl: number; tp: number; profit: number;
+  commission: number; swap: number; fee: number;
 }
 
 function mapMTColumns(headers: string[]): MTCols | null {
@@ -202,6 +203,9 @@ function mapMTColumns(headers: string[]): MTCols | null {
     sl: first('s/l', 's / l', 'sl', 'stop loss'),
     tp: first('t/p', 't / p', 'tp', 'take profit'),
     profit: first('profit', 'kar', 'kâr', 'net kar', 'kar/zarar'),
+    commission: first('commission', 'komisyon'),
+    swap: first('swap', 'takas'),
+    fee: first('taxes', 'fee', 'ücret', 'vergi'),
   };
   if (cols.symbol < 0 || cols.type < 0 || cols.profit < 0) return null;
   return cols;
@@ -215,16 +219,17 @@ function mapMTColumns(headers: string[]): MTCols | null {
  * seviyelerine bakarak ayırıyoruz — alışta stopun altında, satışta üstünde
  * kapandıysa stop yemiştir.
  */
-function mtResult(profit: number, type: 'Buy' | 'Sell', close: number, sl: number, tp: number): TradeResult {
-  if (profit === 0) return 'Başa Baş';
+function mtResult(net: number, type: 'Buy' | 'Sell', close: number, sl: number, tp: number): TradeResult {
+  if (net === 0) return 'Başa Baş';
   const buy = type === 'Buy';
-  if (close > 0) {
-    if (sl > 0 && (buy ? close <= sl : close >= sl)) return 'Başarısız';
-    if (tp > 0 && (buy ? close >= tp : close <= tp)) return 'Başarılı';
-    // Seviyelerin hiçbirine değmeden kapanmış: elle kapatılmış.
-    if (sl > 0 || tp > 0) return profit > 0 ? 'Manuel Karda' : 'Manuel Zararda';
+  // Sonucun işareti her zaman net tutardan gelir; seviyeler yalnızca bunun
+  // stopta mı yoksa elle mi olduğunu söyler.
+  if (net < 0) {
+    if (close > 0 && sl > 0 && (buy ? close <= sl : close >= sl)) return 'Başarısız';
+    return (sl > 0 || tp > 0) && close > 0 ? 'Manuel Zararda' : 'Başarısız';
   }
-  return profit > 0 ? 'Başarılı' : 'Başarısız';
+  if (close > 0 && tp > 0 && (buy ? close >= tp : close <= tp)) return 'Başarılı';
+  return (sl > 0 || tp > 0) && close > 0 ? 'Manuel Karda' : 'Başarılı';
 }
 
 function parseMT(rows: string[][], headers: string[], journalId: string, userId: string): Trade[] {
@@ -247,15 +252,23 @@ function parseMT(rows: string[][], headers: string[], journalId: string, userId:
     const closePrice = c.closePrice >= 0 ? parseNumber(cols[c.closePrice] || '0') : 0;
     const sl = c.sl >= 0 ? parseNumber(cols[c.sl] || '0') : 0;
     const tp = c.tp >= 0 ? parseNumber(cols[c.tp] || '0') : 0;
-    const profit = parseNumber(cols[c.profit] || '0');
+    // Rapordaki "Kar" brüttür: komisyon, swap ve ücretler ayrı sütunlardadır ve
+    // hesap bakiyesine ayrıca yansır. Kullanıcının cebine giren net tutar
+    // üçünün toplamıdır.
+    const gross = parseNumber(cols[c.profit] || '0');
+    const cost =
+      (c.commission >= 0 ? parseNumber(cols[c.commission] || '0') : 0) +
+      (c.swap >= 0 ? parseNumber(cols[c.swap] || '0') : 0) +
+      (c.fee >= 0 ? parseNumber(cols[c.fee] || '0') : 0);
+    const profit = round2(gross + cost);
 
     // Rapor kaç para riske atıldığını yazmaz, ama stop seviyesini yazar.
     // Kâr fiyat mesafesiyle doğru orantılı olduğu için stop mesafesini
     // gerçekleşen mesafeye oranlayınca risk tutarı birebir çıkar.
     const moved = Math.abs(openPrice - closePrice);
     const toStop = Math.abs(openPrice - sl);
-    const riskFromStop = (sl > 0 && openPrice > 0 && closePrice > 0 && moved > 0 && profit !== 0)
-      ? round2((toStop / moved) * Math.abs(profit))
+    const riskFromStop = (sl > 0 && openPrice > 0 && closePrice > 0 && moved > 0 && gross !== 0)
+      ? round2((toStop / moved) * Math.abs(gross))
       : 0;
 
     // Kapanış zamanı yalnızca gerçek bir tarihse alınır.
