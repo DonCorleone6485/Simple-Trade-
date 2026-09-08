@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import MTFAnalysis, { MTFAnalysisView } from './MTFAnalysis';
 import Checklist, { ChecklistView } from './Checklist';
+import SetupPicker from './SetupPicker';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../lib/supabase';
@@ -69,7 +70,6 @@ export default function TradeHistory({
     width: '100%',
   };
 
-  const SETUPS = ['FVG', 'OB', 'BOS / ChoCH', 'Liquidity Sweep', 'EQH / EQL', 'Breaker Block', 'Mitigation', 'VWAP', 'Trend Pullback', 'Range Breakout', 'Diğer'];
 
   const runAiAnalysis = async () => {
     setAiLoading(true);
@@ -678,10 +678,9 @@ export default function TradeHistory({
             </div>
             <div>
               <label style={lbl}>{t('setup')}</label>
-              <select style={{ ...inp, cursor: 'pointer' }} value={editForm.setup || ''} onChange={e => setEditForm(f => ({ ...f, setup: e.target.value }))}>
-                <option value="" style={{ background: '#1a1b2e' }}>—</option>
-                {SETUPS.map(s => <option key={s} value={s} style={{ background: '#1a1b2e' }}>{s}</option>)}
-              </select>
+              {/* Yeni işlem formundaki seçicinin aynısı: kullanıcının kaydettiği
+                  özel setuplar burada da çıksın. */}
+              <SetupPicker value={editForm.setup || ''} onChange={v => setEditForm(f => ({ ...f, setup: v }))} />
             </div>
             <div>
               <label style={lbl}>{t('risk')}</label>
