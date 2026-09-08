@@ -185,6 +185,28 @@ const RTL: Language[] = ['fa', 'ar'];
  *
  * Varsayılanı Türkçe yapmak, siteyi Türkçe bilmeyen herkese Türkçe açar.
  */
+/**
+ * Ülke kodundan dil.
+ *
+ * Yalnızca tarayıcının dili bize bir şey söylemediğinde kullanılır: İran ve
+ * Afganistan'da telefonlar çoğu zaman İngilizce kurulu olur, o yüzden tek
+ * başına tarayıcı dili o kullanıcıyı İngilizce'ye düşürür.
+ */
+const COUNTRY_LANGUAGE: Record<string, Language> = {
+  TR: 'tr', CY: 'tr',
+  IR: 'fa', AF: 'fa', TJ: 'fa',
+  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru', UZ: 'ru', TM: 'ru',
+  SA: 'ar', AE: 'ar', EG: 'ar', QA: 'ar', KW: 'ar', BH: 'ar', OM: 'ar',
+  JO: 'ar', LB: 'ar', IQ: 'ar', SY: 'ar', YE: 'ar', PS: 'ar', LY: 'ar',
+  MA: 'ar', DZ: 'ar', TN: 'ar', SD: 'ar', MR: 'ar',
+  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es', VE: 'es',
+  EC: 'es', GT: 'es', CU: 'es', BO: 'es', DO: 'es', HN: 'es', PY: 'es',
+  SV: 'es', NI: 'es', CR: 'es', PA: 'es', UY: 'es',
+  PT: 'pt', BR: 'pt', AO: 'pt', MZ: 'pt',
+  DE: 'de', AT: 'de',
+  FR: 'fr', MC: 'fr', SN: 'fr', CI: 'fr', LU: 'fr',
+};
+
 export function detectLanguage(): Language {
   try {
     const saved = localStorage.getItem(STORAGE_KEY) as Language | null;
@@ -192,6 +214,19 @@ export function detectLanguage(): Language {
   } catch { /* gizli sekmede localStorage kapalı olabilir */ }
   const nav = typeof navigator !== 'undefined' ? navigator.language.slice(0, 2).toLowerCase() : '';
   return (LANGUAGES as string[]).includes(nav) ? (nav as Language) : 'en';
+}
+
+/** Tarayıcının dili desteklediğimiz bir dil mi? */
+function browserLanguageKnown(): boolean {
+  const nav = typeof navigator !== 'undefined' ? navigator.language.slice(0, 2).toLowerCase() : '';
+  return (LANGUAGES as string[]).includes(nav);
+}
+
+function savedLanguage(): Language | null {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY) as Language | null;
+    return saved && LANGUAGES.includes(saved) ? saved : null;
+  } catch { return null; }
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
@@ -202,6 +237,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLanguageState(lang);
     try { localStorage.setItem(STORAGE_KEY, lang); } catch { /* önemsiz */ }
   };
+
+  // Tarayıcı dili tanıdık değilse ülkeye bakarız — İngilizce'ye düşürmeden
+  // önce son bir şans. Kullanıcının kendi seçimi her zaman üstündür ve bu
+  // sadece ilk ziyarette, bir kez çalışır.
+  useEffect(() => {
+    if (savedLanguage() || browserLanguageKnown()) return;
+    let cancelled = false;
+    fetch('/api/geo')
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        const guess = data && COUNTRY_LANGUAGE[data.country];
+        // Seçimi kaydetmiyoruz: tahmin, kullanıcının kararı değil.
+        if (!cancelled && guess) setLanguageState(guess);
+      })
+      .catch(() => { /* ülke öğrenilemedi, İngilizce kalır */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // Sayfanın kendi dil ve yön bilgisi de takip etsin: yazım denetimi,
   // ekran okuyucular ve Arapça/Farsça için sağdan sola akış buna bakar.
