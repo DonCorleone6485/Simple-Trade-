@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import {
   TrendingUp, BookOpen, List, CalendarDays, BarChart2, Target,
-  Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle,
+  Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Plug,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export type NavKey =
-  | 'journals' | 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals'
+  | 'journals' | 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect'
   | 'pricing' | 'referral' | 'home';
 
 interface AppShellProps {
@@ -107,6 +107,7 @@ export default function AppShell({
             <NavItem nested icon={<CalendarDays className="w-4 h-4" />} label={t('calendarTab')} itemKey="calendar" />
             <NavItem nested icon={<BarChart2 className="w-4 h-4" />} label={t('statsTab')} itemKey="stats" />
             <NavItem nested icon={<Target className="w-4 h-4" />} label={t('goalsTab')} itemKey="goals" />
+            <NavItem nested icon={<Plug className="w-4 h-4" />} label={t('mtConnectTab')} itemKey="mtConnect" />
           </>
         )}
 

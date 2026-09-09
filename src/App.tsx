@@ -16,6 +16,7 @@ import GoalsView from './components/GoalsView';
 import PricingPage from './components/PricingPage';
 import PaymentModal from './components/PaymentModal';
 import CSVImport, { ImportTarget } from './components/CSVImport';
+import MTConnect from './components/MTConnect';
 import { tradeKey } from './lib/tradeKey';
 import LandingPage from './components/LandingPage';
 import JournalDashboard from './components/JournalDashboard';
@@ -29,13 +30,13 @@ import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './l
 import { signedMoney, int } from './lib/format';
 
 type View = 'dashboard' | 'expanded' | 'pricing';
-type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals';
+type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect';
 type AuthView = 'signin' | 'signup';
 type AuthStage = 'landing' | 'auth';
 type Page = 'home' | 'journal';
 
 const JOURNAL_PATH = '/journal';
-const JOURNAL_TABS: JournalTab[] = ['newTrade', 'trades', 'calendar', 'stats', 'goals'];
+const JOURNAL_TABS: JournalTab[] = ['newTrade', 'trades', 'calendar', 'stats', 'goals', 'mtConnect'];
 
 /** Adres satırındaki yolun parçaları: ['journal', '<id>', 'trades'] gibi. */
 function pathParts(): string[] {
@@ -1224,7 +1225,7 @@ export default function App() {
               {/* Journal özeti — kart yok, hizalı sayı sütunları.
                   Takvim ve istatistikler kendi özetlerini gösterir; ikisini üst
                   üste koymak aynı dört sayıyı iki kez okutur. */}
-              {journalTab !== 'stats' && journalTab !== 'calendar' && (
+              {journalTab !== 'stats' && journalTab !== 'calendar' && journalTab !== 'mtConnect' && (
               <div className="flex items-baseline gap-8 sm:gap-14 flex-wrap mb-10 pb-10"
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 {[
@@ -1250,6 +1251,7 @@ export default function App() {
               {journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
               {journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} account={activeJournal} statsOnly />}
               {journalTab === 'goals' && <GoalsView trades={filteredTrades} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
+              {journalTab === 'mtConnect' && <MTConnect journalId={activeJournal.id} journalName={activeJournal.name} />}
             </div>
           )}
         </AppShell>
