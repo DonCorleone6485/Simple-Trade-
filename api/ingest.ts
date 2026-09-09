@@ -80,7 +80,8 @@ export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-  const { key, trades } = body as { key?: string; trades?: Incoming[] };
+  const { key, trades, startingCapital } = body as
+    { key?: string; trades?: Incoming[]; startingCapital?: number };
 
   if (!key || typeof key !== 'string') return res.status(401).json({ error: 'Missing key' });
   if (!Array.isArray(trades)) return res.status(400).json({ error: 'trades must be an array' });
@@ -168,6 +169,21 @@ export default async function handler(req: any, res: any) {
     const { data, error } = await supabase.from('trades').insert(rows).select('id');
     if (error) return res.status(500).json({ error: error.message });
     inserted = (data || []).length;
+  }
+
+  // Hesabın gerçek sermayesi EA'dan geliyorsa, journal hâlâ varsayılan
+  // 10.000 ile duruyorsa onu düzeltiriz. Kullanıcı kendi bir rakam yazdıysa
+  // dokunmayız — onun bildiği bizden iyidir.
+  const deposit = Number(startingCapital);
+  if (isFinite(deposit) && deposit > 0) {
+    const { data: journal } = await supabase
+      .from('journals').select('starting_capital').eq('id', apiKey.journal_id).maybeSingle();
+    const current = journal?.starting_capital;
+    if (current == null || Number(current) === 10000) {
+      await supabase.from('journals')
+        .update({ starting_capital: round2(deposit) })
+        .eq('id', apiKey.journal_id);
+    }
   }
 
   await supabase.from('api_keys').update({ last_used_at: new Date().toISOString() }).eq('id', apiKey.id);

@@ -60,6 +60,11 @@ int OnInit()
    EventSetTimer(PollSeconds < 5 ? 5 : PollSeconds);
    Status("Baglandi. Son " + IntegerToString(HistoryDays) + " gun taraniyor...");
    Print("Simple Trading Journal bağlandı. İlk tarama: son ", HistoryDays, " gün.");
+
+   // Açılışta bir kez, işlem olmadan da bağlan: anahtarı hemen doğrular ve
+   // hesabın gerçek sermayesini bildirir. Yeni işlem beklenirse journal
+   // günlerce varsayılan 10.000 ile durur.
+   Hello();
    Scan();
    if(g_total == 0) Status("Calisiyor. Yeni kapanan islem bekleniyor.");
    return(INIT_SUCCEEDED);
@@ -94,6 +99,31 @@ void MarkSent(const long positionId)
   }
 
 /**
+ * Hesabın başlangıç sermayesi.
+ *
+ * Bakiye hareketlerinin (yatırma/çekme) toplamı. Prop hesaplarında bu tek bir
+ * kayıttır: challenge'ın büyüklüğü. Journal'ı açarken varsayılan 10.000 kalırsa
+ * bakiye ve getiri yanlış çıkar — kullanıcıya sormak yerine buradan okuyoruz.
+ *
+ * Tüm geçmişi tarar, çünkü ilk yatırım kolayca 30 günden eskidir.
+ */
+double InitialDeposit()
+  {
+   if(!HistorySelect(0, TimeCurrent() + 3600)) return(0);
+
+   double total = 0;
+   int deals = HistoryDealsTotal();
+   for(int i = 0; i < deals; i++)
+     {
+      ulong t = HistoryDealGetTicket(i);
+      if(t == 0) continue;
+      if(HistoryDealGetInteger(t, DEAL_TYPE) == DEAL_TYPE_BALANCE)
+         total += HistoryDealGetDouble(t, DEAL_PROFIT);
+     }
+   return(total);
+  }
+
+/**
  * Sunucu saatinin GMT'den farkı.
  *
  * Geçmişteki bütün zamanlar sunucu saatiyle gelir. Olduğu gibi gönderilirse
@@ -122,6 +152,17 @@ string JsonNum(const string key, const double value)
 string JsonPrice(const string key, const double value, const int digits)
   {
    return("\"" + key + "\":" + DoubleToString(value, digits));
+  }
+
+/** İşlemsiz ilk istek: anahtarı doğrular, sermayeyi bildirir. */
+void Hello()
+  {
+   double deposit = InitialDeposit();
+   string json = "{\"key\":\"" + ApiKey + "\"";
+   if(deposit > 0) json += ",\"startingCapital\":" + DoubleToString(deposit, 2);
+   json += ",\"trades\":[]}";
+   if(Send(json, 0))
+      Status("Baglanti tamam. Yeni kapanan islem bekleniyor.");
   }
 
 //+------------------------------------------------------------------+
@@ -168,7 +209,13 @@ void Scan()
 
    if(count == 0) return;
 
-   string json = "{\"key\":\"" + ApiKey + "\",\"trades\":[";
+   // InitialDeposit() geçmiş seçimini değiştirir; sonrasında bir daha
+   // okumadığımız için sorun olmaz, ama sıra önemli.
+
+   string json = "{\"key\":\"" + ApiKey + "\"";
+   double deposit = InitialDeposit();
+   if(deposit > 0) json += ",\"startingCapital\":" + DoubleToString(deposit, 2);
+   json += ",\"trades\":[";
    for(int i = 0; i < count; i++)
      {
       if(i > 0) json += ",";
@@ -311,9 +358,12 @@ bool Send(const string json, const int count)
       return(false);
      }
 
-   g_total += count;
-   Status("Calisiyor. Bu oturumda gonderilen islem: " + IntegerToString(g_total));
-   if(Verbose) Print(count, " pozisyon gönderildi -> ", body);
+   if(count > 0)
+     {
+      g_total += count;
+      Status("Calisiyor. Bu oturumda gonderilen islem: " + IntegerToString(g_total));
+     }
+   if(Verbose && count > 0) Print(count, " pozisyon gönderildi -> ", body);
    return(true);
   }
 //+------------------------------------------------------------------+
