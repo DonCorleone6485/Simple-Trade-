@@ -1,0 +1,160 @@
+import { createClient } from '@supabase/supabase-js';
+import { createHash } from 'crypto';
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
+  process.env.SUPABASE_SERVICE_KEY!
+);
+
+const hash = (key: string) => createHash('sha256').update(key).digest('hex');
+
+/** Tek seferde kabul edilen işlem sayısı — kazara ya da kasten dev gövde gelmesin. */
+const MAX_TRADES = 200;
+
+type Incoming = {
+  externalId?: string | number;
+  openTime?: string;
+  closeTime?: string;
+  symbol?: string;
+  type?: string;
+  openPrice?: number;
+  closePrice?: number;
+  sl?: number;
+  tp?: number;
+  profit?: number;
+  commission?: number;
+  swap?: number;
+  fee?: number;
+};
+
+const num = (v: any) => (typeof v === 'number' && isFinite(v) ? v : parseFloat(v) || 0);
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+/** MT5 tarihleri "2026.09.07 12:49:20" gelir; ISO da kabul edilir. */
+function toISO(raw?: string): string | null {
+  if (!raw) return null;
+  const mt = String(raw).match(/(\d{4})[.\-/](\d{2})[.\-/](\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?/);
+  const d = mt
+    ? new Date(`${mt[1]}-${mt[2]}-${mt[3]}T${mt[4]}:${mt[5]}:${mt[6] || '00'}Z`)
+    : new Date(String(raw));
+  return isNaN(d.getTime()) ? null : d.toISOString();
+}
+
+/**
+ * Sonuç, kapanışın stop ya da hedefe göre nerede olduğundan çıkar; kâr/zararın
+ * işareti tek başına stop olmakla elle kapatmayı ayırt etmez.
+ * (İçe aktarmadaki mtResult ile aynı kural.)
+ */
+function resultOf(net: number, type: 'Buy' | 'Sell', close: number, sl: number, tp: number) {
+  if (net === 0) return 'Başa Baş';
+  const buy = type === 'Buy';
+  if (net < 0) {
+    if (close > 0 && sl > 0 && (buy ? close <= sl : close >= sl)) return 'Başarısız';
+    return (sl > 0 || tp > 0) && close > 0 ? 'Manuel Zararda' : 'Başarısız';
+  }
+  if (close > 0 && tp > 0 && (buy ? close >= tp : close <= tp)) return 'Başarılı';
+  return (sl > 0 || tp > 0) && close > 0 ? 'Manuel Karda' : 'Başarılı';
+}
+
+export default async function handler(req: any, res: any) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+  const { key, trades } = body as { key?: string; trades?: Incoming[] };
+
+  if (!key || typeof key !== 'string') return res.status(401).json({ error: 'Missing key' });
+  if (!Array.isArray(trades)) return res.status(400).json({ error: 'trades must be an array' });
+  if (trades.length > MAX_TRADES) return res.status(413).json({ error: `At most ${MAX_TRADES} trades per request` });
+
+  const { data: apiKey } = await supabase
+    .from('api_keys')
+    .select('id, user_id, journal_id')
+    .eq('key_hash', hash(key))
+    .eq('revoked', false)
+    .maybeSingle();
+
+  if (!apiKey) return res.status(401).json({ error: 'Invalid key' });
+
+  // Bu journal'da hangi işlem numaraları zaten var — aynı pozisyon iki kez
+  // gönderilse de ikinci kez eklenmesin. EA çevrimdışı kalıp geçmişi baştan
+  // taradığında bu koruma devreye girer.
+  const ids = trades.map(t => String(t.externalId ?? '')).filter(Boolean);
+  const known = new Set<string>();
+  if (ids.length > 0) {
+    const { data: existing } = await supabase
+      .from('trades').select('external_id').eq('journal_id', apiKey.journal_id).in('external_id', ids);
+    (existing || []).forEach((r: any) => r.external_id && known.add(String(r.external_id)));
+  }
+
+  const rows: any[] = [];
+  for (const t of trades) {
+    const externalId = t.externalId != null ? String(t.externalId) : null;
+    if (externalId && known.has(externalId)) continue;
+
+    const date = toISO(t.openTime);
+    const symbol = (t.symbol || '').toUpperCase().trim();
+    if (!date || !symbol) continue;
+
+    const type = String(t.type || '').toLowerCase().startsWith('s') ? 'Sell' : 'Buy';
+    const gross = num(t.profit);
+    const cost = num(t.commission) + num(t.swap) + num(t.fee);
+    const net = round2(gross + cost);
+
+    const openPrice = num(t.openPrice);
+    const closePrice = num(t.closePrice);
+    const sl = num(t.sl);
+    const tp = num(t.tp);
+
+    // Risk, stop mesafesinden çıkar: kâr fiyat mesafesiyle orantılıdır.
+    const moved = Math.abs(openPrice - closePrice);
+    const toStop = Math.abs(openPrice - sl);
+    const risk = (sl > 0 && openPrice > 0 && closePrice > 0 && moved > 0 && gross !== 0)
+      ? round2((toStop / moved) * Math.abs(gross))
+      : (net < 0 ? Math.abs(net) : 0);
+
+    const rr = (sl > 0 && tp > 0 && openPrice > 0)
+      ? (() => {
+          const r = type === 'Buy' ? Math.abs(openPrice - sl) : Math.abs(sl - openPrice);
+          const w = type === 'Buy' ? Math.abs(tp - openPrice) : Math.abs(openPrice - tp);
+          return r > 0 ? (w / r).toFixed(2) : '';
+        })()
+      : '';
+
+    const closeISO = toISO(t.closeTime);
+    rows.push({
+      user_id: apiKey.user_id,
+      journal_id: apiKey.journal_id,
+      date,
+      exit_date: closeISO && new Date(closeISO) >= new Date(date) ? closeISO : null,
+      symbol,
+      type,
+      timeframe: '',
+      order_type: 'Market',
+      setup: '',
+      risk,
+      reward: net,
+      rr,
+      result: resultOf(net, type, closePrice, sl, tp),
+      pre_trade_notes: '',
+      post_trade_notes: '',
+      pre_trade_photos: [],
+      post_trade_photos: [],
+      external_id: externalId,
+    });
+  }
+
+  let inserted = 0;
+  if (rows.length > 0) {
+    const { data, error } = await supabase.from('trades').insert(rows).select('id');
+    if (error) return res.status(500).json({ error: error.message });
+    inserted = (data || []).length;
+  }
+
+  await supabase.from('api_keys').update({ last_used_at: new Date().toISOString() }).eq('id', apiKey.id);
+
+  return res.status(200).json({
+    inserted,
+    skipped: trades.length - inserted,
+    journalId: apiKey.journal_id,
+  });
+}
