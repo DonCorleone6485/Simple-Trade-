@@ -1378,12 +1378,18 @@ export default function TradeHistory({
           style={{ color: 'rgba(255,255,255,0.5)' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
-          {selectedIds.size === trades.length && trades.length > 0
+          {selectedIds.size > 0
             ? <CheckSquare className="w-4 h-4" style={{ color: '#8b5cf6' }} />
             : <Square className="w-4 h-4" />}
           <span>{selectedIds.size === trades.length && trades.length > 0
             ? (language === 'tr' ? 'Tümünü Kaldır' : 'Deselect All')
             : (language === 'tr' ? 'Tümünü Seç' : 'Select All')}</span>
+          {/* Kısmi seçimde kaç tane olduğunu söyle. */}
+          {selectedIds.size > 0 && selectedIds.size < trades.length && (
+            <span className="text-[13px]" style={{ color: '#a78bfa' }}>
+              · {selectedIds.size} {language === 'tr' ? 'seçili' : 'selected'}
+            </span>
+          )}
         </button>
 
         {selectedIds.size > 0 && canMove && (
@@ -1435,16 +1441,16 @@ export default function TradeHistory({
                       onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                       onClick={() => openOverlay(() => setSelectedTrade(trade))}
                     >
-                      <div onClick={e => toggleSelect(trade.id, e)} className="flex-shrink-0 transition-opacity"
-                        style={{ opacity: isSelected ? 1 : 0 }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; e.stopPropagation(); }}
-                        onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.opacity = '0'; }}>
+                      {/* Kutu her zaman görünür. Saydam bırakılınca kimse tek
+                          tek seçebildiğini fark etmiyordu. */}
+                      <div onClick={e => toggleSelect(trade.id, e)}
+                        className="flex-shrink-0 -m-1.5 p-1.5 rounded-md transition-colors"
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                         {isSelected
                           ? <CheckSquare className="w-4 h-4" style={{ color: '#8b5cf6' }} />
-                          : <Square className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} />}
+                          : <Square className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.22)' }} />}
                       </div>
-
-                      <span style={{ color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace' }}>-</span>
                       {/* Saat: gün başlığı hangi gün olduğunu söylüyor, bu da
                           günün neresinde olduğunu. Satırdaki boşluğu da doldurur. */}
                       <span className="hidden sm:inline w-12 font-mono text-[13px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
