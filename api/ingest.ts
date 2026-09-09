@@ -11,6 +11,9 @@ const hash = (key: string) => createHash('sha256').update(key).digest('hex');
 /** Tek seferde kabul edilen işlem sayısı — kazara ya da kasten dev gövde gelmesin. */
 const MAX_TRADES = 200;
 
+/** Ücretsiz planın toplam işlem sınırı — uygulamadakiyle aynı. */
+const FREE_TRADE_LIMIT = 20;
+
 type Incoming = {
   externalId?: string | number;
   openTime?: string | number;
@@ -107,8 +110,25 @@ export default async function handler(req: any, res: any) {
     (existing || []).forEach((r: any) => r.external_id && known.add(String(r.external_id)));
   }
 
+  // Ücretsiz planın işlem sınırı. Uygulama tarafında elle giriş ve dosyadan
+  // aktarma zaten sınırlı; buradan sınırsız yazılabilseydi sınır anlamsız
+  // olurdu — bir yıllık geçmiş çeken biri binlerce satır yollayabilir.
+  let remaining = Infinity;
+  {
+    const { data: account } = await supabase
+      .from('users').select('is_pro, pro_until').eq('user_id', apiKey.user_id).maybeSingle();
+    const isPro = !!account?.is_pro && (!account.pro_until || new Date(account.pro_until) > new Date());
+    if (!isPro) {
+      const { count } = await supabase
+        .from('trades').select('*', { count: 'exact', head: true }).eq('user_id', apiKey.user_id);
+      remaining = Math.max(0, FREE_TRADE_LIMIT - (count || 0));
+    }
+  }
+
   const rows: any[] = [];
   for (const t of trades) {
+    if (rows.length >= remaining) break;
+
     const externalId = t.externalId != null ? String(t.externalId) : null;
     if (externalId && known.has(externalId)) continue;
 
@@ -192,5 +212,8 @@ export default async function handler(req: any, res: any) {
     inserted,
     skipped: trades.length - inserted,
     journalId: apiKey.journal_id,
+    ...(remaining !== Infinity && inserted < trades.length
+      ? { limit: `Free plan is capped at ${FREE_TRADE_LIMIT} trades.` }
+      : {}),
   });
 }

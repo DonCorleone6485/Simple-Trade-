@@ -22,7 +22,7 @@
 input string ApiKey       = "";                                   // ApiKey  (stj_...)
 input string ServerUrl    = "https://www.simpletradejournal.io";  // ServerUrl
 input int    PollSeconds  = 30;                                   // PollSeconds
-input int    HistoryDays  = 30;                                   // HistoryDays
+input int    HistoryDays  = 365;                                  // HistoryDays
 input bool   Verbose      = true;                                 // Verbose
 
 // Bu oturumda gönderilmiş pozisyonlar. Sunucu zaten aynı pozisyonu ikinci kez
@@ -30,6 +30,7 @@ input bool   Verbose      = true;                                 // Verbose
 long     g_sent[];
 datetime g_scanFrom = 0;
 int      g_total    = 0;   // bu oturumda gönderilen pozisyon sayısı
+bool     g_fullScanDone = false;  // geçmişin tamamı bir kez tarandı mı
 string   g_status   = "";  // grafiğe yazılan son durum
 
 /**
@@ -168,40 +169,72 @@ void Hello()
 //+------------------------------------------------------------------+
 //| Kapanmış pozisyonları toplar ve gönderir                          |
 //+------------------------------------------------------------------+
+//| Kapanmış pozisyonları toplar ve gönderir                          |
+//|                                                                   |
+//| İki turda çalışır. Birincisi henüz gönderilmemiş kapanış           |
+//| işlemlerini bulur (en çok 100 tane), ikincisi geçmişi bir kez      |
+//| gezip yalnızca o pozisyonların toplamlarını çıkarır.               |
+//|                                                                   |
+//| Her kapanış için geçmişi baştan taramak bir yılda milyonlarca      |
+//| karşılaştırma demekti; terminal her turda donardı.                 |
+//+------------------------------------------------------------------+
 void Scan()
   {
-   datetime to = TimeCurrent() + 3600;
-   if(!HistorySelect(g_scanFrom, to))
+   // İlk tarama kullanıcının istediği kadar geriye gider; sonrakiler yalnızca
+   // son birkaç güne bakar, çünkü eskiler zaten gönderilmiştir.
+   datetime from = g_fullScanDone ? TimeCurrent() - 3 * 86400 : g_scanFrom;
+   datetime to   = TimeCurrent() + 3600;
+
+   if(!HistorySelect(from, to))
      {
       Print("HATA: geçmiş okunamadı.");
       return;
      }
 
-   int    offset  = ServerGmtOffset();
-   string items[];
-   long   ids[];
-   int    count   = 0;
-
    int deals = HistoryDealsTotal();
+
+   // ── 1. tur: gönderilecek pozisyonları belirle ──
+   long   posId[];      ulong  closeDeal[];
+   string symbol[];     int    digits[];
+   long   closeTime[];  double closePrice[];  long reasonCode[];
+   double profit[];     double commission[];  double swap[];  double fee[];
+   long   openTime[];   double openPrice[];   double sl[];    double tp[];
+   string type[];       bool   hasOpen[];
+   int count = 0;
+
    for(int i = 0; i < deals; i++)
      {
-      ulong dealTicket = HistoryDealGetTicket(i);
-      if(dealTicket == 0) continue;
+      ulong t = HistoryDealGetTicket(i);
+      if(t == 0) continue;
 
-      // Pozisyonu kapatan bacak. Kısmi kapanışlarda son OUT işlemi esas alınır.
-      long entry = HistoryDealGetInteger(dealTicket, DEAL_ENTRY);
+      long entry = HistoryDealGetInteger(t, DEAL_ENTRY);
       if(entry != DEAL_ENTRY_OUT && entry != DEAL_ENTRY_OUT_BY) continue;
 
-      long positionId = HistoryDealGetInteger(dealTicket, DEAL_POSITION_ID);
-      if(positionId <= 0 || AlreadySent(positionId)) continue;
+      long pid = HistoryDealGetInteger(t, DEAL_POSITION_ID);
+      if(pid <= 0 || AlreadySent(pid)) continue;
 
-      string payload = BuildPosition(positionId, dealTicket, offset);
-      if(payload == "") continue;
+      string sym = HistoryDealGetString(t, DEAL_SYMBOL);
+      if(sym == "") continue;
 
-      ArrayResize(items, count + 1);
-      ArrayResize(ids, count + 1);
-      items[count] = payload;
-      ids[count]   = positionId;
+      int n = count + 1;
+      ArrayResize(posId, n);      ArrayResize(closeDeal, n);
+      ArrayResize(symbol, n);     ArrayResize(digits, n);
+      ArrayResize(closeTime, n);  ArrayResize(closePrice, n);  ArrayResize(reasonCode, n);
+      ArrayResize(profit, n);     ArrayResize(commission, n);  ArrayResize(swap, n);  ArrayResize(fee, n);
+      ArrayResize(openTime, n);   ArrayResize(openPrice, n);   ArrayResize(sl, n);    ArrayResize(tp, n);
+      ArrayResize(type, n);       ArrayResize(hasOpen, n);
+
+      int d = (int)SymbolInfoInteger(sym, SYMBOL_DIGITS);
+      posId[count]      = pid;
+      closeDeal[count]  = t;
+      symbol[count]     = sym;
+      digits[count]     = (d > 0 ? d : 5);
+      closeTime[count]  = HistoryDealGetInteger(t, DEAL_TIME);
+      closePrice[count] = HistoryDealGetDouble(t, DEAL_PRICE);
+      reasonCode[count] = HistoryDealGetInteger(t, DEAL_REASON);
+      profit[count] = 0; commission[count] = 0; swap[count] = 0; fee[count] = 0;
+      openTime[count] = 0; openPrice[count] = 0; sl[count] = 0; tp[count] = 0;
+      type[count] = "buy"; hasOpen[count] = false;
       count++;
 
       if(count >= 100) break;   // sunucu tek istekte en fazla 200 kabul ediyor
@@ -209,14 +242,89 @@ void Scan()
 
    if(count == 0) return;
 
-   // InitialDeposit() geçmiş seçimini değiştirir; sonrasında bir daha
-   // okumadığımız için sorun olmaz, ama sıra önemli.
+   // ── 2. tur: geçmişi bir kez gez, bu pozisyonların toplamlarını çıkar ──
+   for(int i = 0; i < deals; i++)
+     {
+      ulong t = HistoryDealGetTicket(i);
+      if(t == 0) continue;
+
+      long pid = HistoryDealGetInteger(t, DEAL_POSITION_ID);
+      if(pid <= 0) continue;
+
+      int k = -1;
+      for(int j = 0; j < count; j++)
+         if(posId[j] == pid) { k = j; break; }
+      if(k < 0) continue;
+
+      profit[k]     += HistoryDealGetDouble(t, DEAL_PROFIT);
+      commission[k] += HistoryDealGetDouble(t, DEAL_COMMISSION);
+      swap[k]       += HistoryDealGetDouble(t, DEAL_SWAP);
+      fee[k]        += HistoryDealGetDouble(t, DEAL_FEE);
+
+      if(HistoryDealGetInteger(t, DEAL_ENTRY) == DEAL_ENTRY_IN)
+        {
+         hasOpen[k]   = true;
+         openTime[k]  = HistoryDealGetInteger(t, DEAL_TIME);
+         openPrice[k] = HistoryDealGetDouble(t, DEAL_PRICE);
+         type[k]      = (HistoryDealGetInteger(t, DEAL_TYPE) == DEAL_TYPE_BUY) ? "buy" : "sell";
+
+         // Stop ve hedef, pozisyonu açan emirde durur.
+         ulong orderTicket = (ulong)HistoryDealGetInteger(t, DEAL_ORDER);
+         if(HistoryOrderSelect(orderTicket))
+           {
+            sl[k] = HistoryOrderGetDouble(orderTicket, ORDER_SL);
+            tp[k] = HistoryOrderGetDouble(orderTicket, ORDER_TP);
+           }
+        }
+     }
+
+   // ── JSON ──
+   int    offset = ServerGmtOffset();
+   string items[];
+   long   ids[];
+   int    ready = 0;
+
+   for(int k = 0; k < count; k++)
+     {
+      if(!hasOpen[k]) continue;   // açılışı pencerede olmayan pozisyonu atla
+
+      // Sonradan konmuş ya da taşınmış stop açılış emrinde görünmez; stopla
+      // kapandıysa kapanış fiyatı zaten stop seviyesidir.
+      string reason = "manual";
+      if(reasonCode[k] == DEAL_REASON_SL) { reason = "sl"; if(sl[k] == 0) sl[k] = closePrice[k]; }
+      else if(reasonCode[k] == DEAL_REASON_TP) { reason = "tp"; if(tp[k] == 0) tp[k] = closePrice[k]; }
+
+      string j = "{";
+      j += "\"externalId\":" + IntegerToString(posId[k]) + ",";
+      j += "\"openTime\":"  + IntegerToString(openTime[k]  - offset) + ",";
+      j += "\"closeTime\":" + IntegerToString(closeTime[k] - offset) + ",";
+      j += JsonStr("symbol", symbol[k]) + ",";
+      j += JsonStr("type", type[k]) + ",";
+      j += JsonPrice("openPrice", openPrice[k], digits[k]) + ",";
+      j += JsonPrice("closePrice", closePrice[k], digits[k]) + ",";
+      j += JsonPrice("sl", sl[k], digits[k]) + ",";
+      j += JsonPrice("tp", tp[k], digits[k]) + ",";
+      j += JsonNum("profit", profit[k]) + ",";
+      j += JsonNum("commission", commission[k]) + ",";
+      j += JsonNum("swap", swap[k]) + ",";
+      j += JsonNum("fee", fee[k]) + ",";
+      j += JsonStr("closeReason", reason);
+      j += "}";
+
+      ArrayResize(items, ready + 1);
+      ArrayResize(ids, ready + 1);
+      items[ready] = j;
+      ids[ready]   = posId[k];
+      ready++;
+     }
+
+   if(ready == 0) { g_fullScanDone = true; return; }
 
    string json = "{\"key\":\"" + ApiKey + "\"";
    double deposit = InitialDeposit();
    if(deposit > 0) json += ",\"startingCapital\":" + DoubleToString(deposit, 2);
    json += ",\"trades\":[";
-   for(int i = 0; i < count; i++)
+   for(int i = 0; i < ready; i++)
      {
       if(i > 0) json += ",";
       json += items[i];
@@ -225,87 +333,13 @@ void Scan()
 
    // Ancak sunucu kabul ettiyse gönderilmiş sayarız; ağ hatasında bir sonraki
    // turda yeniden denenir.
-   if(Send(json, count))
-      for(int i = 0; i < count; i++)
-         MarkSent(ids[i]);
-  }
-
-//+------------------------------------------------------------------+
-//| Tek bir pozisyonun JSON'u                                         |
-//+------------------------------------------------------------------+
-string BuildPosition(const long positionId, const ulong closeDeal, const int offset)
-  {
-   string symbol     = HistoryDealGetString(closeDeal, DEAL_SYMBOL);
-   if(symbol == "") return("");
-
-   int    digits     = (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
-   if(digits <= 0) digits = 5;
-
-   datetime closeTime = (datetime)HistoryDealGetInteger(closeDeal, DEAL_TIME);
-   double closePrice  = HistoryDealGetDouble(closeDeal, DEAL_PRICE);
-   long   reasonCode  = HistoryDealGetInteger(closeDeal, DEAL_REASON);
-
-   // Açılış bacağını ve pozisyonun toplam maliyetlerini bul.
-   datetime openTime  = 0;
-   double   openPrice = 0, profit = 0, commission = 0, swap = 0, fee = 0;
-   double   sl = 0, tp = 0;
-   string   type = "buy";
-   bool     foundOpen = false;
-
-   int deals = HistoryDealsTotal();
-   for(int i = 0; i < deals; i++)
+   if(Send(json, ready))
      {
-      ulong t = HistoryDealGetTicket(i);
-      if(t == 0) continue;
-      if(HistoryDealGetInteger(t, DEAL_POSITION_ID) != positionId) continue;
-
-      profit     += HistoryDealGetDouble(t, DEAL_PROFIT);
-      commission += HistoryDealGetDouble(t, DEAL_COMMISSION);
-      swap       += HistoryDealGetDouble(t, DEAL_SWAP);
-      fee        += HistoryDealGetDouble(t, DEAL_FEE);
-
-      if(HistoryDealGetInteger(t, DEAL_ENTRY) == DEAL_ENTRY_IN)
-        {
-         foundOpen = true;
-         openTime  = (datetime)HistoryDealGetInteger(t, DEAL_TIME);
-         openPrice = HistoryDealGetDouble(t, DEAL_PRICE);
-         type      = (HistoryDealGetInteger(t, DEAL_TYPE) == DEAL_TYPE_BUY) ? "buy" : "sell";
-
-         // Stop ve hedef, pozisyonu açan emirde durur.
-         ulong orderTicket = (ulong)HistoryDealGetInteger(t, DEAL_ORDER);
-         if(HistoryOrderSelect(orderTicket))
-           {
-            sl = HistoryOrderGetDouble(orderTicket, ORDER_SL);
-            tp = HistoryOrderGetDouble(orderTicket, ORDER_TP);
-           }
-        }
+      for(int i = 0; i < ready; i++)
+         MarkSent(ids[i]);
+      // 100'lük sınıra dayandıysak geçmişte daha var; bir sonraki turda devam.
+      if(count < 100) g_fullScanDone = true;
      }
-
-   if(!foundOpen) return("");   // açılışı bu pencerede olmayan pozisyonu atla
-
-   // Sonradan konmuş ya da taşınmış stop, açılış emrinde görünmez; stopla
-   // kapandıysa kapanış fiyatı zaten stop seviyesidir.
-   string reason = "manual";
-   if(reasonCode == DEAL_REASON_SL) { reason = "sl"; if(sl == 0) sl = closePrice; }
-   else if(reasonCode == DEAL_REASON_TP) { reason = "tp"; if(tp == 0) tp = closePrice; }
-
-   string j = "{";
-   j += "\"externalId\":" + IntegerToString(positionId) + ",";
-   j += "\"openTime\":"  + IntegerToString((long)openTime  - offset) + ",";
-   j += "\"closeTime\":" + IntegerToString((long)closeTime - offset) + ",";
-   j += JsonStr("symbol", symbol) + ",";
-   j += JsonStr("type", type) + ",";
-   j += JsonPrice("openPrice", openPrice, digits) + ",";
-   j += JsonPrice("closePrice", closePrice, digits) + ",";
-   j += JsonPrice("sl", sl, digits) + ",";
-   j += JsonPrice("tp", tp, digits) + ",";
-   j += JsonNum("profit", profit) + ",";
-   j += JsonNum("commission", commission) + ",";
-   j += JsonNum("swap", swap) + ",";
-   j += JsonNum("fee", fee) + ",";
-   j += JsonStr("closeReason", reason);
-   j += "}";
-   return(j);
   }
 
 //+------------------------------------------------------------------+
