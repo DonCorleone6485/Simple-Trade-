@@ -13,8 +13,8 @@ const MAX_TRADES = 200;
 
 type Incoming = {
   externalId?: string | number;
-  openTime?: string;
-  closeTime?: string;
+  openTime?: string | number;
+  closeTime?: string | number;
   symbol?: string;
   type?: string;
   openPrice?: number;
@@ -30,9 +30,22 @@ type Incoming = {
 const num = (v: any) => (typeof v === 'number' && isFinite(v) ? v : parseFloat(v) || 0);
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-/** MT5 tarihleri "2026.09.07 12:49:20" gelir; ISO da kabul edilir. */
-function toISO(raw?: string): string | null {
-  if (!raw) return null;
+/**
+ * Zaman.
+ *
+ * En güvenilir biçim, saniye cinsinden UTC damgasıdır — EA `TimeGMT()` ile
+ * gönderir, ortada yorumlanacak bir şey kalmaz. MetaTrader'ın kendi yazdığı
+ * "2026.09.07 12:49:20" biçimi de kabul edilir ve UTC sayılır; EA sunucu
+ * saatini göndermeden önce GMT'ye çevirmekle yükümlüdür. Sunucu saatini
+ * olduğu gibi yollamak, aynı işlemin dosyadan gelenle farklı saatte
+ * görünmesine yol açar.
+ */
+function toISO(raw?: string | number): string | null {
+  if (raw == null || raw === '') return null;
+  if (typeof raw === 'number' || /^\d{9,11}$/.test(String(raw))) {
+    const d = new Date(Number(raw) * 1000);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  }
   const mt = String(raw).match(/(\d{4})[.\-/](\d{2})[.\-/](\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?/);
   const d = mt
     ? new Date(`${mt[1]}-${mt[2]}-${mt[3]}T${mt[4]}:${mt[5]}:${mt[6] || '00'}Z`)
