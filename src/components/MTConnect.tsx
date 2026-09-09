@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plug, Copy, Check, Trash2, KeyRound, AlertTriangle, Loader } from 'lucide-react';
+import { Plug, Copy, Check, Trash2, KeyRound, AlertTriangle, Loader, Download } from 'lucide-react';
 import { useAuth } from '@clerk/clerk-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -217,15 +217,16 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             },
             {
               t: tr('Eklentiyi kur', 'Install the add-on'),
-              d: tr('Eklenti dosyasını MetaTrader\'ın Experts klasörüne koy, MetaEditor\'de derle, sonra herhangi bir grafiğe sürükle.',
-                    'Drop the add-on into MetaTrader\'s Experts folder, compile it in MetaEditor, then drag it onto any chart.'),
+              d: tr('Dosyayı indir ve MetaTrader\'da Dosya → Veri Klasörünü Aç → MQL5 → Experts içine koy. MetaEditor\'de aç, F7 ile derle. Sonra MetaTrader\'da Gezgin panelinden herhangi bir grafiğe sürükle.',
+                    'Download it, then in MetaTrader open File → Open Data Folder → MQL5 → Experts and drop it in. Open it in MetaEditor and compile with F7. Then drag it onto any chart from the Navigator.'),
+              download: '/SimpleTradingJournal.mq5',
             },
             {
               t: tr('Anahtarı yapıştır', 'Paste the key'),
               d: tr('Eklenti grafiğe eklenirken açılan ayar penceresinde yukarıdaki anahtarı ilgili alana yapıştır. Hepsi bu — kapanan işlemler birkaç saniye içinde journal\'a düşer.',
                     'In the settings window that opens, paste the key above. That is all — closed trades reach the journal within seconds.'),
             },
-          ].map((s, i) => (
+          ].map((s: { t: string; d: string; code?: string; download?: string }, i: number) => (
             <li key={i} className="flex gap-4">
               <span className="font-display flex-shrink-0" style={{ fontSize: '22px', color: 'rgba(255,255,255,0.18)', lineHeight: 1.2 }}>
                 {String(i + 1).padStart(2, '0')}
@@ -238,6 +239,14 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                     style={{ background: 'rgba(0,0,0,0.3)', color: '#a78bfa' }}>
                     {s.code}
                   </code>
+                )}
+                {s.download && (
+                  <a href={s.download} download
+                    className="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full text-sm font-medium"
+                    style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
+                    <Download className="w-4 h-4" />
+                    SimpleTradingJournal.mq5
+                  </a>
                 )}
               </div>
             </li>

@@ -25,6 +25,8 @@ type Incoming = {
   commission?: number;
   swap?: number;
   fee?: number;
+  /** MT5 pozisyonun neden kapandığını kendisi bilir: 'sl' | 'tp' | 'manual'. */
+  closeReason?: string;
 };
 
 const num = (v: any) => (typeof v === 'number' && isFinite(v) ? v : parseFloat(v) || 0);
@@ -58,8 +60,13 @@ function toISO(raw?: string | number): string | null {
  * işareti tek başına stop olmakla elle kapatmayı ayırt etmez.
  * (İçe aktarmadaki mtResult ile aynı kural.)
  */
-function resultOf(net: number, type: 'Buy' | 'Sell', close: number, sl: number, tp: number) {
+function resultOf(net: number, type: 'Buy' | 'Sell', close: number, sl: number, tp: number, reason?: string) {
   if (net === 0) return 'Başa Baş';
+  // MT5 kapanış sebebini kendi kaydeder; fiyat karşılaştırmasından kesindir.
+  if (reason === 'sl') return net > 0 ? 'Manuel Karda' : 'Başarısız';
+  if (reason === 'tp') return net > 0 ? 'Başarılı' : 'Manuel Zararda';
+  if (reason === 'manual') return net > 0 ? 'Manuel Karda' : 'Manuel Zararda';
+
   const buy = type === 'Buy';
   if (net < 0) {
     if (close > 0 && sl > 0 && (buy ? close <= sl : close >= sl)) return 'Başarısız';
@@ -147,7 +154,7 @@ export default async function handler(req: any, res: any) {
       risk,
       reward: net,
       rr,
-      result: resultOf(net, type, closePrice, sl, tp),
+      result: resultOf(net, type, closePrice, sl, tp, String(t.closeReason || '').toLowerCase()),
       pre_trade_notes: '',
       post_trade_notes: '',
       pre_trade_photos: [],

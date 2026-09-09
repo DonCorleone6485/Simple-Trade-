@@ -1,0 +1,284 @@
+//+------------------------------------------------------------------+
+//|                                       SimpleTradingJournal.mq5   |
+//|  Kapanan pozisyonları Simple Trading Journal'a gönderir.         |
+//|                                                                  |
+//|  Kurulum:                                                        |
+//|   1) Araçlar > Seçenekler > Uzman Danışmanlar sekmesinde         |
+//|      "Listelenen URL'ler için WebRequest'e izin ver" kutusunu     |
+//|      işaretle ve listeye https://www.simpletradejournal.io ekle.  |
+//|   2) Bu dosyayı MQL5/Experts klasörüne koyup F7 ile derle.        |
+//|   3) Herhangi bir grafiğe sürükle, açılan pencerede journal       |
+//|      anahtarını ApiKey alanına yapıştır.                          |
+//+------------------------------------------------------------------+
+#property copyright "Simple Trading Journal"
+#property link      "https://www.simpletradejournal.io"
+#property version   "1.00"
+#property strict
+
+input string ApiKey       = "";                                  // Journal anahtarı (stj_...)
+input string ServerUrl    = "https://www.simpletradejournal.io";  // Sunucu adresi
+input int    PollSeconds  = 30;                                   // Kaç saniyede bir kontrol edilsin
+input int    HistoryDays  = 30;                                   // İlk açılışta kaç günlük geçmiş taransın
+input bool   Verbose      = true;                                 // Günlüğe ayrıntı yaz
+
+// Bu oturumda gönderilmiş pozisyonlar. Sunucu zaten aynı pozisyonu ikinci kez
+// eklemez; bu liste sadece boşuna istek atmamak için.
+long     g_sent[];
+datetime g_scanFrom = 0;
+
+//+------------------------------------------------------------------+
+int OnInit()
+  {
+   if(StringLen(ApiKey) < 8)
+     {
+      Print("HATA: ApiKey boş. Journal'daki MetaTrader sekmesinden anahtar oluşturup buraya yapıştır.");
+      return(INIT_FAILED);
+     }
+
+   g_scanFrom = TimeCurrent() - (datetime)HistoryDays * 86400;
+   ArrayResize(g_sent, 0);
+
+   EventSetTimer(PollSeconds < 5 ? 5 : PollSeconds);
+   Print("Simple Trading Journal bağlandı. İlk tarama: son ", HistoryDays, " gün.");
+   Scan();
+   return(INIT_SUCCEEDED);
+  }
+
+void OnDeinit(const int reason) { EventKillTimer(); }
+
+void OnTimer() { Scan(); }
+
+// Pozisyon kapandığı anda beklemeden gönder.
+void OnTradeTransaction(const MqlTradeTransaction &trans,
+                        const MqlTradeRequest &request,
+                        const MqlTradeResult &result)
+  {
+   if(trans.type == TRADE_TRANSACTION_DEAL_ADD)
+      Scan();
+  }
+
+//+------------------------------------------------------------------+
+bool AlreadySent(const long positionId)
+  {
+   for(int i = 0; i < ArraySize(g_sent); i++)
+      if(g_sent[i] == positionId) return(true);
+   return(false);
+  }
+
+void MarkSent(const long positionId)
+  {
+   int n = ArraySize(g_sent);
+   ArrayResize(g_sent, n + 1);
+   g_sent[n] = positionId;
+  }
+
+/**
+ * Sunucu saatinin GMT'den farkı.
+ *
+ * Geçmişteki bütün zamanlar sunucu saatiyle gelir. Olduğu gibi gönderilirse
+ * aynı işlem, rapordan aktarılan ikiziyle farklı saatte görünür. Yarım saatlik
+ * dilimler de olduğu için 1800 saniyeye yuvarlıyoruz.
+ */
+int ServerGmtOffset()
+  {
+   long diff = (long)TimeCurrent() - (long)TimeGMT();
+   return((int)(MathRound((double)diff / 1800.0) * 1800));
+  }
+
+string JsonStr(const string key, const string value)
+  {
+   string v = value;
+   StringReplace(v, "\\", "\\\\");
+   StringReplace(v, "\"", "\\\"");
+   return("\"" + key + "\":\"" + v + "\"");
+  }
+
+string JsonNum(const string key, const double value)
+  {
+   return("\"" + key + "\":" + DoubleToString(value, 2));
+  }
+
+string JsonPrice(const string key, const double value, const int digits)
+  {
+   return("\"" + key + "\":" + DoubleToString(value, digits));
+  }
+
+//+------------------------------------------------------------------+
+//| Kapanmış pozisyonları toplar ve gönderir                          |
+//+------------------------------------------------------------------+
+void Scan()
+  {
+   datetime to = TimeCurrent() + 3600;
+   if(!HistorySelect(g_scanFrom, to))
+     {
+      Print("HATA: geçmiş okunamadı.");
+      return;
+     }
+
+   int    offset  = ServerGmtOffset();
+   string items[];
+   long   ids[];
+   int    count   = 0;
+
+   int deals = HistoryDealsTotal();
+   for(int i = 0; i < deals; i++)
+     {
+      ulong dealTicket = HistoryDealGetTicket(i);
+      if(dealTicket == 0) continue;
+
+      // Pozisyonu kapatan bacak. Kısmi kapanışlarda son OUT işlemi esas alınır.
+      long entry = HistoryDealGetInteger(dealTicket, DEAL_ENTRY);
+      if(entry != DEAL_ENTRY_OUT && entry != DEAL_ENTRY_OUT_BY) continue;
+
+      long positionId = HistoryDealGetInteger(dealTicket, DEAL_POSITION_ID);
+      if(positionId <= 0 || AlreadySent(positionId)) continue;
+
+      string payload = BuildPosition(positionId, dealTicket, offset);
+      if(payload == "") continue;
+
+      ArrayResize(items, count + 1);
+      ArrayResize(ids, count + 1);
+      items[count] = payload;
+      ids[count]   = positionId;
+      count++;
+
+      if(count >= 100) break;   // sunucu tek istekte en fazla 200 kabul ediyor
+     }
+
+   if(count == 0) return;
+
+   string json = "{\"key\":\"" + ApiKey + "\",\"trades\":[";
+   for(int i = 0; i < count; i++)
+     {
+      if(i > 0) json += ",";
+      json += items[i];
+     }
+   json += "]}";
+
+   // Ancak sunucu kabul ettiyse gönderilmiş sayarız; ağ hatasında bir sonraki
+   // turda yeniden denenir.
+   if(Send(json, count))
+      for(int i = 0; i < count; i++)
+         MarkSent(ids[i]);
+  }
+
+//+------------------------------------------------------------------+
+//| Tek bir pozisyonun JSON'u                                         |
+//+------------------------------------------------------------------+
+string BuildPosition(const long positionId, const ulong closeDeal, const int offset)
+  {
+   string symbol     = HistoryDealGetString(closeDeal, DEAL_SYMBOL);
+   if(symbol == "") return("");
+
+   int    digits     = (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
+   if(digits <= 0) digits = 5;
+
+   datetime closeTime = (datetime)HistoryDealGetInteger(closeDeal, DEAL_TIME);
+   double closePrice  = HistoryDealGetDouble(closeDeal, DEAL_PRICE);
+   long   reasonCode  = HistoryDealGetInteger(closeDeal, DEAL_REASON);
+
+   // Açılış bacağını ve pozisyonun toplam maliyetlerini bul.
+   datetime openTime  = 0;
+   double   openPrice = 0, profit = 0, commission = 0, swap = 0, fee = 0;
+   double   sl = 0, tp = 0;
+   string   type = "buy";
+   bool     foundOpen = false;
+
+   int deals = HistoryDealsTotal();
+   for(int i = 0; i < deals; i++)
+     {
+      ulong t = HistoryDealGetTicket(i);
+      if(t == 0) continue;
+      if(HistoryDealGetInteger(t, DEAL_POSITION_ID) != positionId) continue;
+
+      profit     += HistoryDealGetDouble(t, DEAL_PROFIT);
+      commission += HistoryDealGetDouble(t, DEAL_COMMISSION);
+      swap       += HistoryDealGetDouble(t, DEAL_SWAP);
+      fee        += HistoryDealGetDouble(t, DEAL_FEE);
+
+      if(HistoryDealGetInteger(t, DEAL_ENTRY) == DEAL_ENTRY_IN)
+        {
+         foundOpen = true;
+         openTime  = (datetime)HistoryDealGetInteger(t, DEAL_TIME);
+         openPrice = HistoryDealGetDouble(t, DEAL_PRICE);
+         type      = (HistoryDealGetInteger(t, DEAL_TYPE) == DEAL_TYPE_BUY) ? "buy" : "sell";
+
+         // Stop ve hedef, pozisyonu açan emirde durur.
+         ulong orderTicket = (ulong)HistoryDealGetInteger(t, DEAL_ORDER);
+         if(HistoryOrderSelect(orderTicket))
+           {
+            sl = HistoryOrderGetDouble(orderTicket, ORDER_SL);
+            tp = HistoryOrderGetDouble(orderTicket, ORDER_TP);
+           }
+        }
+     }
+
+   if(!foundOpen) return("");   // açılışı bu pencerede olmayan pozisyonu atla
+
+   // Sonradan konmuş ya da taşınmış stop, açılış emrinde görünmez; stopla
+   // kapandıysa kapanış fiyatı zaten stop seviyesidir.
+   string reason = "manual";
+   if(reasonCode == DEAL_REASON_SL) { reason = "sl"; if(sl == 0) sl = closePrice; }
+   else if(reasonCode == DEAL_REASON_TP) { reason = "tp"; if(tp == 0) tp = closePrice; }
+
+   string j = "{";
+   j += "\"externalId\":" + IntegerToString(positionId) + ",";
+   j += "\"openTime\":"  + IntegerToString((long)openTime  - offset) + ",";
+   j += "\"closeTime\":" + IntegerToString((long)closeTime - offset) + ",";
+   j += JsonStr("symbol", symbol) + ",";
+   j += JsonStr("type", type) + ",";
+   j += JsonPrice("openPrice", openPrice, digits) + ",";
+   j += JsonPrice("closePrice", closePrice, digits) + ",";
+   j += JsonPrice("sl", sl, digits) + ",";
+   j += JsonPrice("tp", tp, digits) + ",";
+   j += JsonNum("profit", profit) + ",";
+   j += JsonNum("commission", commission) + ",";
+   j += JsonNum("swap", swap) + ",";
+   j += JsonNum("fee", fee) + ",";
+   j += JsonStr("closeReason", reason);
+   j += "}";
+   return(j);
+  }
+
+//+------------------------------------------------------------------+
+bool Send(const string json, const int count)
+  {
+   string url = ServerUrl + "/api/ingest";
+   string headers = "Content-Type: application/json\r\n";
+
+   char post[], result[];
+   string resultHeaders;
+
+   // StringToCharArray sona bir sıfır bayt ekler; onu göndermemek gerekir,
+   // yoksa sunucu gövdeyi bozuk JSON olarak görür.
+   int len = StringToCharArray(json, post, 0, WHOLE_ARRAY, CP_UTF8) - 1;
+   if(len < 0) return;
+   ArrayResize(post, len);
+
+   ResetLastError();
+   int status = WebRequest("POST", url, headers, 10000, post, result, resultHeaders);
+
+   if(status == -1)
+     {
+      int err = GetLastError();
+      if(err == 4014)
+         Print("HATA: WebRequest'e izin verilmemiş. Araçlar > Seçenekler > Uzman Danışmanlar sekmesinde ",
+               ServerUrl, " adresini listeye ekle.");
+      else
+         Print("HATA: istek gönderilemedi (", err, ").");
+      return(false);
+     }
+
+   string body = CharArrayToString(result, 0, WHOLE_ARRAY, CP_UTF8);
+
+   if(status != 200)
+     {
+      Print("HATA ", status, ": ", body);
+      if(status == 401) Print("Anahtar geçersiz ya da iptal edilmiş. Journal'dan yeni anahtar oluştur.");
+      return(false);
+     }
+
+   if(Verbose) Print(count, " pozisyon gönderildi -> ", body);
+   return(true);
+  }
+//+------------------------------------------------------------------+
