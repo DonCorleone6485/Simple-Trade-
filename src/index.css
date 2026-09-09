@@ -50,6 +50,19 @@ body::before {
   background: transparent;
 }
 
+/* Tarih girdisinin kendisi. Kütüphane kendi stilini enjekte ettiği için
+   !important gerekiyor; formdaki öteki alanlarla aynı görünsün. */
+.dark-dp-input {
+  width: 100% !important;
+  padding: 8px 12px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  outline: none !important;
+  font-size: 14px !important;
+}
+
 /* ── TARİH / SAAT SEÇİCİ (react-multi-date-picker) ────────────────────────
    Paket kendi CSS'ini açık tema için enjekte eder: takvim beyaz, metin rengi
    ise sayfadan miras kalır — koyu arayüzde beyaz üstüne beyaz. Takvim
