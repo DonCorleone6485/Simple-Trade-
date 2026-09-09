@@ -40,6 +40,9 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
   /** Düzeltmeden önceki hâli — beğenmezse geri alsın. */
   const [before, setBefore] = useState<string | null>(null);
 
+  /** Dikte sırasında gerçekten konuşuldu mu — boşuna düzeltme çağırmayalım. */
+  const spokeRef = useRef(false);
+  const failedRef = useRef(false);
   const recRef = useRef<any>(null);
   // Dikte sırasında kutunun başlangıç metni; üstüne ekleyerek gideriz.
   const baseRef = useRef('');
@@ -57,14 +60,18 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
     rec.interimResults = true;
 
     baseRef.current = valueRef.current ? valueRef.current.replace(/\s*$/, '') + ' ' : '';
+    spokeRef.current = false;
+    failedRef.current = false;
 
     rec.onresult = (e: any) => {
       let text = '';
       for (let i = 0; i < e.results.length; i++) text += e.results[i][0].transcript;
+      if (text.trim().length > 0) spokeRef.current = true;
       onChange(baseRef.current + text);
     };
     rec.onerror = (e: any) => {
       setListening(false);
+      failedRef.current = true;
       if (e.error === 'not-allowed') {
         setError(tr('Mikrofon izni verilmedi. Adres çubuğundaki kilit simgesinden açabilirsin.',
                     'Microphone permission was denied. You can allow it from the padlock in the address bar.'));
@@ -72,7 +79,12 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
         setError(tr('Ses algılanamadı.', 'Could not capture audio.'));
       }
     };
-    rec.onend = () => setListening(false);
+    // Konuşma bitince yazımı kendiliğinden düzeltiriz. Sesle not tutan herkes
+    // zaten bunu istiyor; ayrıca bir düğmeye basmasını beklemenin anlamı yok.
+    rec.onend = () => {
+      setListening(false);
+      if (spokeRef.current && !failedRef.current) tidy();
+    };
 
     recRef.current = rec;
     try {
@@ -86,9 +98,12 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
   const stopListening = () => {
     try { recRef.current?.stop(); } catch { /* zaten durmuş */ }
     setListening(false);
+    // Düzeltme onend'de başlıyor; arada bir kare "Yazımı düzelt" bağlantısı
+    // görünmesin diye durumu şimdiden alıyoruz.
+    if (spokeRef.current && !failedRef.current) setTidying(true);
   };
 
-  const tidy = async () => {
+  async function tidy() {
     const text = valueRef.current.trim();
     if (text.length < 2) return;
     setTidying(true);
@@ -109,7 +124,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
     } finally {
       setTidying(false);
     }
-  };
+  }
 
   const undo = () => {
     if (before == null) return;
@@ -144,22 +159,40 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
           </button>
         )}
 
-        <button type="button" onClick={tidy} disabled={tidying || value.trim().length < 2}
-          style={{ ...chip, opacity: tidying || value.trim().length < 2 ? 0.4 : 1 }}>
-          {tidying ? <Loader className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
-          {tr('Düzelt', 'Tidy up')}
-        </button>
-
-        {before != null && (
-          <button type="button" onClick={undo} style={{ ...chip, color: '#a78bfa' }}>
-            <Undo2 className="w-3.5 h-3.5" />
-            {tr('Geri al', 'Undo')}
+        {/* Dikte bitince düzeltme kendiliğinden olur. Bu bağlantı yazarak not
+            tutan için: adı ne yaptığını söylüyor, "Düzelt" ise söylemiyordu. */}
+        {!listening && !tidying && before == null && value.trim().length > 1 && (
+          <button type="button" onClick={tidy}
+            className="flex items-center gap-1.5 text-[12.5px]"
+            style={{ color: 'rgba(255,255,255,0.4)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#a78bfa'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+            <Wand2 className="w-3.5 h-3.5" />
+            {tr('Yazımı düzelt', 'Fix the writing')}
           </button>
         )}
 
         {listening && (
-          <span className="text-[12px]" style={{ color: '#f87171' }}>
+          <span className="flex items-center gap-1.5 text-[12.5px]" style={{ color: '#f87171' }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#f87171' }} />
             {tr('Dinliyor…', 'Listening…')}
+          </span>
+        )}
+
+        {tidying && (
+          <span className="flex items-center gap-1.5 text-[12.5px]" style={{ color: '#a78bfa' }}>
+            <Loader className="w-3.5 h-3.5 animate-spin" />
+            {tr('Yazım düzeltiliyor…', 'Fixing the writing…')}
+          </span>
+        )}
+
+        {before != null && !tidying && (
+          <span className="flex items-center gap-3 text-[12.5px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            {tr('Yazım düzeltildi', 'Writing tidied')}
+            <button type="button" onClick={undo} className="flex items-center gap-1.5" style={{ color: '#a78bfa' }}>
+              <Undo2 className="w-3.5 h-3.5" />
+              {tr('Geri al', 'Undo')}
+            </button>
           </span>
         )}
       </div>
