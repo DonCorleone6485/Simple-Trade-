@@ -14,22 +14,43 @@ const supabase = createClient(
  */
 const hash = (key: string) => createHash('sha256').update(key).digest('hex');
 
-/** Tarayıcıdan gelen Clerk oturumunu doğrular; kimse başkasının adına anahtar üretemesin. */
-async function requireUser(req: any): Promise<string | null> {
+/**
+ * Tarayıcıdan gelen Clerk oturumunu doğrular; kimse başkasının adına anahtar
+ * üretemesin. Sunucu anahtarı eksik ya da yanlış ortamınsa, bunu "yetkisiz"
+ * diye göstermek yanıltıcı olur — ayrı bir hata döneriz ki neyin eksik olduğu
+ * belli olsun.
+ */
+type AuthResult = { userId: string } | { error: 'unconfigured' | 'unauthorized' };
+
+async function requireUser(req: any): Promise<AuthResult> {
+  const secret = process.env.CLERK_SECRET_KEY;
+  if (!secret) return { error: 'unconfigured' };
+
   const auth = req.headers.authorization || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  if (!token) return null;
+  if (!token) return { error: 'unauthorized' };
   try {
-    const claims = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY! });
-    return claims.sub || null;
+    const claims = await verifyToken(token, { secretKey: secret });
+    return claims.sub ? { userId: claims.sub } : { error: 'unauthorized' };
   } catch {
-    return null;
+    // Anahtar yanlış ortamın (sk_test ile canlı oturum) olabilir; ikisini
+    // buradan ayırt edemeyiz ama en azından ipucunu veririz.
+    return { error: 'unauthorized' };
   }
 }
 
 export default async function handler(req: any, res: any) {
-  const userId = await requireUser(req);
-  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  const auth = await requireUser(req);
+  if ('error' in auth) {
+    if (auth.error === 'unconfigured') {
+      return res.status(503).json({
+        error: 'CLERK_SECRET_KEY is not set on the server',
+        hint: 'Add it in the hosting project settings and redeploy.',
+      });
+    }
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const userId = auth.userId;
 
   // ── Listele ──
   if (req.method === 'GET') {
