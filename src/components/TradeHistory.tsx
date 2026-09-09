@@ -11,6 +11,7 @@ import {
 import MTFAnalysis, { MTFAnalysisView } from './MTFAnalysis';
 import Checklist, { ChecklistView } from './Checklist';
 import SetupPicker from './SetupPicker';
+import NoteField from './NoteField';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../lib/supabase';
@@ -1040,11 +1041,11 @@ export default function TradeHistory({
               <div key={kind} className="space-y-5">
                 <div>
                   <label style={lbl}>{kind === 'pre' ? t('preTrade') : t('postTrade')} {t('notes')}</label>
-                  <textarea style={{ ...inp, height: '190px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
+                  <NoteField style={inp}
                     value={(kind === 'pre' ? editForm.preTradeNotes : editForm.postTradeNotes) || ''}
-                    onChange={e => setEditForm(f => kind === 'pre'
-                      ? { ...f, preTradeNotes: e.target.value }
-                      : { ...f, postTradeNotes: e.target.value })}
+                    onChange={v => setEditForm(f => kind === 'pre'
+                      ? { ...f, preTradeNotes: v }
+                      : { ...f, postTradeNotes: v })}
                     placeholder={kind === 'pre' ? t('preNotesPlaceholder') : t('postNotesPlaceholder')} />
                 </div>
 

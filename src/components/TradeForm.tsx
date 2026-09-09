@@ -8,6 +8,7 @@ import { Trade, MTFEntry, TradeResult, OrderType, ChecklistItem } from '../types
 import MTFAnalysis from './MTFAnalysis';
 import Checklist from './Checklist';
 import SetupPicker from './SetupPicker';
+import NoteField from './NoteField';
 import { useLanguage } from '../context/LanguageContext';
 import { input as uiInput, label as uiLabel, surface, hairline, sectionLabel, primaryBtn, TRANSITION } from '../lib/ui';
 import { useUser } from '@clerk/clerk-react';
@@ -528,9 +529,8 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
           <div className="space-y-6">
             <div>
               <label style={lbl}>{t('notes')} <span style={optHint}>({t('optionalLabel')})</span></label>
-              <textarea value={preNotes} onChange={e => setPreNotes(e.target.value)}
-                style={{ ...inp, height: '200px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
-                placeholder={t('preNotesPlaceholder')} />
+              <NoteField value={preNotes} onChange={setPreNotes} height="200px"
+                style={inp} placeholder={t('preNotesPlaceholder')} />
             </div>
             <div>
               <label style={lbl}>{t('photos')} <span style={optHint}>({t('optionalLabel')})</span></label>
@@ -544,9 +544,8 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
           <div className="space-y-6">
             <div>
               <label style={lbl}>{t('notes')}{isClosed && <Req />}</label>
-              <textarea required={isClosed} value={postNotes} onChange={e => setPostNotes(e.target.value)}
-                style={{ ...inp, height: '200px', resize: 'vertical', padding: '14px', lineHeight: 1.65 }}
-                placeholder={t('postNotesPlaceholder')} />
+              <NoteField value={postNotes} onChange={setPostNotes} height="200px"
+                style={inp} placeholder={t('postNotesPlaceholder')} />
             </div>
             <div>
               <label style={lbl}>{t('photos')} <span style={optHint}>({t('optionalLabel')})</span></label>
