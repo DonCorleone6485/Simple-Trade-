@@ -252,7 +252,7 @@ bool Send(const string json, const int count)
    // StringToCharArray sona bir sıfır bayt ekler; onu göndermemek gerekir,
    // yoksa sunucu gövdeyi bozuk JSON olarak görür.
    int len = StringToCharArray(json, post, 0, WHOLE_ARRAY, CP_UTF8) - 1;
-   if(len < 0) return;
+   if(len < 0) return(false);
    ArrayResize(post, len);
 
    ResetLastError();
