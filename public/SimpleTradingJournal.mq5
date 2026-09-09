@@ -15,11 +15,15 @@
 #property version   "1.00"
 #property strict
 
-input string ApiKey       = "";                                  // Journal anahtarı (stj_...)
-input string ServerUrl    = "https://www.simpletradejournal.io";  // Sunucu adresi
-input int    PollSeconds  = 30;                                   // Kaç saniyede bir kontrol edilsin
-input int    HistoryDays  = 30;                                   // İlk açılışta kaç günlük geçmiş taransın
-input bool   Verbose      = true;                                 // Günlüğe ayrıntı yaz
+// Girdi etiketleri MQL5'te yorum satırından gelir ve ekranda öyle görünür.
+// Site dokuz dilde, EA ise tek dosya: etiketi bir dile çevirmek geri kalan
+// sekizinde kurulum adımlarıyla uyumsuz hale getirir. Değişken adları her
+// dilde aynı olduğu için etiket olarak onları kullanıyoruz.
+input string ApiKey       = "";                                   // ApiKey  (stj_...)
+input string ServerUrl    = "https://www.simpletradejournal.io";  // ServerUrl
+input int    PollSeconds  = 30;                                   // PollSeconds
+input int    HistoryDays  = 30;                                   // HistoryDays
+input bool   Verbose      = true;                                 // Verbose
 
 // Bu oturumda gönderilmiş pozisyonlar. Sunucu zaten aynı pozisyonu ikinci kez
 // eklemez; bu liste sadece boşuna istek atmamak için.
