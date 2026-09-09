@@ -210,21 +210,26 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
         <ol className="space-y-5">
           {[
             {
-              t: tr('MetaTrader\'da izin ver', 'Allow the connection in MetaTrader'),
-              d: tr('Araçlar → Seçenekler → Uzman Danışmanlar sekmesi. "Listelenen URL\'ler için WebRequest\'e izin ver" kutusunu işaretle ve alttaki listeye şu adresi ekle:',
-                    'Tools → Options → Expert Advisors. Tick "Allow WebRequest for listed URL" and add this address to the list below:'),
+              t: tr('Dosyayı indir', 'Download the file'),
+              d: tr('MetaTrader\'da Dosya → Veri Klasörünü Aç. Açılan pencerede MQL5 → Experts klasörüne gir ve indirdiğin dosyayı içine at.',
+                    'In MetaTrader open File → Open Data Folder, go into MQL5 → Experts, and drop the downloaded file in.'),
+              download: '/SimpleTradingJournal.ex5',
+            },
+            {
+              t: tr('İzin ver', 'Allow the connection'),
+              d: tr('Araçlar → Seçenekler → Uzman Danışmanlar sekmesi. "Listelenen URL\'ler için WebRequest\'e izin ver" kutusunu işaretle, alttaki listeye şu adresi ekle:',
+                    'Tools → Options → Expert Advisors. Tick "Allow WebRequest for listed URL" and add this address to the list:'),
               code: 'https://www.simpletradejournal.io',
             },
             {
-              t: tr('Eklentiyi kur', 'Install the add-on'),
-              d: tr('Dosyayı indir ve MetaTrader\'da Dosya → Veri Klasörünü Aç → MQL5 → Experts içine koy. MetaEditor\'de aç, F7 ile derle. Sonra MetaTrader\'da Gezgin panelinden herhangi bir grafiğe sürükle.',
-                    'Download it, then in MetaTrader open File → Open Data Folder → MQL5 → Experts and drop it in. Open it in MetaEditor and compile with F7. Then drag it onto any chart from the Navigator.'),
-              download: '/SimpleTradingJournal.mq5',
+              t: tr('MetaTrader\'ı yeniden başlat', 'Restart MetaTrader'),
+              d: tr('Kapat, tekrar aç. Soldaki Kılavuz panelinde Uzman Danışmanlar altında SimpleTradingJournal görünecek.',
+                    'Close it and open it again. SimpleTradingJournal will appear under Expert Advisors in the Navigator panel on the left.'),
             },
             {
-              t: tr('Anahtarı yapıştır', 'Paste the key'),
-              d: tr('Eklenti grafiğe eklenirken açılan ayar penceresinde yukarıdaki anahtarı ilgili alana yapıştır. Hepsi bu — kapanan işlemler birkaç saniye içinde journal\'a düşer.',
-                    'In the settings window that opens, paste the key above. That is all — closed trades reach the journal within seconds.'),
+              t: tr('Grafiğe sürükle ve anahtarı yapıştır', 'Drag it onto a chart and paste the key'),
+              d: tr('SimpleTradingJournal\'ı herhangi bir grafiğe sürükle. Açılan pencerede Girdiler sekmesine geç, ApiKey satırına yukarıdaki anahtarı yapıştır, Tamam. Grafiğin sol üstünde durum yazısı belirir — orada ne olduğunu görürsün.',
+                    'Drag SimpleTradingJournal onto any chart. In the window that opens, go to the Inputs tab, paste the key above into ApiKey, and click OK. A status line appears at the top-left of the chart telling you what is happening.'),
             },
           ].map((s: { t: string; d: string; code?: string; download?: string }, i: number) => (
             <li key={i} className="flex gap-4">
@@ -245,13 +250,19 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                     className="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full text-sm font-medium"
                     style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
                     <Download className="w-4 h-4" />
-                    SimpleTradingJournal.mq5
+                    SimpleTradingJournal.ex5
                   </a>
                 )}
               </div>
             </li>
           ))}
         </ol>
+        <p className="text-[13px] leading-relaxed mt-6 pt-5" style={{ color: 'rgba(255,255,255,0.3)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          {tr(
+            'Mac kullanıyorsan "Veri Klasörünü Aç" bazı sürümlerde çalışmaz. O zaman Finder\'da Git → Klasöre Git ile şuraya gidebilirsin: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts',
+            'On a Mac, "Open Data Folder" does not work in some builds. In Finder use Go → Go to Folder and paste: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts'
+          )}
+        </p>
       </div>
     </div>
   );

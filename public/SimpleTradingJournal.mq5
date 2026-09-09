@@ -25,12 +25,27 @@ input bool   Verbose      = true;                                 // Günlüğe 
 // eklemez; bu liste sadece boşuna istek atmamak için.
 long     g_sent[];
 datetime g_scanFrom = 0;
+int      g_total    = 0;   // bu oturumda gönderilen pozisyon sayısı
+string   g_status   = "";  // grafiğe yazılan son durum
+
+/**
+ * Durum grafiğin sol üst köşesinde durur.
+ *
+ * Kurulumu yapan kişinin "Araç kutusu > Uzmanlar" sekmesini bilmesi
+ * gerekmesin: çalışıyor mu, ne eksik, kaç işlem gitti — hepsi ekranda.
+ */
+void Status(const string text)
+  {
+   g_status = text;
+   Comment("Simple Trading Journal\n", text);
+  }
 
 //+------------------------------------------------------------------+
 int OnInit()
   {
    if(StringLen(ApiKey) < 8)
      {
+      Status("Anahtar girilmemiş.\nSitede journal > MetaTrader sekmesinden anahtar oluştur,\nsonra bu EA'ya sag tikla > Ozellikler > Girdiler > ApiKey.");
       Print("HATA: ApiKey boş. Journal'daki MetaTrader sekmesinden anahtar oluşturup buraya yapıştır.");
       return(INIT_FAILED);
      }
@@ -39,12 +54,14 @@ int OnInit()
    ArrayResize(g_sent, 0);
 
    EventSetTimer(PollSeconds < 5 ? 5 : PollSeconds);
+   Status("Baglandi. Son " + IntegerToString(HistoryDays) + " gun taraniyor...");
    Print("Simple Trading Journal bağlandı. İlk tarama: son ", HistoryDays, " gün.");
    Scan();
+   if(g_total == 0) Status("Calisiyor. Yeni kapanan islem bekleniyor.");
    return(INIT_SUCCEEDED);
   }
 
-void OnDeinit(const int reason) { EventKillTimer(); }
+void OnDeinit(const int reason) { EventKillTimer(); Comment(""); }
 
 void OnTimer() { Scan(); }
 
@@ -262,10 +279,16 @@ bool Send(const string json, const int count)
      {
       int err = GetLastError();
       if(err == 4014)
+        {
+         Status("Izin yok.\nAraclar > Secenekler > Uzman Danismanlar sekmesinde\n\"Listelenen URL'ler icin WebRequest'e izin ver\" kutusunu isaretle\nve listeye ekle: " + ServerUrl);
          Print("HATA: WebRequest'e izin verilmemiş. Araçlar > Seçenekler > Uzman Danışmanlar sekmesinde ",
                ServerUrl, " adresini listeye ekle.");
+        }
       else
+        {
+         Status("Baglanti kurulamadi (hata " + IntegerToString(err) + "). Internet baglantisini kontrol et.");
          Print("HATA: istek gönderilemedi (", err, ").");
+        }
       return(false);
      }
 
@@ -273,11 +296,19 @@ bool Send(const string json, const int count)
 
    if(status != 200)
      {
+      if(status == 401)
+        {
+         Status("Anahtar gecersiz ya da iptal edilmis.\nSiteden yeni anahtar olusturup buraya yapistir.");
+         Print("Anahtar geçersiz ya da iptal edilmiş. Journal'dan yeni anahtar oluştur.");
+        }
+      else
+         Status("Sunucu hatasi (" + IntegerToString(status) + ").");
       Print("HATA ", status, ": ", body);
-      if(status == 401) Print("Anahtar geçersiz ya da iptal edilmiş. Journal'dan yeni anahtar oluştur.");
       return(false);
      }
 
+   g_total += count;
+   Status("Calisiyor. Bu oturumda gonderilen islem: " + IntegerToString(g_total));
    if(Verbose) Print(count, " pozisyon gönderildi -> ", body);
    return(true);
   }
