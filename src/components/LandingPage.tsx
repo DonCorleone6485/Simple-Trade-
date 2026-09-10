@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import {
   TrendingUp, BookOpen, BarChart2, CalendarDays, Target, Sparkles, Upload,
-  Check, ChevronDown, ArrowRight, Shield, Globe,
+  Check, ChevronDown, ArrowRight, Shield, Globe, Zap, Mic, ListChecks, Clock,
+  Newspaper, Wallet,
 } from 'lucide-react';
 import {
   AreaChart, Area, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip,
@@ -88,74 +89,167 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
     },
     {
       icon: <Target className="w-5 h-5" />,
-      title: t('Hesap Ver', 'Stay Accountable', 'پاسخگو باشید'),
+      title: t('Gelişimini Ölç', 'Measure the Progress', 'پیشرفت را بسنجید'),
       desc: t(
-        'Her işlemden sonra ne düşündüğünü not al. Aynı hatayı üçüncü kez yapmadan önce, ikincisini hatırla.',
-        'Write down what you were thinking after every trade. Remember mistake two before you make it a third time.',
-        'بعد از هر معامله، افکار خود را یادداشت کنید.'
+        'Bu ay geçen aydan iyi miydi? Aylık kırılım, seriler ve disiplin sayıları cevabı tahmine bırakmaz.',
+        'Was this month better than the last? A monthly breakdown, streaks and discipline figures answer that without guesswork.',
+        'آیا این ماه بهتر از ماه قبل بود؟ تفکیک ماهانه پاسخ را می‌دهد.'
       ),
     },
   ];
 
-  const features = [
+  /**
+   * Özellikler üç kümede: kaydetmek, görmek, sürdürmek. Tek bir uzun ızgara
+   * hepsini eşit ağırlıkta gösteriyordu; kümelenince sayfanın anlattığı sıra
+   * ortaya çıkıyor — önce işlem kendiliğinden gelir, sonra sayıya döner,
+   * sonra alışkanlığa.
+   */
+  const featureGroups = [
     {
-      icon: <BookOpen className="w-5 h-5" />,
-      title: t('Her İşlem, Eksiksiz Kayıtlı', 'Every Trade, Fully Logged', 'هر معامله، کاملاً ثبت‌شده'),
-      desc: t(
-        'Sembol, yön, timeframe, setup, risk/kazanç ve R/R — işleme girmeden önce ve çıktıktan sonra not al, ekran görüntüsü ekle.',
-        'Symbol, direction, timeframe, setup, risk/reward and R/R — write notes and attach screenshots before and after every trade.',
-        'نماد، جهت، تایم‌فریم، ستاپ و ریسک/ریوارد را ثبت کنید.'
-      ),
-      span: 'lg:col-span-2',
-      accent: '#8b5cf6',
+      label: t('Kaydet', 'Capture', 'ثبت'),
+      title: t('İşlemler kendiliğinden gelsin', 'Let the trades arrive on their own', 'معاملات خودشان بیایند'),
+      items: [
+        {
+          icon: <Zap className="w-5 h-5" />,
+          title: t('MetaTrader 5 Bağlantısı', 'MetaTrader 5 Connection', 'اتصال متاتریدر ۵'),
+          desc: t(
+            'Uzman danışmanı bir kez kur; kapanan her işlem journal\'ına kendiliğinden düşsün. Bir yıllık geçmişini de getirir.',
+            'Install the expert advisor once; every closed trade lands in your journal by itself — and it brings a year of history with it.',
+            'یک بار اکسپرت را نصب کنید؛ هر معامله بسته‌شده خودش در ژورنال ثبت می‌شود.'
+          ),
+          span: 'lg:col-span-2',
+          accent: '#8b5cf6',
+        },
+        {
+          icon: <Upload className="w-5 h-5" />,
+          title: t('Altı Platformdan İçe Aktar', 'Import From Six Platforms', 'ورود از شش پلتفرم'),
+          desc: t(
+            'MT5, MT4, cTrader, TradeLocker, DXtrade, Match-Trader raporunu yükle. Tanınmayan bir dosyada sütunları kendin eşle; aynı işlem ikinci kez eklenmez.',
+            'Upload a report from MT5, MT4, cTrader, TradeLocker, DXtrade or Match-Trader. Map the columns yourself if the file is unfamiliar — nothing is ever added twice.',
+            'گزارش شش پلتفرم را آپلود کنید؛ هیچ معامله‌ای دوبار اضافه نمی‌شود.'
+          ),
+          span: 'lg:col-span-2',
+          accent: '#f87171',
+        },
+        {
+          icon: <Mic className="w-5 h-5" />,
+          title: t('Konuşarak Not Al', 'Dictate Your Notes', 'یادداشت را با صدا بگویید'),
+          desc: t(
+            'Mikrofona konuş, bitir — yazım kendiliğinden toparlanır. Order Block, FVG, CHoCH gibi terimleri doğru yazar; ücretsiz.',
+            'Talk into the microphone and stop — the writing tidies itself. It knows the terms, too: Order Block, FVG, CHoCH. Free.',
+            'با میکروفون صحبت کنید؛ نگارش خودش مرتب می‌شود و اصطلاحات را درست می‌نویسد.'
+          ),
+          span: 'lg:col-span-2',
+          accent: '#22d3ee',
+        },
+        {
+          icon: <BookOpen className="w-5 h-5" />,
+          title: t('Öncesi ve Sonrası', 'Before and After', 'قبل و بعد'),
+          desc: t(
+            'Sembol, yön, timeframe, risk ve R/R — üstüne girmeden önce ne düşündüğün, çıktıktan sonra ne öğrendiğin, ekran görüntüleriyle.',
+            'Symbol, direction, timeframe, risk and R/R — plus what you were thinking before you entered and what you learned after, with screenshots.',
+            'نماد، جهت، ریسک و R/R — همراه با افکار قبل و درس بعد از معامله.'
+          ),
+          span: 'lg:col-span-2',
+          accent: '#a78bfa',
+        },
+      ],
     },
     {
-      icon: <BarChart2 className="w-5 h-5" />,
-      title: t('Verinin Arkasındaki Gerçek', 'The Truth Behind the Numbers', 'حقیقت پشت اعداد'),
-      desc: t(
-        'Kazanma oranı, profit factor, en iyi/en kötü işlem, seri analizleri ve kümülatif PnL grafiği — tek bakışta.',
-        'Win rate, profit factor, best/worst trade, streak analysis and a cumulative PnL chart — at a glance.',
-        'نرخ برد، فاکتور سود و تحلیل سری‌ها را در یک نگاه ببینید.'
-      ),
-      span: 'lg:col-span-2',
-      accent: '#10b981',
+      label: t('Gör', 'See', 'ببینید'),
+      title: t('Neyin işe yaradığını sayılarla gör', 'See what works, in numbers', 'با اعداد ببینید چه چیزی کار می‌کند'),
+      items: [
+        {
+          icon: <BarChart2 className="w-5 h-5" />,
+          title: t('Verinin Arkasındaki Gerçek', 'The Truth Behind the Numbers', 'حقیقت پشت اعداد'),
+          desc: t(
+            'Beklenen değer, profit factor, payoff oranı, ortalama kazanç ve kayıp, en uzun seriler ve kümülatif PnL — tek bakışta.',
+            'Expectancy, profit factor, payoff ratio, average win and loss, longest streaks and cumulative PnL — at a glance.',
+            'ارزش مورد انتظار، فاکتور سود، میانگین برد و باخت و سود انباشته — در یک نگاه.'
+          ),
+          span: 'lg:col-span-2',
+          accent: '#10b981',
+        },
+        {
+          icon: <CalendarDays className="w-5 h-5" />,
+          title: t('Takvimde Örüntün', 'Your Calendar Pattern', 'الگوی تقویم شما'),
+          desc: t('Günlük kâr/zarara göre renklenen takvim — hangi günler sana yarıyor, hemen belli olur.', 'A calendar colored by daily P&L — the days that suit you become obvious.', 'تقویمی که بر اساس سود و زیان روزانه رنگ می‌شود.'),
+          span: '',
+          accent: '#34d399',
+        },
+        {
+          icon: <Wallet className="w-5 h-5" />,
+          title: t('Hesabın Nereye Gitti', 'Where the Account Went', 'حساب به کجا رسید'),
+          desc: t('Başlangıç sermayenden bugüne bakiye, getiri yüzdesi, aylık kırılım ve yön bazlı performans.', 'Balance from your starting capital to today, return percentage, a monthly breakdown and long-vs-short performance.', 'مانده، درصد بازده و تفکیک ماهانه.'),
+          span: '',
+          accent: '#fbbf24',
+        },
+        {
+          icon: <Sparkles className="w-5 h-5" />,
+          title: t('Yapay Zeka Koçun', 'Your AI Coach', 'مربی هوش مصنوعی شما'),
+          desc: t('Tüm geçmişini AI ile analiz et — güçlü yönlerini, sızdıran yerleri ve kişisel önerileri al.', 'Analyze your whole history with AI — strengths, leaks and personal recommendations.', 'تاریخچه خود را با هوش مصنوعی تحلیل کنید.'),
+          span: 'lg:col-span-2',
+          accent: '#a78bfa',
+          pro: true,
+        },
+      ],
     },
     {
-      icon: <CalendarDays className="w-5 h-5" />,
-      title: t('Takvimde Örüntünü Gör', 'See Your Calendar Pattern', 'الگوی خود را در تقویم ببینید'),
-      desc: t('Günlük kâr/zarara göre renklenen takvim — hangi günler seni yoruyor, hemen belli olur.', 'A calendar color-coded by daily P&L — which days wear you down becomes obvious.', 'تقویمی که بر اساس سود و زیان روزانه رنگ می‌شود.'),
-      span: '',
-      accent: '#34d399',
-    },
-    {
-      icon: <Target className="w-5 h-5" />,
-      title: t('Kuralların, İhlallerin Görünür', 'Your Rules, Your Violations', 'قوانین و نقض‌های شما'),
-      desc: t('Aylık hedef, max risk, işlem yasağı saatleri belirle — sınırı aştığında sistem sana söylesin.', 'Set monthly goals, max risk and no-trade hours — the system flags it the moment you cross a line.', 'اهداف ماهانه و حداکثر ریسک را تعیین کنید.'),
-      span: '',
-      accent: '#fbbf24',
-    },
-    {
-      icon: <Sparkles className="w-5 h-5" />,
-      title: t('Yapay Zeka Koçun', 'Your AI Coach', 'مربی هوش مصنوعی شما'),
-      desc: t('Tüm trade geçmişini AI ile analiz et — güçlü/zayıf yönlerini ve kişisel önerilerini al.', 'Analyze your entire trade history with AI — get strengths, weaknesses and personal recommendations.', 'تاریخچه معاملات خود را با هوش مصنوعی تحلیل کنید.'),
-      span: '',
-      accent: '#a78bfa',
-      pro: true,
-    },
-    {
-      icon: <Upload className="w-5 h-5" />,
-      title: t('Geçmişini Bir Tıkla Aktar', 'Import Your History in One Click', 'تاریخچه خود را با یک کلیک وارد کنید'),
-      desc: t('Broker\'ından aldığın işlem geçmişi raporunu yükle, işlemlerin otomatik olarak journal\'ına eklensin.', 'Upload the trade history your broker gives you and every trade lands in your journal automatically.', 'گزارش تاریخچه معاملات کارگزار خود را آپلود کنید.'),
-      span: '',
-      accent: '#f87171',
+      label: t('Sürdür', 'Keep it up', 'ادامه دهید'),
+      title: t('Kazandıran davranışı tekrar et', 'Repeat the behaviour that pays', 'رفتاری که سود می‌دهد را تکرار کنید'),
+      items: [
+        {
+          icon: <ListChecks className="w-5 h-5" />,
+          title: t('Kendi Checklist\'in', 'Your Own Checklist', 'چک‌لیست خودتان'),
+          desc: t(
+            'Kurulumların için ayrı listeler tut, adlandır. İşlem açarken hangisini kullanacağını seç — seçtiğin liste o journal\'da kalır.',
+            'Keep a separate named list for each setup. Pick one as you open a trade — it stays with that journal.',
+            'برای هر ستاپ فهرست جداگانه بسازید و هنگام ثبت معامله یکی را انتخاب کنید.'
+          ),
+          span: 'lg:col-span-2',
+          accent: '#60a5fa',
+        },
+        {
+          icon: <Shield className="w-5 h-5" />,
+          title: t('Disiplin', 'Discipline', 'انضباط'),
+          desc: t(
+            'İntikam işlemi, aşırı işlem, riski büyütme, alışılmış saatlerin dışı — dört alışkanlık, hepsi zaten girdiğin veriden çıkıyor. Ayrıca bir şey doldurmuyorsun.',
+            'Revenge trades, overtrading, raising the stake, drifting outside your usual hours — four habits, all read from the data you already entered.',
+            'چهار عادت رفتاری از همان داده‌های موجود استخراج می‌شود.'
+          ),
+          span: 'lg:col-span-2',
+          accent: '#f472b6',
+        },
+        {
+          icon: <Clock className="w-5 h-5" />,
+          title: t('Seans Saatleri', 'Session Clock', 'ساعت سشن‌ها'),
+          desc: t('Sydney, Tokyo, Londra, New York — hangisi açık, hangisi kaç saat sonra açılıyor.', 'Sydney, Tokyo, London, New York — which one is open, and how long until the next.', 'کدام سشن باز است و بعدی چه زمانی باز می‌شود.'),
+          span: '',
+          accent: '#38bdf8',
+        },
+        {
+          icon: <Newspaper className="w-5 h-5" />,
+          title: t('Günün Haberleri', 'Today\'s News', 'اخبار امروز'),
+          desc: t('Yüksek etkili ekonomik takvim — ve işlemlerinin haber saatine denk gelip gelmediği.', 'A high-impact economic calendar — and whether your trades land on the news.', 'تقویم اقتصادی و اینکه معاملات شما به زمان خبر می‌خورد یا نه.'),
+          span: '',
+          accent: '#fb923c',
+        },
+        {
+          icon: <Target className="w-5 h-5" />,
+          title: t('Kuralların ve Hedeflerin', 'Your Rules and Targets', 'قوانین و اهداف شما'),
+          desc: t('Aylık hedef, maksimum risk, işlem yasağı saatleri — sınırı aştığında sistem sana söylesin.', 'Monthly targets, maximum risk, no-trade hours — the system tells you the moment you cross a line.', 'اهداف ماهانه و حداکثر ریسک را تعیین کنید.'),
+          span: 'lg:col-span-2',
+          accent: '#facc15',
+        },
+      ],
     },
   ];
 
   const steps = [
     { n: '01', title: t('Journal Oluştur', 'Create a Journal', 'یک ژورنال بسازید'), desc: t('Başlangıç sermayeni ve tarihi gir, hesabını tanımla.', 'Set your starting capital and date to define your account.', 'سرمایه اولیه و تاریخ را وارد کنید.') },
-    { n: '02', title: t('İşlemlerini Gir', 'Log Your Trades', 'معاملات خود را ثبت کنید'), desc: t('Tek tek kaydet ya da broker raporunu tek seferde aktar.', 'Log them one by one, or import your broker\'s report in one go.', 'یک به یک ثبت کنید یا گزارش کارگزار را وارد کنید.') },
+    { n: '02', title: t('İşlemleri Bağla', 'Bring the Trades In', 'معاملات را وارد کنید'), desc: t('MetaTrader\'ı bağla ve kendiliğinden gelsin, raporunu yükle ya da tek tek kaydet.', 'Connect MetaTrader and let them arrive by themselves, upload a report, or log them one by one.', 'متاتریدر را وصل کنید، گزارش را آپلود کنید یا دستی ثبت کنید.') },
     { n: '03', title: t('Örüntünü İncele', 'Review Your Patterns', 'الگوهای خود را بررسی کنید'), desc: t('İstatistikler, takvim ve grafiklerle nerede güçlü nerede zayıf olduğunu gör.', 'See where you\'re strong and where you leak, through stats, calendar and charts.', 'با آمار و نمودارها نقاط قوت و ضعف را ببینید.') },
-    { n: '04', title: t('Kurallarına Uy, Geliş', 'Follow the Rules, Improve', 'به قوانین پایبند باشید و پیشرفت کنید'), desc: t('Hedef koy, ihlalleri takip et, her ay bir öncekinden daha disiplinli ol.', 'Set goals, track violations, be more disciplined every month than the last.', 'اهداف تعیین کنید و نقض‌ها را دنبال کنید.') },
+    { n: '04', title: t('Tekrar Et', 'Repeat What Works', 'آنچه کار می‌کند را تکرار کنید'), desc: t('Checklist\'ini kur, disiplin sayılarına bak, kazandıran davranışı alışkanlığa çevir.', 'Set up your checklist, watch the discipline figures, and turn the behaviour that pays into a habit.', 'چک‌لیست خود را بسازید و رفتار سودده را به عادت تبدیل کنید.') },
   ];
 
   const faqs = [
@@ -177,7 +271,15 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
     },
     {
       q: t('İçe aktarma nasıl çalışır?', 'How does importing work?', 'وارد کردن چگونه کار می‌کند؟'),
-      a: t('Broker\'ından indirdiğin dosyayı yükle — MetaTrader raporu (HTML) ya da CSV olabilir. Platform otomatik tanınır ve işlemlerin seçtiğin journal\'a eklenir; tek tek elle girmene gerek kalmaz.', 'Upload the file your broker gives you — a MetaTrader report (HTML) or a CSV. The platform is detected automatically and every trade is added to the journal you pick, with no manual re-entry.', 'فایلی که کارگزار به شما می‌دهد آپلود کنید — گزارش متاتریدر (HTML) یا CSV.'),
+      a: t('Broker\'ından indirdiğin dosyayı yükle — MT5, MT4, cTrader, TradeLocker, DXtrade ve Match-Trader raporları (HTML ya da CSV) tanınır. Tanımadığı bir dosyada sütunları kendin eşlersin. Aynı raporu tekrar yüklersen sadece yeni işlemler eklenir.', 'Upload the file your broker gives you — reports from MT5, MT4, cTrader, TradeLocker, DXtrade and Match-Trader (HTML or CSV) are recognised. If a file is unfamiliar you map the columns yourself. Re-upload the same report and only the new trades are added.', 'گزارش شش پلتفرم شناخته می‌شود و اگر فایل ناشناس باشد ستون‌ها را خودتان تطبیق می‌دهید.'),
+    },
+    {
+      q: t('İşlemlerim MetaTrader\'dan otomatik gelebilir mi?', 'Can my trades arrive from MetaTrader automatically?', 'آیا معاملات به‌طور خودکار از متاتریدر می‌آیند؟'),
+      a: t('Evet. Hazır uzman danışmanı (.ex5) indirip bir grafiğe sürüklüyorsun, anahtarını yapıştırıyorsun — kapanan her işlem journal\'ına kendiliğinden düşüyor. İlk kurulumda bir yıllık geçmişini de getiriyor. Derleme, kod, ayar yok.', 'Yes. Download the ready-made expert advisor (.ex5), drop it on a chart and paste your key — every closed trade lands in your journal by itself, and the first run brings a year of history with it. No compiling, no code, no settings.', 'بله. اکسپرت آماده را روی چارت بیندازید و کلید خود را وارد کنید.'),
+    },
+    {
+      q: t('Sesli not gerçekten ücretsiz mi?', 'Is the voice note really free?', 'آیا یادداشت صوتی واقعاً رایگان است؟'),
+      a: t('Evet. Konuşmayı tarayıcının kendi tanıması yazıya çeviriyor, yazımı da biz toparlıyoruz — ayrı bir ücret ya da kota yok. Trading terimlerini de bilir: "order bloğu" dediğinde Order Block\'u yazar.', 'Yes. Your browser\'s own recognition turns speech into text and we tidy the writing — no extra charge, no quota. It knows the vocabulary too: say "order block" and it writes Order Block.', 'بله. تشخیص گفتار مرورگر متن را می‌نویسد و ما نگارش را مرتب می‌کنیم.'),
     },
     {
       q: t('Mobil uygulaması var mı?', 'Is there a mobile app?', 'آیا اپلیکیشن موبایل دارید؟'),
@@ -294,27 +396,27 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم ژورنال معاملاتی')}
           </motion.div>
 
-          {/* İki cümlelik başlık. İkincisi cümlenin cevabı — soluk yazılırsa
-              pasif metin gibi okunur; onun yerine biraz küçültüp öne alıyoruz. */}
+          {/* İki cümlelik başlık. Vitrin kayıpla açılmaz: burada söylenen şey
+              iyi işlemin tesadüf olmadığı — ikinci cümle de onun cevabı. */}
           <motion.h1 variants={fadeUp}
             className="font-display text-[2rem] sm:text-5xl lg:text-[4.5rem] leading-[1.06] sm:leading-[1.02] font-medium mb-7"
             style={{ letterSpacing: '-0.035em' }}>
             <span>
-              {t('Her kayıp bir yerde ', 'Every loss repeats ', 'هر ضرر جایی ')}
-              <span style={{ color: '#a78bfa', fontStyle: 'italic' }}>{t('tekrar eder', 'somewhere', 'تکرار می‌شود')}</span>.
+              {t('Kazandıran ne varsa, ', 'Whatever works is ', 'هر چه سود می‌دهد، ')}
+              <span style={{ color: '#a78bfa', fontStyle: 'italic' }}>{t('tekrarlanabilir', 'repeatable', 'تکرارشدنی است')}</span>.
             </span>
             <br />
             <span className="text-[0.82em]" style={{ color: 'rgba(255,255,255,0.72)' }}>
-              {t('Biz o yeri gösteririz.', 'We show you where.', 'ما آن را نشان می‌دهیم.')}
+              {t('Biz onu görünür kılarız.', 'We make it visible.', 'ما آن را نمایان می‌کنیم.')}
             </span>
           </motion.h1>
 
           <motion.p variants={fadeUp} className="text-[17px] sm:text-lg mb-10 max-w-2xl mx-auto leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.5)' }}>
             {t(
-              'İşlemlerini kaydet, istatistiklerini gör, kendi kurallarına uy. Simple Trading Journal, trading\'ini duygudan çıkarıp veriye döker.',
-              'Log your trades, see the statistics, follow your own rules. Simple Trading Journal turns your trading from emotion into data.',
-              'معاملات خود را ثبت کنید، آمار را ببینید و از قوانین خود پیروی کنید.'
+              'İşlemlerin MetaTrader\'dan kendiliğinden gelsin, notunu konuşarak tut, hangi kurulumun kazandırdığını sayılarla gör.',
+              'Let your trades arrive from MetaTrader on their own, dictate your notes out loud, and see in numbers which setup pays.',
+              'معاملات شما به‌طور خودکار از متاتریدر بیاید، یادداشت را با صدا بگویید و ببینید کدام ستاپ سود می‌دهد.'
             )}
           </motion.p>
 
@@ -388,6 +490,20 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               </ResponsiveContainer>
             </motion.div>
           </div>
+
+          {/* Hangi platformlarla çalıştığı ilk ekranda görünsün: logo yığmadan,
+              tek satır. Okuyanın ilk sorusu genelde bu. */}
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: shouldReduceMotion ? 0 : 1.1 }}
+            className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
+            <span className="text-[11px] uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.28)' }}>
+              {t('Şuralardan aktarır', 'Imports from', 'وارد می‌کند از')}
+            </span>
+            {['MetaTrader 5', 'MetaTrader 4', 'cTrader', 'TradeLocker', 'DXtrade', 'Match-Trader'].map(name => (
+              <span key={name} className="text-[13.5px]" style={{ color: 'rgba(255,255,255,0.42)' }}>{name}</span>
+            ))}
+          </motion.div>
         </motion.div>
       </section>
 
@@ -405,7 +521,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               {t('Neden Journal Tutmak İşe Yarar?', 'Why Trade Journaling Works', 'چرا ثبت معاملات مؤثر است؟')}
             </h2>
             <p className="text-[17px] leading-relaxed mt-6 max-w-xl" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              {t('Trading kaybı çoğunlukla kötü bir setup\'tan değil, aynı hatanın fark edilmeden tekrarından gelir.', 'Trading losses usually come not from a bad setup, but from the same mistake repeating unnoticed.', 'ضررهای معاملاتی معمولاً از تکرار ناخودآگاه یک اشتباه می‌آید.')}
+              {t('İyi işlemlerin ortak bir yanı vardır — ama bunu ancak yazılı bir kayıt gösterir. Journal, işe yarayanı görünür kılar; yarına da taşır.', 'Your good trades have something in common — but only a written record shows you what. A journal makes what works visible, and carries it into tomorrow.', 'معاملات خوب شما وجه مشترکی دارند — و فقط یک ثبت مکتوب آن را نشان می‌دهد.')}
             </p>
           </motion.div>
 
@@ -428,37 +544,51 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       <section id="features" className="py-24 sm:py-32 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
-            className="max-w-2xl mb-14">
+            className="max-w-2xl mb-16 sm:mb-20">
             <h2 className="font-display text-[2.1rem] sm:text-[2.6rem] leading-[1.1] font-medium mb-4" style={{ letterSpacing: '-0.03em' }}>
               {t('İhtiyacın Olan Her Araç, Tek Ekranda', 'Every Tool You Need, One Screen', 'هر ابزاری که نیاز دارید، در یک صفحه')}
             </h2>
             <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              {t('Kayıttan analize, hedeften disipline — trading sürecinin her adımı burada.', 'From logging to analysis, from goals to discipline — every step of your process lives here.', 'از ثبت تا تحلیل، هر مرحله در اینجاست.')}
+              {t('İşlem kendiliğinden gelir, sayıya döner, alışkanlığa dönüşür.', 'The trade arrives on its own, becomes a number, then becomes a habit.', 'معامله خودش می‌آید، به عدد تبدیل می‌شود و بعد به عادت.')}
             </p>
           </motion.div>
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={stagger}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            {features.map((f, i) => (
-              <motion.div key={i} variants={fadeUp} whileHover={{ y: shouldReduceMotion ? 0 : -3 }}
-                className={`rounded-2xl p-7 relative h-full ${f.span}`}
-                style={{
-                  background: 'linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
-                  border: '1px solid rgba(255,255,255,0.05)',
-                  boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset',
-                }}>
-                {f.pro && (
-                  <span className="absolute top-5 end-5 px-2 py-0.5 rounded-full text-xs font-semibold"
-                    style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
-                    PRO
-                  </span>
-                )}
-                <div className="mb-5" style={{ color: f.accent }}>{f.icon}</div>
-                <h3 className="text-[16px] font-medium mb-2.5 pe-10" style={{ letterSpacing: '-0.01em' }}>{f.title}</h3>
-                <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{f.desc}</p>
+          {featureGroups.map((group, gi) => (
+            <div key={gi} className={gi > 0 ? 'mt-16 sm:mt-24' : ''}>
+              {/* Küme başlığı: numara yerine sessiz bir etiket, yanında çizgi. */}
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
+                className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-7">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] whitespace-nowrap" style={{ color: '#a78bfa' }}>
+                  {group.label}
+                </span>
+                <h3 className="text-[17px] sm:text-[19px] font-medium" style={{ letterSpacing: '-0.015em' }}>{group.title}</h3>
+                <span className="hidden sm:block flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
               </motion.div>
-            ))}
-          </motion.div>
+
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={stagger}
+                className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                {group.items.map((f, i) => (
+                  <motion.div key={i} variants={fadeUp} whileHover={{ y: shouldReduceMotion ? 0 : -3 }}
+                    className={`rounded-2xl p-7 relative h-full ${f.span}`}
+                    style={{
+                      background: 'linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
+                      border: '1px solid rgba(255,255,255,0.05)',
+                      boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset',
+                    }}>
+                    {f.pro && (
+                      <span className="absolute top-5 end-5 px-2 py-0.5 rounded-full text-xs font-semibold"
+                        style={{ background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
+                        PRO
+                      </span>
+                    )}
+                    <div className="mb-5" style={{ color: f.accent }}>{f.icon}</div>
+                    <h4 className="text-[16px] font-medium mb-2.5 pe-10" style={{ letterSpacing: '-0.01em' }}>{f.title}</h4>
+                    <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{f.desc}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          ))}
         </div>
       </section>
 
