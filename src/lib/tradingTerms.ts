@@ -34,20 +34,40 @@ const SUFFIX = `(?:['’´]?((?:${ATTACHED}){1,4})|\\s(${SPACED}))?`;
 /** Terimden önce harf/rakam olmamalı — "reorder block" yakalanmasın. */
 const LEAD = '(^|[^\\p{L}\\p{N}])';
 
-interface Rule { re: RegExp; canonical: string }
+interface Spec { canonical: string; variants: string[]; suffixes: boolean; trOnly: string[] }
+interface Rule { re: RegExp; canonical: string; apostrophe: boolean }
 
 /**
  * Bir terim kuralı. `variants` küçük harfle yazılmış regex parçalarıdır;
  * aralarındaki boşluk "boşluk, tire ya da bitişik" anlamına gelir, böylece
  * "orderblock" da "order-block" da yakalanır.
  */
-function rule(canonical: string, variants: string[], suffixes = true): Rule {
-  const body = variants.map(v => v.trim().replace(/\s+/g, '[\\s-]*')).join('|');
-  // Ek almayan terimlerde de iki grup duruyor: yerleri sabit kalsın diye boş.
-  const tail = suffixes ? SUFFIX : '()()';
-  // Sonda kesme işareti kalmışsa eşleşmiyoruz: "bloğu'u" gibi bozuk bir metne
-  // ikinci bir ek yapıştırmaktansa hiç dokunmamak daha az zarar verir.
-  return { canonical, re: new RegExp(`${LEAD}(?:${body})${tail}(?![\\p{L}\\p{N}'’´])`, 'giu') };
+function rule(canonical: string, variants: string[], suffixes = true, trOnly: string[] = []): Spec {
+  return { canonical, variants, suffixes, trOnly };
+}
+
+/**
+ * Sözlüğü bir dile göre derler.
+ *
+ * Türkçe ekler yalnız Türkçe metinde aranır: "stop loss ten pips below"
+ * cümlesinde "ten" İngilizce bir kelime, ek değil — Türkçe kuralları
+ * İngilizceye uygularsak "Stop Loss'ten pips" çıkar. İngilizcede ekin yerini
+ * çoğul "s" alır ve kesme işareti kullanılmaz: "order blocks" → "Order Blocks".
+ */
+function compile(specs: Spec[], dialect: 'tr' | 'intl'): Rule[] {
+  return specs.map(sp => {
+    const variants = dialect === 'tr' ? [...sp.variants, ...sp.trOnly] : sp.variants;
+    const body = variants.map(v => v.trim().replace(/\s+/g, '[\\s-]*')).join('|');
+    // Ek almayan terimlerde de iki grup duruyor: yerleri sabit kalsın diye boş.
+    const tail = !sp.suffixes ? '()()' : dialect === 'tr' ? SUFFIX : '(s)?()';
+    // Sonda kesme işareti kalmışsa eşleşmiyoruz: "bloğu'u" gibi bozuk bir metne
+    // ikinci bir ek yapıştırmaktansa hiç dokunmamak daha az zarar verir.
+    return {
+      canonical: sp.canonical,
+      apostrophe: dialect === 'tr',
+      re: new RegExp(`${LEAD}(?:${body})${tail}(?![\\p{L}\\p{N}'’´])`, 'giu'),
+    };
+  });
 }
 
 /**
@@ -55,7 +75,7 @@ function rule(canonical: string, variants: string[], suffixes = true): Rule {
  * Türkçe fonetik karşılıklar ("çenç of karakter") bilerek burada — tanıma
  * Türkçe dinlerken İngilizce terimi böyle yazıyor.
  */
-const RULES: Rule[] = [
+const SPECS: Spec[] = [
   // — ICT / Smart Money ————————————————————————————————
   // Kısaltmalar da söyleniyor: "OB", "TP", "FVG"… Harflerin Türkçe okunuşu
   // (obe, tepe, sele) bilerek yok — "tepe" ve "sele" gerçek kelimeler, notu
@@ -65,8 +85,11 @@ const RULES: Rule[] = [
   // Kısaltmanın kendisi de söyleniyor: "bos", "b o s", bazen "boss". Türkçe
   // "boş" bilerek dışarıda — gerçek bir kelime, ona dokunmak notu bozardı;
   // onu bağlamdan anlaması için yapay zekâya bırakıyoruz.
-  rule('BOS', ['break of structure', 'brake of structure', 'br(?:e|ey)k of strak(?:t|ç|c)(?:ı|i)r',
-               'b o s', 'boss']),
+  // "boss" ve düz "bos" yalnız Türkçe metinde BOS sayılır: İngilizcede "boss"
+  // patron demek, üstelik çoğul eki yüzünden "BOSs" gibi bir şeye dönüşürdü.
+  // İngilizce notta zaten "BOS" diye doğru yazılıyor, dokunmaya gerek yok.
+  rule('BOS', ['break of structure', 'brake of structure', 'br(?:e|ey)k of strak(?:t|ç|c)(?:ı|i)r'],
+       true, ['b o s', 'boss']),
   rule('MSS', ['market structure shift', 'market strak(?:t|ç|c)(?:ı|i)r şift', 'm s s']),
   // Özel biçimler genelden önce: "inversion fvg" düz FVG'ye düşmesin.
   rule('Inversion FVG', ['inversion f v g', 'inversiyon f v g', 'i f v g']),
@@ -125,7 +148,8 @@ const RULES: Rule[] = [
   // — Fiyat hareketi ve formasyonlar ——————————————————
   rule('Breakout', ['breakout', 'br(?:e|i)kaut']),
   rule('Fakeout', ['fake out', 'f(?:e|ey)kaut']),
-  rule('Pullback', ['pull back', 'pulb(?:e|a)k']),
+  // "pull back" İngilizcede fiil ("price will pull back"); orada dokunmuyoruz.
+  rule('Pullback', ['pulb(?:e|a)k'], true, ['pull back']),
   rule('Retest', ['re test', 'rit(?:e|ı)st']),
   rule('Divergence', ['divergence', 'div(?:e|ı)rc(?:a|ı)ns', 'dayvırcıns', 'diverjans']),
   rule('Engulfing', ['engulfing', 'ing(?:a|ı)lfing']),
@@ -172,24 +196,29 @@ const RULES: Rule[] = [
   rule('FOMC', ['f o m c', 'fom(?:s|c)i', 'efomsi']),
 ];
 
+const RULES_TR = compile(SPECS, 'tr');
+const RULES_INTL = compile(SPECS, 'intl');
+const rulesFor = (language: string) => (language === 'tr' ? RULES_TR : RULES_INTL);
+
 /** Sesle yazılmış metindeki terimleri doğru yazımlarına çevirir. */
-export function fixTerms(text: string): string {
+export function fixTerms(text: string, language: string): string {
   let out = text;
-  for (const { re, canonical } of RULES) {
+  for (const { re, canonical, apostrophe } of rulesFor(language)) {
     out = out.replace(re, (_m, lead: string, attached?: string, spaced?: string) => {
       const suffix = attached || spaced;
-      return lead + canonical + (suffix ? `'${suffix}` : '');
+      if (!suffix) return lead + canonical;
+      return lead + canonical + (apostrophe ? `'${suffix}` : suffix);
     });
   }
   return out;
 }
 
 /** Metinde kaç tanınmış terim geçiyor — tanımanın alternatifleri arasında seçim için. */
-export function countTerms(text: string): number {
+export function countTerms(text: string, language: string): number {
   let n = 0;
-  for (const { re } of RULES) n += (text.match(re) || []).length;
+  for (const { re } of rulesFor(language)) n += (text.match(re) || []).length;
   return n;
 }
 
 /** AI'ya verilecek terim listesi; sözlükle aynı yazımı kullansın diye buradan üretilir. */
-export const TERM_LIST = RULES.map(r => r.canonical).join(', ');
+export const TERM_LIST = SPECS.map(r => r.canonical).join(', ');

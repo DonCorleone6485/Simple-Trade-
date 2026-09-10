@@ -25,15 +25,15 @@ const Recognition: any =
  * sık doğrusu duruyor. Uzunluk farkı büyükse dokunmayız: alternatif bütün
  * cümleyi bozmasın diye.
  */
-const bestReading = (result: any): string => {
+const bestReading = (result: any, language: string): string => {
   const top = result[0]?.transcript || '';
   if (!result.isFinal || result.length < 2) return top;
   let pick = top;
-  let score = countTerms(top);
+  let score = countTerms(top, language);
   for (let i = 1; i < result.length; i++) {
     const alt = result[i]?.transcript || '';
     if (!alt || Math.abs(alt.length - top.length) > top.length * 0.25) continue;
-    const altScore = countTerms(alt);
+    const altScore = countTerms(alt, language);
     if (altScore > score) { pick = alt; score = altScore; }
   }
   return pick;
@@ -89,7 +89,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
 
     rec.onresult = (e: any) => {
       let text = '';
-      for (let i = 0; i < e.results.length; i++) text += bestReading(e.results[i]);
+      for (let i = 0; i < e.results.length; i++) text += bestReading(e.results[i], language);
       if (text.trim().length > 0) spokeRef.current = true;
       onChange(baseRef.current + text);
     };
@@ -132,7 +132,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
     if (raw.length < 2) return;
     // Terim sözlüğü yapay zekâdan önce ve ondan bağımsız çalışır: kota bitse,
     // internet gitse de "order bloğu" doğru yazılır.
-    const text = fixTerms(raw);
+    const text = fixTerms(raw, language);
     if (text !== raw) onChange(text);
     setTidying(true);
     setError(null);
@@ -147,7 +147,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setBefore(raw);
       // Model de terimleri kendince yazabiliyor; son sözü sözlük söylesin.
-      onChange(fixTerms(data.text));
+      onChange(fixTerms(data.text, language));
     } catch (e: any) {
       setError(e.message);
     } finally {
