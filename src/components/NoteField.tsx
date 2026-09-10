@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Mic, Square, Wand2, Undo2, Loader } from 'lucide-react';
 import { useAuth } from '@clerk/clerk-react';
 import { useLanguage } from '../context/LanguageContext';
+import { fixTerms, countTerms } from '../lib/tradingTerms';
 
 interface NoteFieldProps {
   value: string;
@@ -16,6 +17,27 @@ const Recognition: any =
   typeof window !== 'undefined'
     ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     : null;
+
+/**
+ * Tanıma bir parça için birkaç okuma döndürebilir; ilki en yüksek güvenli
+ * olandır. Alt sıradakinde tanıdığımız bir terim varsa onu tercih ederiz —
+ * genel dil için "order block" beklenmedik, ama alternatifler arasında sık
+ * sık doğrusu duruyor. Uzunluk farkı büyükse dokunmayız: alternatif bütün
+ * cümleyi bozmasın diye.
+ */
+const bestReading = (result: any): string => {
+  const top = result[0]?.transcript || '';
+  if (!result.isFinal || result.length < 2) return top;
+  let pick = top;
+  let score = countTerms(top);
+  for (let i = 1; i < result.length; i++) {
+    const alt = result[i]?.transcript || '';
+    if (!alt || Math.abs(alt.length - top.length) > top.length * 0.25) continue;
+    const altScore = countTerms(alt);
+    if (altScore > score) { pick = alt; score = altScore; }
+  }
+  return pick;
+};
 
 const LOCALE: Record<string, string> = {
   tr: 'tr-TR', en: 'en-US', fa: 'fa-IR', ar: 'ar-SA', ru: 'ru-RU',
@@ -58,6 +80,8 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
     rec.lang = LOCALE[language] || 'en-US';
     rec.continuous = true;
     rec.interimResults = true;
+    // Terimi doğru yazan okuma ikinci sırada olabiliyor; bestReading seçiyor.
+    rec.maxAlternatives = 3;
 
     baseRef.current = valueRef.current ? valueRef.current.replace(/\s*$/, '') + ' ' : '';
     spokeRef.current = false;
@@ -65,7 +89,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
 
     rec.onresult = (e: any) => {
       let text = '';
-      for (let i = 0; i < e.results.length; i++) text += e.results[i][0].transcript;
+      for (let i = 0; i < e.results.length; i++) text += bestReading(e.results[i]);
       if (text.trim().length > 0) spokeRef.current = true;
       onChange(baseRef.current + text);
     };
@@ -104,8 +128,12 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
   };
 
   async function tidy() {
-    const text = valueRef.current.trim();
-    if (text.length < 2) return;
+    const raw = valueRef.current.trim();
+    if (raw.length < 2) return;
+    // Terim sözlüğü yapay zekâdan önce ve ondan bağımsız çalışır: kota bitse,
+    // internet gitse de "order bloğu" doğru yazılır.
+    const text = fixTerms(raw);
+    if (text !== raw) onChange(text);
     setTidying(true);
     setError(null);
     try {
@@ -117,8 +145,9 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-      setBefore(text);
-      onChange(data.text);
+      setBefore(raw);
+      // Model de terimleri kendince yazabiliyor; son sözü sözlük söylesin.
+      onChange(fixTerms(data.text));
     } catch (e: any) {
       setError(e.message);
     } finally {

@@ -6,12 +6,26 @@ import { verifyToken } from '@clerk/backend';
  * Konuşma tanıma noktalama koymaz, cümleleri birleştirir, bazı kelimeleri
  * yanlış duyar. Burada yapılan iş yazım ve noktalama düzeltmek — anlatılanı
  * değiştirmek, süslemek ya da yorum katmak değil.
+ *
+ * Terimlerin bilinen yanlış duyulmaları istemciden geçerken zaten düzeltilir
+ * (src/lib/tradingTerms.ts). Buradaki liste onun kaçırdıklarını toparlamak
+ * için: doğru yazımı modele söyleyip başka bir yazıma kaymasını engelliyoruz.
+ * İki liste elle aynı tutulur — biri regex tablosu, biri modele verilen ipucu.
  */
+const GLOSSARY =
+  'CHoCH, BOS, FVG, Order Block, Breaker Block, Mitigation Block, Liquidity Sweep, ' +
+  'SMT, Imbalance, Inducement, Equal Highs, Equal Lows, Swing High, Swing Low, Supply Zone, ' +
+  'Demand Zone, Killzone, HTF, LTF, POI, Stop Loss, Take Profit, Break Even, ' +
+  'Trailing Stop, Risk/Reward, Fakeout, Pullback, Retest';
+
 const PROMPT: Record<string, string> = {
   tr: `Aşağıdaki metin bir trader'ın sesli olarak dikte ettiği işlem notudur.
 Görevin SADECE şunlar:
 - Yazım ve noktalama hatalarını düzelt, cümleleri düzgün ayır.
-- Konuşma tanımanın yanlış duyduğu belli olan kelimeleri düzelt (özellikle trading terimleri: FVG, order block, likidite, BOS, ChoCH, stop, take profit, lot, pip, direnç, destek).
+- Konuşma tanımanın yanlış duyduğu belli olan kelimeleri düzelt. Trading terimleri İngilizce ve şu yazımlarla kalsın: ${GLOSSARY}.
+- Terim Türkçe çekime girmişse İngilizce hâline döndür, eki kesme işaretiyle bağla: "order bloğu" → "Order Block'u", "çençini gördüm" → "CHoCH'u gördüm", "efvegeye" → "FVG'ye". Terimi Türkçeleştirme, çevirme.
+- "boş" kelimesi açıkça BOS (break of structure) yerine kullanılmışsa BOS yaz; gerçekten "boş" anlamındaysa dokunma.
+- Harf harf söylenen kısaltmaları da tanı ve listedeki yazıma çevir: OB → Order Block, TP → Take Profit, SL → Stop Loss, RR → Risk/Reward, EQH → Equal Highs, EQL → Equal Lows.
 - Gereksiz "şey", "yani", "işte" gibi dolgu sözcüklerini temizle.
 - Uzun bir anlatım varsa paragraflara böl.
 
@@ -27,7 +41,9 @@ Metin:
   en: `The text below is a trading note dictated out loud by a trader.
 Your job is ONLY to:
 - Fix spelling and punctuation, and break it into proper sentences.
-- Correct words the speech recogniser clearly misheard, especially trading terms (FVG, order block, liquidity, BOS, ChoCH, stop, take profit, lot, pip, support, resistance).
+- Correct words the speech recogniser clearly misheard. Keep trading terms in English, spelled exactly like this: ${GLOSSARY}.
+- If a term was written phonetically or inflected, restore it ("change of character" → "CHoCH", "fair value gap" → "FVG").
+- Expand spelled-out abbreviations to the same spellings: OB → Order Block, TP → Take Profit, SL → Stop Loss, RR → Risk/Reward.
 - Remove filler words.
 - Split long passages into paragraphs.
 
