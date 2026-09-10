@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Trade, OrderType } from '../types';
 import { isWinTrade, isLossTrade, isBreakevenTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
 import { money, signedMoney } from '../lib/format';
+import { analyseDiscipline } from '../lib/discipline';
+import { splitByNews, eventsAround, NewsEvent } from '../lib/news';
 import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
@@ -318,6 +320,28 @@ export default function TradeHistory({
     };
   });
 
+  const disciplineReport = analyseDiscipline(closedTrades);
+
+  // Haber arşivi: işlemlerin kapsadığı aralık kadarı. Arşiv site kullanıldıkça
+  // biriktiği için eski işlemlerde boş dönebilir; o zaman bölüm görünmez.
+  const [newsEvents, setNewsEvents] = useState<NewsEvent[]>([]);
+  useEffect(() => {
+    if (trades.length === 0) return;
+    const times = trades.map(t => new Date(t.date).getTime()).filter(n => !isNaN(n));
+    if (times.length === 0) return;
+    const from = new Date(Math.min(...times) - 86400_000).toISOString();
+    const to = new Date(Math.max(...times) + 86400_000).toISOString();
+    let cancelled = false;
+    fetch(`/api/calendar?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (!cancelled && d) setNewsEvents(d.events || []); })
+      .catch(() => { /* takvim yoksa bölüm gizli kalır */ });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trades.length]);
+
+  const newsSplit = newsEvents.length > 0 ? splitByNews(closedTrades, newsEvents) : null;
+
   const sortedByDate = [...closedTrades].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   /** Ay ay net sonuç — hangi ayların iyi gittiği tek bakışta görünsün. */
@@ -628,6 +652,97 @@ export default function TradeHistory({
             ...(avgHold != null ? [{ label: t('avgDuration'), value: formatDuration(avgHold, language) }] : []),
             ...(openTrades.length > 0 ? [{ label: t('openTradesCount'), value: String(openTrades.length), color: '#fbbf24' }] : []),
           ]} />
+        </Section>
+
+        {/* ── Haber saatleri ── */}
+        {newsSplit && newsSplit.nearCount > 0 && (
+          <Section title={t('newsSection')}>
+            <div className="flex flex-wrap gap-x-14 gap-y-6">
+              {[
+                { label: t('newsNear'), count: newsSplit.nearCount, pnl: newsSplit.nearPnL, rate: newsSplit.nearWinRate },
+                { label: t('newsAway'), count: newsSplit.awayCount, pnl: newsSplit.awayPnL, rate: newsSplit.awayWinRate },
+              ].map((b, i) => (
+                <div key={i}>
+                  <div style={figureLabel}>{b.label}</div>
+                  <div className="flex items-baseline gap-4">
+                    <span className="font-mono text-[24px]"
+                      style={{ color: b.pnl >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
+                      {signedMoney(b.pnl)}
+                    </span>
+                    {b.rate != null && (
+                      <span className="font-mono text-[15px]" style={{ color: 'rgba(255,255,255,0.45)' }}>%{b.rate}</span>
+                    )}
+                  </div>
+                  <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                    {b.count} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-[11.5px] mt-6" style={{ color: 'rgba(255,255,255,0.25)' }}>{t('newsNote')}</p>
+          </Section>
+        )}
+
+        {/* ── Disiplin ── */}
+        <Section title={t('discipline')}>
+          {disciplineReport.flags.length === 0 ? (
+            <p className="text-[14.5px]" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('disciplineNone')}</p>
+          ) : (
+            <div className="space-y-8">
+              {/* Asıl mesaj: kurala uyanla uymayanın parası. */}
+              <div className="flex flex-wrap gap-x-14 gap-y-6">
+                <div>
+                  <div style={figureLabel}>{t('disciplineClean')}</div>
+                  <div className="font-mono text-[24px]"
+                    style={{ color: disciplineReport.cleanPnL >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
+                    {signedMoney(disciplineReport.cleanPnL)}
+                  </div>
+                  <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                    {disciplineReport.cleanCount} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
+                  </div>
+                </div>
+                <div>
+                  <div style={figureLabel}>{t('disciplineFlagged')}</div>
+                  <div className="font-mono text-[24px]"
+                    style={{ color: disciplineReport.flaggedPnL >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
+                    {signedMoney(disciplineReport.flaggedPnL)}
+                  </div>
+                  <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                    {disciplineReport.flaggedCount} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                {disciplineReport.flags.map((f, i) => {
+                  const names: Record<string, [string, string]> = {
+                    revenge: ['ruleRevenge', 'ruleRevengeDesc'],
+                    riskUp: ['ruleRiskUp', 'ruleRiskUpDesc'],
+                    overtrading: ['ruleOvertrading', 'ruleOvertradingDesc'],
+                    offHours: ['ruleOffHours', 'ruleOffHoursDesc'],
+                  };
+                  const [titleKey, descKey] = names[f.key];
+                  return (
+                    <li key={f.key} className="flex items-start gap-5 py-4"
+                      style={{ borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.05)' }}>
+                      <span className="font-mono text-[19px] w-8 flex-shrink-0 text-end"
+                        style={{ color: '#fbbf24', fontVariantNumeric: 'tabular-nums' }}>
+                        {f.trades.length}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[15px] font-medium">{t(titleKey as any)}</div>
+                        <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.38)' }}>{t(descKey as any)}</p>
+                      </div>
+                      <span className="font-mono text-[15px] flex-shrink-0"
+                        style={{ color: f.pnl >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
+                        {signedMoney(f.pnl)}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
         </Section>
 
         {/* ── Seriler ── */}
@@ -1249,6 +1364,23 @@ export default function TradeHistory({
                   <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('plannedRR')}</div>
                   <div className="font-mono font-semibold text-white">{selectedTrade.rr ? `${selectedTrade.rr}R` : '-'}</div>
                 </div>
+                {/* Girişe denk gelen haber varsa — sebebini sonradan hatırlatır. */}
+                {(() => {
+                  const hits = eventsAround(selectedTrade, newsEvents);
+                  if (hits.length === 0) return null;
+                  return (
+                    <div className="text-end">
+                      <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                        {t('newsAtEntry')}
+                      </div>
+                      <div className="text-[13px]" style={{ color: '#fbbf24' }}>
+                        {hits.slice(0, 2).map(h => h.title).join(' · ')}
+                        {hits.length > 2 && ` +${hits.length - 2}`}
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Planlanan hedefin yanında gerçekten olan. */}
                 {realizedR(selectedTrade) != null && (
                   <div className="text-end">
