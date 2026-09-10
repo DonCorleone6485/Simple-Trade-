@@ -19,6 +19,7 @@ import CSVImport, { ImportTarget } from './components/CSVImport';
 import MTConnect from './components/MTConnect';
 import SessionsView from './components/SessionsView';
 import NewsView from './components/NewsView';
+import DisciplineView from './components/DisciplineView';
 import { tradeKey } from './lib/tradeKey';
 import LandingPage from './components/LandingPage';
 import JournalDashboard from './components/JournalDashboard';
@@ -31,7 +32,7 @@ import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, ha
 import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
 import { signedMoney, int } from './lib/format';
 
-type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news';
+type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news' | 'discipline';
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect';
 type AuthView = 'signin' | 'signup';
 type AuthStage = 'landing' | 'auth';
@@ -64,6 +65,7 @@ function pathForView(view: View, journalId?: string, tab: JournalTab = 'trades')
   if (view === 'pricing') return `${JOURNAL_PATH}/pricing`;
   if (view === 'sessions') return `${JOURNAL_PATH}/sessions`;
   if (view === 'news') return `${JOURNAL_PATH}/news`;
+  if (view === 'discipline') return `${JOURNAL_PATH}/discipline`;
   if (view === 'expanded' && journalId) return `${JOURNAL_PATH}/${journalId}/${tab}`;
   return JOURNAL_PATH;
 }
@@ -73,6 +75,7 @@ function parseView(): { view: View; journalId?: string; tab: JournalTab } {
   if (second === 'pricing') return { view: 'pricing', tab: 'trades' };
   if (second === 'sessions') return { view: 'sessions', tab: 'trades' };
   if (second === 'news') return { view: 'news', tab: 'trades' };
+  if (second === 'discipline') return { view: 'discipline', tab: 'trades' };
   if (second) {
     const tab = JOURNAL_TABS.includes(third as JournalTab) ? (third as JournalTab) : 'trades';
     return { view: 'expanded', journalId: second, tab };
@@ -708,6 +711,7 @@ export default function App() {
   const navKey: NavKey =
     view === 'sessions' ? 'sessions'
     : view === 'news' ? 'news'
+    : view === 'discipline' ? 'discipline'
     : view === 'pricing' ? 'pricing'
     : view === 'expanded' ? (journalTab as NavKey)
     : 'journals';
@@ -718,6 +722,7 @@ export default function App() {
     if (key === 'pricing') { goTo({ view: 'pricing' }); return; }
     if (key === 'sessions') { goTo({ view: 'sessions', journal: null }); return; }
     if (key === 'news') { goTo({ view: 'news', journal: null }); return; }
+    if (key === 'discipline') { goTo({ view: 'discipline', journal: null }); return; }
     if (key === 'journals') { goTo({ view: 'dashboard', journal: null }); return; }
     // Yeni işlem, plan limitlerinden geçmeli.
     if (key === 'newTrade') { handleNewTradeClick(); return; }
@@ -727,6 +732,7 @@ export default function App() {
   const shellTitle =
     view === 'sessions' ? t('sessionsTab')
     : view === 'news' ? t('newsTab')
+    : view === 'discipline' ? t('disciplineTab')
     : view === 'pricing' ? pricingLabel
     : view === 'expanded' && journalTab === 'newTrade' ? t('newTradeTab')
     : view === 'expanded' && activeJournal ? activeJournal.name
@@ -1215,6 +1221,12 @@ export default function App() {
 
           {!loading && view === 'sessions' && <SessionsView />}
           {!loading && view === 'news' && <NewsView />}
+          {!loading && view === 'discipline' && (
+            <DisciplineView
+              trades={trades.filter(tr => tr.user_id === user?.id)}
+              journalCount={accounts.length}
+            />
+          )}
 
           {!loading && view === 'dashboard' && (
             <JournalDashboard
