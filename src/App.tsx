@@ -20,6 +20,7 @@ import MTConnect from './components/MTConnect';
 import SessionsView from './components/SessionsView';
 import NewsView from './components/NewsView';
 import DisciplineView from './components/DisciplineView';
+import ChecklistLibrary from './components/ChecklistLibrary';
 import { tradeKey } from './lib/tradeKey';
 import LandingPage from './components/LandingPage';
 import JournalDashboard from './components/JournalDashboard';
@@ -32,7 +33,7 @@ import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, ha
 import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
 import { signedMoney, int } from './lib/format';
 
-type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news' | 'discipline';
+type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news' | 'discipline' | 'checklists';
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect';
 type AuthView = 'signin' | 'signup';
 type AuthStage = 'landing' | 'auth';
@@ -66,6 +67,7 @@ function pathForView(view: View, journalId?: string, tab: JournalTab = 'trades')
   if (view === 'sessions') return `${JOURNAL_PATH}/sessions`;
   if (view === 'news') return `${JOURNAL_PATH}/news`;
   if (view === 'discipline') return `${JOURNAL_PATH}/discipline`;
+  if (view === 'checklists') return `${JOURNAL_PATH}/checklists`;
   if (view === 'expanded' && journalId) return `${JOURNAL_PATH}/${journalId}/${tab}`;
   return JOURNAL_PATH;
 }
@@ -76,6 +78,7 @@ function parseView(): { view: View; journalId?: string; tab: JournalTab } {
   if (second === 'sessions') return { view: 'sessions', tab: 'trades' };
   if (second === 'news') return { view: 'news', tab: 'trades' };
   if (second === 'discipline') return { view: 'discipline', tab: 'trades' };
+  if (second === 'checklists') return { view: 'checklists', tab: 'trades' };
   if (second) {
     const tab = JOURNAL_TABS.includes(third as JournalTab) ? (third as JournalTab) : 'trades';
     return { view: 'expanded', journalId: second, tab };
@@ -224,6 +227,7 @@ export default function App() {
     const mapped = (data || []).map((j: any) => ({
       id: j.id, user_id: j.user_id, name: j.name,
       startDate: j.start_date, startingCapital: j.starting_capital, goals: j.goals,
+      checklistId: j.checklist_id || null,
     }));
     setAccounts(mapped);
     setLoading(false);
@@ -621,6 +625,14 @@ export default function App() {
     ));
   };
 
+  /** Seçilen checklist journal'da kalsın: her işlemde yeniden seçilmesin. */
+  const handleChecklistSelect = async (checklistId: string) => {
+    if (!activeJournal || !user) return;
+    setAccounts(prev => prev.map(a => (a.id === activeJournal.id ? { ...a, checklistId } : a)));
+    setActiveJournal(j => (j ? { ...j, checklistId } : j));
+    await supabase.from('journals').update({ checklist_id: checklistId }).eq('id', activeJournal.id);
+  };
+
   const handleDeleteMultiple = async (ids: string[]) => {
     const toDelete = trades.filter(tr => ids.includes(tr.id));
     for (const trade of toDelete) {
@@ -712,6 +724,7 @@ export default function App() {
     view === 'sessions' ? 'sessions'
     : view === 'news' ? 'news'
     : view === 'discipline' ? 'discipline'
+    : view === 'checklists' ? 'checklists'
     : view === 'pricing' ? 'pricing'
     : view === 'expanded' ? (journalTab as NavKey)
     : 'journals';
@@ -723,6 +736,7 @@ export default function App() {
     if (key === 'sessions') { goTo({ view: 'sessions', journal: null }); return; }
     if (key === 'news') { goTo({ view: 'news', journal: null }); return; }
     if (key === 'discipline') { goTo({ view: 'discipline', journal: null }); return; }
+    if (key === 'checklists') { goTo({ view: 'checklists', journal: null }); return; }
     if (key === 'journals') { goTo({ view: 'dashboard', journal: null }); return; }
     // Yeni işlem, plan limitlerinden geçmeli.
     if (key === 'newTrade') { handleNewTradeClick(); return; }
@@ -733,6 +747,7 @@ export default function App() {
     view === 'sessions' ? t('sessionsTab')
     : view === 'news' ? t('newsTab')
     : view === 'discipline' ? t('disciplineTab')
+    : view === 'checklists' ? t('checklistsTab')
     : view === 'pricing' ? pricingLabel
     : view === 'expanded' && journalTab === 'newTrade' ? t('newTradeTab')
     : view === 'expanded' && activeJournal ? activeJournal.name
@@ -1221,6 +1236,8 @@ export default function App() {
 
           {!loading && view === 'sessions' && <SessionsView />}
           {!loading && view === 'news' && <NewsView />}
+          {!loading && view === 'checklists' && <ChecklistLibrary />}
+
           {!loading && view === 'discipline' && (
             <DisciplineView
               trades={trades.filter(tr => tr.user_id === user?.id)}
@@ -1243,7 +1260,9 @@ export default function App() {
 
           {!loading && view === 'expanded' && activeJournal && journalTab === 'newTrade' && (
             <div className="max-w-4xl">
-              <TradeForm onSave={handleAddTrade} isPro={isPro} hideTitle />
+              <TradeForm onSave={handleAddTrade} isPro={isPro} hideTitle
+                checklistId={activeJournal.checklistId}
+                onChecklistSelect={handleChecklistSelect} />
             </div>
           )}
 

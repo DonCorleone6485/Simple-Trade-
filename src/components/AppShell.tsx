@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
   TrendingUp, BookOpen, List, CalendarDays, BarChart2, Target,
-  Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Plug, Clock, Newspaper, ShieldCheck,
+  Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Plug, Clock, Newspaper, ShieldCheck, ClipboardList,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export type NavKey =
   | 'journals' | 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect'
-  | 'pricing' | 'referral' | 'home' | 'sessions' | 'news' | 'discipline';
+  | 'pricing' | 'referral' | 'home' | 'sessions' | 'news' | 'discipline' | 'checklists';
 
 interface AppShellProps {
   active: NavKey;
@@ -115,6 +115,7 @@ export default function AppShell({
         <NavItem icon={<Clock className="w-4 h-4" />} label={t('sessionsTab')} itemKey="sessions" />
         <NavItem icon={<Newspaper className="w-4 h-4" />} label={t('newsTab')} itemKey="news" />
         <NavItem icon={<ShieldCheck className="w-4 h-4" />} label={t('disciplineTab')} itemKey="discipline" />
+        <NavItem icon={<ClipboardList className="w-4 h-4" />} label={t('checklistsTab')} itemKey="checklists" />
         {!isPro && (
           <NavItem icon={<Sparkles className="w-4 h-4" />} label={tr('Pro\'ya Geç', 'Upgrade to Pro')} itemKey="pricing" />
         )}

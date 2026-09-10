@@ -5,6 +5,8 @@ export interface Account {
   startDate?: string;
   startingCapital?: number;
   goals?: JournalGoals;
+  /** Bu journal'da en son kullanılan checklist. */
+  checklistId?: string | null;
 }
 
 export interface JournalGoals {

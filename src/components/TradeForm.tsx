@@ -17,6 +17,9 @@ import { supabase } from '../lib/supabase';
 interface TradeFormProps {
   onSave: (trade: Trade) => void;
   isPro?: boolean;
+  /** Bu journal'ın en son kullandığı checklist. */
+  checklistId?: string | null;
+  onChecklistSelect?: (id: string) => void;
   /** Portal düzeninde sayfa başlığı üst barda durur. */
   hideTitle?: boolean;
 }
@@ -244,7 +247,7 @@ function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit, uploadi
 }
 
 // ── TRADE FORM ─────────────────────────────────────────────────────────────
-export default function TradeForm({ onSave, isPro = false, hideTitle = false }: TradeFormProps) {
+export default function TradeForm({ onSave, isPro = false, hideTitle = false, checklistId, onChecklistSelect }: TradeFormProps) {
   const { t, language } = useLanguage();
   const { user } = useUser();
 
@@ -399,7 +402,8 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false }: 
           </p>
         </div>
         <div className="p-6">
-          <Checklist value={checklist} onChange={setChecklist} syncTemplate />
+          <Checklist value={checklist} onChange={setChecklist} syncTemplate
+            selectedListId={checklistId} onSelectList={onChecklistSelect} />
         </div>
       </div>
 

@@ -4,30 +4,18 @@ import { ChecklistItem } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../lib/supabase';
+import { NamedChecklist, SAMPLE_ITEMS, bare, loadChecklists, saveChecklists, newListId } from '../lib/checklists';
 
 interface ChecklistProps {
   value: ChecklistItem[];
   onChange: (items: ChecklistItem[]) => void;
   /** Yeni işlemde şablonu kullanıcı hesabından yükler ve değişiklikleri geri yazar. */
   syncTemplate?: boolean;
+  /** Bu journal'ın en son seçtiği liste. */
+  selectedListId?: string | null;
+  onSelectList?: (id: string) => void;
 }
 
-/**
- * Hesabında henüz şablon olmayan kullanıcıya gösterilen örnekler.
- * Silinebilir ve düzenlenebilir — ilk değişiklikte kullanıcının kendi şablonu olur.
- */
-const SAMPLE_ITEMS: { tr: ChecklistItem[]; en: ChecklistItem[] } = {
-  tr: [
-    { id: 'sample-1', title: 'Yapı kırıldı mı?', desc: "HTF'de (4H/1H) BOS veya CHoCH oluştu mu — yönüm bu kırılımla aynı mı?" },
-    { id: 'sample-2', title: 'Likidite alındı mı?', desc: 'Girmeden önce fiyat bir yüksek/düşük süpürdü mü — ters taraftaki stoplar temizlendi mi?' },
-    { id: 'sample-3', title: 'Girişim geçerli bir bölgede mi?', desc: "Order Block veya FVG'ye geri çekilme oldu mu — havada mı giriyorum, yoksa taze bir bölgeden mi?" },
-  ],
-  en: [
-    { id: 'sample-1', title: 'Has structure broken?', desc: 'Did a BOS or CHoCH form on the HTF (4H/1H) — is my direction aligned with that break?' },
-    { id: 'sample-2', title: 'Was liquidity taken?', desc: 'Did price sweep a high/low before entry — were the stops on the other side cleared?' },
-    { id: 'sample-3', title: 'Is the entry in a valid zone?', desc: 'Was there a retrace into an Order Block or FVG — am I entering mid-air or from a fresh zone?' },
-  ],
-};
 
 const newId = () => `c-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
@@ -56,7 +44,7 @@ export function ChecklistView({ items }: { items: ChecklistItem[] }) {
   );
 }
 
-export default function Checklist({ value, onChange, syncTemplate = false }: ChecklistProps) {
+export default function Checklist({ value, onChange, syncTemplate = false, selectedListId, onSelectList }: ChecklistProps) {
   const { language } = useLanguage();
   const { user } = useUser();
   const tr = (a: string, b: string) => (language === 'tr' ? a : b);
@@ -83,38 +71,89 @@ export default function Checklist({ value, onChange, syncTemplate = false }: Che
   /** Şablon yüklenmeden yapılan yazma, yüklemeyi ezmesin. */
   const templateLoaded = useRef(!syncTemplate);
 
+  // Adlandırılmış listeler. Tek liste varsa seçici hiç görünmez — işlem
+  // kaydetmenin hızını bozmamak için.
+  const [library, setLibrary] = useState<NamedChecklist[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(selectedListId ?? null);
+  const [namingNew, setNamingNew] = useState(false);
+  const [newName, setNewName] = useState('');
+  const nameRef = useRef<HTMLInputElement>(null);
+  const libraryRef = useRef<NamedChecklist[]>([]);
+  libraryRef.current = library;
+
+  useEffect(() => { if (namingNew) nameRef.current?.focus(); }, [namingNew]);
+
   useEffect(() => {
     if (adding || editingId) titleRef.current?.focus();
   }, [adding, editingId]);
 
-  // Kullanıcının kayıtlı şablonunu getir; yoksa örneklerle başla.
+  // Kullanıcının listelerini getir; hiç yoksa örneklerle başla.
   useEffect(() => {
     if (!syncTemplate || !user) return;
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from('users')
-        .select('checklist_template')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      const lists = await loadChecklists(user.id);
       if (cancelled) return;
-      const saved = data?.checklist_template as ChecklistItem[] | null | undefined;
-      // null = hiç şablon yok (örnekleri göster), [] = kullanıcı hepsini silmiş.
-      const base = saved ?? (language === 'tr' ? SAMPLE_ITEMS.tr : SAMPLE_ITEMS.en);
-      commit(base.map(i => ({ ...i, checked: false })));
+
+      if (lists.length === 0) {
+        // Hiç listesi yok: örnekleri göster, kaydetmeden. İlk düzenlemede
+        // kendi listesi olur.
+        commit((language === 'tr' ? SAMPLE_ITEMS.tr : SAMPLE_ITEMS.en).map(i => ({ ...i, checked: false })));
+        templateLoaded.current = true;
+        return;
+      }
+
+      const chosen = lists.find(l => l.id === selectedListId) || lists[0];
+      setLibrary(lists);
+      setActiveId(chosen.id);
+      commit(chosen.items.map(i => ({ ...i, checked: false })));
       templateLoaded.current = true;
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncTemplate, user?.id]);
 
-  /** Madde metinleri değişti — kullanıcının kalıcı şablonuna yaz. */
+  /** Madde metinleri değişti — açık olan listeye yaz. */
   const persistTemplate = async (next: ChecklistItem[]) => {
     if (!syncTemplate || !user || !templateLoaded.current) return;
-    const template = next.map(({ id, title, desc }) => ({ id, title, desc }));
-    await supabase
-      .from('users')
-      .upsert({ user_id: user.id, checklist_template: template }, { onConflict: 'user_id' });
+    const items = bare(next);
+    const lists = libraryRef.current;
+
+    // Henüz listesi olmayan kullanıcı ilk kez düzenledi: listesi burada doğar.
+    if (lists.length === 0) {
+      const first: NamedChecklist = { id: newListId(), name: tr('Varsayılan', 'Default'), items };
+      setLibrary([first]);
+      setActiveId(first.id);
+      onSelectList?.(first.id);
+      await saveChecklists(user.id, [first]);
+      return;
+    }
+
+    const next2 = lists.map(l => (l.id === activeId ? { ...l, items } : l));
+    setLibrary(next2);
+    await saveChecklists(user.id, next2);
+  };
+
+  const selectList = (id: string) => {
+    const list = libraryRef.current.find(l => l.id === id);
+    if (!list) return;
+    setActiveId(id);
+    onSelectList?.(id);
+    commit(list.items.map(i => ({ ...i, checked: false })));
+  };
+
+  const createList = async () => {
+    const name = newName.trim();
+    if (!name || !user) return;
+    const list: NamedChecklist = { id: newListId(), name, items: [] };
+    const next = [...libraryRef.current, list];
+    setLibrary(next);
+    setActiveId(list.id);
+    onSelectList?.(list.id);
+    commit([]);
+    setNamingNew(false);
+    setNewName('');
+    await saveChecklists(user.id, next);
   };
 
   const toggle = (id: string) => {
@@ -196,8 +235,57 @@ export default function Checklist({ value, onChange, syncTemplate = false }: Che
     </div>
   );
 
+  const chip: React.CSSProperties = {
+    padding: '5px 12px', borderRadius: '999px', fontSize: '12.5px',
+    border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)',
+    color: 'rgba(255,255,255,0.55)', transition: 'all 150ms',
+  };
+
   return (
     <div className="space-y-2.5">
+      {/* Liste seçici. Tek liste varsa görünmez — o zaman seçilecek bir şey
+          yok ve yeni işlem ekranına gereksiz bir adım eklemiş oluruz. */}
+      {syncTemplate && (library.length > 1 || namingNew) && (
+        <div className="flex items-center gap-2 flex-wrap pb-1">
+          {library.map(l => (
+            <button key={l.id} type="button" onClick={() => selectList(l.id)}
+              style={l.id === activeId
+                ? { ...chip, background: 'rgba(139,92,246,0.16)', borderColor: 'rgba(139,92,246,0.4)', color: '#fff' }
+                : chip}>
+              {l.name}
+            </button>
+          ))}
+          {namingNew ? (
+            <span className="flex items-center gap-2">
+              <input ref={nameRef} value={newName} onChange={e => setNewName(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { e.preventDefault(); createList(); }
+                  if (e.key === 'Escape') { setNamingNew(false); setNewName(''); }
+                }}
+                placeholder={tr('Liste adı', 'List name')}
+                className="outline-none text-[12.5px]"
+                style={{ ...chip, color: '#fff', width: '150px' }} />
+              <button type="button" onClick={createList}
+                style={{ ...chip, background: '#8b5cf6', borderColor: '#8b5cf6', color: '#fff' }}>
+                {tr('Ekle', 'Add')}
+              </button>
+            </span>
+          ) : (
+            <button type="button" onClick={() => setNamingNew(true)} style={{ ...chip, color: '#a78bfa' }}>
+              + {tr('Yeni liste', 'New list')}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Tek listesi olan için sessiz bir giriş: yeni liste açmak isterse. */}
+      {syncTemplate && library.length <= 1 && !namingNew && (
+        <button type="button" onClick={() => setNamingNew(true)}
+          className="text-[12.5px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          + {tr('Yeni liste', 'New list')}
+        </button>
+      )}
+
       {items.map(item => (
         editingId === item.id ? (
           <div key={item.id}>{draftBox}</div>
