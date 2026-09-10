@@ -13,10 +13,14 @@ import { verifyToken } from '@clerk/backend';
  * İki liste elle aynı tutulur — biri regex tablosu, biri modele verilen ipucu.
  */
 const GLOSSARY =
-  'CHoCH, BOS, FVG, Order Block, Breaker Block, Mitigation Block, Liquidity Sweep, ' +
-  'SMT, Imbalance, Inducement, Equal Highs, Equal Lows, Swing High, Swing Low, Supply Zone, ' +
-  'Demand Zone, Killzone, HTF, LTF, POI, Stop Loss, Take Profit, Break Even, ' +
-  'Trailing Stop, Risk/Reward, Fakeout, Pullback, Retest';
+  'CHoCH, BOS, MSS, FVG, Inversion FVG, BPR, Order Block, Breaker Block, Mitigation Block, ' +
+  'Rejection Block, Propulsion Block, BSL, SSL, ERL, IRL, Liquidity Sweep, Liquidity Void, ' +
+  'Stop Hunt, Turtle Soup, Judas Swing, Silver Bullet, Displacement, OTE, PO3, SMT, Unicorn, ' +
+  'Equilibrium, Premium, Discount, Dealing Range, Imbalance, Inducement, Equal Highs, Equal Lows, ' +
+  'Swing High, Swing Low, PDH, PDL, NDOG, NWOG, Supply Zone, Demand Zone, POI, Killzone, HTF, LTF, ' +
+  'Daily Bias, Order Flow, Breakout, Fakeout, Pullback, Retest, Divergence, Engulfing, Pin Bar, ' +
+  'Stop Loss, Take Profit, Break Even, Trailing Stop, Risk/Reward, Drawdown, Slippage, Payout, ' +
+  'Prop Firm, Win Rate, Profit Factor, RSI, MACD, EMA, VWAP, ATR, Fibonacci, NFP, CPI, FOMC';
 
 const PROMPT: Record<string, string> = {
   tr: `Aşağıdaki metin bir trader'ın sesli olarak dikte ettiği işlem notudur.
