@@ -17,6 +17,7 @@ import PricingPage from './components/PricingPage';
 import PaymentModal from './components/PaymentModal';
 import CSVImport, { ImportTarget } from './components/CSVImport';
 import MTConnect from './components/MTConnect';
+import MarketView from './components/MarketView';
 import { tradeKey } from './lib/tradeKey';
 import LandingPage from './components/LandingPage';
 import JournalDashboard from './components/JournalDashboard';
@@ -29,7 +30,7 @@ import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, ha
 import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
 import { signedMoney, int } from './lib/format';
 
-type View = 'dashboard' | 'expanded' | 'pricing';
+type View = 'dashboard' | 'expanded' | 'pricing' | 'market';
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect';
 type AuthView = 'signin' | 'signup';
 type AuthStage = 'landing' | 'auth';
@@ -60,6 +61,7 @@ function pathForPage(page: Page): string {
  */
 function pathForView(view: View, journalId?: string, tab: JournalTab = 'trades'): string {
   if (view === 'pricing') return `${JOURNAL_PATH}/pricing`;
+  if (view === 'market') return `${JOURNAL_PATH}/market`;
   if (view === 'expanded' && journalId) return `${JOURNAL_PATH}/${journalId}/${tab}`;
   return JOURNAL_PATH;
 }
@@ -67,6 +69,7 @@ function pathForView(view: View, journalId?: string, tab: JournalTab = 'trades')
 function parseView(): { view: View; journalId?: string; tab: JournalTab } {
   const [, second, third] = pathParts();
   if (second === 'pricing') return { view: 'pricing', tab: 'trades' };
+  if (second === 'market') return { view: 'market', tab: 'trades' };
   if (second) {
     const tab = JOURNAL_TABS.includes(third as JournalTab) ? (third as JournalTab) : 'trades';
     return { view: 'expanded', journalId: second, tab };
@@ -700,7 +703,8 @@ export default function App() {
 
   // ── PORTAL KABUĞU ──
   const navKey: NavKey =
-    view === 'pricing' ? 'pricing'
+    view === 'market' ? 'market'
+    : view === 'pricing' ? 'pricing'
     : view === 'expanded' ? (journalTab as NavKey)
     : 'journals';
 
@@ -708,6 +712,7 @@ export default function App() {
     if (key === 'home') { navigate('home'); return; }
     if (key === 'referral') { setShowReferral(true); return; }
     if (key === 'pricing') { goTo({ view: 'pricing' }); return; }
+    if (key === 'market') { goTo({ view: 'market', journal: null }); return; }
     if (key === 'journals') { goTo({ view: 'dashboard', journal: null }); return; }
     // Yeni işlem, plan limitlerinden geçmeli.
     if (key === 'newTrade') { handleNewTradeClick(); return; }
@@ -715,7 +720,8 @@ export default function App() {
   };
 
   const shellTitle =
-    view === 'pricing' ? pricingLabel
+    view === 'market' ? t('marketTab')
+    : view === 'pricing' ? pricingLabel
     : view === 'expanded' && journalTab === 'newTrade' ? t('newTradeTab')
     : view === 'expanded' && activeJournal ? activeJournal.name
     : t('myJournals');
@@ -1200,6 +1206,8 @@ export default function App() {
               onProStart={() => setShowPaymentModal(true)}
             />
           )}
+
+          {!loading && view === 'market' && <MarketView />}
 
           {!loading && view === 'dashboard' && (
             <JournalDashboard

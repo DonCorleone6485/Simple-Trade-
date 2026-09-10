@@ -45,6 +45,7 @@ export const translations: Translations = {
   historyTab: { tr: 'İşlemler', en: 'Trades', fa: 'معاملات', ar: 'الصفقات', ru: 'Сделки', es: 'Operaciones', pt: 'Operações', de: 'Trades', fr: 'Trades' },
   calendarTab: { tr: 'Takvim', en: 'Calendar', fa: 'تقویم', ar: 'التقويم', ru: 'Календарь', es: 'Calendario', pt: 'Calendário', de: 'Kalender', fr: 'Calendrier' },
   statsTab: { tr: 'İstatistikler', en: 'Statistics', fa: 'آمار', ar: 'الإحصائيات', ru: 'Статистика', es: 'Estadísticas', pt: 'Estatísticas', de: 'Statistiken', fr: 'Statistiques' },
+  marketTab: { tr: 'Piyasa', en: 'Market', fa: 'بازار', ar: 'السوق', ru: 'Рынок', es: 'Mercado', pt: 'Mercado', de: 'Markt', fr: 'Marché' },
   mtConnectTab: { tr: 'MetaTrader', en: 'MetaTrader', fa: 'متاتریدر', ar: 'ميتاتريدر', ru: 'MetaTrader', es: 'MetaTrader', pt: 'MetaTrader', de: 'MetaTrader', fr: 'MetaTrader' },
   goalsTab: { tr: 'Hedefler', en: 'Goals', fa: 'اهداف', ar: 'الأهداف', ru: 'Цели', es: 'Objetivos', pt: 'Metas', de: 'Ziele', fr: 'Objectifs' },
   formTitle: { tr: 'Yeni İşlem Kaydı', en: 'New Trade Record', fa: 'ثبت معامله جدید', ar: 'تسجيل صفقة جديدة', ru: 'Новая запись сделки', es: 'Nuevo registro de operación', pt: 'Novo registro de operação', de: 'Neuer Trade-Eintrag', fr: 'Nouveau enregistrement de trade' },
