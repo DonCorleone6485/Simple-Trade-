@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
   TrendingUp, BookOpen, List, CalendarDays, BarChart2, Target,
-  Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Plug, Globe,
+  Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Plug, Clock, Newspaper,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export type NavKey =
   | 'journals' | 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect'
-  | 'pricing' | 'referral' | 'home' | 'market';
+  | 'pricing' | 'referral' | 'home' | 'sessions' | 'news';
 
 interface AppShellProps {
   active: NavKey;
@@ -112,7 +112,8 @@ export default function AppShell({
         )}
 
         <SectionLabel>{tr('Hesap', 'Account')}</SectionLabel>
-        <NavItem icon={<Globe className="w-4 h-4" />} label={t('marketTab')} itemKey="market" />
+        <NavItem icon={<Clock className="w-4 h-4" />} label={t('sessionsTab')} itemKey="sessions" />
+        <NavItem icon={<Newspaper className="w-4 h-4" />} label={t('newsTab')} itemKey="news" />
         {!isPro && (
           <NavItem icon={<Sparkles className="w-4 h-4" />} label={tr('Pro\'ya Geç', 'Upgrade to Pro')} itemKey="pricing" />
         )}
