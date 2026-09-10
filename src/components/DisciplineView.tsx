@@ -1,4 +1,5 @@
 import React from 'react';
+import { BarChart2 } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { analyseDiscipline, RuleKey } from '../lib/discipline';
@@ -113,10 +114,14 @@ export default function DisciplineView({ trades, journalCount }: DisciplineViewP
         </>
       )}
 
-      <p className="text-[12.5px] leading-relaxed pt-2"
-        style={{ color: 'rgba(255,255,255,0.3)', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '18px' }}>
-        {t('disciplinePerJournal')}
-      </p>
+      {/* Yol tarifi: okunmayacak kadar küçük yazılırsa hiç yazılmamış olur. */}
+      <div className="rounded-2xl p-5 flex items-start gap-3.5"
+        style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <BarChart2 className="w-[18px] h-[18px] flex-shrink-0 mt-0.5" style={{ color: '#a78bfa' }} />
+        <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          {t('disciplinePerJournal')}
+        </p>
+      </div>
     </div>
   );
 }
