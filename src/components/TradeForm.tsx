@@ -418,7 +418,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
       <div className="p-6 space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
-            <label style={lbl}>{t('dateTime')}<Req /></label>
+            <label style={lbl}>{t('dateTime')}</label>
             <DatePicker
               value={date ? new Date(date) : null}
               onChange={(dateObj: DateObject | null) => {
@@ -446,7 +446,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
             </select>
           </div>
           <div>
-            <label style={lbl}>{t('orderType')}<Req /></label>
+            <label style={lbl}>{t('orderType')}</label>
             <select value={orderType} onChange={e => setOrderType(e.target.value as OrderType)} style={selStyle}>
               <option value="Market" style={optStyle}>{t('orderMarket')}</option>
               <option value="Limit" style={optStyle}>{t('orderLimit')}</option>
@@ -458,15 +458,15 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
             <SetupPicker value={setup} onChange={setSetup} />
           </div>
           <div>
-            <label style={lbl}>{t('plannedRR')}{isClosed && <Req />}</label>
-            <input type="number" step="any" required={isClosed} value={rr} onChange={e => setRr(e.target.value)}
+            <label style={lbl}>{t('plannedRR')} <span style={optHint}>({t('optionalLabel')})</span></label>
+            <input type="number" step="any" value={rr} onChange={e => setRr(e.target.value)}
               style={{ ...inp, fontFamily: 'monospace' }} placeholder={t('rrPlaceholder')} />
           </div>
           <div>
-              <label style={lbl}>{t('risk')}<Req /></label>
+              <label style={lbl}>{t('risk')} <span style={optHint}>({t('optionalLabel')})</span></label>
               <div className="relative">
                 <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                <input type="number" min="0" step="0.01" required value={risk} onChange={e => setRisk(e.target.value)}
+                <input type="number" min="0" step="0.01" value={risk} onChange={e => setRisk(e.target.value)}
                   style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
               </div>
             </div>
@@ -547,7 +547,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
           <p style={sectionTitle}>{t('postTrade')}</p>
           <div className="space-y-6">
             <div>
-              <label style={lbl}>{t('notes')}{isClosed && <Req />}</label>
+              <label style={lbl}>{t('notes')} <span style={optHint}>({t('optionalLabel')})</span></label>
               <NoteField value={postNotes} onChange={setPostNotes} height="200px"
                 style={inp} placeholder={t('postNotesPlaceholder')} />
             </div>
@@ -561,7 +561,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
 
       <div className="p-6 flex items-center justify-between gap-4 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
         <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          <span style={{ color: '#f87171' }}>*</span> {t('requiredNote')}
+          <span style={{ color: '#f87171' }}>*</span> {t('requiredNote')} — {t('requiredHint')}
         </p>
         <button type="submit" disabled={uploadingPre || uploadingPost}
           className="px-6 py-2.5 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
