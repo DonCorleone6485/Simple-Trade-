@@ -90,19 +90,21 @@ function tailFor(language: string, suffixes: boolean): string {
 }
 
 function compile(specs: Spec[], language: string): Rule[] {
-  return specs.map(sp => {
+  return specs.flatMap(sp => {
     const variants = [...sp.variants, ...(sp.byLang[language] || [])];
+    // O dilde biçimi yoksa kural yok: boş gövdeli regex her yeri eşleştirirdi.
+    if (variants.length === 0) return [];
     const body = variants.map(v => v.trim().replace(/\s+/g, '[\\s-]*')).join('|');
     // Ek almayan terimlerde de iki grup duruyor: yerleri sabit kalsın diye boş.
     const tail = tailFor(language, sp.suffixes);
     const lead = language === 'ar' || language === 'fa' ? LEAD_RTL : LEAD;
     // Sonda kesme işareti kalmışsa eşleşmiyoruz: "bloğu'u" gibi bozuk bir metne
     // ikinci bir ek yapıştırmaktansa hiç dokunmamak daha az zarar verir.
-    return {
+    return [{
       canonical: sp.canonical,
       join: JOIN[language] || 'plain',
       re: new RegExp(`${lead}(?:${body})${tail}(?![\\p{L}\\p{N}'’´])`, 'giu'),
-    };
+    }];
   });
 }
 
@@ -245,6 +247,8 @@ const SPECS: Spec[] = [
   rule('Win Rate', ['win rate', 'vin r(?:e|ey)t']),
   rule('Profit Factor', ['profit factor', 'profit faktör']),
   rule('Scalp', ['scalp', 'skalp']),
+  rule('Short', ['şort'], true, { tr: ['short', 'sort'], ru: ['шорт'], fa: ['شورت'] }),
+  rule('Long', [], true, { tr: ['long', 'lonk'], ru: ['лонг'], fa: ['لانگ'] }),
 
   // — Haber ——————————————————————————————————————————
   rule('NFP', ['n f p', 'non farm payroll(?:s)?']),
