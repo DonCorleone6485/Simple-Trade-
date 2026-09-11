@@ -255,7 +255,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
   const faqs = [
     {
       q: t('Ücretsiz olarak kullanabilir miyim?', 'Can I use it for free?', 'آیا می‌توانم رایگان استفاده کنم؟'),
-      a: t('Evet. Free plan 1 journal, günde 1 / toplamda 20 işlem ve trade başına 1 fotoğrafla, tüm istatistiklere ve takvim görünümüne süresiz erişim sağlar. Kart bilgisi istemiyoruz.', 'Yes. The Free plan gives you 1 journal, 1 trade a day (20 total), 1 photo per trade, and unlimited access to all statistics and the calendar view. No card required.', 'بله. طرح رایگان به شما امکان دسترسی نامحدود به آمار می‌دهد.'),
+      a: t('Evet. Free plan 1 journal, günde 1 / toplamda 20 işlem ve işlem öncesi ve sonrası 1\'er fotoğrafla, tüm istatistiklere ve takvim görünümüne süresiz erişim sağlar. Kart bilgisi istemiyoruz.', 'Yes. The Free plan gives you 1 journal, 1 trade a day (20 total), 1 photo before and 1 after each trade, and unlimited access to all statistics and the calendar view. No card required.', 'بله. طرح رایگان به شما امکان دسترسی نامحدود به آمار می‌دهد.'),
     },
     {
       q: t('Pro deneme için kart bilgisi gerekiyor mu?', 'Does the Pro trial require a card?', 'آیا آزمایش Pro نیاز به کارت دارد؟'),

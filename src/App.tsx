@@ -141,7 +141,7 @@ export default function App() {
   const proFeaturesList = [
     language === 'tr' ? 'Sınırsız Journal' : 'Unlimited Journals',
     language === 'tr' ? 'Sınırsız Trade' : 'Unlimited Trades',
-    language === 'tr' ? 'Sınırsız Fotoğraf Yükleme' : 'Unlimited Photo Upload',
+    language === 'tr' ? 'İşlem Öncesi ve Sonrası 3\'er Fotoğraf' : '3 Photos Before and 3 After Each Trade',
     language === 'tr' ? 'AI Analiz' : 'AI Analysis',
     language === 'tr' ? 'Gelişmiş İstatistikler' : 'Advanced Statistics',
     language === 'tr' ? 'Hedef & Kural Sistemi' : 'Goals & Rules System',

@@ -23,7 +23,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
   const proFeatures = [
     language === 'tr' ? 'Sınırsız Journal & Trade' : 'Unlimited Journals & Trades',
-    language === 'tr' ? 'Sınırsız Fotoğraf Yükleme' : 'Unlimited Photo Upload',
+    language === 'tr' ? 'İşlem Öncesi ve Sonrası 3\'er Fotoğraf' : '3 Photos Before and 3 After Each Trade',
     language === 'tr' ? 'AI Analiz' : 'AI Analysis',
     language === 'tr' ? 'Gelişmiş İstatistikler' : 'Advanced Statistics',
     language === 'tr' ? 'Drawdown & Streak Analizi' : 'Drawdown & Streak Analysis',
