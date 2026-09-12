@@ -205,14 +205,12 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
         )}
       </div>
 
-      {/* Kurulumun canlandırması. Yazıyı okumadan da ne yapılacağı görülsün. */}
-      <div>
-        <div style={label}>{tr('Nasıl kurulur', 'How it goes')}</div>
-        <MTSetupTour />
-      </div>
-
-      {/* Kurulum */}
+      {/* Kurulum. Tur, aşağıdaki dört maddenin aynısını oynatır; ayrı bir
+          bölüm olarak değil, kartın kapağı olarak duruyor. */}
       <div style={card} className="p-6">
+        <div className="tour-flush">
+          <MTSetupTour />
+        </div>
         <div style={label}>{tr('Kurulum', 'Setup')}</div>
         <ol className="space-y-5">
           {[

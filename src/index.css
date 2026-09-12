@@ -476,3 +476,14 @@ body::before {
   .tour-controls .ch .lb { display: none; }
   .tour-caption { min-height: 88px; padding: 14px 16px; }
 }
+
+/* Tur, Kurulum kartının kapağı: kartın iç boşluğunu iptal edip kenarlara
+   dayanır, kendi çerçevesini bırakır. Ayrı bir kutu gibi değil, kartın üst
+   yarısı gibi okunsun. */
+.tour-flush { margin: -24px -24px 24px; }
+.tour-flush .mt-tour {
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-radius: 17px 17px 0 0;
+  background: transparent;
+}
