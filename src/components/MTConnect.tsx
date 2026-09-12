@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Plug, Copy, Check, Trash2, KeyRound, AlertTriangle, Loader, Download } from 'lucide-react';
 import { useAuth } from '@clerk/clerk-react';
 import { useLanguage } from '../context/LanguageContext';
+import MTSetupTour from './MTSetupTour';
 
 interface ApiKey {
   id: string;
@@ -202,6 +203,12 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             ))}
           </ul>
         )}
+      </div>
+
+      {/* Kurulumun canlandırması. Yazıyı okumadan da ne yapılacağı görülsün. */}
+      <div>
+        <div style={label}>{tr('Nasıl kurulur', 'How it goes')}</div>
+        <MTSetupTour />
       </div>
 
       {/* Kurulum */}

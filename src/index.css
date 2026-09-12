@@ -140,3 +140,339 @@ body::before {
 }
 
 @page { size: A4 portrait; margin: 14mm; }
+
+/* ── METATRADER KURULUM TURU ───────────────────────────────────────────────
+   MTSetupTour bileşeninin bütün görünümü. Hepsi .mt-tour altında duruyor:
+   içeride MetaTrader'ın kendi dünyası taklit edildiği için (Windows grisi,
+   klasik seçim mavisi, 11px arayüz yazısı) bu kurallar uygulamanın geri
+   kalanına sızmamalı.
+
+   Sahne 960×540'lık sabit bir tuval; JS onu kabın genişliğine ölçekler.
+   Bütün konumlar bu tuvale göre piksel. */
+.mt-tour {
+  --mt-chrome:  #eceef2;
+  --mt-chrome2: #dfe2e9;
+  --mt-edge:    #b6bcc8;
+  --mt-text:    #1d2128;
+  --mt-blue:    #316ac5;
+  --mt-chart:   #191c26;
+  --mt-grid:    rgba(255,255,255,0.055);
+  --mt-up:      #4fc99a;
+  --mt-down:    #e2685f;
+  --mt-ui: "Segoe UI", Tahoma, "Helvetica Neue", sans-serif;
+
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+  overflow: hidden;
+}
+.mt-tour * { box-sizing: border-box; }
+
+.tour-viewport {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  overflow: hidden; background: #070810;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.tour-stage {
+  position: absolute; top: 0; left: 0;
+  width: 960px; height: 540px; transform-origin: top left;
+  font-family: var(--mt-ui); color: var(--mt-text);
+}
+.mt-tour .scene { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.mt-tour .scene.live { opacity: 1; }
+
+/* MetaTrader penceresi */
+.mt-tour .mt5 {
+  position: absolute; left: 44px; top: 34px; width: 872px; height: 472px;
+  background: var(--mt-chrome); border: 1px solid var(--mt-edge); border-radius: 6px;
+  box-shadow: 0 28px 70px rgba(0,0,0,0.62); overflow: hidden;
+  transition: transform .55s cubic-bezier(.4,0,.2,1), opacity .45s ease;
+}
+.mt-tour .mt5.gone { transform: scale(.9) translateY(18px); opacity: 0; }
+
+.mt-tour .titlebar {
+  height: 28px; display: flex; align-items: center; gap: 8px; padding: 0 6px 0 10px;
+  background: linear-gradient(180deg, #f7f8fa, var(--mt-chrome2));
+  border-bottom: 1px solid var(--mt-edge); font-size: 11.5px; color: #3b4250;
+}
+.mt-tour .titlebar .dot { width: 12px; height: 12px; border-radius: 3px; background: #8e97a8; flex: none; }
+.mt-tour .winbtns { margin-inline-start: auto; display: flex; gap: 2px; }
+.mt-tour .winbtn {
+  width: 26px; height: 18px; display: grid; place-items: center;
+  font-size: 10px; color: #5a6172; border-radius: 3px;
+}
+.mt-tour .winbtn.x { transition: background .18s, color .18s; }
+
+.mt-tour .menubar {
+  height: 23px; display: flex; align-items: center; gap: 2px; padding: 0 4px;
+  background: #f4f5f8; border-bottom: 1px solid var(--mt-edge); font-size: 11.5px;
+}
+.mt-tour .menubar span { padding: 3px 8px; border-radius: 3px; }
+.mt-tour .menubar span.hot { background: var(--mt-blue); color: #fff; }
+
+.mt-tour .toolbar {
+  height: 26px; display: flex; align-items: center; gap: 5px; padding: 0 8px;
+  background: linear-gradient(180deg, #f1f2f5, #e6e8ee);
+  border-bottom: 1px solid var(--mt-edge);
+}
+.mt-tour .tool { width: 15px; height: 15px; border-radius: 3px; background: #c3c8d2; }
+.mt-tour .tool.a { background: #9fb4d8; }
+.mt-tour .tool.b { background: #a8c9ae; }
+.mt-tour .tool.c { background: #d6b89a; }
+.mt-tour .tool.sep { width: 1px; height: 15px; border-radius: 0; background: var(--mt-edge); }
+
+.mt-tour .wbody { position: absolute; inset: 77px 0 0; display: flex; }
+
+.mt-tour .dropdown {
+  position: absolute; top: 51px; width: 238px; padding: 4px; z-index: 6;
+  background: #fbfbfd; border: 1px solid var(--mt-edge); border-radius: 4px;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.3); font-size: 11.5px; transform-origin: top left;
+}
+.mt-tour .dropdown .item { padding: 5px 10px; border-radius: 3px; }
+.mt-tour .dropdown .item.hot { background: var(--mt-blue); color: #fff; }
+.mt-tour .dropdown .sep { height: 1px; background: #e0e3ea; margin: 4px 6px; }
+
+/* Grafik alanı */
+.mt-tour .chart {
+  position: relative; flex: 1; background: var(--mt-chart); overflow: hidden;
+  background-image:
+    repeating-linear-gradient(to right, var(--mt-grid) 0 1px, transparent 1px 74px),
+    repeating-linear-gradient(to bottom, var(--mt-grid) 0 1px, transparent 1px 52px);
+}
+.mt-tour .chart .sym {
+  position: absolute; right: 10px; bottom: 8px; font-size: 11px;
+  color: rgba(255,255,255,0.35); letter-spacing: .04em;
+}
+.mt-tour .candles { position: absolute; inset: 0; }
+.mt-tour .candle { position: absolute; }
+.mt-tour .candle i { position: absolute; width: 1px; top: 0; bottom: 0; background: currentColor; }
+.mt-tour .candle b { position: absolute; left: 0; background: currentColor; border-radius: 1px; }
+
+/* EA'nın grafiğe yazdığı Comment metni */
+.mt-tour .comment {
+  position: absolute; left: 10px; top: 8px; z-index: 3;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px; line-height: 1.55; color: #d8dbe6; white-space: pre;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+.mt-tour .comment .ok { color: #34d399; }
+.mt-tour .smiley { position: absolute; right: 14px; top: 8px; z-index: 3; font-size: 13px; color: #34d399; }
+
+/* Kılavuz paneli */
+.mt-tour .nav-panel {
+  width: 214px; background: #f7f8fa; border-inline-end: 1px solid var(--mt-edge); font-size: 11.5px;
+}
+.mt-tour .nav-panel .head {
+  height: 22px; display: flex; align-items: center; padding: 0 8px;
+  background: linear-gradient(180deg, #eceef3, #e2e5ec);
+  border-bottom: 1px solid var(--mt-edge); font-size: 11px; color: #4b5261;
+}
+.mt-tour .tree { padding: 6px 4px; }
+.mt-tour .node { display: flex; align-items: center; gap: 6px; padding: 3px 6px; border-radius: 3px; }
+.mt-tour .node .tw { width: 8px; color: #8a92a1; font-size: 9px; }
+.mt-tour .node .ic { width: 12px; height: 12px; border-radius: 2px; background: #b9c0cd; flex: none; }
+.mt-tour .node.ea .ic { background: #7b68c9; }
+.mt-tour .node.child { padding-inline-start: 22px; }
+
+/* Dosya gezgini */
+.mt-tour .explorer {
+  position: absolute; left: 250px; top: 128px; width: 600px; height: 330px; z-index: 8;
+  background: #fbfbfd; border: 1px solid var(--mt-edge); border-radius: 6px;
+  box-shadow: 0 26px 60px rgba(0,0,0,0.55); overflow: hidden;
+}
+.mt-tour .explorer .path {
+  height: 28px; display: flex; align-items: center; gap: 6px; padding: 0 10px;
+  background: #f1f2f6; border-bottom: 1px solid var(--mt-edge); font-size: 11.5px; color: #4b5261;
+}
+.mt-tour .explorer .path b { font-weight: 600; color: var(--mt-text); }
+.mt-tour .fgrid { display: flex; flex-wrap: wrap; gap: 4px; padding: 12px; align-content: flex-start; }
+.mt-tour .folder {
+  width: 108px; padding: 10px 6px 8px; border-radius: 4px; font-size: 11px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+}
+.mt-tour .folder .fi {
+  width: 40px; height: 31px; border-radius: 3px 3px 4px 4px; position: relative;
+  background: linear-gradient(180deg, #f3c96b, #e0a83e);
+}
+.mt-tour .folder .fi::before {
+  content: ''; position: absolute; left: 0; top: -5px; width: 17px; height: 6px;
+  border-radius: 3px 3px 0 0; background: #e9bb55;
+}
+.mt-tour .dropfile {
+  width: 132px; padding: 10px 6px 8px; border-radius: 4px; font-size: 10.5px; color: #2a2f38;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+}
+.mt-tour .dropfile .fi {
+  width: 34px; height: 42px; border-radius: 3px; background: #fff; border: 1px solid #c3c8d2;
+  display: grid; place-items: center; font-size: 8px; font-weight: 700; color: #7b68c9;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+
+/* Diyalog kutuları */
+.mt-tour .dialog {
+  position: absolute; z-index: 9; background: var(--mt-chrome);
+  border: 1px solid #9aa2b1; border-radius: 6px;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.6); overflow: hidden;
+}
+.mt-tour .dhead {
+  height: 27px; display: flex; align-items: center; padding: 0 10px;
+  background: linear-gradient(180deg, #f7f8fa, var(--mt-chrome2));
+  border-bottom: 1px solid var(--mt-edge); font-size: 11.5px; color: #3b4250;
+}
+.mt-tour .tabs { display: flex; gap: 2px; padding: 8px 10px 0; background: #f4f5f8; }
+.mt-tour .tab {
+  padding: 5px 11px; font-size: 11px; border: 1px solid var(--mt-edge); border-bottom: none;
+  border-radius: 4px 4px 0 0; background: #e3e6ec; color: #5a6172;
+}
+.mt-tour .tab.on { background: var(--mt-chrome); color: var(--mt-text); font-weight: 600; }
+.mt-tour .pane {
+  margin: 0 10px; padding: 14px; background: var(--mt-chrome);
+  border: 1px solid var(--mt-edge); font-size: 11.5px;
+}
+.mt-tour .check { display: flex; align-items: flex-start; gap: 8px; }
+.mt-tour .box {
+  width: 13px; height: 13px; flex: none; margin-top: 1px; border-radius: 2px;
+  border: 1px solid #7d8595; background: #fff;
+  display: grid; place-items: center; font-size: 10px; color: #fff; line-height: 1;
+}
+.mt-tour .box.on { background: var(--mt-blue); border-color: var(--mt-blue); }
+.mt-tour .listbox {
+  margin-top: 10px; height: 78px; background: #fff; border: 1px solid #9aa2b1;
+  padding: 5px 7px; font-size: 11.5px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+.mt-tour .caret {
+  display: inline-block; width: 1px; height: 12px; background: #1d2128;
+  vertical-align: -2px; margin-inline-start: 1px; animation: tour-blink 1s steps(1) infinite;
+}
+@keyframes tour-blink { 50% { opacity: 0; } }
+
+.mt-tour .inputs-table { width: 100%; border-collapse: collapse; font-size: 11.5px; background: #fff; }
+.mt-tour .inputs-table th {
+  text-align: start; font-weight: 600; font-size: 10.5px; color: #5a6172;
+  background: #eceef3; border: 1px solid var(--mt-edge); padding: 4px 8px;
+}
+.mt-tour .inputs-table td { border: 1px solid #dfe2e9; padding: 4px 8px; }
+.mt-tour .inputs-table td.val { font-family: "JetBrains Mono", ui-monospace, monospace; }
+.mt-tour .inputs-table tr.focus td { background: rgba(49,106,197,0.1); }
+.mt-tour .inputs-table tr.focus td.val { outline: 1.5px solid var(--mt-blue); outline-offset: -2px; }
+
+.mt-tour .btnrow { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 10px; }
+.mt-tour .btn {
+  min-width: 74px; padding: 5px 12px; font-size: 11.5px; text-align: center;
+  border: 1px solid #8d95a4; border-radius: 3px;
+  background: linear-gradient(180deg, #fbfbfd, #e7eaf0);
+}
+.mt-tour .btn.primary { border-color: var(--mt-blue); box-shadow: 0 0 0 1px rgba(49,106,197,0.3) inset; }
+.mt-tour .btn.press { background: linear-gradient(180deg, #d9dde5, #eceef3); transform: translateY(1px); }
+
+/* Sahne yardımcıları: görünürlük, halka, imleç */
+.mt-tour .fx { opacity: 0; transition: opacity .3s ease, transform .38s cubic-bezier(.4,0,.2,1); }
+.mt-tour .fx.on { opacity: 1; }
+.mt-tour .fx.pop { transform: scale(.94); }
+.mt-tour .fx.pop.on { transform: scale(1); }
+.mt-tour .fx.drop { transform: translateY(-26px); }
+.mt-tour .fx.drop.on { transform: translateY(0); }
+
+.mt-tour .ring { position: relative; }
+.mt-tour .ring::after {
+  content: ''; position: absolute; inset: -5px; border-radius: 7px; pointer-events: none;
+  border: 2px solid #a78bfa; box-shadow: 0 0 0 4px rgba(139,92,246,0.18);
+  animation: tour-pulse 1.6s ease-in-out infinite;
+}
+@keyframes tour-pulse { 50% { box-shadow: 0 0 0 9px rgba(139,92,246,0.05); } }
+
+.mt-tour .cursor {
+  position: absolute; left: 0; top: 0; width: 22px; height: 22px; z-index: 40; pointer-events: none;
+  transition: transform .62s cubic-bezier(.45,.05,.2,1);
+}
+.mt-tour .cursor svg { display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,.55)); }
+.mt-tour .cursor::before {
+  content: ''; position: absolute; left: -9px; top: -9px; width: 38px; height: 38px;
+  border-radius: 50%; background: rgba(167,139,250,0.45); opacity: 0; transform: scale(.3);
+}
+.mt-tour .cursor.click::before { animation: tour-tap .5s ease-out; }
+@keyframes tour-tap {
+  0%   { opacity: .75; transform: scale(.25); }
+  100% { opacity: 0;   transform: scale(1.1); }
+}
+.mt-tour .ghost {
+  position: absolute; z-index: 30; padding: 3px 8px; border-radius: 3px;
+  background: rgba(123,104,201,0.92); color: #fff; font-size: 11px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.45);
+  transition: transform .62s cubic-bezier(.45,.05,.2,1), opacity .25s;
+}
+
+.mt-tour .chip {
+  position: absolute; left: 44px; top: -2px; z-index: 20;
+  display: flex; align-items: baseline; gap: 9px; font-family: "Inter", sans-serif;
+}
+.mt-tour .chip .n {
+  font-family: "Newsreader", serif; font-size: 15px; color: rgba(255,255,255,0.28);
+  font-variant-numeric: tabular-nums;
+}
+.mt-tour .chip .t { font-size: 12px; color: rgba(255,255,255,0.62); }
+
+.mt-tour .endcard {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px; text-align: center;
+  font-family: "Inter", sans-serif;
+}
+.mt-tour .endcard .tick {
+  width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(52,211,153,0.13); border: 1px solid rgba(52,211,153,0.4);
+  color: #34d399; font-size: 20px;
+}
+.mt-tour .endcard h3 {
+  font-family: "Newsreader", serif; font-weight: 500; font-size: 27px; margin: 0;
+  color: #fff; letter-spacing: -0.01em;
+}
+.mt-tour .endcard p { margin: 0; font-size: 14px; color: rgba(255,255,255,0.5); max-width: 46ch; }
+
+/* Altyazı ve denetimler */
+.tour-caption {
+  min-height: 74px; display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.tour-caption .step {
+  font-family: "Newsreader", serif; font-size: 13px; color: #a78bfa;
+  white-space: nowrap; letter-spacing: .04em; font-variant-numeric: tabular-nums;
+}
+.tour-caption .text { font-size: 14.5px; line-height: 1.5; color: rgba(255,255,255,0.8); }
+.tour-caption code {
+  font-family: "JetBrains Mono", monospace; font-size: 12.5px;
+  background: rgba(139,92,246,0.14); color: #a78bfa; padding: 1px 6px; border-radius: 4px;
+}
+
+.tour-controls { display: flex; align-items: center; gap: 14px; padding: 12px 16px; }
+.tour-controls .pp {
+  width: 38px; height: 38px; flex: none; border-radius: 50%; border: none;
+  background: #8b5cf6; color: #fff; display: grid; place-items: center;
+  cursor: pointer; transition: filter .15s;
+}
+.tour-controls .pp:hover { filter: brightness(1.12); }
+.tour-controls .track { flex: 1; display: flex; gap: 4px; }
+.tour-controls .ch {
+  flex: 1; background: none; border: none; padding: 0; cursor: pointer;
+  text-align: start; color: inherit; font: inherit;
+}
+.tour-controls .ch .bar {
+  display: block; height: 4px; border-radius: 3px;
+  background: rgba(255,255,255,0.1); overflow: hidden;
+}
+.tour-controls .ch .bar i { display: block; height: 100%; width: 0; background: #8b5cf6; }
+.tour-controls .ch .lb {
+  display: block; margin-top: 7px; font-size: 11px; color: rgba(255,255,255,0.3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .2s;
+}
+.tour-controls .ch[data-state="now"] .lb { color: #f2f2f7; }
+.tour-controls .ch[data-state="done"] .lb { color: rgba(255,255,255,0.42); }
+.tour-time {
+  font-family: "JetBrains Mono", monospace; font-size: 12px; color: rgba(255,255,255,0.3);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .tour-controls .ch .lb { display: none; }
+  .tour-caption { min-height: 88px; padding: 14px 16px; }
+}
