@@ -182,6 +182,9 @@ export default async function handler(req: any, res: any) {
       post_trade_photos: [],
       external_id: externalId,
     });
+    // Aynı pakette aynı pozisyon iki kez gelirse (eski EA'lar kısmi kapanışı
+    // ayrı ayrı gönderiyordu) ikincisini eklemeyiz.
+    if (externalId) known.add(externalId);
   }
 
   let inserted = 0;

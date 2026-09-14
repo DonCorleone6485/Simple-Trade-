@@ -12,7 +12,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Simple Trading Journal"
 #property link      "https://www.simpletradejournal.io"
-#property version   "1.02"
+#property version   "1.03"
 #property strict
 
 // Girdi etiketleri MQL5'te yorum satırından gelir ve ekranda öyle görünür.
@@ -33,6 +33,38 @@ int      g_total    = 0;   // bu oturumda gönderilen pozisyon sayısı
 bool     g_fullScanDone = false;  // geçmişin tamamı bir kez tarandı mı
 string   g_status   = "";  // grafiğe yazılan son durum
 bool     g_ready    = false; // anahtar girilmiş ve tarama başlamış mı
+string   g_key      = "";    // kullanılan anahtar: girilen ya da hatırlanan
+
+/**
+ * Anahtarı hatırlarız. EA grafikten kalkıp yeniden eklendiğinde MetaTrader
+ * girdileri boş getiriyor; kullanıcı her seferinde anahtarı bulup yeniden
+ * yapıştırmak zorunda kalmasın. Dosya terminalin kendi MQL5/Files klasöründe.
+ *
+ * Anahtar hesap numarasına bağlı: aynı terminalde canlı ve prop hesabı
+ * kullanan biri hesap değiştirince işlemler öteki hesabın journal'ına
+ * gitmesin.
+ */
+string KeyFile() { return("SimpleTradingJournal_" + IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN)) + ".key"); }
+
+string LoadKey()
+  {
+   if(AccountInfoInteger(ACCOUNT_LOGIN) <= 0) return("");
+   int h = FileOpen(KeyFile(), FILE_READ | FILE_TXT | FILE_ANSI);
+   if(h == INVALID_HANDLE) return("");
+   string key = FileReadString(h);
+   FileClose(h);
+   StringTrimLeft(key); StringTrimRight(key);
+   return(key);
+  }
+
+void SaveKey(const string key)
+  {
+   if(AccountInfoInteger(ACCOUNT_LOGIN) <= 0) return;
+   int h = FileOpen(KeyFile(), FILE_WRITE | FILE_TXT | FILE_ANSI);
+   if(h == INVALID_HANDLE) return;
+   FileWriteString(h, key);
+   FileClose(h);
+  }
 
 /**
  * Durum grafiğin sol üst köşesinde durur.
@@ -53,7 +85,11 @@ int OnInit()
    // sessizce siler: kullanıcı onu grafikte sanır, oysa hiç çalışmaz — ve
    // günlerce öyle kalır. Grafikte kalıp neyin eksik olduğunu söylüyoruz;
    // anahtar Girdiler'e yapıştırılınca MetaTrader OnInit'i yeniden çağırır.
-   if(StringLen(ApiKey) < 8)
+   g_key = ApiKey;
+   StringTrimLeft(g_key); StringTrimRight(g_key);
+   if(StringLen(g_key) < 8) g_key = LoadKey();
+
+   if(StringLen(g_key) < 8)
      {
       g_ready = false;
       Status("ANAHTAR GIRILMEMIS - su an calismiyor.\n"
@@ -173,11 +209,15 @@ string JsonPrice(const string key, const double value, const int digits)
 void Hello()
   {
    double deposit = InitialDeposit();
-   string json = "{\"key\":\"" + ApiKey + "\"";
+   string json = "{\"key\":\"" + g_key + "\"";
    if(deposit > 0) json += ",\"startingCapital\":" + DoubleToString(deposit, 2);
    json += ",\"trades\":[]}";
    if(Send(json, 0))
+     {
+      // Sunucu kabul etti: anahtar doğru, bir dahaki eklemede hatırlanır.
+      SaveKey(g_key);
       Status("Baglanti tamam. Yeni kapanan islem bekleniyor.");
+     }
   }
 
 //+------------------------------------------------------------------+
@@ -230,6 +270,24 @@ void Scan()
       string sym = HistoryDealGetString(t, DEAL_SYMBOL);
       if(sym == "") continue;
 
+      // Kısmi kapanış: pozisyonun bir kısmı kapandı, kalanı hâlâ açık.
+      // Tamamı kapanmadan göndermiyoruz; yoksa yarım kârla kaydolurdu.
+      if(PositionSelectByTicket((ulong)pid)) continue;
+
+      // Aynı pozisyonun birden çok çıkışı (TP1, TP2…) tek işlemdir. Geçmiş
+      // zamana göre sıralı: sonraki çıkış kapanış bilgisinin üstüne yazar.
+      int seen = -1;
+      for(int j = 0; j < count; j++)
+         if(posId[j] == pid) { seen = j; break; }
+      if(seen >= 0)
+        {
+         closeDeal[seen]  = t;
+         closeTime[seen]  = HistoryDealGetInteger(t, DEAL_TIME);
+         closePrice[seen] = HistoryDealGetDouble(t, DEAL_PRICE);
+         reasonCode[seen] = HistoryDealGetInteger(t, DEAL_REASON);
+         continue;
+        }
+
       int n = count + 1;
       ArrayResize(posId, n);      ArrayResize(closeDeal, n);
       ArrayResize(symbol, n);     ArrayResize(digits, n);
@@ -275,7 +333,8 @@ void Scan()
       swap[k]       += HistoryDealGetDouble(t, DEAL_SWAP);
       fee[k]        += HistoryDealGetDouble(t, DEAL_FEE);
 
-      if(HistoryDealGetInteger(t, DEAL_ENTRY) == DEAL_ENTRY_IN)
+      // Pozisyona sonradan ekleme yapıldıysa açılış ilk giriştir.
+      if(HistoryDealGetInteger(t, DEAL_ENTRY) == DEAL_ENTRY_IN && !hasOpen[k])
         {
          hasOpen[k]   = true;
          openTime[k]  = HistoryDealGetInteger(t, DEAL_TIME);
@@ -334,7 +393,7 @@ void Scan()
 
    if(ready == 0) { g_fullScanDone = true; return; }
 
-   string json = "{\"key\":\"" + ApiKey + "\"";
+   string json = "{\"key\":\"" + g_key + "\"";
    double deposit = InitialDeposit();
    if(deposit > 0) json += ",\"startingCapital\":" + DoubleToString(deposit, 2);
    json += ",\"trades\":[";
