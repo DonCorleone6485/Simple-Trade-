@@ -17,6 +17,7 @@ import NoteField from './NoteField';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../lib/supabase';
+import { loadChecklists } from '../lib/checklists';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip as RechartsTooltip, ResponsiveContainer,
@@ -28,7 +29,7 @@ interface TradeHistoryProps {
   onDelete: (id: string) => void;
   onDeleteMultiple?: (ids: string[]) => void;
   /** İstatistiklerde hesap bakiyesi ve getiri için başlangıç sermayesi. */
-  account?: { startingCapital?: number | null };
+  account?: { startingCapital?: number | null; checklistId?: string | null };
   /** Bu journal dışındaki journal'lar — işlem taşımak için. */
   otherJournals?: { id: string; name: string }[];
   onMoveTrades?: (ids: string[], targetJournalId: string) => void;
@@ -515,11 +516,27 @@ export default function TradeHistory({
       setEditForm({ ...trade });
       setSelectedTrade(null);
     });
+    // Checklist'i olmayan işlem (MetaTrader'dan gelen ya da o gün doldurulmamış)
+    // boş kutuyla ve "örnek maddeler" düğmesiyle açılıyordu. Journal'ın
+    // kullandığı liste işaretsiz gelsin — kullanıcı sonradan işaretlesin.
+    if (!(trade.checklist && trade.checklist.length > 0) && user) {
+      loadChecklists(user.id).then(lists => {
+        const list = lists.find(l => l.id === account?.checklistId) || lists[0];
+        if (!list || list.items.length === 0) return;
+        setEditForm(f => (f.id === trade.id && !(f.checklist && f.checklist.length > 0))
+          ? { ...f, checklist: list.items.map(i => ({ ...i, checked: false })) }
+          : f);
+      });
+    }
   };
 
   const saveEdit = () => {
     if (!editingTrade || !onUpdate) return;
     const merged = { ...editingTrade, ...editForm } as Trade;
+    // Hazır getirdiğimiz liste hiç işaretlenmediyse işleme yazmayız: yoksa
+    // dokunulmamış her işlem detayda "Checklist 0/5" diye görünürdü.
+    const hadChecklist = !!(editingTrade.checklist && editingTrade.checklist.length > 0);
+    if (!hadChecklist && !(merged.checklist || []).some(i => i.checked)) merged.checklist = undefined;
     if (merged.exitDate && new Date(merged.exitDate).getTime() < new Date(merged.date).getTime()) {
       alert(language === 'tr'
         ? 'Çıkış tarihi, giriş tarihinden önce olamaz.'
@@ -1143,6 +1160,8 @@ export default function TradeHistory({
             <MTFAnalysis
               value={editForm.mtfAnalysis || []}
               onChange={entries => setEditForm(f => ({ ...f, mtfAnalysis: entries }))}
+              symbol={editForm.symbol}
+              autoFill={!(editingTrade.mtfAnalysis && editingTrade.mtfAnalysis.length > 0)}
             />
           </div>
 

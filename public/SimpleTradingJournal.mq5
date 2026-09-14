@@ -12,7 +12,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Simple Trading Journal"
 #property link      "https://www.simpletradejournal.io"
-#property version   "1.00"
+#property version   "1.01"
 #property strict
 
 // Girdi etiketleri MQL5'te yorum satırından gelir ve ekranda öyle görünür.
@@ -133,7 +133,10 @@ double InitialDeposit()
  */
 int ServerGmtOffset()
   {
-   long diff = (long)TimeCurrent() - (long)TimeGMT();
+   // TimeCurrent() son fiyatın saatidir: hafta sonu cuma gecesinde donar ve
+   // fark iki güne çıkar — işlemler iki gün ileri tarihli gönderilirdi.
+   // TimeTradeServer() fiyat gelmese de sunucunun şu anki saatini verir.
+   long diff = (long)TimeTradeServer() - (long)TimeGMT();
    return((int)(MathRound((double)diff / 1800.0) * 1800));
   }
 

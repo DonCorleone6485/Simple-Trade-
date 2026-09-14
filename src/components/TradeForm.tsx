@@ -382,7 +382,10 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
     setSymbol('EURUSD'); setOrderType('Market');
     setSetup(''); setRisk(''); setReward(''); setRr('');
     setPreNotes(''); setPostNotes('');
-    setPrePhotos([]); setPostPhotos([]); setMtf([]);
+    // Multi-timeframe analizi temizlenmiyor: parite aynı kalırsa bir sonraki
+    // işlemde gelmesi gereken zaten bu analiz. Parite değişirse bileşen o
+    // paritenin son analizini kendisi getirir.
+    setPrePhotos([]); setPostPhotos([]);
     setChecklist(prev => prev.map(i => ({ ...i, checked: false })));
     setResult('');
   };

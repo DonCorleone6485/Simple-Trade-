@@ -116,17 +116,27 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, loadingPrefill, entries.length]);
 
+  /** Analizin ait olduğu parite — parite değişince elle yapılan değişiklik geçersiz. */
+  const symbolRef = useRef(symbol);
+
   // Bölüm açıldığında (veya sembol değiştiğinde) bu sembolün en son analizini getir.
   useEffect(() => {
+    // Parite değişti: ekrandaki analiz eski paritenin. EURUSD'de elle
+    // düzenlenmiş olsa bile altına geçince altının son analizi gelmeli.
+    if (symbol !== symbolRef.current) {
+      symbolRef.current = symbol;
+      dirtyRef.current = false;
+    }
     if (!autoFill || !open || !symbol || !user || dirtyRef.current) return;
     let cancelled = false;
-    (async () => {
+    // Parite elle yazılıyorsa her harfte sorgu atmayalım.
+    const timer = setTimeout(async () => {
       setLoadingPrefill(true);
       const { data } = await supabase
         .from('trades')
         .select('mtf_analysis')
         .eq('user_id', user.id)
-        .eq('symbol', symbol)
+        .eq('symbol', symbol.toUpperCase().trim())
         .not('mtf_analysis', 'is', null)
         .order('date', { ascending: false })
         .limit(1);
@@ -140,8 +150,8 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
         setPrefilledFrom(null);
       }
       setLoadingPrefill(false);
-    })();
-    return () => { cancelled = true; };
+    }, 300);
+    return () => { cancelled = true; clearTimeout(timer); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoFill, open, symbol, user?.id]);
 
