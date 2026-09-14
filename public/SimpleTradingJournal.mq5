@@ -12,7 +12,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Simple Trading Journal"
 #property link      "https://www.simpletradejournal.io"
-#property version   "1.01"
+#property version   "1.02"
 #property strict
 
 // Girdi etiketleri MQL5'te yorum satırından gelir ve ekranda öyle görünür.
@@ -32,6 +32,7 @@ datetime g_scanFrom = 0;
 int      g_total    = 0;   // bu oturumda gönderilen pozisyon sayısı
 bool     g_fullScanDone = false;  // geçmişin tamamı bir kez tarandı mı
 string   g_status   = "";  // grafiğe yazılan son durum
+bool     g_ready    = false; // anahtar girilmiş ve tarama başlamış mı
 
 /**
  * Durum grafiğin sol üst köşesinde durur.
@@ -48,12 +49,22 @@ void Status(const string text)
 //+------------------------------------------------------------------+
 int OnInit()
   {
+   // Anahtar boşsa grafikten kendimizi kaldırmıyoruz. INIT_FAILED eklentiyi
+   // sessizce siler: kullanıcı onu grafikte sanır, oysa hiç çalışmaz — ve
+   // günlerce öyle kalır. Grafikte kalıp neyin eksik olduğunu söylüyoruz;
+   // anahtar Girdiler'e yapıştırılınca MetaTrader OnInit'i yeniden çağırır.
    if(StringLen(ApiKey) < 8)
      {
-      Status("Anahtar girilmemiş.\nSitede journal > MetaTrader sekmesinden anahtar oluştur,\nsonra bu EA'ya sag tikla > Ozellikler > Girdiler > ApiKey.");
-      Print("HATA: ApiKey boş. Journal'daki MetaTrader sekmesinden anahtar oluşturup buraya yapıştır.");
-      return(INIT_FAILED);
+      g_ready = false;
+      Status("ANAHTAR GIRILMEMIS - su an calismiyor.\n"
+             "Grafikte F7'ye bas (ya da sag tik > Uzman Danismanlar > Ozellikler),\n"
+             "Girdiler sekmesinde ApiKey satirina sitedeki anahtari yapistir, Tamam.");
+      Print("HATA: ApiKey boş. Grafikte F7 > Girdiler > ApiKey satırına journal'daki anahtarı yapıştır.");
+      Alert("Simple Trading Journal: anahtar girilmedi, eklenti çalışmıyor. "
+            "Grafikte F7'ye basıp Girdiler > ApiKey satırına sitedeki anahtarı yapıştır.");
+      return(INIT_SUCCEEDED);
      }
+   g_ready = true;
 
    g_scanFrom = TimeCurrent() - (datetime)HistoryDays * 86400;
    ArrayResize(g_sent, 0);
@@ -73,14 +84,14 @@ int OnInit()
 
 void OnDeinit(const int reason) { EventKillTimer(); Comment(""); }
 
-void OnTimer() { Scan(); }
+void OnTimer() { if(g_ready) Scan(); }
 
 // Pozisyon kapandığı anda beklemeden gönder.
 void OnTradeTransaction(const MqlTradeTransaction &trans,
                         const MqlTradeRequest &request,
                         const MqlTradeResult &result)
   {
-   if(trans.type == TRADE_TRANSACTION_DEAL_ADD)
+   if(g_ready && trans.type == TRADE_TRANSACTION_DEAL_ADD)
       Scan();
   }
 

@@ -232,9 +232,9 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                     'Close it and open it again. SimpleTradingJournal will appear under Expert Advisors in the Navigator panel on the left.'),
             },
             {
-              t: tr('Grafiğe sürükle ve anahtarı yapıştır', 'Drag it onto a chart and paste the key'),
-              d: tr('SimpleTradingJournal\'ı herhangi bir grafiğe sürükle. Açılan pencerede Girdiler sekmesine geç, ApiKey satırına yukarıdaki anahtarı yapıştır, Tamam. Grafiğin sol üstünde durum yazısı belirir — orada ne olduğunu görürsün.',
-                    'Drag SimpleTradingJournal onto any chart. In the window that opens, go to the Inputs tab, paste the key above into ApiKey, and click OK. A status line appears at the top-left of the chart telling you what is happening.'),
+              t: tr('Boş bir grafiğe sürükle ve anahtarı yapıştır', 'Drag it onto an empty chart and paste the key'),
+              d: tr('Yeni, boş bir grafik aç ve SimpleTradingJournal\'ı onun üstüne sürükle — işlem yaptığın grafiğe değil. MetaTrader bir grafikte tek uzman danışman çalıştırır: Position Sizer gibi başka bir eklentinin olduğu grafiğe koyarsan onu kaldırır, sonra oraya o eklentiyi geri koyduğunda da bizimki gider. Açılan pencerede Girdiler sekmesine geç, ApiKey satırına yukarıdaki anahtarı yapıştır, Tamam. Grafiğin sol üstünde durum yazısı belirir — orada ne olduğunu görürsün.',
+                    'Open a new, empty chart and drag SimpleTradingJournal onto it — not the chart you trade on. MetaTrader runs one expert advisor per chart: drop it on a chart running another add-on such as Position Sizer and that one is removed, and putting that one back removes ours. In the window that opens, go to the Inputs tab, paste the key above into ApiKey, and click OK. A status line appears at the top-left of the chart telling you what is happening.'),
             },
           ].map((s: { t: string; d: string; code?: string; download?: string }, i: number) => (
             <li key={i} className="flex gap-4">
