@@ -232,11 +232,34 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                     'Close it and open it again. SimpleTradingJournal will appear under Expert Advisors in the Navigator panel on the left.'),
             },
             {
-              t: tr('Boş bir grafiğe sürükle ve anahtarı yapıştır', 'Drag it onto an empty chart and paste the key'),
-              d: tr('Yeni, boş bir grafik aç ve SimpleTradingJournal\'ı onun üstüne sürükle — işlem yaptığın grafiğe değil. MetaTrader bir grafikte tek uzman danışman çalıştırır: Position Sizer gibi başka bir eklentinin olduğu grafiğe koyarsan onu kaldırır, sonra oraya o eklentiyi geri koyduğunda da bizimki gider. Açılan pencerede Girdiler sekmesine geç, ApiKey satırına yukarıdaki anahtarı yapıştır, Tamam. Grafiğin sol üstünde durum yazısı belirir — orada ne olduğunu görürsün.',
-                    'Open a new, empty chart and drag SimpleTradingJournal onto it — not the chart you trade on. MetaTrader runs one expert advisor per chart: drop it on a chart running another add-on such as Position Sizer and that one is removed, and putting that one back removes ours. In the window that opens, go to the Inputs tab, paste the key above into ApiKey, and click OK. A status line appears at the top-left of the chart telling you what is happening.'),
+              t: tr('Grafiğe sürükle ve anahtarı yapıştır', 'Drag it onto a chart and paste the key'),
+              d: tr('SimpleTradingJournal\'ı bir grafiğin üstüne sürükle. Açılan pencerede Girdiler sekmesine geç, ApiKey satırına yukarıdaki anahtarı yapıştır, Tamam. Grafiğin sol üstünde "Baglanti tamam" yazısı belirir.',
+                    'Drag SimpleTradingJournal onto a chart. In the window that opens, go to the Inputs tab, paste the key above into ApiKey, and click OK. "Connected" appears at the top-left of the chart.'),
+              extra: (
+                <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.18)' }}>
+                  <div className="text-[14px] font-medium mb-2" style={{ color: '#c4b5fd' }}>
+                    {tr('Hangi grafiğe koymalıyım?', 'Which chart should it go on?')}
+                  </div>
+                  <p className="text-[13.5px] leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                    {tr('MetaTrader bir grafikte aynı anda yalnızca bir uzman danışman (EA) çalıştırır. Başka bir EA kullanıyorsan (örneğin Position Sizer) iki yolun var:',
+                        'MetaTrader runs only one expert advisor (EA) per chart. If you already use another EA (Position Sizer, for example), you have two options:')}
+                  </p>
+                  <div className="space-y-3 text-[13.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                    <div>
+                      <span className="font-medium" style={{ color: '#fff' }}>{tr('Sürekli çalışsın — önerilen. ', 'Always on — recommended. ')}</span>
+                      {tr('Yeni, boş bir grafik aç ve eklentiyi oraya koy. O grafik açık kaldıkça kapanan her işlem kendiliğinden journal\'a gelir. İşlemlerini diğer grafiklerde her zamanki gibi yapmaya devam edersin.',
+                          'Open a new, empty chart and put the add-on there. As long as that chart stays open, every closed trade reaches your journal by itself. Keep trading on your other charts as usual.')}
+                    </div>
+                    <div>
+                      <span className="font-medium" style={{ color: '#fff' }}>{tr('Sadece istediğimde güncellensin. ', 'Only when I want. ')}</span>
+                      {tr('Eklentiyi, diğer EA\'nı kullandığın grafiğe at. Journal o anda güncellenir — arada kapanmış işlemler dahil — ama o grafikteki diğer EA kaldırılır. Onu geri koyduğunda bizimki kalkar ve bir dahaki sefere kadar güncelleme olmaz. Anahtarı her seferinde yeniden sormaz. Bazı EA\'lar grafikten kaldırılınca kendi ayarlarını sıfırlar; bunu göz önünde bulundur.',
+                          'Drop the add-on onto the chart where your other EA runs. Your journal updates right then — including trades closed in between — but the other EA is removed. Put that one back and ours is removed, with no updates until next time. It will not ask for the key again. Some EAs reset their own settings when removed from a chart, so keep that in mind.')}
+                    </div>
+                  </div>
+                </div>
+              ),
             },
-          ].map((s: { t: string; d: string; code?: string; download?: string }, i: number) => (
+          ].map((s: { t: string; d: string; code?: string; download?: string; extra?: React.ReactNode }, i: number) => (
             <li key={i} className="flex gap-4">
               <span className="font-display flex-shrink-0" style={{ fontSize: '22px', color: 'rgba(255,255,255,0.18)', lineHeight: 1.2 }}>
                 {String(i + 1).padStart(2, '0')}
@@ -258,6 +281,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                     SimpleTradingJournal.ex5
                   </a>
                 )}
+                {s.extra}
               </div>
             </li>
           ))}

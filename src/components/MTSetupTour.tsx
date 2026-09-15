@@ -99,9 +99,9 @@ export default function MTSetupTour() {
               '**SimpleTradingJournal** now sits under **Expert Advisors** in the **Navigator** panel on the left. If the panel is hidden, **Ctrl+N** brings it back.') },
 
     /* 04 — Grafiğe sürükle, anahtarı yapıştır */
-    { sc: 3, beat: 0, dur: 6000, cursor: [600, 300], drag: [[150, 205], [600, 300]],
-      cap: tr('Yeni, **boş bir grafik** aç ve eklentiyi onun üstüne sürükle. İşlem yaptığın grafiğe koyma: MetaTrader bir grafikte **tek uzman danışman** çalıştırır, oradaki diğerini (örneğin Position Sizer) kaldırır.',
-              'Open a new, **empty chart** and drag the add-on onto it. Not the chart you trade on: MetaTrader runs **one expert advisor per chart** and removes whatever was there (Position Sizer, for example).') },
+    { sc: 3, beat: 0, dur: 4600, cursor: [600, 300], drag: [[150, 205], [600, 300]],
+      cap: tr('Eklentiyi bir grafiğin üstüne sürükle. Başka bir uzman danışman kullanıyorsan **boş bir grafik** aç ve oraya koy — böylece sürekli çalışır.',
+              'Drag the add-on onto a chart. If you already use another expert advisor, open an **empty chart** and put it there — that way it stays on.') },
     { sc: 3, beat: 1, dur: 2400, cursor: [420, 150], click: true, ring: 's3-tab',
       cap: tr('Açılan pencerede **Girdiler** sekmesine geç.',
               'In the window that opens, go to the **Inputs** tab.') },
