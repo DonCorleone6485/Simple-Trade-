@@ -13,6 +13,7 @@ import {
 import MTFAnalysis, { MTFAnalysisView } from './MTFAnalysis';
 import Checklist, { ChecklistView } from './Checklist';
 import SetupPicker from './SetupPicker';
+import EmotionPicker, { EmotionChips } from './EmotionPicker';
 import NoteField from './NoteField';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser } from '@clerk/clerk-react';
@@ -1076,6 +1077,10 @@ export default function TradeHistory({
               </select>
             </div>
             <div>
+              <label style={lbl}>{t('emotion')}</label>
+              <EmotionPicker value={editForm.emotions || []} onChange={v => setEditForm(f => ({ ...f, emotions: v }))} />
+            </div>
+            <div>
               <label style={lbl}>{t('orderType')}</label>
               <select style={{ ...inp, cursor: 'pointer' }} value={editForm.orderType || 'Market'} onChange={e => setEditForm(f => ({ ...f, orderType: e.target.value as OrderType }))}>
                 <option value="Market" style={{ background: '#1a1b2e' }}>{t('orderMarket')}</option>
@@ -1106,6 +1111,18 @@ export default function TradeHistory({
                 }}
                 placeholder="0.00" />
             </div>
+            {(['entryPrice', 'stopLoss', 'exitPrice'] as const).map(field => (
+              <div key={field}>
+                <label style={lbl}>{t(field === 'stopLoss' ? 'stopLossPrice' : field)}</label>
+                <input type="number" step="any" min="0" inputMode="decimal" style={{ ...inp, fontFamily: 'monospace' }}
+                  value={editForm[field] ?? ''}
+                  onChange={e => {
+                    const n = parseFloat(e.target.value);
+                    setEditForm(f => ({ ...f, [field]: isFinite(n) && n > 0 ? n : undefined }));
+                  }}
+                  placeholder="0.00000" />
+              </div>
+            ))}
             <div>
               <label style={lbl}>{t('plannedRR')}</label>
               <input type="number" step="0.01" style={inp} value={editForm.rr || ''} onChange={e => setEditForm(f => ({ ...f, rr: e.target.value }))} placeholder="2.5" />
@@ -1372,6 +1389,9 @@ export default function TradeHistory({
                       </span>
                     )}
                   </div>
+                  {(selectedTrade.emotions?.length ?? 0) > 0 && (
+                    <div className="mt-2.5"><EmotionChips values={selectedTrade.emotions} /></div>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-6 flex-wrap">
@@ -1383,6 +1403,14 @@ export default function TradeHistory({
                   <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('plannedRR')}</div>
                   <div className="font-mono font-semibold text-white">{selectedTrade.rr ? `${selectedTrade.rr}R` : '-'}</div>
                 </div>
+                {([['entryPrice', selectedTrade.entryPrice], ['stopLossPrice', selectedTrade.stopLoss], ['exitPrice', selectedTrade.exitPrice]] as const)
+                  .filter(([, v]) => v != null)
+                  .map(([key, v]) => (
+                    <div key={key} className="text-end">
+                      <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t(key)}</div>
+                      <div className="font-mono font-semibold" style={{ color: key === 'stopLossPrice' ? '#f87171' : '#fff' }}>{v}</div>
+                    </div>
+                  ))}
                 {/* Girişe denk gelen haber varsa — sebebini sonradan hatırlatır. */}
                 {(() => {
                   const hits = eventsAround(selectedTrade, newsEvents);

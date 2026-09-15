@@ -75,4 +75,10 @@ export interface Trade {
   importSource?: string;
   /** Platformun işleme verdiği numara — tekrar içe aktarmayı önler. */
   externalId?: string;
+  /** İşleme girerkenki ruh hâli: hazır anahtarlar ya da kullanıcının yazdıkları. */
+  emotions?: string[];
+  /** Fiyatlar — isteğe bağlı; MetaTrader'dan ve rapordan kendiliğinden gelir. */
+  entryPrice?: number;
+  stopLoss?: number;
+  exitPrice?: number;
 }

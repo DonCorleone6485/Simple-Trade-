@@ -376,6 +376,10 @@ function parseRows(rows: string[][], c: ColumnMap, journalId: string, userId: st
       postTradePhotos: [],
       importSource: source,
       externalId: c.ticket >= 0 ? (cols[c.ticket] || '').trim() || undefined : undefined,
+      // Rapor fiyatları zaten yazıyor; formdaki fiyat alanları boş gelmesin.
+      entryPrice: openPrice > 0 ? openPrice : undefined,
+      stopLoss: sl > 0 ? sl : undefined,
+      exitPrice: closePrice > 0 ? closePrice : undefined,
     } as Trade);
   }
 

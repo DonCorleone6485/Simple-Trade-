@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
 import { MTF_TIMEFRAMES } from './MTFAnalysis';
 import { money, signedMoney, int } from '../lib/format';
+import { emotionLabel } from '../lib/emotions';
 
 interface PrintableReportProps {
   journal: Account;
@@ -178,6 +179,10 @@ export default function PrintableReport({ journal, trades, single = false, onDon
           ...(holdMinutes(trade) != null ? [[t('tradeDuration'), formatDuration(holdMinutes(trade), language)] as [string, string]] : []),
           ...(trade.orderType ? [[t('orderType'), orderText(trade.orderType)] as [string, string]] : []),
           ...(trade.setup ? [[t('setup'), trade.setup] as [string, string]] : []),
+          ...(trade.emotions?.length ? [[t('emotion'), trade.emotions.map(e => emotionLabel(e, language)).join(', ')] as [string, string]] : []),
+          ...(trade.entryPrice != null ? [[t('entryPrice'), String(trade.entryPrice)] as [string, string]] : []),
+          ...(trade.stopLoss != null ? [[t('stopLossPrice'), String(trade.stopLoss)] as [string, string]] : []),
+          ...(trade.exitPrice != null ? [[t('exitPrice'), String(trade.exitPrice)] as [string, string]] : []),
           [t('risk'), money(trade.risk || 0)],
           [
             win ? t('reward') : loss ? t('lossAmountLabel') : t('rewardOrLossLabel'),

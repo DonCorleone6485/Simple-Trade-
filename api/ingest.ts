@@ -181,6 +181,10 @@ export default async function handler(req: any, res: any) {
       pre_trade_photos: [],
       post_trade_photos: [],
       external_id: externalId,
+      // EA fiyatları gönderiyor; formdaki fiyat alanları boş kalmasın.
+      entry_price: openPrice > 0 ? openPrice : null,
+      stop_loss: sl > 0 ? sl : null,
+      exit_price: closePrice > 0 ? closePrice : null,
     });
     // Aynı pakette aynı pozisyon iki kez gelirse (eski EA'lar kısmi kapanışı
     // ayrı ayrı gönderiyordu) ikincisini eklemeyiz.

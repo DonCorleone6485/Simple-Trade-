@@ -8,6 +8,7 @@ import { Trade, MTFEntry, TradeResult, OrderType, ChecklistItem } from '../types
 import MTFAnalysis from './MTFAnalysis';
 import Checklist from './Checklist';
 import SetupPicker from './SetupPicker';
+import EmotionPicker from './EmotionPicker';
 import NoteField from './NoteField';
 import { useLanguage } from '../context/LanguageContext';
 import { input as uiInput, label as uiLabel, surface, hairline, sectionLabel, primaryBtn, TRANSITION } from '../lib/ui';
@@ -32,6 +33,12 @@ const inp = uiInput;
 const lbl = uiLabel;
 
 const card: React.CSSProperties = { ...surface };
+
+/** Boş ya da geçersiz fiyat kaydedilmez. */
+const priceOrUndefined = (v: string): number | undefined => {
+  const n = parseFloat(v);
+  return isFinite(n) && n > 0 ? n : undefined;
+};
 
 /** Zorunlu alan işareti. */
 const Req = () => <span style={{ color: '#f87171', marginInlineStart: '3px' }}>*</span>;
@@ -263,6 +270,11 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
   const [type, setType] = useState<'Buy' | 'Sell'>('Buy');
   const [orderType, setOrderType] = useState<OrderType>('Market');
   const [setup, setSetup] = useState('');
+  const [emotions, setEmotions] = useState<string[]>([]);
+  // Fiyatlar metin olarak tutulur: yarım yazılmış "1." gibi değerler silinmesin.
+  const [entryPrice, setEntryPrice] = useState('');
+  const [stopLoss, setStopLoss] = useState('');
+  const [exitPrice, setExitPrice] = useState('');
   const [risk, setRisk] = useState('');
   const [reward, setReward] = useState('');
   const [rr, setRr] = useState('');
@@ -371,6 +383,10 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
       // Kullanıcı her zaman pozitif yazar; kayıpta değeri negatife çeviriyoruz.
       reward: !isClosed ? 0 : isBreakevenResult ? 0 : (isLossResult ? -1 : 1) * Math.abs(parseFloat(reward) || 0),
       rr, result: result as TradeResult,
+      emotions: emotions.length > 0 ? emotions : undefined,
+      entryPrice: priceOrUndefined(entryPrice),
+      stopLoss: priceOrUndefined(stopLoss),
+      exitPrice: priceOrUndefined(exitPrice),
       preTradeNotes: preNotes, postTradeNotes: postNotes,
       preTradePhotos: prePhotos, postTradePhotos: postPhotos,
       mtfAnalysis: mtf.length > 0 ? mtf : undefined,
@@ -381,6 +397,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
     setDate(new Date().toISOString()); setExitDate(new Date().toISOString()); setExitTouched(false);
     setSymbol('EURUSD'); setOrderType('Market');
     setSetup(''); setRisk(''); setReward(''); setRr('');
+    setEmotions([]); setEntryPrice(''); setStopLoss(''); setExitPrice('');
     setPreNotes(''); setPostNotes('');
     // Multi-timeframe analizi temizlenmiyor: parite aynı kalırsa bir sonraki
     // işlemde gelmesi gereken zaten bu analiz. Parite değişirse bileşen o
@@ -449,6 +466,10 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
             </select>
           </div>
           <div>
+            <label style={lbl}>{t('emotion')} <span style={optHint}>({t('optionalLabel')})</span></label>
+            <EmotionPicker value={emotions} onChange={setEmotions} />
+          </div>
+          <div>
             <label style={lbl}>{t('orderType')}</label>
             <select value={orderType} onChange={e => setOrderType(e.target.value as OrderType)} style={selStyle}>
               <option value="Market" style={optStyle}>{t('orderMarket')}</option>
@@ -504,6 +525,19 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
                   placeholder="0.00" />
               </div>
             </div>
+
+            {([
+              ['entryPrice', entryPrice, setEntryPrice],
+              ['stopLossPrice', stopLoss, setStopLoss],
+              ['exitPrice', exitPrice, setExitPrice],
+            ] as const).map(([key, val, set]) => (
+              <div key={key}>
+                <label style={lbl}>{t(key)} <span style={optHint}>({t('optionalLabel')})</span></label>
+                <input type="number" step="any" min="0" inputMode="decimal" value={val}
+                  onChange={e => set(e.target.value)}
+                  style={{ ...inp, fontFamily: 'monospace' }} placeholder="0.00000" />
+              </div>
+            ))}
 
             <div>
               <label style={lbl}>{t('exitDateTime')}{isClosed && <Req />}</label>

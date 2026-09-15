@@ -94,6 +94,30 @@ function getInitialAuthStage(): AuthStage {
   return window.location.hash && window.location.hash.length > 1 ? 'auth' : 'landing';
 }
 
+/** Veritabanı satırını işleme çevirir. */
+const tradeFromRow = (t: any): Trade => ({
+  id: t.id, accountId: t.journal_id, journal_id: t.journal_id, user_id: t.user_id,
+  date: t.date, exitDate: t.exit_date || undefined, symbol: t.symbol, type: t.type, timeframe: t.timeframe, orderType: t.order_type || undefined, setup: t.setup,
+  risk: t.risk, reward: t.reward, rr: t.rr, result: t.result,
+  preTradeNotes: t.pre_trade_notes || '', postTradeNotes: t.post_trade_notes || '',
+  preTradePhotos: t.pre_trade_photos || [], postTradePhotos: t.post_trade_photos || [],
+  mtfAnalysis: t.mtf_analysis || [],
+  checklist: t.checklist || [],
+  externalId: t.external_id || undefined,
+  emotions: t.emotions || [],
+  entryPrice: t.entry_price ?? undefined,
+  stopLoss: t.stop_loss ?? undefined,
+  exitPrice: t.exit_price ?? undefined,
+});
+
+/** Formdan gelen isteğe bağlı alanların sütun karşılıkları. */
+const optionalColumns = (trade: Trade) => ({
+  emotions: trade.emotions?.length ? trade.emotions : null,
+  entry_price: trade.entryPrice ?? null,
+  stop_loss: trade.stopLoss ?? null,
+  exit_price: trade.exitPrice ?? null,
+});
+
 export default function App() {
   const { language, setLanguage, t } = useLanguage();
   const { user, isSignedIn, isLoaded } = useUser();
@@ -237,16 +261,7 @@ export default function App() {
     if (!user) return;
     const { data } = await supabase.from('trades').select('*').eq('user_id', user.id).order('date', { ascending: false });
     if (data) {
-      setTrades(data.map((t: any) => ({
-        id: t.id, accountId: t.journal_id, journal_id: t.journal_id, user_id: t.user_id,
-        date: t.date, exitDate: t.exit_date || undefined, symbol: t.symbol, type: t.type, timeframe: t.timeframe, orderType: t.order_type || undefined, setup: t.setup,
-        risk: t.risk, reward: t.reward, rr: t.rr, result: t.result,
-        preTradeNotes: t.pre_trade_notes || '', postTradeNotes: t.post_trade_notes || '',
-        preTradePhotos: t.pre_trade_photos || [], postTradePhotos: t.post_trade_photos || [],
-        mtfAnalysis: t.mtf_analysis || [],
-        checklist: t.checklist || [],
-        externalId: t.external_id || undefined,
-      })));
+      setTrades(data.map(tradeFromRow));
     }
   };
 
@@ -470,17 +485,10 @@ export default function App() {
       pre_trade_photos: trade.preTradePhotos, post_trade_photos: trade.postTradePhotos,
       mtf_analysis: trade.mtfAnalysis?.length ? trade.mtfAnalysis : null,
       checklist: trade.checklist?.length ? trade.checklist : null,
+      ...optionalColumns(trade),
     }).select().single();
     if (data) {
-      const newTrade: Trade = {
-        id: data.id, accountId: data.journal_id, journal_id: data.journal_id, user_id: data.user_id,
-        date: data.date, exitDate: data.exit_date || undefined, symbol: data.symbol, type: data.type, timeframe: data.timeframe, orderType: data.order_type || undefined, setup: data.setup,
-        risk: data.risk, reward: data.reward, rr: data.rr, result: data.result,
-        preTradeNotes: data.pre_trade_notes || '', postTradeNotes: data.post_trade_notes || '',
-        preTradePhotos: data.pre_trade_photos || [], postTradePhotos: data.post_trade_photos || [],
-        mtfAnalysis: data.mtf_analysis || [],
-        checklist: data.checklist || [],
-      };
+      const newTrade = tradeFromRow(data);
       setTrades(prev => [newTrade, ...prev]);
       goTo({ view: 'expanded', tab: 'trades' });
     }
@@ -496,6 +504,7 @@ export default function App() {
       pre_trade_photos: trade.preTradePhotos, post_trade_photos: trade.postTradePhotos,
       mtf_analysis: trade.mtfAnalysis?.length ? trade.mtfAnalysis : null,
       checklist: trade.checklist?.length ? trade.checklist : null,
+      ...optionalColumns(trade),
     }).eq('id', trade.id);
 
     if (error) {
@@ -566,15 +575,9 @@ export default function App() {
         pre_trade_notes: trade.preTradeNotes || '', post_trade_notes: trade.postTradeNotes || '',
         pre_trade_photos: [], post_trade_photos: [],
         external_id: trade.externalId || null,
+        ...optionalColumns(trade),
       }).select().single();
-      if (data) inserted.push({
-        externalId: data.external_id || undefined,
-        id: data.id, accountId: data.journal_id, journal_id: data.journal_id, user_id: data.user_id,
-        date: data.date, exitDate: data.exit_date || undefined, symbol: data.symbol, type: data.type, timeframe: data.timeframe, orderType: data.order_type || undefined, setup: data.setup,
-        risk: data.risk, reward: data.reward, rr: data.rr, result: data.result,
-        preTradeNotes: data.pre_trade_notes || '', postTradeNotes: data.post_trade_notes || '',
-        preTradePhotos: [], postTradePhotos: [],
-      });
+      if (data) inserted.push(tradeFromRow(data));
     }
     setTrades(prev => [...inserted, ...prev]);
     // Yeni journal açıldıysa doğrudan içine gir.
