@@ -99,15 +99,22 @@ export default async function handler(req: any, res: any) {
 
   if (!apiKey) return res.status(401).json({ error: 'Invalid key' });
 
-  // Bu journal'da hangi işlem numaraları zaten var — aynı pozisyon iki kez
-  // gönderilse de ikinci kez eklenmesin. EA çevrimdışı kalıp geçmişi baştan
-  // taradığında bu koruma devreye girer.
+  // Kullanıcının hangi işlemleri zaten var — aynı pozisyon iki kez gönderilse
+  // de ikinci kez eklenmesin. EA her açılışta geçmişi baştan taradığı için bu
+  // koruma sürekli devrede.
+  //
+  // Bakılan yer journal değil kullanıcının tamamı: EA'nın getirdiği bir
+  // işlemi başka bir journal'a taşıyan kullanıcıya, EA bir sonraki açılışta
+  // aynı işlemi eski journal'a yeniden yazıyordu. Numara tek başına yetmez —
+  // iki ayrı broker aynı pozisyon numarasını verebilir — sembolle birlikte
+  // eşleştiriyoruz.
   const ids = trades.map(t => String(t.externalId ?? '')).filter(Boolean);
   const known = new Set<string>();
+  const seenKey = (id: string, symbol: string) => `${id}|${symbol.toUpperCase().trim()}`;
   if (ids.length > 0) {
     const { data: existing } = await supabase
-      .from('trades').select('external_id').eq('journal_id', apiKey.journal_id).in('external_id', ids);
-    (existing || []).forEach((r: any) => r.external_id && known.add(String(r.external_id)));
+      .from('trades').select('external_id, symbol').eq('user_id', apiKey.user_id).in('external_id', ids);
+    (existing || []).forEach((r: any) => r.external_id && known.add(seenKey(String(r.external_id), r.symbol || '')));
   }
 
   // Ücretsiz planın işlem sınırı. Uygulama tarafında elle giriş ve dosyadan
@@ -130,11 +137,10 @@ export default async function handler(req: any, res: any) {
     if (rows.length >= remaining) break;
 
     const externalId = t.externalId != null ? String(t.externalId) : null;
-    if (externalId && known.has(externalId)) continue;
-
     const date = toISO(t.openTime);
     const symbol = (t.symbol || '').toUpperCase().trim();
     if (!date || !symbol) continue;
+    if (externalId && known.has(seenKey(externalId, symbol))) continue;
 
     const type = String(t.type || '').toLowerCase().startsWith('s') ? 'Sell' : 'Buy';
     const gross = num(t.profit);
@@ -188,7 +194,7 @@ export default async function handler(req: any, res: any) {
     });
     // Aynı pakette aynı pozisyon iki kez gelirse (eski EA'lar kısmi kapanışı
     // ayrı ayrı gönderiyordu) ikincisini eklemeyiz.
-    if (externalId) known.add(externalId);
+    if (externalId) known.add(seenKey(externalId, symbol));
   }
 
   let inserted = 0;
