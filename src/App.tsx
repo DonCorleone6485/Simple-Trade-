@@ -21,6 +21,7 @@ import SessionsView from './components/SessionsView';
 import NewsView from './components/NewsView';
 import DisciplineView from './components/DisciplineView';
 import ChecklistLibrary from './components/ChecklistLibrary';
+import PropEvaluation from './components/PropEvaluation';
 import { tradeKey } from './lib/tradeKey';
 import LandingPage from './components/LandingPage';
 import JournalDashboard from './components/JournalDashboard';
@@ -33,7 +34,7 @@ import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, ha
 import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
 import { signedMoney, int } from './lib/format';
 
-type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news' | 'discipline' | 'checklists';
+type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news' | 'discipline' | 'checklists' | 'propReview';
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect';
 type AuthView = 'signin' | 'signup';
 type AuthStage = 'landing' | 'auth';
@@ -68,6 +69,7 @@ function pathForView(view: View, journalId?: string, tab: JournalTab = 'trades')
   if (view === 'news') return `${JOURNAL_PATH}/news`;
   if (view === 'discipline') return `${JOURNAL_PATH}/discipline`;
   if (view === 'checklists') return `${JOURNAL_PATH}/checklists`;
+  if (view === 'propReview') return `${JOURNAL_PATH}/prop-review`;
   if (view === 'expanded' && journalId) return `${JOURNAL_PATH}/${journalId}/${tab}`;
   return JOURNAL_PATH;
 }
@@ -79,6 +81,7 @@ function parseView(): { view: View; journalId?: string; tab: JournalTab } {
   if (second === 'news') return { view: 'news', tab: 'trades' };
   if (second === 'discipline') return { view: 'discipline', tab: 'trades' };
   if (second === 'checklists') return { view: 'checklists', tab: 'trades' };
+  if (second === 'prop-review') return { view: 'propReview', tab: 'trades' };
   if (second) {
     const tab = JOURNAL_TABS.includes(third as JournalTab) ? (third as JournalTab) : 'trades';
     return { view: 'expanded', journalId: second, tab };
@@ -728,6 +731,7 @@ export default function App() {
     : view === 'news' ? 'news'
     : view === 'discipline' ? 'discipline'
     : view === 'checklists' ? 'checklists'
+    : view === 'propReview' ? 'propReview'
     : view === 'pricing' ? 'pricing'
     : view === 'expanded' ? (journalTab as NavKey)
     : 'journals';
@@ -740,6 +744,7 @@ export default function App() {
     if (key === 'news') { goTo({ view: 'news', journal: null }); return; }
     if (key === 'discipline') { goTo({ view: 'discipline', journal: null }); return; }
     if (key === 'checklists') { goTo({ view: 'checklists', journal: null }); return; }
+    if (key === 'propReview') { goTo({ view: 'propReview', journal: null }); return; }
     if (key === 'journals') { goTo({ view: 'dashboard', journal: null }); return; }
     // Yeni işlem, plan limitlerinden geçmeli.
     if (key === 'newTrade') { handleNewTradeClick(); return; }
@@ -751,6 +756,7 @@ export default function App() {
     : view === 'news' ? t('newsTab')
     : view === 'discipline' ? t('disciplineTab')
     : view === 'checklists' ? t('checklistsTab')
+    : view === 'propReview' ? t('propReviewTab')
     : view === 'pricing' ? pricingLabel
     : view === 'expanded' && journalTab === 'newTrade' ? t('newTradeTab')
     : view === 'expanded' && activeJournal ? activeJournal.name
@@ -1240,6 +1246,7 @@ export default function App() {
           {!loading && view === 'sessions' && <SessionsView />}
           {!loading && view === 'news' && <NewsView />}
           {!loading && view === 'checklists' && <ChecklistLibrary />}
+          {!loading && view === 'propReview' && <PropEvaluation />}
 
           {!loading && view === 'discipline' && (
             <DisciplineView
