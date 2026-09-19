@@ -1,54 +1,15 @@
-/**
- * Prop hesabı değerlendirme maddeleri.
- *
- * Toplam 100 puan; ağırlıklar maddelerin hesabı gerçekten bitirme gücüne göre
- * dağıtılmış: drawdown tipi tek başına 20 puan, hafta sonu taşıma 1 puan.
- *
- * Uzun açıklamalar burada veri olarak duruyor, bileşende değil: metin sayfanın
- * yapısından uzun ömürlü ve düzenlemesi daha sık.
- */
+import { PropPack } from './core';
 
-export type DetailBlock =
-  | { p: string }
-  | { h: string }
-  | { ul: string[] }
-  | { table: { head: string[]; rows: string[][] } };
-
-export interface PropOption {
-  tr: string;
-  en: string;
-  points: number;
-}
-
-export interface PropCriterion {
-  id: string;
-  /** Bu maddeden alınabilecek en yüksek puan. */
-  max: number;
-  title: { tr: string; en: string };
-  /** Başlığın altındaki kısa tanım. */
-  short: { tr: string; en: string };
-  /** Firmaların kural metninde bu maddenin geçtiği adlar. */
-  keywords: string;
-  options: PropOption[];
-  /** "Açıklama ve örnek" panelinin içeriği. */
-  detail: DetailBlock[];
-}
-
-export const PROP_CRITERIA: PropCriterion[] = [
-  {
-    id: 'drawdown',
-    max: 20,
-    title: { tr: 'Maksimum Zarar Çizgisinin Tipi (Drawdown)', en: 'Type of Maximum Drawdown' },
-    short: {
-      tr: 'Hesabın ölüm çizgisi — altına inersen hesap biter. Soru şu: bu çizgi baştan sabit mi duruyor, yoksa sen kâr ettikçe yukarı mı kayıyor? Kayan bir çizgi, kâğıt üstündeki kârını geri verdiğinde seni patlatabilir. Bu, bir hesabı diğerinden ayıran en belirleyici tek değişkendir.',
-      en: 'The account\'s kill line — go below it and the account is over. The question: does it stay where it started, or does it climb as you profit? A trailing line can blow you up when you give back paper profit. This is the single most decisive difference between accounts.',
-    },
-    keywords: '"Max Drawdown", "Maximum Loss", "Overall Drawdown", "Static / Trailing Drawdown", "Smart Drawdown", "High Water Mark"',
+/** Türkçe metinler. Seçenek sırası core.ts'teki `points` dizisiyle aynıdır. */
+const tr: PropPack = {
+  drawdown: {
+    title: 'Maksimum Zarar Çizgisinin Tipi (Drawdown)',
+    short: 'Hesabın ölüm çizgisi — altına inersen hesap biter. Soru şu: bu çizgi baştan sabit mi duruyor, yoksa sen kâr ettikçe yukarı mı kayıyor? Kayan bir çizgi, kâğıt üstündeki kârını geri verdiğinde seni patlatabilir. Bu, bir hesabı diğerinden ayıran en belirleyici tek değişkendir.',
     options: [
-      { tr: 'Sabit — baştan belirlenir, hiç oynamaz (Static)', en: 'Static — set at the start, never moves', points: 20 },
-      { tr: 'Kapalı bakiyeyi takip eder, başa baş noktasında kilitlenir', en: 'Trails closed balance, locks at breakeven', points: 14 },
-      { tr: 'Kapalı bakiyeyi takip eder, kilitlenme yok (Balance/EOD trailing)', en: 'Trails closed balance, never locks (Balance/EOD trailing)', points: 10 },
-      { tr: 'Açık pozisyon kârını da takip eder (Equity trailing)', en: 'Trails open profit too (Equity trailing)', points: 2 },
+      'Sabit — baştan belirlenir, hiç oynamaz (Static)',
+      'Kapalı bakiyeyi takip eder, başa baş noktasında kilitlenir',
+      'Kapalı bakiyeyi takip eder, kilitlenme yok (Balance/EOD trailing)',
+      'Açık pozisyon kârını da takip eder (Equity trailing)',
     ],
     detail: [
       { h: 'Açıklama' },
@@ -73,21 +34,15 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'news',
-    max: 15,
-    title: { tr: 'Haber Anında İşlem', en: 'Trading Around News' },
-    short: {
-      tr: 'Yüksek etkili haber anında işlem açıp kapatabiliyor musun? Kısıt varsa asıl mesele kısıtın kendisi değil, **ihlalin sonucu**: sadece o işlemin kârı mı siliniyor, yoksa hesap mı kapanıyor?',
-      en: 'Can you open and close trades during high-impact news? If there is a restriction, what matters is not the restriction but **what happens when you breach it**: is only that trade\'s profit removed, or is the account closed?',
-    },
-    keywords: '"News Trading", "News Restriction", "Blackout Period", "High-Impact News", "Major News Events", "News Straddling"',
+  news: {
+    title: 'Haber Anında İşlem',
+    short: 'Yüksek etkili haber anında işlem açıp kapatabiliyor musun? Kısıt varsa asıl mesele kısıtın kendisi değil, **ihlalin sonucu**: sadece o işlemin kârı mı siliniyor, yoksa hesap mı kapanıyor?',
     options: [
-      { tr: 'Tamamen serbest, zaman penceresi yok', en: 'Fully allowed, no blackout window', points: 15 },
-      { tr: 'Ek paket (add-on) ile serbest', en: 'Allowed with a paid add-on', points: 12 },
-      { tr: 'Yasak penceresi var (±2, ±4, ±5 dk), önceden açılmış işlem muaf', en: 'Blackout window, trades opened earlier are exempt', points: 9 },
-      { tr: 'Yasak penceresi var (±2, ±4, ±5 dk), ihlalde sadece kâr siliniyor', en: 'Blackout window, breach removes only the profit', points: 6 },
-      { tr: 'Yasak penceresi var (±2, ±4, ±5 dk), ihlalde hesap kapanıyor', en: 'Blackout window, breach closes the account', points: 1 },
+      'Tamamen serbest, zaman penceresi yok',
+      'Ek paket (add-on) ile serbest',
+      'Yasak penceresi var (±2, ±4, ±5 dk), önceden açılmış işlem muaf',
+      'Yasak penceresi var (±2, ±4, ±5 dk), ihlalde sadece kâr siliniyor',
+      'Yasak penceresi var (±2, ±4, ±5 dk), ihlalde hesap kapanıyor',
     ],
     detail: [
       { h: 'Açıklama' },
@@ -110,21 +65,15 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'floating',
-    max: 12,
-    title: { tr: 'Açık Pozisyon Zarar Limiti (Floating)', en: 'Open Position Loss Limit (Floating)' },
-    short: {
-      tr: 'Açık pozisyonlarındaki **henüz kapatmadığın** zarara bakan ayrı bir sınır. Eşiği aşarsan sistem tüm pozisyonları anında kapatır — günlük limitine hiç yaklaşmamış olsan bile. Aynı anda birden fazla işlem açanlar için en sinsi kural.',
-      en: 'A separate limit on the loss you have **not yet realised**. Cross it and the system closes every position at once — even if you never came near your daily limit. The sneakiest rule for anyone holding several trades at a time.',
-    },
-    keywords: '"Guardian Shield", "Equity Protection", "Position Loss Limit", "Open P&L Protection", "Account Drawdown", "Max Floating Loss", "Unrealised Loss Limit"',
+  floating: {
+    title: 'Açık Pozisyon Zarar Limiti (Floating)',
+    short: 'Açık pozisyonlarındaki **henüz kapatmadığın** zarara bakan ayrı bir sınır. Eşiği aşarsan sistem tüm pozisyonları anında kapatır — günlük limitine hiç yaklaşmamış olsan bile. Aynı anda birden fazla işlem açanlar için en sinsi kural.',
     options: [
-      { tr: 'Yok', en: 'None', points: 12 },
-      { tr: 'Var, eşik %4 ve üstü', en: 'Yes, threshold 4% or above', points: 9 },
-      { tr: 'Var, eşik %3', en: 'Yes, threshold 3%', points: 7 },
-      { tr: 'Var, eşik %2', en: 'Yes, threshold 2%', points: 4 },
-      { tr: 'Var, eşik %2 altı', en: 'Yes, threshold below 2%', points: 1 },
+      'Yok',
+      'Var, eşik %4 ve üstü',
+      'Var, eşik %3',
+      'Var, eşik %2',
+      'Var, eşik %2 altı',
     ],
     detail: [
       { h: 'Açıklama' },
@@ -133,13 +82,7 @@ export const PROP_CRITERIA: PropCriterion[] = [
       { p: 'Neden sinsi? Çünkü **günlük limitine hiç yaklaşmamış olabilirsin**. Tek tek bakınca hepsi makul riskli birkaç pozisyon açarsın, ama açık zararları toplandığında bu eşiği aşar ve sistem seni piyasadan çıkarır — belki de pozisyonların dönmesine bir adım kala.' },
       { h: 'Örnek ($100.000 hesap, %2 eşik = $2.000)' },
       { p: 'Sabah üç işlem açtın, her birinin riski $1.000:' },
-      {
-        ul: [
-          'XAUUSD long → şu an −$700',
-          'EURUSD long → şu an −$700',
-          'GBPUSD long → şu an −$700',
-        ],
-      },
+      { ul: ['XAUUSD long → şu an −$700', 'EURUSD long → şu an −$700', 'GBPUSD long → şu an −$700'] },
       { p: '**Toplam açık zarar: −$2.100** → Sistem devreye girer, üç pozisyonu da kapatır.' },
       { p: 'Oysa:' },
       {
@@ -154,20 +97,14 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'dailyBase',
-    max: 10,
-    title: { tr: 'Günlük Zarar Çizgisinin Hesaplama Tabanı', en: 'Basis of the Daily Loss Line' },
-    short: {
-      tr: 'Günlük çizgi her gün sıfırlanıp yeniden hesaplanır. Soru: neyin üzerinden? Yükseği kullanılıyorsa, gece taşıdığın kâğıt üstü kâr çizgiyi yukarı iter — ertesi gün o kârı geri verdiğinde, hiç gerçek zarar etmemişken hesap patlayabilir.',
-      en: 'The daily line resets every day. On what basis? If the higher of balance and equity is used, paper profit carried overnight pushes the line up — give that profit back the next day and the account can die without a single real loss.',
-    },
-    keywords: '"Daily Loss Limit", "Daily Drawdown", "Balance-based / Equity-based", "Higher of balance or equity", "Previous day\'s closing balance", "Midnight Mark"',
+  dailyBase: {
+    title: 'Günlük Zarar Çizgisinin Hesaplama Tabanı',
+    short: 'Günlük çizgi her gün sıfırlanıp yeniden hesaplanır. Soru: neyin üzerinden? Yükseği kullanılıyorsa, gece taşıdığın kâğıt üstü kâr çizgiyi yukarı iter — ertesi gün o kârı geri verdiğinde, hiç gerçek zarar etmemişken hesap patlayabilir.',
     options: [
-      { tr: 'Günlük limit hiç yok', en: 'No daily limit at all', points: 10 },
-      { tr: 'Bakiye tabanlı — açık kâr çizgiyi itmez', en: 'Balance-based — open profit does not move it', points: 9 },
-      { tr: 'Bakiye ile equity\'nin yükseği alınır', en: 'Higher of balance or equity', points: 5 },
-      { tr: 'Gün içi equity zirvesinden hesaplanır', en: 'From the intraday equity peak', points: 1 },
+      'Günlük limit hiç yok',
+      'Bakiye tabanlı — açık kâr çizgiyi itmez',
+      'Bakiye ile equity\'nin yükseği alınır',
+      'Gün içi equity zirvesinden hesaplanır',
     ],
     detail: [
       { h: 'Açıklama' },
@@ -185,22 +122,10 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'consistency',
-    max: 10,
-    title: { tr: 'Kâr Dağılımı Kuralı (Consistency)', en: 'Profit Consistency Rule' },
-    short: {
-      tr: 'En iyi gününün, toplam kârının belirli bir yüzdesini geçememesi kuralı. Hesabı kapatmaz ama ödemeyi bekletir. Dikkat: bazı firmalarda değerlendirmede yok ama fonlandıktan sonra devreye giriyor.',
-      en: 'Your best day may not exceed a set share of total profit. It does not close the account but it holds your payout. Careful: some firms apply it only after funding, not during the evaluation.',
-    },
-    keywords: '"Consistency Rule", "Consistency Score", "Best Day Rule", "Profit Consistency", "Daily Profit Distribution", "Profit Concentration"',
-    options: [
-      { tr: 'Yok', en: 'None', points: 10 },
-      { tr: '%50 ve üstü', en: '50% or above', points: 8 },
-      { tr: '%40 – %49', en: '40% – 49%', points: 6 },
-      { tr: '%30 – %39', en: '30% – 39%', points: 4 },
-      { tr: '%30 altı', en: 'Below 30%', points: 1 },
-    ],
+  consistency: {
+    title: 'Kâr Dağılımı Kuralı (Consistency)',
+    short: 'En iyi gününün, toplam kârının belirli bir yüzdesini geçememesi kuralı. Hesabı kapatmaz ama ödemeyi bekletir. Dikkat: bazı firmalarda değerlendirmede yok ama fonlandıktan sonra devreye giriyor.',
+    options: ['Yok', '%50 ve üstü', '%40 – %49', '%30 – %39', '%30 altı'],
     detail: [
       { h: 'Açıklama' },
       { p: 'Bu kural şunu söyler: **tek bir günün kârı, toplam kârının belirli bir yüzdesini geçemez.** Amaç, firmanın "bu adam şanslı bir vuruş yaptı mı yoksa gerçekten becerikli mi?" sorusuna cevap aramasıdır.' },
@@ -216,20 +141,10 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'overnight',
-    max: 9,
-    title: { tr: 'Gece Pozisyon Taşıma', en: 'Holding Overnight' },
-    short: {
-      tr: 'Pozisyonu gece boyunca, gün değişimini aşarak açık tutabilme. Yasaksa gün içinde açtığın her pozisyonu seans sonunda kapatmak zorundasın.',
-      en: 'Holding a position through the daily rollover. If it is banned, everything you open must be closed by the end of the session.',
-    },
-    keywords: '"Overnight Holding", "Swing Trading", "Hold Overnight", "Rollover", "Flat by Close", "End of Session Close"',
-    options: [
-      { tr: 'Serbest', en: 'Allowed', points: 9 },
-      { tr: 'Ek paket (add-on) ile serbest', en: 'Allowed with a paid add-on', points: 6 },
-      { tr: 'Yasak — seans sonunda otomatik kapanıyor', en: 'Banned — closed automatically at session end', points: 1 },
-    ],
+  overnight: {
+    title: 'Gece Pozisyon Taşıma',
+    short: 'Pozisyonu gece boyunca, gün değişimini aşarak açık tutabilme. Yasaksa gün içinde açtığın her pozisyonu seans sonunda kapatmak zorundasın.',
+    options: ['Serbest', 'Ek paket (add-on) ile serbest', 'Yasak — seans sonunda otomatik kapanıyor'],
     detail: [
       { h: 'Açıklama' },
       { p: 'Pozisyonunu gün değişimini aşarak, gece boyunca açık tutabilme hakkı. Basit görünür ama stratejini doğrudan belirler.' },
@@ -243,21 +158,15 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'payout',
-    max: 8,
-    title: { tr: 'Ödeme Sıklığı', en: 'Payout Frequency' },
-    short: {
-      tr: 'Kârını ne sıklıkla çekebiliyorsun ve ilk çekim için ne kadar beklemen gerekiyor? Çekilmemiş kâr her zaman risk altındadır.',
-      en: 'How often can you withdraw, and how long until the first payout? Profit you have not withdrawn is always still at risk.',
-    },
-    keywords: '"Payout Frequency", "Reward Cycle", "Withdrawal Cycle", "On-Demand Payout", "First Payout", "Minimum Withdrawal"',
+  payout: {
+    title: 'Ödeme Sıklığı',
+    short: 'Kârını ne sıklıkla çekebiliyorsun ve ilk çekim için ne kadar beklemen gerekiyor? Çekilmemiş kâr her zaman risk altındadır.',
     options: [
-      { tr: 'İstediğin an (On-demand)', en: 'On demand', points: 8 },
-      { tr: 'Haftalık (7 gün)', en: 'Weekly (7 days)', points: 7 },
-      { tr: '10 – 14 gün', en: '10 – 14 days', points: 5 },
-      { tr: 'Ek paket (add-on) ile 14 güne iniyor', en: 'Down to 14 days with a paid add-on', points: 4 },
-      { tr: 'Aylık (28 – 30 gün)', en: 'Monthly (28 – 30 days)', points: 1 },
+      'İstediğin an (On-demand)',
+      'Haftalık (7 gün)',
+      '10 – 14 gün',
+      'Ek paket (add-on) ile 14 güne iniyor',
+      'Aylık (28 – 30 gün)',
     ],
     detail: [
       { h: 'Açıklama' },
@@ -271,21 +180,15 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'riskPerTrade',
-    max: 6,
-    title: { tr: 'İşlem veya Enstrüman Başına Risk Limiti', en: 'Risk Limit per Trade or Instrument' },
-    short: {
-      tr: 'Toplam günlük limitin dışında, tek bir işlemde veya enstrümanda ne kadar riske girebileceğine dair ayrı bir tavan. Aynı enstrümandaki pozisyonlar toplanarak tek işlem sayılır.',
-      en: 'On top of the daily limit, a separate cap on how much you may risk in one trade or one instrument. Positions in the same instrument are usually added together and counted as one.',
-    },
-    keywords: '"Risk per Trade", "Symbol Loss Limit", "Risk per Trade Idea", "Max Risk per Position", "Maximum Lot Size", "Position Size Limit"',
+  riskPerTrade: {
+    title: 'İşlem veya Enstrüman Başına Risk Limiti',
+    short: 'Toplam günlük limitin dışında, tek bir işlemde veya enstrümanda ne kadar riske girebileceğine dair ayrı bir tavan. Aynı enstrümandaki pozisyonlar toplanarak tek işlem sayılır.',
     options: [
-      { tr: 'Yok', en: 'None', points: 6 },
-      { tr: 'Var, eşik %3 ve üstü', en: 'Yes, threshold 3% or above', points: 5 },
-      { tr: 'Var, eşik %2 – %3', en: 'Yes, threshold 2% – 3%', points: 4 },
-      { tr: 'Var, eşik %2 altı', en: 'Yes, threshold below 2%', points: 2 },
-      { tr: 'Lot tavanı var (enstrüman bazlı)', en: 'Lot cap per instrument', points: 1 },
+      'Yok',
+      'Var, eşik %3 ve üstü',
+      'Var, eşik %2 – %3',
+      'Var, eşik %2 altı',
+      'Lot tavanı var (enstrüman bazlı)',
     ],
     detail: [
       { h: 'Açıklama' },
@@ -310,20 +213,14 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'stopLoss',
-    max: 5,
-    title: { tr: 'Stop-Loss Kuralı', en: 'Stop-Loss Rule' },
-    short: {
-      tr: 'Stop koymak zorunlu mu? Koyduğun stop platformda görünür kalmak zorunda mı? "Stop koy, sonra kaldır, fiyat gelince elle kapat" yöntemi bazı firmalarda gizli stop sayılır ve yasaktır.',
-      en: 'Is a stop mandatory? Must it stay visible on the platform? Placing a stop, removing it and closing by hand counts as a hidden stop at some firms, and is banned.',
-    },
-    keywords: '"Stop Loss Requirement", "Mandatory Stop Loss", "Hidden / Stealth Stop Loss", "Visible SL", "SL must remain on platform"',
+  stopLoss: {
+    title: 'Stop-Loss Kuralı',
+    short: 'Stop koymak zorunlu mu? Koyduğun stop platformda görünür kalmak zorunda mı? "Stop koy, sonra kaldır, fiyat gelince elle kapat" yöntemi bazı firmalarda gizli stop sayılır ve yasaktır.',
     options: [
-      { tr: 'Zorunlu değil, görünürlük şartı da yok', en: 'Not required, no visibility condition', points: 5 },
-      { tr: 'Zorunlu değil ama koyulursa görünür kalmalı', en: 'Not required, but must stay visible if placed', points: 4 },
-      { tr: 'Zorunlu (belirli süre içinde konmalı)', en: 'Mandatory (within a set time)', points: 3 },
-      { tr: 'Zorunlu + maksimum mesafe şartı var', en: 'Mandatory + maximum distance condition', points: 1 },
+      'Zorunlu değil, görünürlük şartı da yok',
+      'Zorunlu değil ama koyulursa görünür kalmalı',
+      'Zorunlu (belirli süre içinde konmalı)',
+      'Zorunlu + maksimum mesafe şartı var',
     ],
     detail: [
       { h: 'Açıklama' },
@@ -340,20 +237,14 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'minDays',
-    max: 2,
-    title: { tr: 'Minimum İşlem Günü', en: 'Minimum Trading Days' },
-    short: {
-      tr: 'Hedefi tutturmuş olsan bile geçmek için gereken minimum gün sayısı. Kritik ayrım: sadece **işlem açman** mı yeterli, yoksa o gün **kâr etmen** de şart mı?',
-      en: 'The minimum number of days before you can pass, even with the target hit. The critical distinction: is **opening a trade** enough, or must the day be **profitable**?',
-    },
-    keywords: '"Minimum Trading Days", "Profitable Days", "Active Trading Days", "Qualifying Days", "Minimum Profitable Days"',
+  minDays: {
+    title: 'Minimum İşlem Günü',
+    short: 'Hedefi tutturmuş olsan bile geçmek için gereken minimum gün sayısı. Kritik ayrım: sadece **işlem açman** mı yeterli, yoksa o gün **kâr etmen** de şart mı?',
     options: [
-      { tr: 'Yok (0 gün)', en: 'None (0 days)', points: 2 },
-      { tr: '1 – 4 gün, düz gün (kâr şartı yok)', en: '1 – 4 days, plain days (no profit condition)', points: 1.5 },
-      { tr: '5 gün ve üstü, düz gün', en: '5 days or more, plain days', points: 1 },
-      { tr: 'Kârlı gün şartı var', en: 'Profitable-day condition', points: 0.5 },
+      'Yok (0 gün)',
+      '1 – 4 gün, düz gün (kâr şartı yok)',
+      '5 gün ve üstü, düz gün',
+      'Kârlı gün şartı var',
     ],
     detail: [
       { h: 'Açıklama' },
@@ -379,19 +270,13 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'payoutDrawdown',
-    max: 2,
-    title: { tr: 'Çekim Sonrası Zarar Çizgisinin Davranışı', en: 'The Loss Line After a Payout' },
-    short: {
-      tr: 'Para çektiğinde bakiyen düşer — peki zarar çizgin de düşer mi, yoksa yerinde mi kalır? Yerinde kalıyorsa her çekim tamponunu daraltır.',
-      en: 'A payout lowers your balance — does the loss line come down with it, or stay where it was? If it stays, every withdrawal narrows your buffer.',
-    },
-    keywords: '"Drawdown Lock Upon Payout", "Payout Drawdown Adjustment", "Withdrawal Impact on Drawdown", "Buffer after withdrawal"',
+  payoutDrawdown: {
+    title: 'Çekim Sonrası Zarar Çizgisinin Davranışı',
+    short: 'Para çektiğinde bakiyen düşer — peki zarar çizgin de düşer mi, yoksa yerinde mi kalır? Yerinde kalıyorsa her çekim tamponunu daraltır.',
     options: [
-      { tr: 'Çekim çizgiyi etkilemez, taban çekim oranında aşağı iner', en: 'The line drops with the withdrawal, buffer preserved', points: 2 },
-      { tr: 'Taban yerinde kalır, tampon çekim kadar daralır', en: 'The line stays, the buffer narrows by the amount withdrawn', points: 1 },
-      { tr: 'Taban başlangıç bakiyesinde kilitlenir', en: 'The line locks at the starting balance', points: 0.5 },
+      'Çekim çizgiyi etkilemez, taban çekim oranında aşağı iner',
+      'Taban yerinde kalır, tampon çekim kadar daralır',
+      'Taban başlangıç bakiyesinde kilitlenir',
     ],
     detail: [
       { h: 'Açıklama' },
@@ -408,20 +293,10 @@ export const PROP_CRITERIA: PropCriterion[] = [
     ],
   },
 
-  {
-    id: 'weekend',
-    max: 1,
-    title: { tr: 'Hafta Sonu Pozisyon Taşıma', en: 'Holding Over the Weekend' },
-    short: {
-      tr: 'Cuma kapanışından Pazartesi açılışına pozisyonu açık taşıyabilme. Gece taşımadan ayrı bir kuraldır. Serbest olsa bile endeks/petrolde swap maliyeti yükselir ve Pazartesi açılış boşluğu stop\'unu atlayabilir.',
-      en: 'Holding from Friday\'s close to Monday\'s open. A separate rule from overnight holding. Even when allowed, swap costs rise on indices and oil, and Monday\'s gap can jump over your stop.',
-    },
-    keywords: '"Weekend Holding", "Hold Over Weekend", "Friday Close", "Weekend Gap Risk", "Flat by Friday", "Swing Add-on"',
-    options: [
-      { tr: 'Serbest', en: 'Allowed', points: 1 },
-      { tr: 'Ek paket (add-on) ile serbest', en: 'Allowed with a paid add-on', points: 0.75 },
-      { tr: 'Yasak — Cuma kapanışında otomatik kapanıyor', en: 'Banned — closed automatically at Friday\'s close', points: 0.25 },
-    ],
+  weekend: {
+    title: 'Hafta Sonu Pozisyon Taşıma',
+    short: 'Cuma kapanışından Pazartesi açılışına pozisyonu açık taşıyabilme. Gece taşımadan ayrı bir kuraldır. Serbest olsa bile endeks/petrolde swap maliyeti yükselir ve Pazartesi açılış boşluğu stop\'unu atlayabilir.',
+    options: ['Serbest', 'Ek paket (add-on) ile serbest', 'Yasak — Cuma kapanışında otomatik kapanıyor'],
     detail: [
       { h: 'Açıklama' },
       { p: 'Cuma kapanışından Pazartesi açılışına kadar pozisyonunu açık tutabilme hakkı. Gece taşımadan **ayrı bir kuraldır** — bazı firmalar hafta içi geceleri serbest bırakır ama hafta sonunu yasaklar.' },
@@ -435,29 +310,6 @@ export const PROP_CRITERIA: PropCriterion[] = [
       { p: 'Bu yüzden hafta sonu taşırken, günlük ve toplam çizgilerine normalden daha fazla mesafe bırakmak gerekir.' },
     ],
   },
-];
+};
 
-/** Tüm maddelerin en yüksek puanları toplamı — 100. */
-export const PROP_MAX_SCORE = PROP_CRITERIA.reduce((sum, c) => sum + c.max, 0);
-
-/** Her maddede en kötü seçenek seçilseydi çıkacak puan — tabanın sıfır olmadığını gösterir. */
-export const PROP_MIN_SCORE = PROP_CRITERIA.reduce(
-  (sum, c) => sum + Math.min(...c.options.map(o => o.points)), 0);
-
-export interface ScoreBand {
-  min: number;
-  tr: string;
-  en: string;
-  color: string;
-}
-
-export const SCORE_BANDS: ScoreBand[] = [
-  { min: 85, tr: 'Kusursuza yakın — nadir bulunur', en: 'Near flawless — rare', color: '#34d399' },
-  { min: 70, tr: 'Güçlü hesap, sektörün üst dilimi', en: 'Strong account, top of the field', color: '#a3e635' },
-  { min: 55, tr: 'Ortalama — çoğu firma bu bantta', en: 'Average — where most firms sit', color: '#fbbf24' },
-  { min: 40, tr: 'Zayıf, ciddi kısıtlar var', en: 'Weak, with serious restrictions', color: '#fb923c' },
-  { min: 0, tr: 'Kötü', en: 'Poor', color: '#f87171' },
-];
-
-export const bandFor = (score: number): ScoreBand =>
-  SCORE_BANDS.find(b => score >= b.min) || SCORE_BANDS[SCORE_BANDS.length - 1];
+export default tr;

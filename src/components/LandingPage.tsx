@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import {
   TrendingUp, BookOpen, BarChart2, CalendarDays, Target, Sparkles, Upload,
   Check, ChevronDown, ArrowRight, Shield, Globe, Zap, Mic, ListChecks, Clock,
-  Newspaper, Wallet,
+  Newspaper, Wallet, Gauge,
 } from 'lucide-react';
 import {
   AreaChart, Area, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip,
@@ -235,6 +235,17 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           accent: '#fb923c',
         },
         {
+          icon: <Gauge className="w-5 h-5" />,
+          title: t('Prop Hesabı Değerlendirme', 'Prop Account Review', 'ارزیابی حساب پراپ'),
+          desc: t(
+            'Bir prop hesabını 12 maddede puanla — drawdown tipi, haber kuralı, açık pozisyon limiti, ödeme sıklığı… 100 üzerinden sonucu gör, üç firmayı yan yana koy. Her maddenin yanında o kuralın ne demek olduğunu rakamlarla anlatan bir açıklama var. Kabul edemeyeceğin kuralı kırmızı çizgi yaparsan, o kuralı olan firma puanı ne olursa olsun "uygun değil" görünür.',
+            'Score a prop account on 12 criteria — drawdown type, news rule, floating loss limit, payout frequency… See the result out of 100 and put three firms side by side. Each criterion carries an explanation of what that rule means, in numbers. Mark a rule you cannot live with as a red line and any firm carrying it shows as "not suitable", whatever it scores.',
+            'یک حساب پراپ را در ۱۲ بند امتیاز بده و نتیجه را از ۱۰۰ ببین؛ تا سه شرکت را کنار هم مقایسه کن.'
+          ),
+          span: 'lg:col-span-4',
+          accent: '#c084fc',
+        },
+        {
           icon: <Target className="w-5 h-5" />,
           title: t('Kuralların ve Hedeflerin', 'Your Rules and Targets', 'قوانین و اهداف شما'),
           desc: t('Aylık hedef, maksimum risk, işlem yasağı saatleri — sınırı aştığında sistem sana söylesin.', 'Monthly targets, maximum risk, no-trade hours — the system tells you the moment you cross a line.', 'اهداف ماهانه و حداکثر ریسک را تعیین کنید.'),
@@ -276,6 +287,10 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
     {
       q: t('İşlemlerim MetaTrader\'dan otomatik gelebilir mi?', 'Can my trades arrive from MetaTrader automatically?', 'آیا معاملات به‌طور خودکار از متاتریدر می‌آیند؟'),
       a: t('Evet. Hazır uzman danışmanı (.ex5) indirip bir grafiğe sürüklüyorsun, anahtarını yapıştırıyorsun — kapanan her işlem journal\'ına kendiliğinden düşüyor. İlk kurulumda bir yıllık geçmişini de getiriyor. Derleme, kod, ayar yok.', 'Yes. Download the ready-made expert advisor (.ex5), drop it on a chart and paste your key — every closed trade lands in your journal by itself, and the first run brings a year of history with it. No compiling, no code, no settings.', 'بله. اکسپرت آماده را روی چارت بیندازید و کلید خود را وارد کنید.'),
+    },
+    {
+      q: t('Prop hesabı değerlendirme nedir?', 'What is the prop account review?', 'ارزیابی حساب پراپ چیست؟'),
+      a: t('Bir prop firmasının kurallarını 12 maddede puanlayıp 100 üzerinden sonuç veren bir araç: drawdown tipi 20 puan, haber kuralı 15, açık pozisyon limiti 12 — ağırlıklar maddenin hesabı gerçekten bitirme gücüne göre. Üç firmayı yan yana koyup karşılaştırabilir, çıktısını PDF alabilirsin. Her maddenin yanında o kuralın ne anlama geldiğini örneklerle anlatan bir açıklama var; kurallar sözleşmede hangi adlarla geçiyorsa onlar da yazıyor.', 'A tool that scores a prop firm\'s rules on 12 criteria out of 100: drawdown type 20 points, the news rule 15, the floating loss limit 12 — weighted by how likely each is to actually end the account. Put three firms side by side and export the comparison as a PDF. Each criterion carries an explanation with worked examples, plus the names the rule goes by in the firm\'s terms.', 'ابزاری که قوانین یک شرکت پراپ را در ۱۲ بند از ۱۰۰ امتیاز می‌دهد و امکان مقایسه سه شرکت را می‌دهد.'),
     },
     {
       q: t('Sesli not gerçekten ücretsiz mi?', 'Is the voice note really free?', 'آیا یادداشت صوتی واقعاً رایگان است؟'),
