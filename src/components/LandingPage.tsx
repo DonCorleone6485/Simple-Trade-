@@ -3,12 +3,13 @@ import { motion, useReducedMotion } from 'motion/react';
 import {
   TrendingUp, BookOpen, BarChart2, CalendarDays, Target, Sparkles, Upload,
   Check, ChevronDown, ArrowRight, Shield, Globe, Zap, Mic, ListChecks, Clock,
-  Newspaper, Wallet, Gauge,
+  Newspaper, Wallet, Gauge, Lock,
 } from 'lucide-react';
 import {
   AreaChart, Area, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip,
 } from 'recharts';
 import { useLanguage } from '../context/LanguageContext';
+import { SESSIONS, sessionState } from '../lib/sessions';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -28,6 +29,82 @@ const languages = [
   { code: 'ar', label: 'العربية' }, { code: 'ru', label: 'Русский' }, { code: 'es', label: 'Español' },
   { code: 'pt', label: 'Português' }, { code: 'de', label: 'Deutsch' }, { code: 'fr', label: 'Français' },
 ];
+
+/**
+ * Kart içindeki küçük canlı parçalar.
+ *
+ * Seans saati uygulamanın kullandığı hesabın aynısını kullanıyor, puan
+ * rozeti gerçek bandı çiziyor. Vitrinde uydurma bir ekran göstermek, ürünü
+ * ilk açtığında hayal kırıklığına dönüşür.
+ */
+function SessionClock() {
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="flex items-center gap-2 mt-5 flex-wrap">
+      {SESSIONS.map(s => {
+        const { open } = sessionState(s, now);
+        return (
+          <span key={s.key} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11.5px] font-medium"
+            style={{
+              background: open ? 'rgba(52,211,153,0.12)' : 'rgba(255,255,255,0.04)',
+              color: open ? '#34d399' : 'rgba(255,255,255,0.38)',
+              border: `1px solid ${open ? 'rgba(52,211,153,0.25)' : 'rgba(255,255,255,0.06)'}`,
+            }}>
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: open ? '#34d399' : 'rgba(255,255,255,0.22)' }} />
+            {s.code}
+            <span className="font-mono" style={{ fontVariantNumeric: 'tabular-nums', opacity: 0.85 }}>
+              {new Intl.DateTimeFormat('en-GB', { timeZone: s.tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(now)}
+            </span>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Mikrofon açıkken görünen ses dalgası. Yalnız CSS — kayıt yapmaz. */
+function MicWave({ still }: { still: boolean }) {
+  return (
+    <div className="flex items-end gap-[3px] mt-5 h-7" aria-hidden="true">
+      {[0.5, 0.9, 0.35, 1, 0.65, 0.85, 0.45, 0.75, 0.3, 0.6, 0.95, 0.4].map((h, i) => (
+        <span key={i} className={still ? undefined : 'stj-wave-bar'}
+          style={{
+            width: '3px', borderRadius: '2px', background: '#22d3ee',
+            height: `${h * 100}%`, opacity: 0.75, animationDelay: `${i * 90}ms`,
+          }} />
+      ))}
+    </div>
+  );
+}
+
+/** Prop değerlendirmenin sonucu ekranda nasıl görünüyorsa öyle. */
+function PropScore({ language }: { language: string }) {
+  const rows = [
+    { name: 'A', score: 78, color: '#a3e635' },
+    { name: 'B', score: 54, color: '#fb923c' },
+  ];
+  return (
+    <div className="mt-5 space-y-2 max-w-md">
+      {rows.map(r => (
+        <div key={r.name} className="flex items-center gap-3">
+          <span className="text-[12px] w-16 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            {language === 'tr' ? 'Firma' : 'Firm'} {r.name}
+          </span>
+          <span className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <span className="block h-full rounded-full" style={{ width: `${r.score}%`, background: r.color }} />
+          </span>
+          <span className="font-mono text-[12.5px] w-16 text-end flex-shrink-0" style={{ color: r.color }}>
+            {r.score} / 100
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }: LandingPageProps) {
   const { language, setLanguage } = useLanguage();
@@ -139,6 +216,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             'Talk into the microphone and stop — the writing tidies itself. It knows the terms, too: Order Block, FVG, CHoCH. Free.',
             'با میکروفون صحبت کنید؛ نگارش خودش مرتب می‌شود و اصطلاحات را درست می‌نویسد.'
           ),
+          widget: <MicWave still={!!shouldReduceMotion} />,
           span: 'lg:col-span-2',
           accent: '#22d3ee',
         },
@@ -224,6 +302,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           icon: <Clock className="w-5 h-5" />,
           title: t('Seans Saatleri', 'Session Clock', 'ساعت سشن‌ها'),
           desc: t('Sydney, Tokyo, Londra, New York — hangisi açık, hangisi kaç saat sonra açılıyor.', 'Sydney, Tokyo, London, New York — which one is open, and how long until the next.', 'کدام سشن باز است و بعدی چه زمانی باز می‌شود.'),
+          widget: <SessionClock />,
           span: '',
           accent: '#38bdf8',
         },
@@ -242,6 +321,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             'Score a prop account on 12 criteria — drawdown type, news rule, floating loss limit, payout frequency… See the result out of 100 and put three firms side by side. Each criterion carries an explanation of what that rule means, in numbers. Mark a rule you cannot live with as a red line and any firm carrying it shows as "not suitable", whatever it scores.',
             'یک حساب پراپ را در ۱۲ بند امتیاز بده و نتیجه را از ۱۰۰ ببین؛ تا سه شرکت را کنار هم مقایسه کن.'
           ),
+          widget: <PropScore language={language} />,
           span: 'lg:col-span-4',
           accent: '#c084fc',
         },
@@ -512,11 +592,16 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: shouldReduceMotion ? 0 : 1.1 }}
             className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
-            <span className="text-[11px] uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.28)' }}>
+            <span className="text-[10.5px] uppercase tracking-[0.18em]" style={{ color: 'rgba(255,255,255,0.25)' }}>
               {t('Şuralardan aktarır', 'Imports from', 'وارد می‌کند از')}
             </span>
-            {['MetaTrader 5', 'MetaTrader 4', 'cTrader', 'TradeLocker', 'DXtrade', 'Match-Trader'].map(name => (
-              <span key={name} className="text-[13.5px]" style={{ color: 'rgba(255,255,255,0.42)' }}>{name}</span>
+            {['MetaTrader 5', 'MetaTrader 4', 'cTrader', 'TradeLocker', 'DXtrade', 'Match-Trader'].map((name, i) => (
+              <React.Fragment key={name}>
+                {i > 0 && <span className="w-1 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.15)' }} />}
+                <span className="text-[14px] font-medium" style={{ color: 'rgba(255,255,255,0.6)', letterSpacing: '-0.01em' }}>
+                  {name}
+                </span>
+              </React.Fragment>
             ))}
           </motion.div>
         </motion.div>
@@ -582,7 +667,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
 
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={stagger}
                 className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-                {group.items.map((f, i) => (
+                {group.items.map((f: any, i: number) => (
                   <motion.div key={i} variants={fadeUp} whileHover={{ y: shouldReduceMotion ? 0 : -3 }}
                     className={`rounded-2xl p-7 relative h-full ${f.span}`}
                     style={{
@@ -599,6 +684,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                     <div className="mb-5" style={{ color: f.accent }}>{f.icon}</div>
                     <h4 className="text-[16px] font-medium mb-2.5 pe-10" style={{ letterSpacing: '-0.01em' }}>{f.title}</h4>
                     <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{f.desc}</p>
+                    {f.widget}
                   </motion.div>
                 ))}
               </motion.div>
@@ -624,9 +710,13 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                 className={i > 0 ? 'lg:ps-10' : ''}
                 style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
                 {/* Numara rozet değil, tipografi: sayfanın serifiyle büyük ve sessiz. */}
-                <div className="font-display leading-none mb-6"
-                  style={{ fontSize: '46px', color: 'rgba(255,255,255,0.16)', letterSpacing: '-0.03em' }}>
-                  {s.n}
+                <div className="relative font-display leading-none mb-6 w-fit"
+                  style={{ fontSize: '46px', color: 'rgba(255,255,255,0.28)', letterSpacing: '-0.03em' }}>
+                  {/* Sayının arkasında dağınık bir mor ışık: numara arka plandan
+                      ayrılsın, ama rozet gibi kutulanmasın. */}
+                  <span className="pointer-events-none absolute -inset-6 rounded-full blur-2xl"
+                    style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.35), transparent 70%)' }} />
+                  <span className="relative">{s.n}</span>
                 </div>
                 <h3 className="text-[16px] font-medium mb-2.5" style={{ letterSpacing: '-0.01em' }}>{s.title}</h3>
                 <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.desc}</p>
@@ -692,8 +782,11 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
 
             <motion.div variants={fadeUp} className="p-8 sm:p-10 relative"
               style={{
-                borderInlineStart: '1px solid rgba(255,255,255,0.06)',
-                background: 'linear-gradient(180deg, rgba(139,92,246,0.07), transparent 70%)',
+                borderInlineStart: '1px solid rgba(139,92,246,0.22)',
+                background: 'linear-gradient(180deg, rgba(139,92,246,0.09), transparent 70%)',
+                // Kutuyu doygun mora boyamak reklam gibi okunuyordu; ışık
+                // kenardan içeri sızsın, kart kendi zemininde kalsın.
+                boxShadow: 'inset 0 0 80px -40px rgba(139,92,246,0.55)',
               }}>
               {/* Vurgu: kutunun tamamını boyamak yerine üstte tek bir çizgi. */}
               <span className="absolute top-0 start-0 end-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #8b5cf6, transparent)' }} />
@@ -730,6 +823,22 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                 {signedIn ? ctaLabel : t('Ücretsiz Dene', 'Start Free Trial', 'شروع آزمایشی رایگان')}
               </button>
             </motion.div>
+          </motion.div>
+
+          {/* Söz verebileceğimiz kadarını söylüyoruz: "banka düzeyinde güvenlik"
+              gibi ölçülemeyen bir iddia, kontrol eden kullanıcıda güveni
+              artırmaz, azaltır. Burada yazan şey veritabanında açık olan şey. */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
+            className="max-w-4xl mt-6 flex items-center gap-2.5 px-4 py-3 rounded-xl"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <Lock className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
+            <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              {t(
+                'Verilerin satır bazlı güvenlikle (RLS) izole — başka hiçbir kullanıcı senin journal\'ını, işlemlerini ya da fotoğraflarını göremez. Kart bilgisi istemiyoruz.',
+                'Your data is isolated with row-level security (RLS) — no other user can see your journals, trades or screenshots. We never ask for a card.',
+                'داده‌های شما با امنیت سطح ردیف (RLS) ایزوله است — هیچ کاربر دیگری ژورنال شما را نمی‌بیند.'
+              )}
+            </p>
           </motion.div>
         </div>
       </section>

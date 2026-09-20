@@ -141,6 +141,21 @@ body::before {
 
 @page { size: A4 portrait; margin: 14mm; }
 
+/* Ana sayfadaki mikrofon kartının ses dalgası. Sadece süs: kayıt yapmaz,
+   mikrofon istemez. Hareketi azalt diyene bileşen zaten durağan çiziyor,
+   burada bir kez daha güvenceye alıyoruz. */
+@keyframes stj-wave {
+  0%, 100% { transform: scaleY(0.35); }
+  50%      { transform: scaleY(1); }
+}
+.stj-wave-bar {
+  transform-origin: bottom;
+  animation: stj-wave 1.1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stj-wave-bar { animation: none; }
+}
+
 /* ── METATRADER KURULUM TURU ───────────────────────────────────────────────
    MTSetupTour bileşeninin bütün görünümü. Hepsi .mt-tour altında duruyor:
    içeride MetaTrader'ın kendi dünyası taklit edildiği için (Windows grisi,

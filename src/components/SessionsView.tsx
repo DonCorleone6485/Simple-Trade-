@@ -1,30 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-
-/**
- * Seanslar, şehirlerinin yerel saatiyle tanımlı.
- *
- * Sabit UTC aralıkları yazmak yaz saatinde kayar: Londra yılın yarısında
- * UTC+0, yarısında UTC+1. Şehrin saat dilimini kullanınca bu kendiliğinden
- * doğru olur.
- */
-const SESSIONS = [
-  { key: 'sydney', tz: 'Australia/Sydney', open: 8, close: 17, tr: 'Sidney', en: 'Sydney' },
-  { key: 'tokyo', tz: 'Asia/Tokyo', open: 9, close: 18, tr: 'Tokyo', en: 'Tokyo' },
-  { key: 'london', tz: 'Europe/London', open: 8, close: 17, tr: 'Londra', en: 'London' },
-  { key: 'newyork', tz: 'America/New_York', open: 8, close: 17, tr: 'New York', en: 'New York' },
-];
-
-function hourIn(tz: string, now: Date): number {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false,
-  }).formatToParts(now);
-  const get = (t: string) => parts.find(p => p.type === t)?.value || '0';
-  return Number(get('hour')) + Number(get('minute')) / 60;
-}
-
-const weekdayIn = (tz: string, now: Date) =>
-  new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'short' }).format(now);
+import { SESSIONS, sessionState } from '../lib/sessions';
 
 export default function SessionsView() {
   const { language } = useLanguage();
@@ -53,11 +29,7 @@ export default function SessionsView() {
     <div className="max-w-4xl">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {SESSIONS.map(s => {
-          const h = hourIn(s.tz, now);
-          const day = weekdayIn(s.tz, now);
-          const weekend = day === 'Sat' || day === 'Sun';
-          const open = !weekend && h >= s.open && h < s.close;
-          const left = open ? s.close - h : (h < s.open ? s.open - h : 24 - h + s.open);
+          const { weekend, open, left } = sessionState(s, now);
 
           return (
             <div key={s.key} style={card}>
