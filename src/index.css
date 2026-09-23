@@ -302,6 +302,92 @@ body::before {
   .hover-quiet:hover .hover-icon { transform: none; }
 }
 
+/* ── ÜST MENÜ VE ÇAĞRI DÜĞMELERİ ──────────────────────────────────────────
+   Menü eskiden beyaza dönüyordu; sayfanın geri kalanı altına döndüğü için
+   tek başına yabancı duruyordu. Artık o da altın, altında da aynı kısa
+   çizgi açılıyor — "Neden Journal"daki hareketin aynısı.
+
+   Çizgi width ile açılıyor, transform ile değil: eleman zaten akışın
+   dışında (absolute), dolayısıyla genişlemesi hiçbir şeyi itmiyor. Bunun
+   karşılığında inset-inline-start bedavaya geliyor — Arapça ve Farsçada
+   çizgi kendiliğinden sağdan açılıyor. */
+.nav-link {
+  position: relative;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.25s ease;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: -6px;
+  height: 1px;
+  width: 0;
+  background: var(--gold);
+  transition: width 0.3s ease;
+}
+.nav-link:hover { color: var(--gold); }
+.nav-link:hover::after { width: 100%; }
+
+/* "Giriş Yap" düğmesinde çizgi yok — hap şeklinde bir düğme, altına çizgi
+   çekmek tuhaf duruyor. Sadece rengi menüyle aynı yere gidiyor. */
+.nav-quiet { transition: color 0.25s ease; }
+.nav-quiet:hover { color: var(--gold) !important; }
+
+/* Mor düğmenin üstünden bir kez geçen parıltı. Mor marka rengi, onu altına
+   çevirmiyoruz: değişen tek şey üstünden süzülen ışık ve altındaki mor
+   halo. Huzme düğmenin dışına taşmasın diye overflow kapalı; isolation
+   olmadan z-index: -1 olan huzme morun arkasına düşüp kayboluyor. */
+.cta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: background 0.2s ease, box-shadow 0.3s ease;
+}
+.cta::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 70%
+  );
+  transform: translateX(-130%);
+}
+.cta:hover { box-shadow: 0 10px 32px -8px rgba(139, 92, 246, 0.7); }
+.cta:hover::before { animation: cta-sheen 0.85s cubic-bezier(0.3, 0, 0.2, 1); }
+@keyframes cta-sheen {
+  from { transform: translateX(-130%); }
+  to { transform: translateX(130%); }
+}
+
+/* Dokunmatikte parıltı parmak kalkınca donup kalıyor; halo yeter. */
+@media (hover: none) {
+  .cta:hover::before { animation: none; }
+}
+
+/* Bu blok .cta tanımlarının ARDINDAN gelmek zorunda: aynı ağırlıkta iki
+   kural çakışınca sonra yazılan kazanıyor, yukarıya koyarsak hiçbir etkisi
+   olmuyor. (Menünün altındaki çizgi burada yok — açılması yol almak değil,
+   bir işaret koymak.)
+
+   Huzme gidiyor, ama yerine bir şey koymadan gitmiyor: düğme baştan sona
+   hafifçe açılıyor. Yoksa bu ayarı açan kişi düğmeye dokunduğunu hiç
+   anlamıyor — nitekim ilk denemede tam bu oldu. */
+@media (prefers-reduced-motion: reduce) {
+  .cta::before {
+    background: rgba(255, 255, 255, 0.14);
+    transform: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .cta:hover::before { animation: none; opacity: 1; }
+}
+
 @page { size: A4 portrait; margin: 14mm; }
 
 /* Ana sayfadaki mikrofon kartının ses dalgası. Sadece süs: kayıt yapmaz,

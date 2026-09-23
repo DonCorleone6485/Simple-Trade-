@@ -386,7 +386,6 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
     },
   ];
 
-  const navLink: React.CSSProperties = { color: 'rgba(255,255,255,0.6)' };
 
   return (
     <div className="app-ground min-h-screen" style={{ color: '#fff' }}>
@@ -409,19 +408,13 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
-            <button onClick={() => scrollTo('features')} className="text-sm font-medium transition-colors" style={navLink}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)'; }}>
+            <button onClick={() => scrollTo('features')} className="nav-link text-sm font-medium">
               {t('Özellikler', 'Features', 'امکانات')}
             </button>
-            <button onClick={() => scrollTo('how-it-works')} className="text-sm font-medium transition-colors" style={navLink}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)'; }}>
+            <button onClick={() => scrollTo('how-it-works')} className="nav-link text-sm font-medium">
               {t('Nasıl Çalışır', 'How It Works', 'چگونه کار می‌کند')}
             </button>
-            <button onClick={() => scrollTo('pricing')} className="text-sm font-medium transition-colors" style={navLink}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)'; }}>
+            <button onClick={() => scrollTo('pricing')} className="nav-link text-sm font-medium">
               {t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری')}
             </button>
           </nav>
@@ -455,15 +448,13 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
 
             {!signedIn && (
               <button onClick={onSignIn}
-                className="hidden sm:block px-4 py-2 rounded-full text-sm font-medium transition-all"
-                style={{ color: 'rgba(255,255,255,0.8)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.8)'; }}>
+                className="nav-quiet hidden sm:block px-4 py-2 rounded-full text-sm font-medium"
+                style={{ color: 'rgba(255,255,255,0.8)' }}>
                 {t('Giriş Yap', 'Sign In', 'ورود')}
               </button>
             )}
             <button onClick={onGetStarted}
-              className="flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-sm font-medium transition-all"
+              className="cta flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-sm font-medium"
               style={{ background: '#8b5cf6', color: '#fff' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
@@ -529,7 +520,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               onClick={onGetStarted}
               whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
               whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-              className="flex items-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-medium"
+              className="cta flex items-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-medium"
               style={{ background: '#8b5cf6', color: '#fff' }}>
               {ctaLabel}
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
@@ -833,7 +824,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                 ))}
               </div>
               <button onClick={onGetStarted}
-                className="w-full py-3 rounded-full text-sm font-medium transition-all"
+                className="cta w-full py-3 rounded-full text-sm font-medium"
                 style={{ background: '#8b5cf6', color: '#fff' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
@@ -926,7 +917,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             </p>
             <motion.button onClick={onGetStarted}
               whileHover={{ scale: shouldReduceMotion ? 1 : 1.03 }} whileTap={{ scale: shouldReduceMotion ? 1 : 0.97 }}
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-[15px] font-medium"
+              className="cta inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-[15px] font-medium"
               style={{ background: '#8b5cf6', color: '#fff' }}>
               {ctaLabel}
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
