@@ -123,10 +123,8 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
           <div className="overflow-y-auto" style={{ maxHeight: '300px' }}>
             {/* Boş seçenek */}
             <button type="button" onClick={() => handleSelect('')}
-              className="w-full text-start px-4 py-2.5 text-sm transition-all"
-              style={{ color: 'rgba(255,255,255,0.35)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+              className="ui-pill w-full text-start px-4 py-2.5 text-sm transition-all"
+              style={{ color: 'rgba(255,255,255,0.35)' }}>
               {language === 'tr' ? '— Seçin —' : '— Select —'}
             </button>
 
@@ -136,10 +134,8 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
             </div>
             {DEFAULT_SETUPS.map(s => (
               <button key={s} type="button" onClick={() => handleSelect(s)}
-                className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
-                style={{ color: value === s ? '#a78bfa' : '#fff' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                className="ui-pill w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
+                style={{ color: value === s ? '#a78bfa' : '#fff' }}>
                 {s}
                 {value === s && <span style={{ color: '#a78bfa' }}>✓</span>}
               </button>
@@ -153,19 +149,15 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
                   {language === 'tr' ? 'Özel Setuplar' : 'Custom Setups'}
                 </div>
                 {customSetups.map(s => (
-                  <div key={s} className="group flex items-center px-4 py-2.5 text-sm transition-all"
-                    style={{ color: value === s ? '#a78bfa' : '#fff' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                  <div key={s} className="ui-pill group flex items-center px-4 py-2.5 text-sm transition-all"
+                    style={{ color: value === s ? '#a78bfa' : '#fff' }}>
                     <button type="button" onClick={() => handleSelect(s)} className="flex-1 text-start flex items-center gap-2">
                       {s}
                       {value === s && <span style={{ color: '#a78bfa' }}>✓</span>}
                     </button>
                     <button type="button" onClick={e => removeCustom(s, e)}
-                      className="p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                      className="ui-pill ui-pill-danger p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                       style={{ color: '#f87171' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.15)'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                       title={language === 'tr' ? 'Sil' : 'Delete'}>
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -196,10 +188,8 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
               </div>
             ) : (
               <button type="button" onClick={() => setShowInput(true)}
-                className="w-full flex items-center gap-2 px-4 py-3 text-sm transition-all"
-                style={{ color: '#a78bfa' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                className="ui-pill w-full flex items-center gap-2 px-4 py-3 text-sm transition-all"
+                style={{ color: '#a78bfa' }}>
                 <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                   style={{ background: 'rgba(139,92,246,0.2)' }}>+</span>
                 <span>{language === 'tr' ? 'Özel Setup Ekle' : 'Add Custom Setup'}</span>

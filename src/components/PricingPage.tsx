@@ -128,10 +128,8 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
           </div>
           <button
             onClick={onFreeStart}
-            className="w-full py-3 rounded-full text-sm font-medium mb-8 transition-all"
+            className="ui-pill w-full py-3 rounded-full text-sm font-medium mb-8 transition-all"
             style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
           >
             {t('Ücretsiz Başla', 'Get Started Free', 'شروع رایگان')}
           </button>
@@ -194,10 +192,8 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
 
           <button
             onClick={onProStart}
-            className="w-full py-3 rounded-full text-sm font-medium mb-8 transition-all"
+            className="cta w-full py-3 rounded-full text-sm font-medium mb-8 transition-all"
             style={{ background: '#8b5cf6', color: '#fff' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
           >
             {t("Pro'ya Geç", 'Upgrade to Pro', 'ارتقا به Pro')}
           </button>

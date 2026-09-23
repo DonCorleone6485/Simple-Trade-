@@ -198,10 +198,8 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
   if (!open) {
     return (
       <button type="button" onClick={() => setOpen(true)}
-        className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
-        style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.16)'; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
+        className="ui-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+        style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}>
         <Layers className="w-4 h-4" />
         {tr('Multi Timeframe Analiz Ekle', 'Add Multi-Timeframe Analysis')}
       </button>
@@ -226,10 +224,8 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
             )}
           </span>
           <button type="button" onClick={clearAll}
-            className="flex items-center gap-1 text-xs font-medium ms-auto"
-            style={{ color: 'rgba(255,255,255,0.45)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.45)'; }}>
+            className="link-gold flex items-center gap-1 text-xs font-medium ms-auto"
+            style={{ color: 'rgba(255,255,255,0.45)' }}>
             <RotateCcw className="w-3 h-3" />
             {tr('Temizle', 'Clear')}
           </button>
@@ -259,15 +255,11 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
               </span>
               <div className="flex items-center gap-1 ms-auto">
                 <button type="button" onClick={() => startEdit(entry)} title={tr('Düzenle', 'Edit')}
-                  className="p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#a78bfa'; (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.12)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                  className="ui-pill p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}>
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
                 <button type="button" onClick={() => removeEntry(entry.timeframe)} title={tr('Sil', 'Delete')}
-                  className="p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.12)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                  className="ui-pill ui-pill-danger p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}>
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -325,18 +317,14 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
 
           <div className="flex items-center gap-2">
             <button type="button" onClick={saveDraft}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-              style={{ background: '#8b5cf6', color: '#fff' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+              className="cta flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+              style={{ background: '#8b5cf6', color: '#fff' }}>
               <Check className="w-4 h-4" />
               {tr('Kaydet', 'Save')}
             </button>
             <button type="button" onClick={() => { setDraft(null); setEditingTf(null); }}
-              className="px-4 py-2 rounded-xl text-sm transition-all"
-              style={{ color: 'rgba(255,255,255,0.45)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.45)'; }}>
+              className="link-gold px-4 py-2 rounded-xl text-sm transition-all"
+              style={{ color: 'rgba(255,255,255,0.45)' }}>
               {tr('Vazgeç', 'Cancel')}
             </button>
           </div>
@@ -361,10 +349,8 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
               {availableTfs.map(tf => (
                 <button key={tf.code} type="button" onClick={() => startNew(tf.code)}
                   title={language === 'tr' ? tf.tr : tf.en}
-                  className="px-3 py-2 rounded-xl text-sm font-mono font-semibold transition-all"
-                  style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.22)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.22)'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; (e.currentTarget as HTMLElement).style.color = '#a78bfa'; }}>
+                  className="ui-pill px-3 py-2 rounded-xl text-sm font-mono font-semibold transition-all"
+                  style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.22)' }}>
                   {tf.code}
                 </button>
               ))}
@@ -372,10 +358,8 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
           </div>
         ) : (
           <button type="button" onClick={() => setPickerOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
-            style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.16)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
+            className="ui-pill flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+            style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}>
             <Plus className="w-4 h-4" />
             {entries.length === 0
               ? tr('Timeframe Seç', 'Pick a Timeframe')

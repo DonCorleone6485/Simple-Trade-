@@ -192,10 +192,8 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                 <span className="text-[12px] ms-auto" style={{ color: 'rgba(255,255,255,0.3)' }}>
                   {tr('son kullanım', 'last used')}: {fmt(k.last_used_at)}
                 </span>
-                <button onClick={() => revoke(k.id)} className="p-1.5 rounded-lg flex-shrink-0"
+                <button onClick={() => revoke(k.id)} className="ui-pill ui-pill-danger p-1.5 rounded-lg flex-shrink-0"
                   style={{ color: 'rgba(255,255,255,0.25)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.25)'; }}
                   title={tr('İptal et', 'Revoke')}>
                   <Trash2 className="w-4 h-4" />
                 </button>

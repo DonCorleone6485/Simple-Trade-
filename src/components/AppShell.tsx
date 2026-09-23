@@ -53,21 +53,15 @@ export default function AppShell({
   }) => {
     const on = active === itemKey;
     return (
-      <button onClick={() => go(itemKey)}
-        className={`w-full flex items-center gap-3 py-2.5 rounded-xl text-[13.5px] relative ${nested ? 'ps-9 pe-3' : 'px-3'}`}
-        style={{
-          background: on ? 'rgba(139,92,246,0.12)' : 'transparent',
-          color: on ? '#fff' : 'rgba(255,255,255,0.45)',
-          fontWeight: on ? 500 : 400,
-          transition: 'all 150ms cubic-bezier(0.4,0,0.2,1)',
-        }}
-        onMouseEnter={e => { if (!on) { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.8)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; } }}
-        onMouseLeave={e => { if (!on) { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.45)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; } }}>
+      // Seçili olmak bir durum, satır içi stil değil: data-on'u CSS okuyor,
+      // böylece hem duruş hem imleç hâli tek yerde yazılı.
+      <button onClick={() => go(itemKey)} data-on={on}
+        className={`ui-nav w-full flex items-center gap-3 py-2.5 rounded-xl text-[13.5px] relative ${nested ? 'ps-9 pe-3' : 'px-3'}`}>
         {on && (
           <span className="absolute top-1/2 -translate-y-1/2 rounded-full"
             style={{ insetInlineStart: 0, width: '2px', height: '18px', background: '#8b5cf6' }} />
         )}
-        <span style={{ color: on ? '#a78bfa' : 'currentColor', display: 'flex' }}>{icon}</span>
+        <span className="ui-nav-icon" style={{ display: 'flex' }}>{icon}</span>
         <span className="truncate">{label}</span>
       </button>
     );
@@ -83,10 +77,10 @@ export default function AppShell({
     <div className="flex flex-col h-full" style={{ width: SIDEBAR_W, background: '#0a0b14' }}>
       {/* Marka */}
       <button onClick={() => go('home')}
-        className="flex items-center gap-2.5 px-5 h-16 flex-shrink-0"
+        className="hover-quiet flex items-center gap-2.5 px-5 h-16 flex-shrink-0"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <TrendingUp className="w-[18px] h-[18px] flex-shrink-0" style={{ color: '#8b5cf6' }} />
-        <span className="font-display text-[15px] truncate" style={{ letterSpacing: '-0.01em' }}>
+        <span className="hover-title font-display text-[15px] truncate" style={{ letterSpacing: '-0.01em' }}>
           Simple Trading Journal
         </span>
       </button>
@@ -138,10 +132,7 @@ export default function AppShell({
             <div className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.6)' }}>{userLabel}</div>
             {isPro && <div className="text-[10px] tracking-wider" style={{ color: '#a78bfa' }}>PRO</div>}
           </div>
-          <button onClick={onSignOut} className="p-1.5 rounded-lg flex-shrink-0"
-            style={{ color: 'rgba(255,255,255,0.3)', transition: 'color 150ms' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.3)'; }}
+          <button onClick={onSignOut} className="ui-icon-btn ui-icon-btn-danger p-1.5 rounded-lg flex-shrink-0"
             title={tr('Çıkış Yap', 'Sign Out')}>
             <LogOut className="w-4 h-4" />
           </button>

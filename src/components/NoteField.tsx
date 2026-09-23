@@ -335,10 +335,8 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
             tutan için: adı ne yaptığını söylüyor, "Düzelt" ise söylemiyordu. */}
         {!listening && !tidying && !transcribing && before == null && value.trim().length > 1 && (
           <button type="button" onClick={tidy}
-            className="flex items-center gap-1.5 text-[12.5px]"
-            style={{ color: 'rgba(255,255,255,0.4)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#a78bfa'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+            className="ui-pill flex items-center gap-1.5 text-[12.5px]"
+            style={{ color: 'rgba(255,255,255,0.4)' }}>
             <Wand2 className="w-3.5 h-3.5" />
             {tr('Yazımı düzelt', 'Fix the writing')}
           </button>

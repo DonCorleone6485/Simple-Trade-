@@ -975,10 +975,8 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
               <button
                 onClick={handleImport}
                 disabled={!canImport}
-                className="px-6 py-2 text-sm font-semibold rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="cta px-6 py-2 text-sm font-semibold rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ background: '#8b5cf6', color: '#fff' }}
-                onMouseEnter={e => { if (canImport) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
               >
                 {/* Sayı gerçekten eklenecek olanı gösterir; dosyadaki toplamı değil. */}
                 {freshTrades.length > 0

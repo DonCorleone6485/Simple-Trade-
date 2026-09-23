@@ -313,15 +313,11 @@ export default function Checklist({ value, onChange, syncTemplate = false, selec
 
             <div className="flex items-center gap-1 flex-shrink-0">
               <button type="button" onClick={() => startEdit(item)} title={tr('Düzenle', 'Edit')}
-                className="p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#a78bfa'; (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.12)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                className="ui-pill p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 <Pencil className="w-3.5 h-3.5" />
               </button>
               <button type="button" onClick={() => removeItem(item.id)} title={tr('Sil', 'Delete')}
-                className="p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.12)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                className="ui-pill ui-pill-danger p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -334,10 +330,8 @@ export default function Checklist({ value, onChange, syncTemplate = false, selec
       {!adding && !editingId && (
         <div className="flex items-center gap-2 flex-wrap">
           <button type="button" onClick={startAdd}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
-            style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.16)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
+            className="ui-pill flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+            style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}>
             <Plus className="w-4 h-4" />
             {tr('Madde Ekle', 'Add Item')}
           </button>
@@ -345,10 +339,8 @@ export default function Checklist({ value, onChange, syncTemplate = false, selec
           {/* Maddelerin hepsi silinmişse örneklere dönüş yolu açık kalsın. */}
           {items.length === 0 && (
             <button type="button" onClick={loadSamples}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
-              style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.1)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.09)'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.55)'; }}>
+              className="ui-pill flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
+              style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.1)' }}>
               <RotateCcw className="w-4 h-4" />
               {tr('Örnek maddeleri yükle', 'Load sample items')}
             </button>

@@ -78,10 +78,8 @@ export default function JournalDashboard({
         </div>
 
         <button onClick={onNewJournal}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium"
-          style={{ background: '#8b5cf6', color: '#fff', transition: 'all 150ms cubic-bezier(0.4,0,0.2,1)' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; (e.currentTarget as HTMLElement).style.transform = 'none'; }}>
+          className="cta flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium"
+          style={{ background: '#8b5cf6', color: '#fff' }}>
           <Plus className="w-4 h-4" />
           {t('newJournal')}
         </button>
@@ -139,16 +137,14 @@ export default function JournalDashboard({
                 <li key={acc.id}
                   style={{ borderBottom: i === ordered.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.04)' }}>
                   <div onClick={() => onOpen(acc)}
-                    className="group flex items-center gap-5 sm:gap-8 py-6 cursor-pointer -mx-4 px-4 rounded-2xl"
-                    style={{ transition: 'background 150ms cubic-bezier(0.4,0,0.2,1)' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.025)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                    className="ui-row group flex items-center gap-5 sm:gap-8 py-6 cursor-pointer -mx-4 px-4 rounded-2xl">
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-[17px] font-medium truncate" style={{ letterSpacing: '-0.01em' }}>{acc.name}</span>
+                        <span className="hover-title text-[17px] font-medium truncate" style={{ letterSpacing: '-0.01em' }}>{acc.name}</span>
+                        {/* Ok da altın: satırın "buraya gidilir" demesinin bir parçası. */}
                         <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 flex-shrink-0"
-                          style={{ color: 'rgba(255,255,255,0.35)', transition: 'opacity 150ms' }} />
+                          style={{ color: '#f0b429', transition: 'opacity 150ms' }} />
                       </div>
                       <div className="text-[13px] mt-1.5 flex items-center gap-2.5 flex-wrap" style={{ color: 'rgba(255,255,255,0.3)' }}>
                         <span>
@@ -176,19 +172,13 @@ export default function JournalDashboard({
                     </div>
 
                     <button onClick={e => { e.stopPropagation(); onEdit(acc); }}
-                      className="p-2 rounded-lg opacity-0 group-hover:opacity-100 flex-shrink-0"
-                      style={{ color: 'rgba(255,255,255,0.25)', transition: 'all 150ms' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#a78bfa'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.25)'; }}
+                      className="ui-icon-btn p-2 rounded-lg opacity-0 group-hover:opacity-100 flex-shrink-0"
                       title={t('editJournal')}>
                       <Pencil className="w-4 h-4" />
                     </button>
 
                     <button onClick={e => { e.stopPropagation(); onDelete(acc.id); }}
-                      className="p-2 rounded-lg opacity-0 group-hover:opacity-100 flex-shrink-0 w-8"
-                      style={{ color: 'rgba(255,255,255,0.25)', transition: 'all 150ms' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.25)'; }}
+                      className="ui-icon-btn ui-icon-btn-danger p-2 rounded-lg opacity-0 group-hover:opacity-100 flex-shrink-0 w-8"
                       title={t('delete')}>
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -204,10 +194,7 @@ export default function JournalDashboard({
             {t('noJournals')}
           </p>
           <button onClick={onNewJournal}
-            className="text-sm font-medium mt-2"
-            style={{ color: '#a78bfa', transition: 'color 150ms' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#c4b5fd'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#a78bfa'; }}>
+            className="link-gold text-sm font-medium mt-2" style={{ color: '#a78bfa' }}>
             {t('newJournal')} →
           </button>
         </div>

@@ -169,10 +169,8 @@ export default function TradeHistory({
         <div className="space-y-2">
           {otherJournals.map(j => (
             <button key={j.id} onClick={() => doMove(j.id)}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start text-sm transition-all"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#fff' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.15)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}>
+              className="ui-pill w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start text-sm transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#fff' }}>
               <FolderInput className="w-4 h-4 flex-shrink-0" style={{ color: '#a78bfa' }} />
               <span className="truncate">{j.name}</span>
             </button>
@@ -989,10 +987,8 @@ export default function TradeHistory({
               <span className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.3)' }}>AI Analiz</span>
             </div>
             <button onClick={runAiAnalysis} disabled={aiLoading}
-              className="px-4 py-2 rounded-full text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: '#8b5cf6', color: '#fff' }}
-              onMouseEnter={e => { if (!aiLoading) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+              className="cta px-4 py-2 rounded-full text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ background: '#8b5cf6', color: '#fff' }}>
               {aiLoading ? t('aiAnalyzeLoading') : t('aiAnalyzeBtn')}
             </button>
           </div>
@@ -1033,10 +1029,8 @@ export default function TradeHistory({
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <button onClick={closeOverlay}
-            className="flex items-center gap-2 text-sm font-medium"
-            style={{ color: 'rgba(255,255,255,0.5)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
+            className="link-gold flex items-center gap-2 text-sm font-medium"
+            style={{ color: 'rgba(255,255,255,0.5)' }}>
             <ChevronLeft className="w-4 h-4" />
             {language === 'tr' ? 'Geri' : 'Back'}
           </button>
@@ -1045,10 +1039,8 @@ export default function TradeHistory({
               style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
               {t('cancel')}
             </button>
-            <button onClick={saveEdit} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl"
-              style={{ background: '#8b5cf6', color: '#fff' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+            <button onClick={saveEdit} className="cta flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl"
+              style={{ background: '#8b5cf6', color: '#fff' }}>
               <Save className="w-4 h-4" />
               {t('save')}
             </button>
@@ -1209,15 +1201,13 @@ export default function TradeHistory({
                     {canUpload && (
                       <div
                         onClick={() => !uploadingEditPhoto && fileRef.current?.click()}
-                        className="w-full h-24 flex flex-col items-center justify-center rounded-xl transition-all"
+                        className="ui-pill w-full h-24 flex flex-col items-center justify-center rounded-xl transition-all"
                         style={{
                           background: 'rgba(255,255,255,0.03)',
                           border: '1px dashed rgba(255,255,255,0.12)',
                           cursor: uploadingEditPhoto ? 'not-allowed' : 'pointer',
                           opacity: uploadingEditPhoto ? 0.6 : 1,
                         }}
-                        onMouseEnter={e => { if (!uploadingEditPhoto) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}
                       >
                         {uploadingEditPhoto
                           ? <><Loader className="w-4 h-4 mb-1 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{language === 'tr' ? 'Yükleniyor...' : 'Uploading...'}</span></>
@@ -1253,10 +1243,8 @@ export default function TradeHistory({
               style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
               {t('cancel')}
             </button>
-            <button onClick={saveEdit} className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl"
-              style={{ background: '#8b5cf6', color: '#fff' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+            <button onClick={saveEdit} className="cta flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl"
+              style={{ background: '#8b5cf6', color: '#fff' }}>
               <Save className="w-4 h-4" />
               {t('save')}
             </button>
@@ -1300,20 +1288,16 @@ export default function TradeHistory({
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <button onClick={closeOverlay}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all"
-              style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+              className="ui-pill flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all"
+              style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}>
               <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
               {t('backToList')}
             </button>
             <div className="flex items-center gap-2">
               {onPrintTrade && (
                 <button onClick={() => onPrintTrade(selectedTrade)} title={t('printTrade')}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
-                  style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }}>
+                  className="ui-pill flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}>
                   <Printer className="w-4 h-4" />
                   {t('printPdf')}
                 </button>
@@ -1321,27 +1305,21 @@ export default function TradeHistory({
               {canMove && (
                 <button onClick={() => setMovingIds([selectedTrade.id])}
                   title={language === 'tr' ? "Başka journal'a taşı" : 'Move to another journal'}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
-                  style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }}>
+                  className="ui-pill flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}>
                   <FolderInput className="w-4 h-4" />
                   {language === 'tr' ? 'Taşı' : 'Move'}
                 </button>
               )}
               <button onClick={e => startEdit(selectedTrade, e)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
-                style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.2)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
+                className="ui-pill flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
+                style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}>
                 <Edit2 className="w-4 h-4" />
                 {language === 'tr' ? 'Düzenle' : 'Edit'}
               </button>
               <button onClick={() => { onDelete(selectedTrade.id); closeOverlay(); }}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
-                style={{ background: 'rgba(248,113,113,0.1)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.2)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.1)'; }}>
+                className="ui-pill ui-pill-danger flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
+                style={{ background: 'rgba(248,113,113,0.1)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}>
                 <Trash2 className="w-4 h-4" />
                 {t('delete')}
               </button>
@@ -1554,10 +1532,8 @@ export default function TradeHistory({
     <div className="space-y-6">
       {movePicker}
       <div className="flex items-center justify-between">
-        <button onClick={toggleSelectAll} className="flex items-center gap-2 text-sm transition-all"
-          style={{ color: 'rgba(255,255,255,0.5)' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
+        <button onClick={toggleSelectAll} className="link-gold flex items-center gap-2 text-sm transition-all"
+          style={{ color: 'rgba(255,255,255,0.5)' }}>
           {selectedIds.size > 0
             ? <CheckSquare className="w-4 h-4" style={{ color: '#8b5cf6' }} />
             : <Square className="w-4 h-4" />}
@@ -1574,10 +1550,8 @@ export default function TradeHistory({
 
         {selectedIds.size > 0 && canMove && (
           <button onClick={() => setMovingIds(Array.from(selectedIds))}
-            className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ms-auto me-3"
-            style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.2)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}>
+            className="ui-pill flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ms-auto me-3"
+            style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}>
             <FolderInput className="w-4 h-4" />
             {selectedIds.size} {language === 'tr' ? 'işlemi taşı' : 'trades — move'}
           </button>
@@ -1585,10 +1559,8 @@ export default function TradeHistory({
 
         {selectedIds.size > 0 && (
           <button onClick={handleDeleteSelected}
-            className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all"
-            style={{ background: 'rgba(248,113,113,0.1)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.2)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.1)'; }}>
+            className="ui-pill ui-pill-danger flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all"
+            style={{ background: 'rgba(248,113,113,0.1)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}>
             <Trash2 className="w-4 h-4" />
             {selectedIds.size} {language === 'tr' ? 'işlemi sil' : 'trades delete'}
           </button>
@@ -1611,22 +1583,22 @@ export default function TradeHistory({
 
                   return (
                     <div key={trade.id}
-                      className="group flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer relative"
+                      className="ui-row group flex items-center gap-3 p-3 rounded-xl cursor-pointer relative"
                       style={{
                         color: 'rgba(255,255,255,0.8)',
-                        background: isSelected ? 'rgba(139,92,246,0.08)' : 'transparent',
+                        // 'transparent' yazmak yerine hiç yazmıyoruz: satır içi
+                        // bir renk, CSS'teki imleç kuralını her zaman yener.
+                        // Seçiliyken mor kalıyor — seçim bir durum, altın ise
+                        // "gidilebilir" demek; ikisi karışmamalı.
+                        background: isSelected ? 'rgba(139,92,246,0.08)' : undefined,
                         border: isSelected ? '1px solid rgba(139,92,246,0.2)' : '1px solid transparent',
                       }}
-                      onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
-                      onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                       onClick={() => openOverlay(() => setSelectedTrade(trade))}
                     >
                       {/* Kutu her zaman görünür. Saydam bırakılınca kimse tek
                           tek seçebildiğini fark etmiyordu. */}
                       <div onClick={e => toggleSelect(trade.id, e)}
-                        className="flex-shrink-0 -m-1.5 p-1.5 rounded-md transition-colors"
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                        className="ui-icon-btn flex-shrink-0 -m-1.5 p-1.5 rounded-md">
                         {isSelected
                           ? <CheckSquare className="w-4 h-4" style={{ color: '#8b5cf6' }} />
                           : <Square className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.22)' }} />}
@@ -1636,7 +1608,7 @@ export default function TradeHistory({
                       <span className="hidden sm:inline w-12 font-mono text-[13px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
                         {new Date(trade.date).toLocaleTimeString(language === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                       </span>
-                      <span className="w-20 sm:w-24 font-medium">{trade.symbol}</span>
+                      <span className="hover-title w-20 sm:w-24 font-medium">{trade.symbol}</span>
                       <span className="w-10 sm:w-14 text-sm font-medium" style={{ color: trade.type === 'Buy' ? '#34d399' : '#f87171' }}>
                         {trade.type === 'Buy' ? t('buy') : t('sell')}
                       </span>
@@ -1667,36 +1639,28 @@ export default function TradeHistory({
                         style={{ background: '#1a1b2e', borderRadius: '8px', padding: '2px', border: '1px solid rgba(255,255,255,0.08)' }}
                         onClick={e => e.stopPropagation()}>
                         <button onClick={e => startEdit(trade, e)}
-                          className="p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
+                          className="ui-pill p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                           style={{ color: '#a78bfa' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.15)'; }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                           title={language === 'tr' ? 'Düzenle' : 'Edit'}>
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button onClick={e => { e.stopPropagation(); openOverlay(() => setSelectedTrade(trade)); }}
-                          className="p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
+                          className="ui-pill p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                           style={{ color: 'rgba(255,255,255,0.5)' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'; }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                           title={language === 'tr' ? 'Detaylar' : 'Details'}>
                           <Eye className="w-3.5 h-3.5" />
                         </button>
                         {canMove && (
                           <button onClick={e => { e.stopPropagation(); setMovingIds([trade.id]); }}
-                            className="p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
+                            className="ui-pill p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                             style={{ color: 'rgba(255,255,255,0.5)' }}
-                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'; }}
-                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                             title={language === 'tr' ? "Başka journal'a taşı" : 'Move to another journal'}>
                             <FolderInput className="w-3.5 h-3.5" />
                           </button>
                         )}
                         <button onClick={e => { e.stopPropagation(); onDelete(trade.id); }}
-                          className="p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
+                          className="ui-pill ui-pill-danger p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                           style={{ color: '#f87171' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.15)'; }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                           title={t('deleteTrade')}>
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>

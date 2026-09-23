@@ -91,9 +91,7 @@ export default function EmotionPicker({ value, onChange }: { value: string[]; on
     const on = selected.includes(v);
     const color = TONE_COLOR[emotionTone(v)];
     return (
-      <div key={v} className="group flex items-center px-4 py-2 text-sm transition-all"
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+      <div key={v} className="ui-pill group flex items-center px-4 py-2 text-sm transition-all">
         <button type="button" onClick={() => toggle(v)} className="flex-1 text-start flex items-center gap-2.5">
           <span className="w-4 h-4 rounded flex items-center justify-center text-[10px] flex-shrink-0"
             style={{ border: `1px solid ${on ? color.fg : 'rgba(255,255,255,0.25)'}`, background: on ? color.bg : 'transparent', color: color.fg }}>
@@ -153,9 +151,7 @@ export default function EmotionPicker({ value, onChange }: { value: string[]; on
               </div>
             ) : (
               <button type="button" onClick={() => setShowInput(true)}
-                className="w-full flex items-center gap-2 px-4 py-3 text-sm transition-all" style={{ color: '#a78bfa' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                className="ui-pill w-full flex items-center gap-2 px-4 py-3 text-sm transition-all" style={{ color: '#a78bfa' }}>
                 <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                   style={{ background: 'rgba(139,92,246,0.2)' }}>+</span>
                 <span>{tr('Kendi Duygunu Ekle', 'Add Your Own')}</span>

@@ -122,10 +122,8 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
         </div>
         <button
           onClick={() => editing ? handleSave() : setEditing(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all"
+          className="cta flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all"
           style={{ background: editing ? '#8b5cf6' : 'rgba(255,255,255,0.08)', color: '#fff' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = editing ? '#7c3aed' : 'rgba(255,255,255,0.12)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = editing ? '#8b5cf6' : 'rgba(255,255,255,0.08)'; }}
         >
           {editing ? <><Save className="w-4 h-4" /> {t('save')}</> : <><Edit3 className="w-4 h-4" /> {t('editGoals')}</>}
         </button>
@@ -353,10 +351,8 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
             </button>
             <button
               onClick={handleSave}
-              className="px-6 py-2 text-sm font-semibold rounded-xl transition-all"
+              className="cta px-6 py-2 text-sm font-semibold rounded-xl transition-all"
               style={{ background: '#8b5cf6', color: '#fff' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
             >
               {t('save')}
             </button>
@@ -372,10 +368,8 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
           <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('noGoalsDesc')}</p>
           <button
             onClick={() => setEditing(true)}
-            className="px-6 py-2 text-sm font-semibold rounded-xl transition-all"
+            className="cta px-6 py-2 text-sm font-semibold rounded-xl transition-all"
             style={{ background: '#8b5cf6', color: '#fff' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}
           >
             {t('editGoals')}
           </button>

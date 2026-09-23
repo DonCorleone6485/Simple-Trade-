@@ -139,20 +139,16 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
         <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <button
             onClick={prevMonth}
-            className="p-2 rounded-lg transition-all"
+            className="ui-pill p-2 rounded-lg transition-all"
             style={{ color: 'rgba(255,255,255,0.4)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
           >
             <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
           </button>
           <h2 className="font-display text-[20px] capitalize text-white">{getMonthLabel()}</h2>
           <button
             onClick={nextMonth}
-            className="p-2 rounded-lg transition-all"
+            className="ui-pill p-2 rounded-lg transition-all"
             style={{ color: 'rgba(255,255,255,0.4)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
           >
             <ChevronRight className="w-5 h-5 rtl:rotate-180" />
           </button>
@@ -211,7 +207,10 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
               <div
                 key={day}
                 onClick={() => stats ? setSelectedDay(isSelected ? null : key) : null}
-                className="relative rounded-xl transition-all flex flex-col"
+                /* Günün rengi kâr/zararı anlatıyor; onu altına boyamak
+                   bilgiyi siler. Dokunulabilirliği renk yerine ince bir
+                   altın halka söylüyor. */
+                className="ui-cell relative rounded-xl flex flex-col"
                 style={{
                   background: bg,
                   border,
@@ -219,8 +218,6 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
                   minHeight: '72px',
                   padding: '8px',
                 }}
-                onMouseEnter={e => { if (stats) (e.currentTarget as HTMLElement).style.opacity = '0.85'; }}
-                onMouseLeave={e => { if (stats) (e.currentTarget as HTMLElement).style.opacity = '1'; }}
               >
                 <span className="text-sm font-semibold" style={{ color: textColor }}>
                   {day}
@@ -267,10 +264,8 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
             </div>
             <button
               onClick={() => setSelectedDay(null)}
-              className="p-2 rounded-lg transition-all"
+              className="link-gold p-2 rounded-lg transition-all"
               style={{ color: 'rgba(255,255,255,0.4)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}
             >
               <X className="w-5 h-5" />
             </button>
@@ -321,10 +316,8 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
                   </div>
                   <button
                     onClick={() => { onDelete(trade.id); if (selectedTrades.length === 1) setSelectedDay(null); }}
-                    className="p-2 rounded-lg transition-all flex-shrink-0"
+                    className="ui-pill ui-pill-danger p-2 rounded-lg transition-all flex-shrink-0"
                     style={{ color: 'rgba(255,255,255,0.2)' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.1)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                   >
                     <X className="w-4 h-4" />
                   </button>

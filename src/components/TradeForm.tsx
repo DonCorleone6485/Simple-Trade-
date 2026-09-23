@@ -159,9 +159,7 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
                 <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{language === 'tr' ? 'Son Kullanılanlar' : 'Recently Used'}</div>
                 {recentlyUsed.map(symbol => (
                   <button key={`recent-${symbol}`} type="button" onClick={() => handleSelect(symbol)}
-                    className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all" style={{ color: '#fff' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                    className="ui-pill w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all" style={{ color: '#fff' }}>
                     <span className="font-mono font-medium">{symbol}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.35)' }}>
                       {Object.entries(SYMBOLS).find(([, v]) => v.includes(symbol))?.[0] || 'Custom'}
@@ -177,20 +175,16 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
             {!search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{category}</div>}
             {filteredSymbols.map(symbol => (
               <button key={symbol} type="button" onClick={() => handleSelect(symbol)}
-                className="w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
-                style={{ color: value === symbol ? '#a78bfa' : '#fff' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                className="ui-pill w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
+                style={{ color: value === symbol ? '#a78bfa' : '#fff' }}>
                 <span className="font-mono font-medium">{symbol}</span>
                 {value === symbol && <span className="text-xs" style={{ color: '#a78bfa' }}>✓</span>}
               </button>
             ))}
             {search.trim() && !filteredSymbols.includes(search.trim().toUpperCase()) && (
               <button type="button" onClick={() => handleSelect(search.trim().toUpperCase())}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm transition-all"
-                style={{ color: '#a78bfa', borderTop: '1px solid rgba(255,255,255,0.06)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.1)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                className="ui-pill w-full flex items-center gap-3 px-4 py-3 text-sm transition-all"
+                style={{ color: '#a78bfa', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                 <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(139,92,246,0.2)' }}>+</span>
                 <span><span className="font-mono font-semibold">{search.trim().toUpperCase()}</span> ekle</span>
               </button>
@@ -220,10 +214,8 @@ function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit, uploadi
     <div className="space-y-3">
       {canUploadMore && (
         <div onClick={() => !uploading && fileInputRef.current?.click()}
-          className="w-full flex items-center justify-center gap-2.5 py-4"
-          style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '14px', cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.6 : 1, transition: TRANSITION }}
-          onMouseEnter={e => { if (!uploading) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}>
+          className="ui-pill w-full flex items-center justify-center gap-2.5 py-4"
+          style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '14px', cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.6 : 1, transition: TRANSITION }}>
           {uploading
             ? <><Loader className="w-4 h-4 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Yükleniyor...</span></>
             : <>
@@ -601,10 +593,8 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
           <span style={{ color: '#f87171' }}>*</span> {t('requiredNote')} — {t('requiredHint')}
         </p>
         <button type="submit" disabled={uploadingPre || uploadingPost}
-          className="px-6 py-2.5 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          style={primaryBtn}
-          onMouseEnter={e => { if (!uploadingPre && !uploadingPost) (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+          className="cta px-6 py-2.5 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          style={primaryBtn}>
           {uploadingPre || uploadingPost
             ? (language === 'tr' ? 'Fotoğraflar yükleniyor...' : 'Uploading photos...')
             : t('saveButton')}
