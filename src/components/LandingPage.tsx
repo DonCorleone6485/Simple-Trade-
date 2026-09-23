@@ -183,6 +183,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
    */
   const featureGroups = [
     {
+      /** Kart sayısını tam bölen sütun: satırın sonunda boşluk kalmasın. */
+      cols: 'sm:grid-cols-2',
       label: t('Kaydet', 'Capture', 'ثبت'),
       title: t('İşlemler kendiliğinden gelsin', 'Let the trades arrive on their own', 'معاملات خودشان بیایند'),
       items: [
@@ -194,7 +196,6 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             'Install the expert advisor once; every closed trade lands in your journal by itself — and it brings a year of history with it.',
             'یک بار اکسپرت را نصب کنید؛ هر معامله بسته‌شده خودش در ژورنال ثبت می‌شود.'
           ),
-          span: 'lg:col-span-2',
           accent: '#8b5cf6',
         },
         {
@@ -205,7 +206,6 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             'Upload a report from MT5, MT4, cTrader, TradeLocker, DXtrade or Match-Trader. Map the columns yourself if the file is unfamiliar — nothing is ever added twice.',
             'گزارش شش پلتفرم را آپلود کنید؛ هیچ معامله‌ای دوبار اضافه نمی‌شود.'
           ),
-          span: 'lg:col-span-2',
           accent: '#f87171',
         },
         {
@@ -217,7 +217,6 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             'با میکروفون صحبت کنید؛ نگارش خودش مرتب می‌شود و اصطلاحات را درست می‌نویسد.'
           ),
           widget: <MicWave still={!!shouldReduceMotion} />,
-          span: 'lg:col-span-2',
           accent: '#22d3ee',
         },
         {
@@ -228,12 +227,12 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             'Symbol, direction, timeframe, risk and R/R — plus what you were thinking before you entered and what you learned after, with screenshots.',
             'نماد، جهت، ریسک و R/R — همراه با افکار قبل و درس بعد از معامله.'
           ),
-          span: 'lg:col-span-2',
           accent: '#a78bfa',
         },
       ],
     },
     {
+      cols: 'sm:grid-cols-2',
       label: t('Gör', 'See', 'ببینید'),
       title: t('Neyin işe yaradığını sayılarla gör', 'See what works, in numbers', 'با اعداد ببینید چه چیزی کار می‌کند'),
       items: [
@@ -245,34 +244,31 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             'Expectancy, profit factor, payoff ratio, average win and loss, longest streaks and cumulative PnL — at a glance.',
             'ارزش مورد انتظار، فاکتور سود، میانگین برد و باخت و سود انباشته — در یک نگاه.'
           ),
-          span: 'lg:col-span-2',
           accent: '#10b981',
         },
         {
           icon: <CalendarDays className="w-5 h-5" />,
           title: t('Takvimde Örüntün', 'Your Calendar Pattern', 'الگوی تقویم شما'),
           desc: t('Günlük kâr/zarara göre renklenen takvim — hangi günler sana yarıyor, hemen belli olur.', 'A calendar colored by daily P&L — the days that suit you become obvious.', 'تقویمی که بر اساس سود و زیان روزانه رنگ می‌شود.'),
-          span: '',
           accent: '#34d399',
         },
         {
           icon: <Wallet className="w-5 h-5" />,
           title: t('Hesabın Nereye Gitti', 'Where the Account Went', 'حساب به کجا رسید'),
           desc: t('Başlangıç sermayenden bugüne bakiye, getiri yüzdesi, aylık kırılım ve yön bazlı performans.', 'Balance from your starting capital to today, return percentage, a monthly breakdown and long-vs-short performance.', 'مانده، درصد بازده و تفکیک ماهانه.'),
-          span: '',
           accent: '#fbbf24',
         },
         {
           icon: <Sparkles className="w-5 h-5" />,
           title: t('Yapay Zeka Koçun', 'Your AI Coach', 'مربی هوش مصنوعی شما'),
           desc: t('Tüm geçmişini AI ile analiz et — güçlü yönlerini, sızdıran yerleri ve kişisel önerileri al.', 'Analyze your whole history with AI — strengths, leaks and personal recommendations.', 'تاریخچه خود را با هوش مصنوعی تحلیل کنید.'),
-          span: 'lg:col-span-2',
           accent: '#a78bfa',
           pro: true,
         },
       ],
     },
     {
+      cols: 'sm:grid-cols-2 lg:grid-cols-3',
       label: t('Sürdür', 'Keep it up', 'ادامه دهید'),
       title: t('Kazandıran davranışı tekrar et', 'Repeat the behaviour that pays', 'رفتاری که سود می‌دهد را تکرار کنید'),
       items: [
@@ -284,7 +280,6 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             'Keep a separate named list for each setup. Pick one as you open a trade — it stays with that journal.',
             'برای هر ستاپ فهرست جداگانه بسازید و هنگام ثبت معامله یکی را انتخاب کنید.'
           ),
-          span: 'lg:col-span-2',
           accent: '#60a5fa',
         },
         {
@@ -295,7 +290,6 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             'Revenge trades, overtrading, raising the stake, drifting outside your usual hours — four habits, all read from the data you already entered.',
             'چهار عادت رفتاری از همان داده‌های موجود استخراج می‌شود.'
           ),
-          span: 'lg:col-span-2',
           accent: '#f472b6',
         },
         {
@@ -303,14 +297,12 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           title: t('Seans Saatleri', 'Session Clock', 'ساعت سشن‌ها'),
           desc: t('Sydney, Tokyo, Londra, New York — hangisi açık, hangisi kaç saat sonra açılıyor.', 'Sydney, Tokyo, London, New York — which one is open, and how long until the next.', 'کدام سشن باز است و بعدی چه زمانی باز می‌شود.'),
           widget: <SessionClock />,
-          span: '',
           accent: '#38bdf8',
         },
         {
           icon: <Newspaper className="w-5 h-5" />,
           title: t('Günün Haberleri', 'Today\'s News', 'اخبار امروز'),
           desc: t('Yüksek etkili ekonomik takvim — ve işlemlerinin haber saatine denk gelip gelmediği.', 'A high-impact economic calendar — and whether your trades land on the news.', 'تقویم اقتصادی و اینکه معاملات شما به زمان خبر می‌خورد یا نه.'),
-          span: '',
           accent: '#fb923c',
         },
         {
@@ -322,14 +314,12 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             'یک حساب پراپ را در ۱۲ بند امتیاز بده و نتیجه را از ۱۰۰ ببین؛ تا سه شرکت را کنار هم مقایسه کن.'
           ),
           widget: <PropScore language={language} />,
-          span: 'lg:col-span-4',
           accent: '#c084fc',
         },
         {
           icon: <Target className="w-5 h-5" />,
           title: t('Kuralların ve Hedeflerin', 'Your Rules and Targets', 'قوانین و اهداف شما'),
           desc: t('Aylık hedef, maksimum risk, işlem yasağı saatleri — sınırı aştığında sistem sana söylesin.', 'Monthly targets, maximum risk, no-trade hours — the system tells you the moment you cross a line.', 'اهداف ماهانه و حداکثر ریسک را تعیین کنید.'),
-          span: 'lg:col-span-2',
           accent: '#facc15',
         },
       ],
@@ -500,12 +490,12 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               iyi işlemin tesadüf olmadığı — ikinci cümle de onun cevabı. */}
           {/* Afiş başlık: dar ve büyük. Son satır serif ve altın — bir tek o
               cümle "el yazısı" gibi durup gözü kendine çeker. */}
-          <motion.h1 variants={fadeUp} className="poster mb-7 text-[2.6rem] sm:text-[4.2rem] lg:text-[5.6rem]">
+          <motion.h1 variants={fadeUp} className="poster mb-7 text-[2.2rem] sm:text-[3.4rem] lg:text-[4.6rem]">
             <span className="block">{t('Kazandıran ne varsa,', 'Whatever works is', 'هر چه سود می‌دهد،')}</span>
             <span className="block" style={{ color: 'rgba(255,255,255,0.92)' }}>
               {t('tekrarlanabilir.', 'repeatable.', 'تکرارشدنی است.')}
             </span>
-            <span className="block font-display normal-case mt-3 text-[0.42em] leading-[1.1]"
+            <span className="block font-display mt-3 text-[0.55em] leading-[1.15]"
               style={{ color: '#f0b429', fontStyle: 'italic', letterSpacing: '-0.02em' }}>
               {t('Biz onu görünür kılarız.', 'We make it visible.', 'ما آن را نمایان می‌کنیم.')}
             </span>
@@ -659,7 +649,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             </p>
           </motion.div>
 
-          {featureGroups.map((group, gi) => (
+          {featureGroups.map((group: any, gi: number) => (
             <div key={gi} className={gi > 0 ? 'mt-16 sm:mt-24' : ''}>
               {/* Küme başlığı: numara yerine sessiz bir etiket, yanında çizgi. */}
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
@@ -672,7 +662,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               </motion.div>
 
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={stagger}
-                className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                className={`grid ${group.cols} gap-4 sm:gap-5`}>
                 {group.items.map((f: any, i: number) => (
                   <motion.div key={i} variants={fadeUp} whileHover={{ y: shouldReduceMotion ? 0 : -3 }}
                     className={`rounded-2xl p-7 relative h-full ${f.span}`}
@@ -750,7 +740,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           {/* İki plan tek yüzey üstünde, aralarında ince bir çizgi. Pro'yu
               doygun mor bir kutuya koymak fiyatı değil reklamı öne çıkarıyordu. */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={stagger}
-            className="max-w-4xl rounded-3xl overflow-hidden grid sm:grid-cols-2"
+            className="max-w-4xl mx-auto rounded-3xl overflow-hidden grid sm:grid-cols-2"
             style={{
               background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015))',
               border: '1px solid rgba(255,255,255,0.06)',
@@ -837,7 +827,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               gibi ölçülemeyen bir iddia, kontrol eden kullanıcıda güveni
               artırmaz, azaltır. Burada yazan şey veritabanında açık olan şey. */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
-            className="max-w-4xl mt-6 flex items-center gap-2.5 px-4 py-3 rounded-xl"
+            className="max-w-4xl mx-auto mt-6 flex items-center gap-2.5 px-4 py-3 rounded-xl"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <Lock className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
             <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
@@ -903,7 +893,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-28 sm:py-36 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}>
             <h2 className="poster text-[2.4rem] sm:text-[3.6rem] mb-6">
-              {t('Trading\'ini Bugün Kaydetmeye Başla', 'Start Logging Your Trading Today', 'همین امروز معاملات خود را ثبت کنید')}
+              {t('İşlemlerini Bugün Kaydetmeye Başla', 'Start Logging Your Trades Today', 'همین امروز معاملات خود را ثبت کنید')}
             </h2>
             <p className="text-[16px] mb-10" style={{ color: 'rgba(255,255,255,0.45)' }}>
               {t('Ücretsiz, kart bilgisi olmadan, 30 saniyede.', 'Free, no card required, in 30 seconds.', 'رایگان، بدون کارت، در ۳۰ ثانیه.')}

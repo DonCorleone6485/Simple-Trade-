@@ -1,14 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --font-display: "Newsreader", ui-serif, Georgia, serif;
-  /* Afiş yazısı: vitrinin büyük başlıkları. Dar ve ağır olduğu için aynı
-     satıra çok daha fazla kelime sığar ve ekranda bağırır — ürün içinde
-     kullanmıyoruz, orada sakin serif kalıyor. */
-  --font-poster: "Anton", "Haettenschweiler", "Arial Narrow", Impact, sans-serif;
 }
 
 html {
@@ -151,11 +147,10 @@ body::before {
    yazılmış küçük etiketler. İkisi arasındaki ölçek farkı, sayfayı
    pahalılaştıran şeyin kendisi. */
 .poster {
-  font-family: var(--font-poster);
-  text-transform: uppercase;
-  letter-spacing: -0.005em;
-  font-weight: 400;
-  line-height: 0.92;
+  font-family: var(--font-display);
+  letter-spacing: -0.032em;
+  font-weight: 500;
+  line-height: 1.05;
 }
 .eyebrow {
   font-family: var(--font-mono);
