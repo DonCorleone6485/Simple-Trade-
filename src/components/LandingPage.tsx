@@ -640,7 +640,9 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               <motion.div key={i} variants={fadeUp} onMouseMove={spotlight}
                 className={`hover-quiet py-2 ${i > 0 ? 'sm:ps-10' : ''} ${i < whyItems.length - 1 ? 'sm:pe-10' : ''} mb-10 sm:mb-0`}
                 style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
-                <div className="hover-icon mb-5" style={{ color: '#a78bfa' }}>{item.icon}</div>
+                {/* Morun satır içi stille değil sınıfla verilmesi şart: satır içi
+                    stil, imleç gelince ikonu altına çeviren kuralı yeniyor. */}
+                <div className="hover-icon mb-5">{item.icon}</div>
                 <h3 className="hover-title text-[17px] font-medium" style={{ letterSpacing: '-0.01em' }}>{item.title}</h3>
                 <span className="hover-rule" />
                 <p className="text-[14.5px] leading-relaxed mt-2.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{item.desc}</p>
@@ -880,8 +882,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                 return (
                   <motion.div key={i} variants={fadeUp}
                     style={{ borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.07)' }}>
-                    <button onClick={() => setOpenFAQ(isOpen ? null : i)}
-                      className="hover-row w-full flex items-start justify-between gap-6 py-6 text-start group">
+                    <button onClick={() => setOpenFAQ(isOpen ? null : i)} onMouseMove={spotlight}
+                      className="hover-row hover-lit w-full flex items-start justify-between gap-6 py-6 text-start group">
                       <span className="flex items-baseline gap-4 min-w-0">
                         {/* Renkler satır içi stille değil sınıfla veriliyor:
                             satır içi stil, imleç geldiğinde altına dönmesini
