@@ -326,6 +326,13 @@ body::before {
   background: var(--gold);
   transition: width 0.3s ease;
 }
+/* Aynı hareketin daha sönük ve daha vurgulu iki tonu: footer bağlantıları
+   ve footer'ın mor çağrısı. Sadece duruş rengini değiştiriyorlar, imleç
+   gelince üçü de aynı yere gidiyor. .nav-link'ten SONRA gelmeleri şart —
+   ikisi de aynı ağırlıkta, sonra yazılan kazanıyor. */
+.nav-link-dim { color: rgba(255, 255, 255, 0.4); }
+.nav-link-accent { color: #a78bfa; }
+
 .nav-link:hover { color: var(--gold); }
 .nav-link:hover::after { width: 100%; }
 

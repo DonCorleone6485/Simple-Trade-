@@ -946,19 +946,19 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                 { label: t('Nasıl Çalışır', 'How It Works', 'چگونه کار می‌کند'), href: '#how-it-works' },
                 { label: t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری'), href: '#pricing' },
               ].map(l => (
-                <a key={l.href} href={l.href} className="hover-row hover-title text-[13.5px]"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+                /* Renk satır içi stille verilmiyordu diye değil — veriliyordu
+                   diye sorun çıkıyordu: onMouseEnter beyazı doğrudan elemana
+                   yazınca, imleç gelince altına çeviren kural yeniliyordu. */
+                <a key={l.href} href={l.href} className="nav-link nav-link-dim text-[13.5px]">
                   {l.label}
                 </a>
               ))}
               {!signedIn && (
-                <button onClick={onSignIn} className="text-[13.5px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <button onClick={onSignIn} className="nav-link nav-link-dim text-[13.5px]">
                   {t('Giriş Yap', 'Sign In', 'ورود')}
                 </button>
               )}
-              <button onClick={onGetStarted} className="text-[13.5px]" style={{ color: '#a78bfa' }}>
+              <button onClick={onGetStarted} className="nav-link nav-link-accent text-[13.5px]">
                 {signedIn ? ctaLabel : t('Ücretsiz Başla', 'Get Started', 'شروع رایگان')}
               </button>
             </div>
