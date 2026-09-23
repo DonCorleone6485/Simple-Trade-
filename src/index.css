@@ -204,8 +204,27 @@ body::before {
 .hover-title { transition: color 0.25s ease; }
 .hover-mark { transition: color 0.25s ease; }
 
+/* Dikey ayraçlarla bölünmüş ızgaralarda (üç sütunlu "neden journal", dört
+   adım) satırı kaydırmak olmuyor: sütun yandaki çizginin üstüne biniyor ve
+   düzen bozuluyor. Orada yer değiştiren hiçbir şey yok — renk değişiyor ve
+   başlığın altında kısa bir altın çizgi açılıyor. */
+.hover-quiet:hover .hover-title,
+.hover-quiet:hover .hover-mark { color: var(--gold); }
+.hover-quiet:hover .hover-icon { color: var(--gold); }
+.hover-icon { transition: color 0.25s ease; }
+.hover-rule {
+  display: block;
+  height: 1px;
+  width: 0;
+  margin-top: 10px;
+  background: var(--gold);
+  opacity: 0.85;
+  transition: width 0.3s ease;
+}
+.hover-quiet:hover .hover-rule { width: 34px; }
+
 @media (prefers-reduced-motion: reduce) {
-  .hover-row, .hover-card, .hover-title, .hover-mark { transition: none; }
+  .hover-row, .hover-card, .hover-title, .hover-mark, .hover-icon, .hover-rule { transition: none; }
   .hover-row:hover { padding-inline-start: 0; }
 }
 

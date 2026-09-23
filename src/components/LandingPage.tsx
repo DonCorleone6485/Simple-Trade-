@@ -624,11 +624,12 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           <div className="grid sm:grid-cols-3">
             {whyItems.map((item, i) => (
               <motion.div key={i} variants={fadeUp}
-                className={`hover-row py-2 ${i > 0 ? 'sm:ps-10' : ''} ${i < whyItems.length - 1 ? 'sm:pe-10' : ''} mb-10 sm:mb-0`}
+                className={`hover-quiet py-2 ${i > 0 ? 'sm:ps-10' : ''} ${i < whyItems.length - 1 ? 'sm:pe-10' : ''} mb-10 sm:mb-0`}
                 style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
-                <div className="mb-5" style={{ color: '#a78bfa' }}>{item.icon}</div>
-                <h3 className="hover-title text-[17px] font-medium mb-2.5" style={{ letterSpacing: '-0.01em' }}>{item.title}</h3>
-                <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{item.desc}</p>
+                <div className="hover-icon mb-5" style={{ color: '#a78bfa' }}>{item.icon}</div>
+                <h3 className="hover-title text-[17px] font-medium" style={{ letterSpacing: '-0.01em' }}>{item.title}</h3>
+                <span className="hover-rule" />
+                <p className="text-[14.5px] leading-relaxed mt-2.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -704,7 +705,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-10">
             {steps.map((s, i) => (
               <motion.div key={i} variants={fadeUp}
-                className={`hover-row ${i > 0 ? 'lg:ps-10' : ''}`}
+                className={`hover-quiet ${i > 0 ? 'lg:ps-10' : ''}`}
                 style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
                 {/* Numara rozet değil, tipografi: sayfanın serifiyle büyük ve sessiz. */}
                 <div className="relative font-display leading-none mb-6 w-fit"
@@ -715,8 +716,9 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                     style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.35), transparent 70%)' }} />
                   <span className="hover-mark relative">{s.n}</span>
                 </div>
-                <h3 className="hover-title text-[16px] font-medium mb-2.5" style={{ letterSpacing: '-0.01em' }}>{s.title}</h3>
-                <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.desc}</p>
+                <h3 className="hover-title text-[16px] font-medium" style={{ letterSpacing: '-0.01em' }}>{s.title}</h3>
+                <span className="hover-rule" />
+                <p className="text-[14.5px] leading-relaxed mt-2.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -865,16 +867,23 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                     style={{ borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.07)' }}>
                     <button onClick={() => setOpenFAQ(isOpen ? null : i)}
                       className="hover-row w-full flex items-start justify-between gap-6 py-6 text-start group">
-                      <span className="hover-title text-[16px] leading-snug"
-                        style={{ color: isOpen ? '#fff' : 'rgba(255,255,255,0.78)' }}>
-                        {faq.q}
+                      <span className="flex items-baseline gap-4 min-w-0">
+                        {/* Renkler satır içi stille değil sınıfla veriliyor:
+                            satır içi stil, imleç geldiğinde altına dönmesini
+                            sağlayan kuralı yeniyordu. */}
+                        <span className={`hover-mark eyebrow flex-shrink-0 ${isOpen ? 'text-[#f0b429]' : ''}`}>
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <span className={`hover-title text-[16px] leading-snug ${isOpen ? 'text-white' : 'text-white/[0.78]'}`}>
+                          {faq.q}
+                        </span>
                       </span>
                       <ChevronDown className={`w-4 h-4 flex-shrink-0 mt-1 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                         style={{ color: isOpen ? '#a78bfa' : 'rgba(255,255,255,0.3)' }} />
                     </button>
                     <motion.div initial={false} animate={{ height: isOpen ? 'auto' : 0 }} className="overflow-hidden"
                       transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}>
-                      <p className="pb-7 pe-10 text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{faq.a}</p>
+                      <p className="pb-7 pe-10 ps-9 text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{faq.a}</p>
                     </motion.div>
                   </motion.div>
                 );
