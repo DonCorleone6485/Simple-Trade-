@@ -473,8 +473,12 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
       {/* ── HERO ── */}
       <section className="relative overflow-hidden pt-36 sm:pt-44 pb-24 sm:pb-32">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[700px] rounded-full blur-3xl opacity-[0.16]"
+          {/* İki ışık: mor marka rengi, altın ise başlığın sıcaklığı. İkisi de
+              fark edilmeyecek kadar hafif — fark edilirse abartılmış demektir. */}
+          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[700px] rounded-full blur-3xl opacity-[0.11]"
             style={{ background: 'radial-gradient(circle, #8b5cf6, transparent 70%)' }} />
+          <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[760px] h-[420px] rounded-full blur-3xl opacity-[0.07]"
+            style={{ background: 'radial-gradient(circle, #f0b429, transparent 70%)' }} />
           <div className="absolute inset-0 opacity-[0.035]" style={{
             backgroundImage: 'linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)',
             backgroundSize: '64px 64px',
@@ -485,23 +489,24 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
 
         <motion.div initial="hidden" animate="visible" variants={stagger}
           className="relative max-w-4xl mx-auto px-6 text-center">
-          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] font-medium mb-8"
-            style={{ background: 'rgba(139,92,246,0.09)', color: '#a78bfa' }}>
-            <Sparkles className="w-3.5 h-3.5" />
-            {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم ژورنال معاملاتی')}
+          <motion.div variants={fadeUp} className="flex items-center justify-center gap-3 mb-8">
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#f0b429' }} />
+            <span className="eyebrow">
+              {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم ژورنال معاملاتی')}
+            </span>
           </motion.div>
 
           {/* İki cümlelik başlık. Vitrin kayıpla açılmaz: burada söylenen şey
               iyi işlemin tesadüf olmadığı — ikinci cümle de onun cevabı. */}
-          <motion.h1 variants={fadeUp}
-            className="font-display text-[2rem] sm:text-5xl lg:text-[4.5rem] leading-[1.06] sm:leading-[1.02] font-medium mb-7"
-            style={{ letterSpacing: '-0.035em' }}>
-            <span>
-              {t('Kazandıran ne varsa, ', 'Whatever works is ', 'هر چه سود می‌دهد، ')}
-              <span style={{ color: '#a78bfa', fontStyle: 'italic' }}>{t('tekrarlanabilir', 'repeatable', 'تکرارشدنی است')}</span>.
+          {/* Afiş başlık: dar ve büyük. Son satır serif ve altın — bir tek o
+              cümle "el yazısı" gibi durup gözü kendine çeker. */}
+          <motion.h1 variants={fadeUp} className="poster mb-7 text-[2.6rem] sm:text-[4.2rem] lg:text-[5.6rem]">
+            <span className="block">{t('Kazandıran ne varsa,', 'Whatever works is', 'هر چه سود می‌دهد،')}</span>
+            <span className="block" style={{ color: 'rgba(255,255,255,0.92)' }}>
+              {t('tekrarlanabilir.', 'repeatable.', 'تکرارشدنی است.')}
             </span>
-            <br />
-            <span className="text-[0.82em]" style={{ color: 'rgba(255,255,255,0.72)' }}>
+            <span className="block font-display normal-case mt-3 text-[0.42em] leading-[1.1]"
+              style={{ color: '#f0b429', fontStyle: 'italic', letterSpacing: '-0.02em' }}>
               {t('Biz onu görünür kılarız.', 'We make it visible.', 'ما آن را نمایان می‌کنیم.')}
             </span>
           </motion.h1>
@@ -616,8 +621,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           {/* Sayfanın en büyük cümlesi. Ortalanmış bir başlık yığını yerine
               tek başına duran bir ifade — bölümler arası ritmi burada kırıyoruz. */}
           <motion.div variants={fadeUp} className="max-w-3xl mb-20 sm:mb-24">
-            <h2 className="font-display text-[2.6rem] sm:text-[3.6rem] leading-[1.06] font-medium"
-              style={{ letterSpacing: '-0.035em' }}>
+            <span className="channel mb-5 block">CH 01 · {t('Neden', 'Why', 'چرا')}</span>
+            <h2 className="poster text-[2.4rem] sm:text-[3.4rem]">
               {t('Neden Journal Tutmak İşe Yarar?', 'Why Trade Journaling Works', 'چرا ثبت معاملات مؤثر است؟')}
             </h2>
             <p className="text-[17px] leading-relaxed mt-6 max-w-xl" style={{ color: 'rgba(255,255,255,0.45)' }}>
@@ -645,7 +650,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
             className="max-w-2xl mb-16 sm:mb-20">
-            <h2 className="font-display text-[2.1rem] sm:text-[2.6rem] leading-[1.1] font-medium mb-4" style={{ letterSpacing: '-0.03em' }}>
+            <span className="channel mb-5 block">CH 02 · {t('Araçlar', 'Tools', 'ابزارها')}</span>
+            <h2 className="poster text-[2.1rem] sm:text-[3rem] mb-4">
               {t('İhtiyacın Olan Her Araç, Tek Ekranda', 'Every Tool You Need, One Screen', 'هر ابزاری که نیاز دارید، در یک صفحه')}
             </h2>
             <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
@@ -658,7 +664,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               {/* Küme başlığı: numara yerine sessiz bir etiket, yanında çizgi. */}
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
                 className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-7">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] whitespace-nowrap" style={{ color: '#a78bfa' }}>
+                <span className="eyebrow whitespace-nowrap" style={{ color: '#f0b429' }}>
                   {group.label}
                 </span>
                 <h3 className="text-[17px] sm:text-[19px] font-medium" style={{ letterSpacing: '-0.015em' }}>{group.title}</h3>
@@ -698,7 +704,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
             className="max-w-2xl mb-16">
-            <h2 className="font-display text-[2.1rem] sm:text-[2.6rem] leading-[1.1] font-medium" style={{ letterSpacing: '-0.03em' }}>
+            <span className="channel mb-5 block">CH 03 · {t('Kurulum', 'Setup', 'راه‌اندازی')}</span>
+            <h2 className="poster text-[2.1rem] sm:text-[3rem]">
               {t('4 Adımda Başla', 'Get Started in 4 Steps', 'در ۴ مرحله شروع کنید')}
             </h2>
           </motion.div>
@@ -731,7 +738,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}
             className="max-w-2xl mb-14">
-            <h2 className="font-display text-[2.1rem] sm:text-[2.6rem] leading-[1.1] font-medium mb-4" style={{ letterSpacing: '-0.03em' }}>
+            <span className="channel mb-5 block">CH 04 · {t('Fiyat', 'Pricing', 'قیمت')}</span>
+            <h2 className="poster text-[2.1rem] sm:text-[3rem] mb-4">
               {t('Sade ve Şeffaf Fiyatlandırma', 'Simple & Transparent Pricing', 'قیمت‌گذاری ساده و شفاف')}
             </h2>
             <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
@@ -850,10 +858,12 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               sütunlu bölüm; ritmi burada bir kez daha değiştiriyoruz. */}
           <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] gap-10 lg:gap-16">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}>
-              <h2 className="font-display text-[2.1rem] sm:text-[2.6rem] leading-[1.1] font-medium lg:sticky lg:top-28"
-                style={{ letterSpacing: '-0.03em' }}>
-                {t('Sıkça Sorulan Sorular', 'Frequently Asked Questions', 'سؤالات متداول')}
-              </h2>
+              <div className="lg:sticky lg:top-28">
+                <span className="channel mb-5 block">CH 05 · {t('Sorular', 'Questions', 'پرسش‌ها')}</span>
+                <h2 className="poster text-[2.1rem] sm:text-[3rem]">
+                  {t('Sıkça Sorulan Sorular', 'Frequently Asked Questions', 'سؤالات متداول')}
+                </h2>
+              </div>
             </motion.div>
 
             {/* Kutu yok: sorular tek bir sütun, aralarında ince çizgi. */}
@@ -892,8 +902,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           style={{ background: 'radial-gradient(620px 300px at 50% 0%, rgba(139,92,246,0.16), transparent 70%)' }} />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-28 sm:py-36 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={fadeUp}>
-            <h2 className="font-display text-[2.3rem] sm:text-[3.2rem] leading-[1.06] font-medium mb-6"
-              style={{ letterSpacing: '-0.035em' }}>
+            <h2 className="poster text-[2.4rem] sm:text-[3.6rem] mb-6">
               {t('Trading\'ini Bugün Kaydetmeye Başla', 'Start Logging Your Trading Today', 'همین امروز معاملات خود را ثبت کنید')}
             </h2>
             <p className="text-[16px] mb-10" style={{ color: 'rgba(255,255,255,0.45)' }}>
