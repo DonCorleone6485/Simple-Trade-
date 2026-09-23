@@ -145,6 +145,20 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
     document.getElementById(id)?.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
 
+  /**
+   * İmlecin kutu içindeki yerini iki CSS değişkenine yazar; ışık huzmesi
+   * (index.css'teki .hover-quiet::before) oradan besleniyor. Konumu CSS'e
+   * devretmek, ışığı her karede JavaScript'le çizmekten çok daha ucuz:
+   * burada sadece iki sayı değişiyor, boyama tarayıcının işi.
+   */
+  const spotlight = (e: React.MouseEvent<HTMLElement>) => {
+    if (shouldReduceMotion) return;
+    const el = e.currentTarget;
+    const box = el.getBoundingClientRect();
+    el.style.setProperty('--x', `${e.clientX - box.left}px`);
+    el.style.setProperty('--y', `${e.clientY - box.top}px`);
+  };
+
   const whyItems = [
     {
       icon: <BarChart2 className="w-5 h-5" />,
@@ -621,9 +635,9 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           </motion.div>
 
           {/* Kutu yok: sütunları ince bir çizgi ayırıyor. */}
-          <div className="grid sm:grid-cols-3">
+          <div className="hover-group grid sm:grid-cols-3">
             {whyItems.map((item, i) => (
-              <motion.div key={i} variants={fadeUp}
+              <motion.div key={i} variants={fadeUp} onMouseMove={spotlight}
                 className={`hover-quiet py-2 ${i > 0 ? 'sm:ps-10' : ''} ${i < whyItems.length - 1 ? 'sm:pe-10' : ''} mb-10 sm:mb-0`}
                 style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
                 <div className="hover-icon mb-5" style={{ color: '#a78bfa' }}>{item.icon}</div>
@@ -663,9 +677,10 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               </motion.div>
 
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={stagger}
-                className={`grid ${group.cols} gap-4 sm:gap-5`}>
+                className={`hover-group grid ${group.cols} gap-4 sm:gap-5`}>
                 {group.items.map((f: any, i: number) => (
                   <motion.div key={i} variants={fadeUp} whileHover={{ y: shouldReduceMotion ? 0 : -3 }}
+                    onMouseMove={spotlight}
                     className="hover-card rounded-2xl p-7 relative h-full"
                     style={{
                       background: 'linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
@@ -702,9 +717,9 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={stagger}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-10">
+            className="hover-group grid sm:grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-10">
             {steps.map((s, i) => (
-              <motion.div key={i} variants={fadeUp}
+              <motion.div key={i} variants={fadeUp} onMouseMove={spotlight}
                 className={`hover-quiet ${i > 0 ? 'lg:ps-10' : ''}`}
                 style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
                 {/* Numara rozet değil, tipografi: sayfanın serifiyle büyük ve sessiz. */}

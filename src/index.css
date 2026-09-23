@@ -192,7 +192,6 @@ body::before {
 .hover-row:hover .hover-title,
 .hover-card:hover .hover-title { color: var(--gold); }
 
-.hover-card { transition: border-color 0.25s ease, box-shadow 0.25s ease; }
 .hover-card:hover {
   border-color: rgba(240, 180, 41, 0.25) !important;
   /* Kartın kendi iç çizgisi satır içi stilde duruyor; !important olmadan
@@ -206,12 +205,62 @@ body::before {
 
 /* Dikey ayraçlarla bölünmüş ızgaralarda (üç sütunlu "neden journal", dört
    adım) satırı kaydırmak olmuyor: sütun yandaki çizginin üstüne biniyor ve
-   düzen bozuluyor. Orada yer değiştiren hiçbir şey yok — renk değişiyor ve
-   başlığın altında kısa bir altın çizgi açılıyor. */
+   düzen bozuluyor. Orada hiçbir şey yer değiştirmiyor — bunun yerine üç
+   sessiz hareket üst üste biniyor:
+
+     1. imlecin altında yumuşak bir altın ışık dolaşıyor,
+     2. aynı ızgaradaki diğer sütunlar hafifçe soluyor,
+     3. ikon bir tık yükselip büyüyor.
+
+   Üçü de sadece opacity ve transform kullanıyor; tarayıcı hiçbir kutuyu
+   yeniden ölçmüyor, dolayısıyla ne çizgiler kayıyor ne de metin zıplıyor. */
+/* isolation: isolate şart. z-index: -1 olan ::before, ancak elemanın kendisi
+   bir yığın bağlamı açtığında "kendi arka planının üstünde ama yazının
+   altında" boyanıyor. Açmazsak ışık kartın arka planının arkasına düşüp
+   büsbütün kayboluyor. */
+.hover-quiet { position: relative; isolation: isolate; transition: opacity 0.3s ease; }
+.hover-card { isolation: isolate; }
 .hover-quiet:hover .hover-title,
 .hover-quiet:hover .hover-mark { color: var(--gold); }
 .hover-quiet:hover .hover-icon { color: var(--gold); }
-.hover-icon { transition: color 0.25s ease; }
+
+/* İmleç ışığı. --x/--y'yi JavaScript yazıyor; yazamazsa gradyan ortada
+   duruyor ve efekt yine çalışıyor. Yatayda taşma yok (inset'in sağ/solu 0):
+   ayraç çizgisinin öbür tarafına sızmasın diye. */
+.hover-quiet::before,
+.hover-card::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(
+    200px circle at var(--x, 50%) var(--y, 50%),
+    rgba(240, 180, 41, 0.1),
+    transparent 72%
+  );
+}
+.hover-quiet::before { inset: -12px 0; border-radius: 14px; }
+.hover-card::before { inset: 0; border-radius: 1rem; }
+.hover-quiet:hover::before,
+.hover-card:hover::before { opacity: 1; }
+
+/* Kardeşlerin sönmesi: imlecin durduğu sütun aynı kalıyor, yanındakiler
+   geri çekiliyor. !important şart — framer-motion animasyon bittikten sonra
+   elemanın üstünde satır içi opacity: 1 bırakıyor, o da sınıfı yenerdi. */
+.hover-group:has(.hover-quiet:hover) .hover-quiet:not(:hover),
+.hover-group:has(.hover-card:hover) .hover-card:not(:hover) {
+  opacity: 0.55 !important;
+}
+.hover-card { transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease; }
+
+.hover-icon {
+  width: fit-content;
+  transition: color 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.hover-quiet:hover .hover-icon { transform: translateY(-3px) scale(1.08); }
+
 .hover-rule {
   display: block;
   height: 1px;
@@ -223,9 +272,22 @@ body::before {
 }
 .hover-quiet:hover .hover-rule { width: 34px; }
 
+/* Dokunmatik ekranda "hover" bir kez takılıp kalıyor: parmağını çektikten
+   sonra sütun altın rengi kalıyordu. Işığı ve söndürmeyi gerçek imleci olan
+   cihazlara ayırıyoruz. */
+@media (hover: none) {
+  .hover-quiet::before, .hover-card::before { display: none; }
+  .hover-group:has(.hover-quiet:hover) .hover-quiet:not(:hover),
+  .hover-group:has(.hover-card:hover) .hover-card:not(:hover) { opacity: 1 !important; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hover-row, .hover-card, .hover-title, .hover-mark, .hover-icon, .hover-rule { transition: none; }
   .hover-row:hover { padding-inline-start: 0; }
+  .hover-quiet::before, .hover-card::before { display: none; }
+  .hover-quiet:hover .hover-icon { transform: none; }
+  .hover-group:has(.hover-quiet:hover) .hover-quiet:not(:hover),
+  .hover-group:has(.hover-card:hover) .hover-card:not(:hover) { opacity: 1 !important; }
 }
 
 @page { size: A4 portrait; margin: 14mm; }
