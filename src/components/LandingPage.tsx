@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { useLanguage } from '../context/LanguageContext';
 import { SESSIONS, sessionState } from '../lib/sessions';
+import { copy } from '../lib/landingCopy';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -114,10 +115,16 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
 
+  /**
+   * Metinler kaynakta üç dille yazılı; kalan altı dil landingCopy.ts'ten
+   * İngilizce metnin kendisiyle aranıyor. Çeviri bulunamazsa İngilizce
+   * dönüyor — eksik bir satır sayfayı boş bırakmıyor.
+   */
   const t = (tr: string, en: string, fa: string) => {
     if (language === 'tr') return tr;
     if (language === 'fa') return fa;
-    return en;
+    if (language === 'en') return en;
+    return copy(en, language);
   };
 
   // Giriş yapmış kullanıcı için tüm "Ücretsiz Başla" CTA'ları journal'a götürür.

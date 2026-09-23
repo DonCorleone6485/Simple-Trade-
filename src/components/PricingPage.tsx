@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, Zap, TrendingUp, Shield } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { copy } from '../lib/landingCopy';
 
 interface PricingPageProps {
   onboardingMode?: boolean;
@@ -13,10 +14,16 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
   const { language } = useLanguage();
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly');
 
+  /**
+   * Metinler kaynakta üç dille yazılı; kalan altı dil landingCopy.ts'ten
+   * İngilizce metnin kendisiyle aranıyor. Çeviri bulunamazsa İngilizce
+   * dönüyor — eksik bir satır sayfayı boş bırakmıyor.
+   */
   const t = (tr: string, en: string, fa: string) => {
     if (language === 'tr') return tr;
     if (language === 'fa') return fa;
-    return en;
+    if (language === 'en') return en;
+    return copy(en, language);
   };
 
   const freeFeatures = [
@@ -98,7 +105,7 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
           {t('Yıllık', 'Yearly', 'سالانه')}
           <span className="ms-2 px-2 py-0.5 rounded-full text-xs font-semibold"
             style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
-            {t(`%${savings} İndirim`, `${savings}% Off`, `${savings}% تخفیف`)}
+            {t('%{n} İndirim', '{n}% Off', '{n}% تخفیف').replace('{n}', String(savings))}
           </span>
         </span>
       </div>
@@ -167,7 +174,7 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
             </span>
             {billing === 'yearly' && (
               <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                {t(`Yıllık $${yearlyPrice} faturalandırılır`, `Billed $${yearlyPrice}/year`, `${yearlyPrice}$ سالانه فاکتور می‌شود`)}
+                {t('Yıllık ${n} faturalandırılır', 'Billed ${n}/year', '{n}$ سالانه فاکتور می‌شود').replace('{n}', String(yearlyPrice))}
               </p>
             )}
           </div>
