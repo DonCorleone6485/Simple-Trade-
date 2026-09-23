@@ -624,10 +624,10 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
           <div className="grid sm:grid-cols-3">
             {whyItems.map((item, i) => (
               <motion.div key={i} variants={fadeUp}
-                className={`py-2 ${i > 0 ? 'sm:ps-10' : ''} ${i < whyItems.length - 1 ? 'sm:pe-10' : ''} mb-10 sm:mb-0`}
+                className={`hover-row py-2 ${i > 0 ? 'sm:ps-10' : ''} ${i < whyItems.length - 1 ? 'sm:pe-10' : ''} mb-10 sm:mb-0`}
                 style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
                 <div className="mb-5" style={{ color: '#a78bfa' }}>{item.icon}</div>
-                <h3 className="text-[17px] font-medium mb-2.5" style={{ letterSpacing: '-0.01em' }}>{item.title}</h3>
+                <h3 className="hover-title text-[17px] font-medium mb-2.5" style={{ letterSpacing: '-0.01em' }}>{item.title}</h3>
                 <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{item.desc}</p>
               </motion.div>
             ))}
@@ -665,7 +665,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                 className={`grid ${group.cols} gap-4 sm:gap-5`}>
                 {group.items.map((f: any, i: number) => (
                   <motion.div key={i} variants={fadeUp} whileHover={{ y: shouldReduceMotion ? 0 : -3 }}
-                    className={`rounded-2xl p-7 relative h-full ${f.span}`}
+                    className="hover-card rounded-2xl p-7 relative h-full"
                     style={{
                       background: 'linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
                       border: '1px solid rgba(255,255,255,0.05)',
@@ -678,7 +678,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                       </span>
                     )}
                     <div className="mb-5" style={{ color: f.accent }}>{f.icon}</div>
-                    <h4 className="text-[16px] font-medium mb-2.5 pe-10" style={{ letterSpacing: '-0.01em' }}>{f.title}</h4>
+                    <h4 className="hover-title text-[16px] font-medium mb-2.5 pe-10" style={{ letterSpacing: '-0.01em' }}>{f.title}</h4>
                     <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{f.desc}</p>
                     {f.widget}
                   </motion.div>
@@ -704,7 +704,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-10">
             {steps.map((s, i) => (
               <motion.div key={i} variants={fadeUp}
-                className={i > 0 ? 'lg:ps-10' : ''}
+                className={`hover-row ${i > 0 ? 'lg:ps-10' : ''}`}
                 style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
                 {/* Numara rozet değil, tipografi: sayfanın serifiyle büyük ve sessiz. */}
                 <div className="relative font-display leading-none mb-6 w-fit"
@@ -713,9 +713,9 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                       ayrılsın, ama rozet gibi kutulanmasın. */}
                   <span className="pointer-events-none absolute -inset-6 rounded-full blur-2xl"
                     style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.35), transparent 70%)' }} />
-                  <span className="relative">{s.n}</span>
+                  <span className="hover-mark relative">{s.n}</span>
                 </div>
-                <h3 className="text-[16px] font-medium mb-2.5" style={{ letterSpacing: '-0.01em' }}>{s.title}</h3>
+                <h3 className="hover-title text-[16px] font-medium mb-2.5" style={{ letterSpacing: '-0.01em' }}>{s.title}</h3>
                 <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.desc}</p>
               </motion.div>
             ))}
@@ -864,8 +864,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                   <motion.div key={i} variants={fadeUp}
                     style={{ borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.07)' }}>
                     <button onClick={() => setOpenFAQ(isOpen ? null : i)}
-                      className="w-full flex items-start justify-between gap-6 py-6 text-start group">
-                      <span className="text-[16px] leading-snug transition-colors"
+                      className="hover-row w-full flex items-start justify-between gap-6 py-6 text-start group">
+                      <span className="hover-title text-[16px] leading-snug"
                         style={{ color: isOpen ? '#fff' : 'rgba(255,255,255,0.78)' }}>
                         {faq.q}
                       </span>
@@ -933,7 +933,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
                 { label: t('Nasıl Çalışır', 'How It Works', 'چگونه کار می‌کند'), href: '#how-it-works' },
                 { label: t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری'), href: '#pricing' },
               ].map(l => (
-                <a key={l.href} href={l.href} className="text-[13.5px] transition-colors"
+                <a key={l.href} href={l.href} className="hover-row hover-title text-[13.5px]"
                   style={{ color: 'rgba(255,255,255,0.4)' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>

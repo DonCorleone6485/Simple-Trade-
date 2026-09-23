@@ -177,6 +177,38 @@ body::before {
   background: linear-gradient(90deg, rgba(240, 180, 41, 0.5), transparent);
 }
 
+/* ── VİTRİNİN HAREKET DİLİ ────────────────────────────────────────────────
+   Tek bir kural: imleç gelince satır azıcık ilerler, numara ve başlık altına
+   döner. Her bölüme ayrı bir efekt uydurmak sayfayı dağıtır; aynı hareketin
+   her yerde tekrarı ise "buralar tıklanır" duygusunu öğretir.
+
+   padding-inline-start kullanılıyor (padding-left değil): Arapça ve Farsçada
+   sayfa sağdan sola akıyor, satır da ters yöne ilerlemeli. */
+.hover-row {
+  transition: padding-inline-start 0.25s ease, border-color 0.25s ease;
+}
+.hover-row:hover { padding-inline-start: 12px; }
+.hover-row:hover .hover-mark,
+.hover-row:hover .hover-title,
+.hover-card:hover .hover-title { color: var(--gold); }
+
+.hover-card { transition: border-color 0.25s ease, box-shadow 0.25s ease; }
+.hover-card:hover {
+  border-color: rgba(240, 180, 41, 0.25) !important;
+  /* Kartın kendi iç çizgisi satır içi stilde duruyor; !important olmadan
+     bu gölge ona yeniliyor. İç çizgiyi de birlikte yazıyoruz ki kaybolmasın. */
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 18px 50px -32px rgba(240, 180, 41, 0.4) !important;
+}
+.hover-title { transition: color 0.25s ease; }
+.hover-mark { transition: color 0.25s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-row, .hover-card, .hover-title, .hover-mark { transition: none; }
+  .hover-row:hover { padding-inline-start: 0; }
+}
+
 @page { size: A4 portrait; margin: 14mm; }
 
 /* Ana sayfadaki mikrofon kartının ses dalgası. Sadece süs: kayıt yapmaz,
