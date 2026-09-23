@@ -358,7 +358,19 @@ body::before {
   );
   transform: translateX(-130%);
 }
-.cta:hover { box-shadow: 0 10px 32px -8px rgba(139, 92, 246, 0.7); }
+/* Üç şey birden, üçü de renk: mor bir tık açılıyor, çevresine ince bir
+   altın halka geliyor, altında mor bir halo yanıyor. Renk olmaları önemli —
+   "hareketi azalt" açık olan kullanıcı da bunların üçünü de görüyor, huzme
+   olmadan da düğme cevap vermiş oluyor.
+
+   background'da !important var: mor, düğmelerin üzerinde satır içi stille
+   duruyor ve onsuz bu kural ona yeniliyor. */
+.cta:hover {
+  background: #a17bff !important;
+  box-shadow:
+    0 0 0 1.5px rgba(240, 180, 41, 0.8),
+    0 14px 40px -10px rgba(139, 92, 246, 1);
+}
 .cta:hover::before { animation: cta-sheen 0.85s cubic-bezier(0.3, 0, 0.2, 1); }
 @keyframes cta-sheen {
   from { transform: translateX(-130%); }
@@ -379,13 +391,7 @@ body::before {
    hafifçe açılıyor. Yoksa bu ayarı açan kişi düğmeye dokunduğunu hiç
    anlamıyor — nitekim ilk denemede tam bu oldu. */
 @media (prefers-reduced-motion: reduce) {
-  .cta::before {
-    background: rgba(255, 255, 255, 0.14);
-    transform: none;
-    opacity: 0;
-    transition: opacity 0.25s ease;
-  }
-  .cta:hover::before { animation: none; opacity: 1; }
+  .cta:hover::before { animation: none; }
 }
 
 @page { size: A4 portrait; margin: 14mm; }

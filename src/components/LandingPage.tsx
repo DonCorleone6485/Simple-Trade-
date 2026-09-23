@@ -455,9 +455,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
             )}
             <button onClick={onGetStarted}
               className="cta flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-sm font-medium"
-              style={{ background: '#8b5cf6', color: '#fff' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+              style={{ background: '#8b5cf6', color: '#fff' }}>
               {signedIn && <BookOpen className="w-4 h-4" />}
               {ctaLabel}
             </button>
@@ -825,9 +823,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               </div>
               <button onClick={onGetStarted}
                 className="cta w-full py-3 rounded-full text-sm font-medium"
-                style={{ background: '#8b5cf6', color: '#fff' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+                style={{ background: '#8b5cf6', color: '#fff' }}>
                 {signedIn ? ctaLabel : t('Ücretsiz Dene', 'Start Free Trial', 'شروع آزمایشی رایگان')}
               </button>
             </motion.div>
