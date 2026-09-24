@@ -28,6 +28,7 @@ import JournalDashboard from './components/JournalDashboard';
 import AppShell, { NavKey } from './components/AppShell';
 import PrintableReport from './components/PrintableReport';
 import { Trade, Account, JournalGoals, JournalKind, DrawdownType } from './types';
+import PropStatus from './components/PropStatus';
 import { useLanguage } from './context/LanguageContext';
 import { supabase } from './lib/supabase';
 import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
@@ -1408,6 +1409,14 @@ export default function App() {
               {/* Journal özeti — kart yok, hizalı sayı sütunları.
                   Takvim ve istatistikler kendi özetlerini gösterir; ikisini üst
                   üste koymak aynı dört sayıyı iki kez okutur. */}
+              {/* Prop hesapta sınırlar her şeyden önce gelir: kaç işlem
+                  yaptığından önce ne kadar yerin kaldığını görmen lazım.
+                  Takvim ve istatistik sekmeleri kendi özetlerini gösterdiği
+                  için oralarda tekrarlanmıyor. */}
+              {activeJournal.kind === 'prop' && journalTab !== 'stats' && journalTab !== 'calendar' && journalTab !== 'mtConnect' && (
+                <PropStatus account={activeJournal} trades={filteredTrades} />
+              )}
+
               {journalTab !== 'stats' && journalTab !== 'calendar' && journalTab !== 'mtConnect' && (
               <div className="flex items-baseline gap-8 sm:gap-14 flex-wrap mb-10 pb-10"
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
