@@ -22,12 +22,17 @@ import { useLanguage } from '../context/LanguageContext';
 
 const FADE_MS = 8000;
 
-/** "2:15" — saat ve dakika. Bir saatin altındaysa yalnız dakika. */
-function countdown(hours: number): string {
+/**
+ * "6s 13dk" — birimleriyle.
+ *
+ * Önce "6:13" yazıyordu ve kimse ne olduğunu anlamıyordu: saat mi, kalan süre
+ * mi, kapanış saati mi? İki harf ekleyince soru kalmıyor.
+ */
+function countdown(hours: number, hLabel: string, mLabel: string): string {
   const total = Math.max(0, Math.round(hours * 60));
   const h = Math.floor(total / 60);
   const m = total % 60;
-  return h > 0 ? `${h}:${String(m).padStart(2, '0')}` : `${m}dk`;
+  return h > 0 ? `${h}${hLabel} ${m}${mLabel}` : `${m}${mLabel}`;
 }
 
 const IMPACT_COLOR: Record<string, string> = {
@@ -42,7 +47,7 @@ function Slot({ dot, label, children, onClick }: {
     <button onClick={onClick}
       className="ui-pill flex items-center gap-2 px-2.5 py-1.5 rounded-lg whitespace-nowrap"
       style={{ background: 'transparent', border: '1px solid transparent' }}>
-      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: dot }} />
+      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: dot }} />
       <span className="text-[9.5px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.3)' }}>{label}</span>
       <span className="text-[12.5px]" style={{ color: 'rgba(255,255,255,0.62)' }}>{children}</span>
     </button>
@@ -76,11 +81,26 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
   }, []);
 
   // ── Seans ──
-  const states = SESSIONS.map(s => sessionState(s, now));
-  const open = states.find(s => s.open);
-  // Açık seans yoksa en yakın açılacak olanı gösteriyoruz — "hiçbiri açık
-  // değil" demek yerine "şuna şu kadar var" demek daha işe yarar.
-  const next = states.filter(s => !s.open).sort((a, b) => a.left - b.left)[0];
+  //
+  // Tek bir seans göstermek yetmiyordu: "Londra 6s 13dk" yazısı, Londra'nın
+  // kapanmasına mı yoksa açılmasına mı kaldığını söylemiyordu. Artık her
+  // satır ne olduğunu yazıyor ve haber yuvası gibi sırayla dönüyor — açık
+  // olanlar önce, sonra en yakın açılacaklar.
+  const hLabel = t('stripHour');
+  const mLabel = t('stripMinute');
+  const states = SESSIONS.map(s => sessionState(s, now)).filter(s => !s.weekend);
+  const sessionFacts = [
+    ...states.filter(s => s.open).sort((a, b) => a.left - b.left)
+      .map(s => ({
+        open: true,
+        text: `${language === 'tr' ? s.session.tr : s.session.en} · ${t('stripToClose')} ${countdown(s.left, hLabel, mLabel)}`,
+      })),
+    ...states.filter(s => !s.open).sort((a, b) => a.left - b.left).slice(0, 2)
+      .map(s => ({
+        open: false,
+        text: `${language === 'tr' ? s.session.tr : s.session.en} · ${t('stripToOpen')} ${countdown(s.left, hLabel, mLabel)}`,
+      })),
+  ];
 
   // ── Bugünün kalan önemli haberleri ──
   const upcoming = (events || [])
@@ -95,35 +115,37 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 3);
 
-  // Birden fazlaysa aralarında yumuşakça geçiş.
+  // İki yuva tek sayaçla dönüyor: ayrı ayrı dönselerdi şerit sürekli bir
+  // yerinden kıpırdıyor olurdu. Birlikte değişince göz bir kez bakıp geçiyor.
+  const cycle = Math.max(sessionFacts.length, upcoming.length);
   useEffect(() => {
-    if (upcoming.length < 2) { setSlide(0); return; }
+    if (cycle < 2) { setSlide(0); return; }
     const id = setInterval(() => {
       setVisible(false);
-      setTimeout(() => { setSlide(i => (i + 1) % upcoming.length); setVisible(true); }, 260);
+      setTimeout(() => { setSlide(i => i + 1); setVisible(true); }, 260);
     }, FADE_MS);
     return () => clearInterval(id);
-  }, [upcoming.length]);
+  }, [cycle]);
 
-  const item = upcoming[slide % Math.max(1, upcoming.length)];
+  const fade = { opacity: visible ? 1 : 0, transition: 'opacity 0.25s ease', display: 'inline-block' } as const;
+  const fact = sessionFacts.length ? sessionFacts[slide % sessionFacts.length] : null;
+  const item = upcoming.length ? upcoming[slide % upcoming.length] : null;
   const locale = language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US';
 
   return (
     // Dar ekranda tamamen gizleniyor: başlıkla çakışmaktansa hiç görünmesin.
     <div className="hidden lg:flex items-center gap-1 min-w-0">
-      {(open || next) && (
-        <Slot dot={open ? '#34d399' : 'rgba(255,255,255,0.25)'}
+      {fact && (
+        <Slot dot={fact.open ? '#34d399' : 'rgba(255,255,255,0.28)'}
           label={t('stripSession')} onClick={onOpenSessions}>
-          {open
-            ? `${language === 'tr' ? open.session.tr : open.session.en} · ${countdown(open.left)}`
-            : `${language === 'tr' ? next.session.tr : next.session.en} ${countdown(next.left)}`}
+          <span style={fade}>{fact.text}</span>
         </Slot>
       )}
 
       {item && (
         <Slot dot={IMPACT_COLOR[item.impact] || 'rgba(255,255,255,0.25)'}
           label={t('stripNext')} onClick={onOpenNews}>
-          <span style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.25s ease', display: 'inline-block' }}>
+          <span style={fade}>
             {new Date(item.date).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
             {' · '}
             {/* Uzun haber adları başlığı itiyordu; ekranda kalan yere göre
