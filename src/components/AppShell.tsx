@@ -4,6 +4,7 @@ import {
   Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Plug, Clock, Newspaper, ShieldCheck, ClipboardList, Gauge,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import HeaderStrip from './HeaderStrip';
 import { Lock } from './Logo';
 
 export type NavKey =
@@ -168,9 +169,15 @@ export default function AppShell({
               <Menu className="w-5 h-5" />
             </button>
 
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-shrink">
               <h1 className="font-display text-[19px] leading-tight truncate" style={{ letterSpacing: '-0.01em' }}>{title}</h1>
               {subtitle && <p className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>{subtitle}</p>}
+            </div>
+
+            {/* Başlıkla düğmeler arasındaki boşluk boş duruyordu. Sürekli
+                değişen ve bakmadan bilinemeyen iki bilgi oraya yerleşti. */}
+            <div className="flex-1 min-w-0 flex justify-center">
+              <HeaderStrip onOpenSessions={() => onNavigate('sessions')} onOpenNews={() => onNavigate('news')} />
             </div>
 
             <div className="flex items-center gap-2 flex-shrink-0">
