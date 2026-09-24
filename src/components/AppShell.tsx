@@ -4,6 +4,7 @@ import {
   Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Plug, Clock, Newspaper, ShieldCheck, ClipboardList, Gauge,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { Lock } from './Logo';
 
 export type NavKey =
   | 'journals' | 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect'
@@ -79,10 +80,9 @@ export default function AppShell({
       <button onClick={() => go('home')}
         className="hover-quiet flex items-center gap-2.5 px-5 h-16 flex-shrink-0"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <TrendingUp className="w-[18px] h-[18px] flex-shrink-0" style={{ color: '#8b5cf6' }} />
-        <span className="hover-title font-display text-[15px] truncate" style={{ letterSpacing: '-0.01em' }}>
-          Simple Trading Journal
-        </span>
+        {/* İşaret ve isim tek bir çizim: aralarındaki boşluk ve hizalama
+            markanın kuralı, her yerde aynı. */}
+        <Lock className="hover-title h-[26px] w-auto flex-shrink-0" />
       </button>
 
       <nav className="flex-1 overflow-y-auto px-3 py-3">

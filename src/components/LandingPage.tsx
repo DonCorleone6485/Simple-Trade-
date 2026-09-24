@@ -11,6 +11,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { SESSIONS, sessionState } from '../lib/sessions';
 import { copy } from '../lib/landingCopy';
+import { Lock as LogoLock } from './Logo';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -407,12 +408,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
         }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: '#8b5cf6' }} />
-            <span className="font-semibold tracking-tight text-[13px] sm:text-base whitespace-nowrap">
-              {t('Simple Trading Journal', 'Simple Trading Journal', 'سیمپل تریدینگ ژورنال')}
-            </span>
-          </div>
+          <LogoLock className="h-[26px] sm:h-[30px] w-auto flex-shrink-0" />
 
           <nav className="hidden md:flex items-center gap-8">
             <button onClick={() => scrollTo('features')} className="nav-link text-sm font-medium">
@@ -936,12 +932,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               bir footer sitenin sonunu aceleye getirilmiş gösteriyordu. */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-10">
             <div className="max-w-xs">
-              <div className="flex items-center gap-2.5 mb-3">
-                <TrendingUp className="w-[18px] h-[18px]" style={{ color: '#8b5cf6' }} />
-                <span className="font-display text-[15px]" style={{ letterSpacing: '-0.01em' }}>
-                  {t('Simple Trading Journal', 'Simple Trading Journal', 'سیمپل تریدینگ ژورنال')}
-                </span>
-              </div>
+              <LogoLock className="h-[24px] w-auto mb-3" />
               <p className="text-[13.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)' }}>
                 {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم دفترچه معاملات')}
               </p>

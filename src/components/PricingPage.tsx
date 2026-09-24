@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Check, Zap, TrendingUp, Shield } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { copy } from '../lib/landingCopy';
+import { Lock } from './Logo';
 
 interface PricingPageProps {
   onboardingMode?: boolean;
@@ -60,9 +61,8 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
       <div className="text-center mb-12">
         {onboardingMode ? (
           <>
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <TrendingUp className="w-6 h-6" style={{ color: '#8b5cf6' }} />
-              <span className="font-display text-[22px] font-medium text-white">Simple Trading Journal</span>
+            <div className="flex items-center justify-center mb-4">
+              <Lock className="h-[34px] w-auto text-white" />
             </div>
             <h1 className="font-display text-[38px] font-medium text-white mb-4">
               {t('Hoş Geldiniz! 👋', 'Welcome! 👋', '!خوش آمدید 👋')}
