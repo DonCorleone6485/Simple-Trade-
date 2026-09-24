@@ -16,7 +16,9 @@ import SetupPicker from './SetupPicker';
 import EmotionPicker, { EmotionChips } from './EmotionPicker';
 import NoteField from './NoteField';
 import { useLanguage } from '../context/LanguageContext';
-import { useUser } from '@clerk/clerk-react';
+import { fetchPhotoFromLink } from '../lib/photoLink';
+import PhotoLinkRow from './PhotoLinkRow';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { supabase } from '../lib/supabase';
 import { loadChecklists } from '../lib/checklists';
 import {
@@ -185,6 +187,7 @@ export default function TradeHistory({
   );
 
   const { user } = useUser();
+  const { getToken } = useAuth();
   const isOwner = user?.primaryEmailAddress?.emailAddress === 'asgharjafari2007@outlook.com';
 
   const card: React.CSSProperties = {
@@ -547,6 +550,29 @@ export default function TradeHistory({
     closeOverlay();
   };
 
+  /** Dosyayı depoya koyar ve düzenlenen işleme ekler. */
+  const storeEditPhoto = async (file: File, kind: 'pre' | 'post'): Promise<string | null> => {
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${user?.id}/${Date.now()}_${Math.random().toString(36).substr(2, 6)}_${kind}.${ext}`;
+    const { data, error } = await supabase.storage.from('trade-photos').upload(path, file, { contentType: file.type });
+    if (error || !data) { console.error('Upload error:', error); return error?.message || 'upload failed'; }
+    const url = supabase.storage.from('trade-photos').getPublicUrl(data.path).data.publicUrl;
+    if (kind === 'pre') setEditForm(f => ({ ...f, preTradePhotos: [...(f.preTradePhotos || []), url] }));
+    else setEditForm(f => ({ ...f, postTradePhotos: [...(f.postTradePhotos || []), url] }));
+    return null;
+  };
+
+  /** Bağlantıdan ekleme — yeni işlem formundakiyle aynı yol. */
+  const addEditPhotoFromLink = async (url: string, kind: 'pre' | 'post'): Promise<string | null> => {
+    const current = kind === 'pre' ? (editForm.preTradePhotos || []) : (editForm.postTradePhotos || []);
+    if (!isOwner && current.length >= 3) {
+      return language === 'tr' ? 'En fazla 3 fotoğraf.' : 'At most 3 photos.';
+    }
+    const { file, error } = await fetchPhotoFromLink(url, getToken, language);
+    if (!file) return error || null;
+    return await storeEditPhoto(file, kind);
+  };
+
   const handleEditPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
     const files = Array.from(e.target.files || []) as File[];
     const current = kind === 'pre' ? (editForm.preTradePhotos || []) : (editForm.postTradePhotos || []);
@@ -557,18 +583,8 @@ export default function TradeHistory({
     setUploadingEditPhoto(true);
     let failure = '';
     for (const file of files) {
-      const ext = file.name.split('.').pop() || 'jpg';
-      const path = `${user?.id}/${Date.now()}_${Math.random().toString(36).substr(2, 6)}_${kind}.${ext}`;
-      const { data, error } = await supabase.storage.from('trade-photos').upload(path, file, { contentType: file.type });
-      if (!error && data) {
-        const { data: urlData } = supabase.storage.from('trade-photos').getPublicUrl(data.path);
-        const url = urlData.publicUrl;
-        if (kind === 'pre') setEditForm(f => ({ ...f, preTradePhotos: [...(f.preTradePhotos || []), url] }));
-        else setEditForm(f => ({ ...f, postTradePhotos: [...(f.postTradePhotos || []), url] }));
-      } else if (error) {
-        console.error('Upload error:', error);
-        failure = error.message;
-      }
+      const err = await storeEditPhoto(file, kind);
+      if (err) failure = err;
     }
     setUploadingEditPhoto(false);
     e.target.value = '';
@@ -1216,6 +1232,7 @@ export default function TradeHistory({
                         <input type="file" ref={fileRef} onChange={e => handleEditPhotoUpload(e, kind)} accept="image/*" multiple className="hidden" disabled={uploadingEditPhoto} />
                       </div>
                     )}
+                    {canUpload && <PhotoLinkRow onAdd={u => addEditPhotoFromLink(u, kind)} />}
                     {photos.length > 0 && (
                       <div className="grid grid-cols-3 gap-2">
                         {photos.map((photo, i) => (

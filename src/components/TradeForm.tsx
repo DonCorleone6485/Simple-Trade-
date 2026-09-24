@@ -11,8 +11,10 @@ import SetupPicker from './SetupPicker';
 import EmotionPicker from './EmotionPicker';
 import NoteField from './NoteField';
 import { useLanguage } from '../context/LanguageContext';
+import { fetchPhotoFromLink } from '../lib/photoLink';
+import PhotoLinkRow from './PhotoLinkRow';
 import { input as uiInput, label as uiLabel, surface, hairline, sectionLabel, primaryBtn, TRANSITION } from '../lib/ui';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { supabase } from '../lib/supabase';
 
 interface TradeFormProps {
@@ -198,10 +200,12 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
 
 // ── SETUP PICKER ───────────────────────────────────────────────────────────
 // ── PHOTO UPLOADER ─────────────────────────────────────────────────────────
-function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit, uploading }: {
+function PhotoUploader({ photos, onUpload, onRemove, onAddLink, isUnlimited, limit, uploading }: {
   photos: string[];
   onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemove: (index: number) => void;
+  /** Bağlantıdan ekleme; hata mesajı döner, sorun yoksa null. */
+  onAddLink: (url: string) => Promise<string | null>;
   isUnlimited?: boolean;
   limit: number;
   uploading?: boolean;
@@ -227,6 +231,9 @@ function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit, uploadi
           <input type="file" ref={fileInputRef} onChange={onUpload} accept="image/*" multiple className="hidden" disabled={uploading} />
         </div>
       )}
+
+      {canUploadMore && <PhotoLinkRow onAdd={onAddLink} />}
+
       {photos.length > 0 && (
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
           {photos.map((photo, index) => (
@@ -249,6 +256,7 @@ function PhotoUploader({ photos, onUpload, onRemove, isUnlimited, limit, uploadi
 export default function TradeForm({ onSave, isPro = false, hideTitle = false, checklistId, onChecklistSelect }: TradeFormProps) {
   const { t, language } = useLanguage();
   const { user } = useUser();
+  const { getToken } = useAuth();
 
   const isOwner = user?.primaryEmailAddress?.emailAddress === OWNER_EMAIL;
   const photoLimit = isOwner ? Infinity : isPro ? PHOTO_LIMIT_PRO : PHOTO_LIMIT_FREE;
@@ -310,6 +318,28 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
     setResult(val);
     if (val === 'Başa Baş') setReward('0');
     else if (reward === '0') setReward('');
+  };
+
+  /**
+   * Bağlantıdaki resmi indirip kendi depomuza kopyalıyoruz.
+   *
+   * Sadece bağlantıyı saklamak daha ucuz olurdu ama fotoğraf başkasının
+   * sunucusunda kalırdı: o bağlantı bir gün ölünce journal'daki kayıt boş bir
+   * kareye dönerdi. Kopyaladığımız için elle yüklenen fotoğrafla aynı yoldan
+   * geçiyor — kota, silme ve sahiplik kuralları kendiliğinden geçerli.
+   */
+  const addPhotoFromLink = async (url: string, kind: 'pre' | 'post'): Promise<string | null> => {
+    const current = kind === 'pre' ? prePhotos : postPhotos;
+    if (!isOwner && current.length >= photoLimit) {
+      return language === 'tr' ? `En fazla ${photoLimit} fotoğraf.` : `At most ${photoLimit} photos.`;
+    }
+    const { file, error } = await fetchPhotoFromLink(url, getToken, language);
+    if (!file) return error || null;
+    const { url: stored, error: upErr } = await uploadPhotoToStorage(file, kind);
+    if (!stored) return upErr || (language === 'tr' ? 'Yüklenemedi.' : 'Upload failed.');
+    if (kind === 'pre') setPrePhotos(p => [...p, stored]);
+    else setPostPhotos(p => [...p, stored]);
+    return null;
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, kind: 'pre' | 'post') => {
@@ -567,7 +597,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
             </div>
             <div>
               <label style={lbl}>{t('photos')} <span style={optHint}>({t('optionalLabel')})</span></label>
-              <PhotoUploader photos={prePhotos} onUpload={e => handlePhotoUpload(e, 'pre')} onRemove={i => removePhoto(i, 'pre')} isUnlimited={isOwner} limit={photoLimit} uploading={uploadingPre} />
+              <PhotoUploader photos={prePhotos} onUpload={e => handlePhotoUpload(e, 'pre')} onRemove={i => removePhoto(i, 'pre')} onAddLink={u => addPhotoFromLink(u, 'pre')} isUnlimited={isOwner} limit={photoLimit} uploading={uploadingPre} />
             </div>
           </div>
         </div>
@@ -582,7 +612,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
             </div>
             <div>
               <label style={lbl}>{t('photos')} <span style={optHint}>({t('optionalLabel')})</span></label>
-              <PhotoUploader photos={postPhotos} onUpload={e => handlePhotoUpload(e, 'post')} onRemove={i => removePhoto(i, 'post')} isUnlimited={isOwner} limit={photoLimit} uploading={uploadingPost} />
+              <PhotoUploader photos={postPhotos} onUpload={e => handlePhotoUpload(e, 'post')} onRemove={i => removePhoto(i, 'post')} onAddLink={u => addPhotoFromLink(u, 'post')} isUnlimited={isOwner} limit={photoLimit} uploading={uploadingPost} />
             </div>
           </div>
         </div>
