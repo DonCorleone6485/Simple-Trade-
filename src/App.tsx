@@ -27,7 +27,7 @@ import LandingPage from './components/LandingPage';
 import JournalDashboard from './components/JournalDashboard';
 import AppShell, { NavKey } from './components/AppShell';
 import PrintableReport from './components/PrintableReport';
-import { Trade, Account, JournalGoals } from './types';
+import { Trade, Account, JournalGoals, JournalKind, DrawdownType } from './types';
 import { useLanguage } from './context/LanguageContext';
 import { supabase } from './lib/supabase';
 import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
@@ -140,6 +140,11 @@ export default function App() {
   const [newJournalName, setNewJournalName] = useState('');
   const [newJournalStartDate, setNewJournalStartDate] = useState('');
   const [newJournalCapital, setNewJournalCapital] = useState('');
+  const [newJournalKind, setNewJournalKind] = useState<JournalKind>('real');
+  const [newPropTarget, setNewPropTarget] = useState('');
+  const [newPropDaily, setNewPropDaily] = useState('');
+  const [newPropTotal, setNewPropTotal] = useState('');
+  const [newPropDD, setNewPropDD] = useState<DrawdownType>('static');
   const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
   const [editingJournal, setEditingJournal] = useState<Account | null>(null);
   /** Yazdırma/PDF görünümüne gönderilen işlemler; null ise rapor kapalı. */
@@ -247,15 +252,64 @@ export default function App() {
     else { setReferralMsg(data.error || 'Hata oluştu'); }
   };
 
+  /**
+   * Veritabanı satırını Account'a çevirir.
+   *
+   * Üç ayrı yerde elle eşleniyordu ve yeni bir sütun eklendiğinde birini
+   * unutmak çok kolaydı — nitekim prop alanları eklenirken tam bu oldu.
+   * Artık tek yer var.
+   */
+  const accountFromRow = (j: any): Account => ({
+    id: j.id, user_id: j.user_id, name: j.name,
+    startDate: j.start_date, startingCapital: j.starting_capital, goals: j.goals,
+    checklistId: j.checklist_id || null,
+    kind: (j.kind as JournalKind) || 'real',
+    prop: j.kind === 'prop' ? {
+      profitTarget: j.prop_profit_target ?? undefined,
+      maxDailyLoss: j.prop_max_daily_loss ?? undefined,
+      maxTotalLoss: j.prop_max_total_loss ?? undefined,
+      drawdownType: (j.prop_drawdown_type as DrawdownType) || 'static',
+    } : undefined,
+  });
+
+  /** Formdaki sayı alanı boşsa null gider — 0 ile karışmasın. */
+  const num = (v: string) => (v.trim() === '' ? null : parseFloat(v));
+
+  const journalNameFields = () => ({
+    name: newJournalName.trim(),
+    start_date: newJournalStartDate,
+    starting_capital: parseFloat(newJournalCapital),
+  });
+
+  /** Tür 'real'e dönerse prop sütunları temizlenir; eski değerler kalmasın. */
+  const propColumns = () => (newJournalKind === 'prop'
+    ? {
+        kind: 'prop' as const,
+        prop_profit_target: num(newPropTarget),
+        prop_max_daily_loss: num(newPropDaily),
+        prop_max_total_loss: num(newPropTotal),
+        prop_drawdown_type: newPropDD,
+      }
+    : {
+        kind: 'real' as const,
+        prop_profit_target: null,
+        prop_max_daily_loss: null,
+        prop_max_total_loss: null,
+        prop_drawdown_type: null,
+      });
+
+  const propRules = () => (newJournalKind === 'prop' ? {
+    profitTarget: num(newPropTarget) ?? undefined,
+    maxDailyLoss: num(newPropDaily) ?? undefined,
+    maxTotalLoss: num(newPropTotal) ?? undefined,
+    drawdownType: newPropDD,
+  } : undefined);
+
   const loadJournals = async () => {
     if (!user) return;
     setLoading(true);
     const { data } = await supabase.from('journals').select('*').eq('user_id', user.id).order('created_at', { ascending: true });
-    const mapped = (data || []).map((j: any) => ({
-      id: j.id, user_id: j.user_id, name: j.name,
-      startDate: j.start_date, startingCapital: j.starting_capital, goals: j.goals,
-      checklistId: j.checklist_id || null,
-    }));
+    const mapped = (data || []).map(accountFromRow);
     setAccounts(mapped);
     setLoading(false);
   };
@@ -380,6 +434,12 @@ export default function App() {
     setNewJournalName(account.name);
     setNewJournalStartDate(account.startDate ? String(account.startDate).slice(0, 10) : '');
     setNewJournalCapital(account.startingCapital != null ? String(account.startingCapital) : '');
+    setNewJournalKind(account.kind || 'real');
+    const pr = account.prop || {};
+    setNewPropTarget(pr.profitTarget != null ? String(pr.profitTarget) : '');
+    setNewPropDaily(pr.maxDailyLoss != null ? String(pr.maxDailyLoss) : '');
+    setNewPropTotal(pr.maxTotalLoss != null ? String(pr.maxTotalLoss) : '');
+    setNewPropDD(pr.drawdownType || 'static');
     setShowNewJournalModal(true);
   };
 
@@ -387,6 +447,8 @@ export default function App() {
     setShowNewJournalModal(false);
     setEditingJournal(null);
     setNewJournalName(''); setNewJournalStartDate(''); setNewJournalCapital('');
+    setNewJournalKind('real');
+    setNewPropTarget(''); setNewPropDaily(''); setNewPropTotal(''); setNewPropDD('static');
   };
 
   // ── JOURNAL LİMİT KONTROLÜ ──
@@ -400,6 +462,8 @@ export default function App() {
     setNewJournalName(suggestJournalName());
     setNewJournalStartDate(todayForDateInput());
     setNewJournalCapital('10000');
+    setNewJournalKind('real');
+    setNewPropTarget(''); setNewPropDaily(''); setNewPropTotal(''); setNewPropDD('static');
     setShowNewJournalModal(true);
   };
 
@@ -408,11 +472,7 @@ export default function App() {
 
     // Düzenleme
     if (editingJournal) {
-      const patch = {
-        name: newJournalName.trim(),
-        start_date: newJournalStartDate,
-        starting_capital: parseFloat(newJournalCapital),
-      };
+      const patch = { ...journalNameFields(), ...propColumns() };
       const { error } = await supabase.from('journals').update(patch).eq('id', editingJournal.id);
       if (error) {
         alert(language === 'tr' ? 'Journal güncellenemedi: ' + error.message : 'Could not update journal: ' + error.message);
@@ -423,6 +483,8 @@ export default function App() {
         name: patch.name,
         startDate: patch.start_date,
         startingCapital: patch.starting_capital,
+        kind: patch.kind,
+        prop: propRules(),
       };
       setAccounts(prev => prev.map(a => (a.id === updated.id ? updated : a)));
       setActiveJournal(prev => (prev && prev.id === updated.id ? updated : prev));
@@ -432,14 +494,10 @@ export default function App() {
 
     // Yeni kayıt
     const { data } = await supabase.from('journals').insert({
-      user_id: user.id, name: newJournalName.trim(),
-      start_date: newJournalStartDate, starting_capital: parseFloat(newJournalCapital),
+      user_id: user.id, ...journalNameFields(), ...propColumns(),
     }).select().single();
     if (data) {
-      const newAccount: Account = {
-        id: data.id, user_id: data.user_id, name: data.name,
-        startDate: data.start_date, startingCapital: data.starting_capital,
-      };
+      const newAccount: Account = accountFromRow(data);
       setAccounts(prev => [...prev, newAccount]);
       closeJournalModal();
       goTo({ view: 'expanded', journal: newAccount, tab: 'trades' });
@@ -548,10 +606,7 @@ export default function App() {
         alert(language === 'tr' ? 'Journal oluşturulamadı.' : 'Could not create the journal.');
         return;
       }
-      targetJournal = {
-        id: data.id, user_id: data.user_id, name: data.name,
-        startDate: data.start_date, startingCapital: data.starting_capital,
-      };
+      targetJournal = accountFromRow(data);
       setAccounts(prev => [...prev, targetJournal as Account]);
     }
     if (!targetJournal) return;
@@ -1159,7 +1214,7 @@ export default function App() {
         {/* Delete Journal Modal */}
         {accountToDelete && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="p-7 w-full max-w-md" style={modalCard}>
+            <div className="p-7 w-full max-w-md max-h-[88vh] overflow-y-auto" style={modalCard}>
               <h3 className="font-display text-[22px] mb-2" style={{ color: '#f87171', letterSpacing: '-0.01em' }}>{t('deleteAccountTitle')}</h3>
               <p className="text-sm mb-8 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{t('deleteAccountDesc')}</p>
               <div className="flex justify-end gap-2">
@@ -1186,6 +1241,28 @@ export default function App() {
                 {editingJournal ? t('editJournalDesc') : t('newJournalDesc')}
               </p>
               <div className="space-y-4">
+                {/* Tür en üstte: altındaki alanların hangileri olacağını o
+                    belirliyor, sonra sorulursa kullanıcı iki kez doldurur. */}
+                <div>
+                  <label style={uiLabel}>{t('journalKind')}</label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {([
+                      { k: 'real' as const, title: t('kindReal'), desc: t('kindRealDesc') },
+                      { k: 'prop' as const, title: t('kindProp'), desc: t('kindPropDesc') },
+                    ]).map(o => {
+                      const on = newJournalKind === o.k;
+                      return (
+                        <button key={o.k} type="button" onClick={() => setNewJournalKind(o.k)}
+                          data-on={on}
+                          className="ui-nav text-start px-3.5 py-3 rounded-xl"
+                          style={{ border: `1px solid ${on ? 'rgba(139,92,246,0.35)' : 'rgba(255,255,255,0.08)'}` }}>
+                          <div className="text-[13.5px] font-medium">{o.title}</div>
+                          <div className="text-[11.5px] leading-snug mt-0.5" style={{ opacity: 0.65 }}>{o.desc}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
                 <div>
                   <label style={uiLabel}>{t('journalName')}</label>
                   <input type="text" value={newJournalName} onChange={e => setNewJournalName(e.target.value)} placeholder={t('journalNamePlaceholder')} autoFocus
@@ -1206,6 +1283,56 @@ export default function App() {
                       style={{ ...uiInput, paddingInlineStart: '30px' }} />
                   </div>
                 </div>
+
+                {/* Prop kuralları yalnızca prop hesapta sorulur. Gerçek hesapta
+                    bu alanlar yok — kimse kendi parasına kâr hedefi dayatmaz. */}
+                {newJournalKind === 'prop' && (
+                  <div className="space-y-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                    <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.38)' }}>
+                      {t('propRulesHint')}
+                    </p>
+                    {([
+                      { label: t('profitTarget'), v: newPropTarget, set: setNewPropTarget, ph: '10000' },
+                      { label: t('maxDailyLoss'), v: newPropDaily, set: setNewPropDaily, ph: '5000' },
+                      { label: t('maxTotalLoss'), v: newPropTotal, set: setNewPropTotal, ph: '10000' },
+                    ]).map(f => {
+                      const cap = parseFloat(newJournalCapital);
+                      const n = parseFloat(f.v);
+                      // Şirketler kuralı yüzdeyle ilan eder, kullanıcı parayla
+                      // düşünür. İkisini birden göstermek çeviri yükünü kaldırıyor.
+                      const pct = cap > 0 && n > 0 ? `%${((n / cap) * 100).toFixed(1).replace(/\.0$/, '')}` : null;
+                      return (
+                        <div key={f.label}>
+                          <label style={uiLabel}>{f.label}</label>
+                          <div className="relative">
+                            <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                            <input type="number" min="0" step="0.01" value={f.v} onChange={e => f.set(e.target.value)} placeholder={f.ph}
+                              className="font-mono" style={{ ...uiInput, paddingInlineStart: '30px' }} />
+                            {pct && (
+                              <span className="absolute end-3 top-1/2 -translate-y-1/2 text-[12px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>{pct}</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div>
+                      <label style={uiLabel}>{t('drawdownType')}</label>
+                      <div className="grid grid-cols-1 gap-2">
+                        {([
+                          { k: 'static' as const, label: t('ddStatic') },
+                          { k: 'trailing' as const, label: t('ddTrailing') },
+                        ]).map(o => (
+                          <button key={o.k} type="button" onClick={() => setNewPropDD(o.k)}
+                            data-on={newPropDD === o.k}
+                            className="ui-nav text-start px-3.5 py-2.5 rounded-xl text-[13px]"
+                            style={{ border: `1px solid ${newPropDD === o.k ? 'rgba(139,92,246,0.35)' : 'rgba(255,255,255,0.08)'}` }}>
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex justify-end gap-3 mt-6">
                 <button onClick={closeJournalModal} style={quietBtn}>{t('cancel')}</button>

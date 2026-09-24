@@ -1,3 +1,32 @@
+/**
+ * Journal'ın türü.
+ *
+ * 'real' kendi paranla açtığın hesap; kuralı sadece kendi koyduğun hedefler.
+ * 'prop' bir fon şirketinin hesabı: kâr hedefi, günlük ve toplam kayıp
+ * sınırları dışarıdan dayatılıyor ve aşıldığında hesap kapanıyor. Bu yüzden
+ * ayrı bir tür: aynı işlemler, tamamen farklı bir "nerede duruyorum" sorusu.
+ */
+export type JournalKind = 'real' | 'prop';
+
+/**
+ * Maksimum toplam kaybın nereden ölçüldüğü.
+ *
+ * 'static'   — başlangıç bakiyesinden. Kâr ettikçe sınır uzaklaşır.
+ * 'trailing' — ulaşılan en yüksek bakiyeden. Kâr ettikçe sınır peşinden gelir,
+ *              yani kazancını geri vermek de hesabı patlatır.
+ *
+ * Aynı rakam, ikisinde bambaşka yerde durur; sormadan doğru sayı yazılamaz.
+ */
+export type DrawdownType = 'static' | 'trailing';
+
+/** Fon şirketinin dayattığı sınırlar. Hepsi para birimi cinsinden saklanır. */
+export interface PropRules {
+  profitTarget?: number;
+  maxDailyLoss?: number;
+  maxTotalLoss?: number;
+  drawdownType?: DrawdownType;
+}
+
 export interface Account {
   id: string;
   user_id?: string;
@@ -7,6 +36,9 @@ export interface Account {
   goals?: JournalGoals;
   /** Bu journal'da en son kullanılan checklist. */
   checklistId?: string | null;
+  /** Eski kayıtlarda yok; yokluğu 'real' demek. */
+  kind?: JournalKind;
+  prop?: PropRules;
 }
 
 export interface JournalGoals {
