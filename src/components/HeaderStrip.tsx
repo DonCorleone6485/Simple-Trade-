@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { SESSIONS, sessionState } from '../lib/sessions';
 import { NewsEvent } from '../lib/news';
+import { Bell } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { loadAlerts, saveAlerts, permissionState, requestPermission } from '../lib/alerts';
 
 /**
  * Başlık çubuğundaki sessiz şerit.
@@ -63,6 +65,13 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
   const [events, setEvents] = useState<NewsEvent[] | null>(null);
   const [slide, setSlide] = useState(0);
   const [visible, setVisible] = useState(true);
+  // Zil, uyarıların açık olup olmadığına göre görünüyor. Durumu her karede
+  // localStorage'dan okumak yerine bir kez alıp burada tutuyoruz.
+  const [alertsOn, setAlertsOn] = useState(() => {
+    const a = loadAlerts();
+    return a.news || a.session;
+  });
+  const [justOn, setJustOn] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000);
@@ -128,6 +137,32 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
   }, [cycle]);
 
   const fade = { opacity: visible ? 1 : 0, transition: 'opacity 0.25s ease', display: 'inline-block' } as const;
+
+  /**
+   * Keşif buradan oluyor.
+   *
+   * Uyarı anahtarları Günün Haberleri ve Seanslar sayfalarında duruyordu ve
+   * oraya girmeyen kimse böyle bir şey olduğunu anlamıyordu. Oysa kullanıcı
+   * uyarı isteyeceği anda tam da buraya bakıyor: sıradaki habere. Zil o yazının
+   * yanında duruyor ve tek dokunuşla açıyor; ince ayar iki sayfada.
+   */
+  const turnOn = async () => {
+    let state = permissionState();
+    if (state === 'default') state = await requestPermission();
+    if (state !== 'granted') return;
+    const a = loadAlerts();
+    saveAlerts({ ...a, news: true, session: true });
+    setAlertsOn(true);
+    // İzin zaten verilmişse tarayıcı hiçbir pencere açmıyor ve zil sessizce
+    // kayboluyordu — tıklayan kişi bir şey olup olmadığını anlamıyordu.
+    // Birkaç saniyelik teyit, o boşluğu kapatıyor.
+    setJustOn(true);
+    setTimeout(() => setJustOn(false), 4000);
+  };
+
+  // İzni reddetmiş kullanıcıya zil göstermek anlamsız: tıklasa da bir şey
+  // olmuyor, tarayıcı bir daha sormuyor.
+  const canOffer = !alertsOn && permissionState() !== 'denied' && permissionState() !== 'unsupported';
   const fact = sessionFacts.length ? sessionFacts[slide % sessionFacts.length] : null;
   const item = upcoming.length ? upcoming[slide % upcoming.length] : null;
   const locale = language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US';
@@ -153,6 +188,21 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
             <span className="inline-block align-bottom truncate max-w-[180px] xl:max-w-[260px]">{item.title}</span>
           </span>
         </Slot>
+      )}
+      {justOn && (
+        <span className="flex items-center gap-1.5 px-2 py-1.5 text-[11.5px] flex-shrink-0" style={{ color: '#34d399' }}>
+          <Bell className="w-3.5 h-3.5" />
+          {t('alertsOnNow')}
+        </span>
+      )}
+
+      {canOffer && (fact || item) && (
+        <button onClick={turnOn} title={t('alertsRemindMe')}
+          className="ui-pill flex items-center gap-1.5 px-2 py-1.5 rounded-lg flex-shrink-0"
+          style={{ background: 'transparent', border: '1px solid transparent', color: 'rgba(255,255,255,0.35)' }}>
+          <Bell className="w-3.5 h-3.5" />
+          <span className="text-[11.5px]">{t('alertsRemindMe')}</span>
+        </button>
       )}
     </div>
   );
