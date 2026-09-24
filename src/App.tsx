@@ -1215,7 +1215,7 @@ export default function App() {
         {/* Delete Journal Modal */}
         {accountToDelete && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="p-7 w-full max-w-md max-h-[88vh] overflow-y-auto" style={modalCard}>
+            <div className="p-7 w-full max-w-md" style={modalCard}>
               <h3 className="font-display text-[22px] mb-2" style={{ color: '#f87171', letterSpacing: '-0.01em' }}>{t('deleteAccountTitle')}</h3>
               <p className="text-sm mb-8 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{t('deleteAccountDesc')}</p>
               <div className="flex justify-end gap-2">
@@ -1234,7 +1234,11 @@ export default function App() {
         {/* New Journal Modal */}
         {showNewJournalModal && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="p-7 w-full max-w-md" style={modalCard}>
+            {/* Prop hesapta dört alan daha var. Aynı dar kutuda alt alta
+                dizilince modal ekrandan taşıyordu; kutu genişliyor ve alanlar
+                iki sütuna giriyor, böylece satır sayısı yarıya iniyor. */}
+            <div className={`p-7 w-full max-h-[88vh] overflow-y-auto ${newJournalKind === 'prop' ? 'max-w-2xl' : 'max-w-md'}`}
+              style={modalCard}>
               <h3 className="font-display text-[22px] mb-1.5" style={{ letterSpacing: '-0.01em' }}>
                 {editingJournal ? t('editJournal') : t('newJournal')}
               </h3>
@@ -1270,66 +1274,71 @@ export default function App() {
                     onFocus={e => e.target.select()}
                     style={uiInput} />
                 </div>
-                <div>
-                  <label style={uiLabel}>{t('startDate')}</label>
-                  <input type="date" value={newJournalStartDate} onChange={e => setNewJournalStartDate(e.target.value)}
-                    style={{ ...uiInput, colorScheme: 'dark' }} />
-                </div>
-                <div>
-                  <label style={uiLabel}>{t('startingCapital')}</label>
-                  <div className="relative">
-                    <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                    <input type="number" min="0" step="0.01" value={newJournalCapital} onChange={e => setNewJournalCapital(e.target.value)} placeholder="10000"
-                      className="font-mono"
-                      style={{ ...uiInput, paddingInlineStart: '30px' }} />
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label style={uiLabel}>{t('startDate')}</label>
+                    <input type="date" value={newJournalStartDate} onChange={e => setNewJournalStartDate(e.target.value)}
+                      style={{ ...uiInput, colorScheme: 'dark' }} />
+                  </div>
+                  <div>
+                    <label style={uiLabel}>{t('startingCapital')}</label>
+                    <div className="relative">
+                      <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                      <input type="number" min="0" step="0.01" value={newJournalCapital} onChange={e => setNewJournalCapital(e.target.value)} placeholder="10000"
+                        className="font-mono"
+                        style={{ ...uiInput, paddingInlineStart: '30px' }} />
+                    </div>
                   </div>
                 </div>
 
                 {/* Prop kuralları yalnızca prop hesapta sorulur. Gerçek hesapta
                     bu alanlar yok — kimse kendi parasına kâr hedefi dayatmaz. */}
                 {newJournalKind === 'prop' && (
-                  <div className="space-y-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div className="pt-4 space-y-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
                     <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.38)' }}>
                       {t('propRulesHint')}
                     </p>
-                    {([
-                      { label: t('profitTarget'), v: newPropTarget, set: setNewPropTarget, ph: '10000' },
-                      { label: t('maxDailyLoss'), v: newPropDaily, set: setNewPropDaily, ph: '5000' },
-                      { label: t('maxTotalLoss'), v: newPropTotal, set: setNewPropTotal, ph: '10000' },
-                    ]).map(f => {
-                      const cap = parseFloat(newJournalCapital);
-                      const n = parseFloat(f.v);
-                      // Şirketler kuralı yüzdeyle ilan eder, kullanıcı parayla
-                      // düşünür. İkisini birden göstermek çeviri yükünü kaldırıyor.
-                      const pct = cap > 0 && n > 0 ? `%${((n / cap) * 100).toFixed(1).replace(/\.0$/, '')}` : null;
-                      return (
-                        <div key={f.label}>
-                          <label style={uiLabel}>{f.label}</label>
-                          <div className="relative">
-                            <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
-                            <input type="number" min="0" step="0.01" value={f.v} onChange={e => f.set(e.target.value)} placeholder={f.ph}
-                              className="font-mono" style={{ ...uiInput, paddingInlineStart: '30px' }} />
-                            {pct && (
-                              <span className="absolute end-3 top-1/2 -translate-y-1/2 text-[12px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>{pct}</span>
-                            )}
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {([
+                        { label: t('profitTarget'), v: newPropTarget, set: setNewPropTarget, ph: '10000' },
+                        { label: t('maxDailyLoss'), v: newPropDaily, set: setNewPropDaily, ph: '5000' },
+                        { label: t('maxTotalLoss'), v: newPropTotal, set: setNewPropTotal, ph: '10000' },
+                      ]).map(f => {
+                        const cap = parseFloat(newJournalCapital);
+                        const n = parseFloat(f.v);
+                        // Şirketler kuralı yüzdeyle ilan eder, kullanıcı parayla
+                        // düşünür. İkisini birden göstermek yanlış rakamı anında
+                        // fark ettiriyor.
+                        const pct = cap > 0 && n > 0 ? `%${((n / cap) * 100).toFixed(1).replace(/\.0$/, '')}` : null;
+                        return (
+                          <div key={f.label}>
+                            <label style={uiLabel}>{f.label}</label>
+                            <div className="relative">
+                              <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                              <input type="number" min="0" step="0.01" value={f.v} onChange={e => f.set(e.target.value)} placeholder={f.ph}
+                                className="font-mono" style={{ ...uiInput, paddingInlineStart: '30px' }} />
+                              {pct && (
+                                <span className="absolute end-3 top-1/2 -translate-y-1/2 text-[12px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>{pct}</span>
+                              )}
+                            </div>
                           </div>
+                        );
+                      })}
+                      <div>
+                        <label style={uiLabel}>{t('drawdownType')}</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {([
+                            { k: 'static' as const, label: t('ddStatic') },
+                            { k: 'trailing' as const, label: t('ddTrailing') },
+                          ]).map(o => (
+                            <button key={o.k} type="button" onClick={() => setNewPropDD(o.k)}
+                              data-on={newPropDD === o.k}
+                              className="ui-nav text-start px-3 py-2.5 rounded-xl text-[12px] leading-snug"
+                              style={{ border: `1px solid ${newPropDD === o.k ? 'rgba(139,92,246,0.35)' : 'rgba(255,255,255,0.08)'}` }}>
+                              {o.label}
+                            </button>
+                          ))}
                         </div>
-                      );
-                    })}
-                    <div>
-                      <label style={uiLabel}>{t('drawdownType')}</label>
-                      <div className="grid grid-cols-1 gap-2">
-                        {([
-                          { k: 'static' as const, label: t('ddStatic') },
-                          { k: 'trailing' as const, label: t('ddTrailing') },
-                        ]).map(o => (
-                          <button key={o.k} type="button" onClick={() => setNewPropDD(o.k)}
-                            data-on={newPropDD === o.k}
-                            className="ui-nav text-start px-3.5 py-2.5 rounded-xl text-[13px]"
-                            style={{ border: `1px solid ${newPropDD === o.k ? 'rgba(139,92,246,0.35)' : 'rgba(255,255,255,0.08)'}` }}>
-                            {o.label}
-                          </button>
-                        ))}
                       </div>
                     </div>
                   </div>
