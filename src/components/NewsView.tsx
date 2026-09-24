@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Loader } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { NewsEvent } from '../lib/news';
+import AlertSettings from './AlertSettings';
+import { loadAlerts, AlertSettings as Settings } from '../lib/alerts';
 
 /**
  * Etki derecesi.
@@ -25,6 +27,7 @@ export default function NewsView() {
   const [events, setEvents] = useState<NewsEvent[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [onlyImportant, setOnlyImportant] = useState(true);
+  const [alerts, setAlerts] = useState<Settings>(loadAlerts);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60000);
@@ -58,6 +61,9 @@ export default function NewsView() {
 
   return (
     <div className="max-w-4xl">
+      {/* Haberleri okurken haber uyarısını açmak, ayrı bir ayarlar sayfası
+          aramaktan doğal. */}
+      <AlertSettings kind="news" settings={alerts} onChange={setAlerts} />
       <div className="flex items-center justify-end mb-6">
         <button onClick={() => setOnlyImportant(v => !v)} className="text-[13px]"
           style={{ color: onlyImportant ? '#a78bfa' : 'rgba(255,255,255,0.4)' }}>

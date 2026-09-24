@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { SESSIONS, sessionState } from '../lib/sessions';
+import AlertSettings from './AlertSettings';
+import { loadAlerts, AlertSettings as Settings } from '../lib/alerts';
 
 export default function SessionsView() {
   const { language } = useLanguage();
   const tr = (a: string, b: string) => (language === 'tr' ? a : b);
   const [now, setNow] = useState(new Date());
+  const [alerts, setAlerts] = useState<Settings>(loadAlerts);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30000);
@@ -27,6 +30,9 @@ export default function SessionsView() {
 
   return (
     <div className="max-w-4xl">
+      {/* Uyarıyı seansların yanında açmak, bir ayarlar menüsü dolaşmaktan
+          doğal: bakarken "bana haber ver" diyorsun. */}
+      <AlertSettings kind="session" settings={alerts} onChange={setAlerts} />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {SESSIONS.map(s => {
           const { weekend, open, left } = sessionState(s, now);

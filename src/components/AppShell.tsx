@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import HeaderStrip from './HeaderStrip';
+import AlertRunner from './AlertRunner';
 import { Lock } from './Logo';
 
 export type NavKey =
@@ -144,6 +145,9 @@ export default function AppShell({
 
   return (
     <div className="app-ground min-h-screen flex" style={{ color: '#fff' }} dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Hiçbir şey çizmiyor; hangi sayfada olursan ol bildirimleri o
+          çalıştırıyor. */}
+      <AlertRunner onNavigate={onNavigate} />
       {/* Masaüstü yan menü */}
       <aside className="hidden lg:block fixed inset-y-0 z-30"
         style={{ insetInlineStart: 0, borderInlineEnd: '1px solid rgba(255,255,255,0.05)' }}>
