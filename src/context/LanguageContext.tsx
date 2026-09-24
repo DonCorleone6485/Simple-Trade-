@@ -65,6 +65,7 @@ export const translations: Translations = {
   alertInMinutes: { tr: "{n} dakika sonra", en: "in {n} minutes", fa: "{n} دقیقه دیگر", ar: "بعد {n} دقيقة", ru: "через {n} мин.", es: "en {n} minutos", pt: "daqui a {n} minutos", de: "in {n} Minuten", fr: "dans {n} minutes" },
   minutesShort: { tr: "dk", en: "min", fa: "دقیقه", ar: "دقيقة", ru: "мин", es: "min", pt: "min", de: "Min", fr: "min" },
   hourShort: { tr: "sa", en: "h", fa: "ساعت", ar: "ساعة", ru: "ч", es: "h", pt: "h", de: "Std", fr: "h" },
+  stripTomorrow: { tr: "Yarın", en: "Tomorrow", fa: "فردا", ar: "غداً", ru: "Завтра", es: "Mañana", pt: "Amanhã", de: "Morgen", fr: "Demain" },
   stripSession: { tr: "Seans", en: "Session", fa: "جلسه", ar: "الجلسة", ru: "Сессия", es: "Sesión", pt: "Sessão", de: "Session", fr: "Séance" },
   stripNext: { tr: "Sıradaki", en: "Next", fa: "بعدی", ar: "التالي", ru: "Далее", es: "Siguiente", pt: "Seguinte", de: "Nächste", fr: "Suivant" },
   journalKind: { tr: 'Journal Türü', en: 'Journal Type', fa: 'نوع ژورنال', ar: 'نوع السجل', ru: 'Тип журнала', es: 'Tipo de diario', pt: 'Tipo de diário', de: 'Journal-Typ', fr: 'Type de journal' },

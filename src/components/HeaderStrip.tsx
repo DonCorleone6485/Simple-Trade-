@@ -111,18 +111,27 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
       })),
   ];
 
-  // ── Bugünün kalan önemli haberleri ──
+  const locale = language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US';
+
+  // ── Sıradaki önemli haberler ──
+  //
+  // Önce yalnızca BUGÜNÜN kalanları gösteriliyordu ve günün son haberi
+  // geçtiği anda yuva kayboluyordu — akşam boyunca şerit yarı boş kalıyordu,
+  // oysa yarın sabah için gösterilecek bir şey vardı. Artık gün sınırına
+  // bakmıyoruz: sıradaki üç olay hangi güne düşüyorsa o.
   const upcoming = (events || [])
-    .filter(e => {
-      const d = new Date(e.date);
-      return (
-        (e.impact === 'High' || e.impact === 'Medium') &&
-        d.getTime() > now.getTime() &&
-        d.toDateString() === now.toDateString()
-      );
-    })
+    .filter(e => (e.impact === 'High' || e.impact === 'Medium') && new Date(e.date).getTime() > now.getTime())
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 3);
+
+  /** Bugün değilse hangi gün olduğu yazılıyor; yoksa "12:15" yanıltıcı olur. */
+  const dayPrefix = (d: Date): string => {
+    if (d.toDateString() === now.toDateString()) return '';
+    const t1 = new Date(now);
+    t1.setDate(t1.getDate() + 1);
+    if (d.toDateString() === t1.toDateString()) return `${t('stripTomorrow')} `;
+    return `${d.toLocaleDateString(locale, { weekday: 'short' })} `;
+  };
 
   // İki yuva tek sayaçla dönüyor: ayrı ayrı dönselerdi şerit sürekli bir
   // yerinden kıpırdıyor olurdu. Birlikte değişince göz bir kez bakıp geçiyor.
@@ -165,7 +174,6 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
   const canOffer = !alertsOn && permissionState() !== 'denied' && permissionState() !== 'unsupported';
   const fact = sessionFacts.length ? sessionFacts[slide % sessionFacts.length] : null;
   const item = upcoming.length ? upcoming[slide % upcoming.length] : null;
-  const locale = language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US';
 
   return (
     // Dar ekranda tamamen gizleniyor: başlıkla çakışmaktansa hiç görünmesin.
@@ -181,6 +189,7 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
         <Slot dot={IMPACT_COLOR[item.impact] || 'rgba(255,255,255,0.25)'}
           label={t('stripNext')} onClick={onOpenNews}>
           <span style={fade}>
+            {dayPrefix(new Date(item.date))}
             {new Date(item.date).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
             {' · '}
             {/* Uzun haber adları başlığı itiyordu; ekranda kalan yere göre
