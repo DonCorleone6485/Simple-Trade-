@@ -330,13 +330,17 @@ export default async function handler(req: any, res: any) {
       if (prior.closed) continue;
 
       if (stillOpen) {
-        // Hâlâ açık: stop taşınmış ya da hedef değişmiş olabilir. Stop'un
-        // bugünkü yeri terminalde durur, o yüzden onu tazeliyoruz.
+        // Hâlâ açık: stop taşınmış, hedef değişmiş ya da lot eklenmiş olabilir.
+        //
+        // Pozisyon yaşarken terminal tek doğru kaynaktır ve stop ile risk BİRLİKTE
+        // gider: stop'u başa başa çekip riski eski tutarında bırakmak, ekranda
+        // birbirini yalanlayan iki sayı demek olurdu. Kapandıktan sonra bu
+        // alanlara bir daha dokunmuyoruz.
         const patch: any = { date };
         if (openPrice > 0) patch.entry_price = openPrice;
         if (sl > 0) patch.stop_loss = sl;
         if (rr) patch.rr = rr;
-        if (!(Number(prior.risk) > 0) && risk > 0) patch.risk = risk;
+        if (risk > 0) patch.risk = risk;
         const { error } = await supabase.from('trades').update(patch).eq('id', prior.id);
         if (!error) refreshed++;
       } else {
