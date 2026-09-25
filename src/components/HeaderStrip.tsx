@@ -107,15 +107,25 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+  // İzni reddetmiş kullanıcıya zil göstermek anlamsız: tıklasa da bir şey
+  // olmuyor, tarayıcı bir daha sormuyor.
+  const canOffer = !alertsOn && permissionState() !== 'denied' && permissionState() !== 'unsupported';
+
   // Journal ekranında düğmeler çok: 1140 piksellik başlık çubuğunda şeride
   // yalnızca ~350 piksel kalıyor, iki yuva oraya sığmıyor. Orada tek yuva
   // gösterip iki bilgiyi sırayla geçiriyoruz — böylece dar ekranda haber
   // büsbütün kaybolmuyor.
-  const showBoth = width >= 430;
-  const showAny = width >= 170;
+  //
+  // "Bana hatırlat" zili de bu bütçenin içinde. Hesaba katmayınca en sonda
+  // duruyor ve kırpılıyordu: kullanıcının ekranında "Bana hat" diye yarıda
+  // kalmıştı.
+  const BELL_W = 108;
+  const usable = width - (canOffer ? BELL_W : 0);
+  const showBoth = usable >= 430;
+  const showAny = usable >= 170;
   // Nokta, etiket, boşluklar ve düğme dolgusu ~110 piksel; kalanı yazıya.
   // İki yuva birden varsa alan ikiye bölünüyor.
-  const textRoom = Math.max(60, Math.floor(width / (showBoth ? 2 : 1)) - 110);
+  const textRoom = Math.max(60, Math.floor(usable / (showBoth ? 2 : 1)) - 110);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000);
@@ -216,9 +226,6 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
     setTimeout(() => setJustOn(false), 4000);
   };
 
-  // İzni reddetmiş kullanıcıya zil göstermek anlamsız: tıklasa da bir şey
-  // olmuyor, tarayıcı bir daha sormuyor.
-  const canOffer = !alertsOn && permissionState() !== 'denied' && permissionState() !== 'unsupported';
   const fact = sessionFacts.length ? sessionFacts[slide % sessionFacts.length] : null;
   const item = upcoming.length ? upcoming[slide % upcoming.length] : null;
   /**
@@ -258,7 +265,7 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
         </span>
       )}
 
-      {canOffer && (fact || item) && (
+      {canOffer && showAny && (fact || item) && (
         <button onClick={turnOn} title={t('alertsRemindMe')}
           className="ui-pill flex items-center gap-1.5 px-2 py-1.5 rounded-lg flex-shrink-0"
           style={{ background: 'transparent', border: '1px solid transparent', color: 'rgba(255,255,255,0.35)' }}>
