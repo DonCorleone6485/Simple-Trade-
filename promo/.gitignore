@@ -1,0 +1,5 @@
+node_modules/
+out/
+# Sentezlenen sesler: `npm run sounds` ile yeniden üretiliyor.
+public/music/
+public/sfx/

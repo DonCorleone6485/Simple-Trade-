@@ -1,0 +1,16 @@
+import React from 'react';
+import { Composition } from 'remotion';
+import { Ayna } from './Ayna';
+import { Fis } from './Fis';
+import { Hic } from './Hic';
+import { Mac } from './Mac';
+import { AYNA, FIS, HIC, MAC, FPS } from './cues';
+
+export const Root: React.FC = () => (
+  <>
+    <Composition id="Ayna" component={Ayna} width={1080} height={1920} fps={FPS} durationInFrames={AYNA.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="Fis" component={Fis} width={1080} height={1920} fps={FPS} durationInFrames={FIS.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="Hic" component={Hic} width={1080} height={1920} fps={FPS} durationInFrames={HIC.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="Mac" component={Mac} width={1920} height={1080} fps={FPS} durationInFrames={MAC.duration * FPS} defaultProps={{ music: true }} />
+  </>
+);

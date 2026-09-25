@@ -1,0 +1,32 @@
+import { loadFont as loadInter } from '@remotion/google-fonts/Inter';
+import { loadFont as loadMono } from '@remotion/google-fonts/JetBrainsMono';
+import { loadFont as loadSerif } from '@remotion/google-fonts/Newsreader';
+
+/**
+ * Sitenin görsel dili — src/index.css ile aynı. Türkçe harfler (ı, ş, ğ, İ)
+ * latin-ext alt kümesinde; o yüklenmezse harfler yedek fonta düşer ve aynı
+ * kelimenin içinde iki ayrı yazı tipi görünür.
+ */
+export const sans = loadInter('normal', { weights: ['400', '500', '600'], subsets: ['latin', 'latin-ext'] }).fontFamily;
+export const mono = loadMono('normal', { weights: ['400', '500'], subsets: ['latin', 'latin-ext'] }).fontFamily;
+export const serif = loadSerif('normal', { weights: ['400', '500'], subsets: ['latin', 'latin-ext'] }).fontFamily;
+
+export const C = {
+  bg: '#050507',
+  text: '#F4F4F6',
+  dim: 'rgba(255,255,255,0.45)',
+  faint: 'rgba(255,255,255,0.26)',
+  line: 'rgba(255,255,255,0.08)',
+  purple: '#8b5cf6',
+  lilac: '#a78bfa',
+  gold: '#f0b429',
+  red: '#f87171',
+  green: '#34d399',
+  amber: '#fbbf24',
+};
+
+/** Sitedeki tutar yazımı: "−$1,380" — tipografik eksi, binlik virgül. */
+export const signed = (v: number) =>
+  `${v >= 0 ? '+' : '−'}$${Math.abs(Math.round(v)).toLocaleString('en-US')}`;
+export const money = (v: number, d = 0) =>
+  `$${Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}`;
