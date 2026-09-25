@@ -116,16 +116,36 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
   // gösterip iki bilgiyi sırayla geçiriyoruz — böylece dar ekranda haber
   // büsbütün kaybolmuyor.
   //
-  // "Bana hatırlat" zili de bu bütçenin içinde. Hesaba katmayınca en sonda
-  // duruyor ve kırpılıyordu: kullanıcının ekranında "Bana hat" diye yarıda
-  // kalmıştı.
+  // Sıralama önemli: ÖNCE bilgi yerleşiyor, zil ancak artan yere giriyor.
+  //
+  // Tersi de denendi ve yanlıştı: zil yer kapınca seans ya da haber yuvası
+  // düşüyordu. Oysa zil bir kerelik bir teklif — tıklandığı an kalıcı olarak
+  // kayboluyor — bilgi ise her gün lazım. Bir kerelik teklifin her gün
+  // gereken şeyin önüne geçmesi doğru değil.
+  //
+  // Zil sığmazsa kaybolmuyor: anahtarlar Seanslar ve Günün Haberleri
+  // sayfalarında zaten duruyor.
+  // Zil iki boyda olabiliyor: yazılı ve yalnız simge. Bilgiye öncelik verince
+  // yazılı hâli çoğu ekranda sığmıyordu ve zil büsbütün kayboluyordu — oysa
+  // teklifin görünmesi bu özelliğin keşfedilmesinin tek yolu. Yazı sığmazsa
+  // simge kalıyor; ipucu balonu ne olduğunu söylüyor.
   const BELL_W = 108;
-  const usable = width - (canOffer ? BELL_W : 0);
-  const showBoth = usable >= 430;
-  const showAny = usable >= 170;
+  const BELL_ICON_W = 38;
+  const showBoth = width >= 430;
+  const showAny = width >= 170;
+  // Zilin eşiği, yuvanın en az sığdığı genişlik değil RAHAT sığdığı genişlik.
+  // 170'te yuva görünüyor ama yazısı kesiliyordu: "New York · açılış…" —
+  // yani tam da okunmak istenen sayı gidiyordu. Zil ancak yuva yazısını
+  // bozmadan sığabildiğinde giriyor.
+  const SLOT_COMFORT = 260;
+  const slotsNeed = showBoth ? 430 : showAny ? SLOT_COMFORT : 0;
+  const bellRoom = canOffer && showAny ? width - slotsNeed : 0;
+  const bellLabel = bellRoom >= BELL_W;
+  const showBell = bellRoom >= BELL_ICON_W;
   // Nokta, etiket, boşluklar ve düğme dolgusu ~110 piksel; kalanı yazıya.
   // İki yuva birden varsa alan ikiye bölünüyor.
-  const textRoom = Math.max(60, Math.floor(usable / (showBoth ? 2 : 1)) - 110);
+  const forText = width - (showBell ? (bellLabel ? BELL_W : BELL_ICON_W) : 0);
+  const textRoom = Math.max(60, Math.floor(forText / (showBoth ? 2 : 1)) - 110);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000);
@@ -265,12 +285,12 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
         </span>
       )}
 
-      {canOffer && showAny && (fact || item) && (
+      {showBell && (fact || item) && (
         <button onClick={turnOn} title={t('alertsRemindMe')}
           className="ui-pill flex items-center gap-1.5 px-2 py-1.5 rounded-lg flex-shrink-0"
           style={{ background: 'transparent', border: '1px solid transparent', color: 'rgba(255,255,255,0.35)' }}>
           <Bell className="w-3.5 h-3.5" />
-          <span className="text-[11.5px]">{t('alertsRemindMe')}</span>
+          {bellLabel && <span className="text-[11.5px]">{t('alertsRemindMe')}</span>}
         </button>
       )}
     </div>
