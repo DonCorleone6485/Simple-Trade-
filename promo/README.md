@@ -23,6 +23,13 @@ scripts/finish.sh out/ayna_raw.mp4 out/ayna.mp4 -14   # ses: −14 LUFS
 Müziksiz versiyon (Instagram/TikTok'ta uygulamanın içinden ses eklemek için):
 `--props='{"music":false}'`, ardından `finish.sh ... -18`.
 
+## Görseller
+
+`public/img/` içindeki üç boksör karesi Higgsfield'de Nano Banana Pro ile
+üretildi (kare başına 2 kredi); ikisi ilk karenin referansıyla, yüz aynı kalsın
+diye. Sesler gibi bedavaya yeniden üretilemedikleri için depoda duruyorlar.
+Hareketi (yakınlaşma, kayma) `Mac.tsx` içindeki `Still` veriyor.
+
 ## Kurallar
 
 - **Zamanlama tek yerde:** `src/cues.ts`. Görüntü de müzik de oradan okuyor;

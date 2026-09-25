@@ -1,5 +1,5 @@
 import React from 'react';
-import { AbsoluteFill, Html5Audio, interpolate, staticFile, useCurrentFrame, useVideoConfig, Easing } from 'remotion';
+import { AbsoluteFill, Html5Audio, Img, interpolate, staticFile, useCurrentFrame, useVideoConfig, Easing } from 'remotion';
 import { MAC } from './cues';
 import { C, mono, sans, serif, signed, money } from './theme';
 import {
@@ -424,24 +424,34 @@ function ClipCalendar({ c }: { c: typeof MAC.clips[number] }) {
   );
 }
 
-// ─── Açılış görüntüsü ─────────────────────────────────────────────────────
+// ─── Boksör kareleri ──────────────────────────────────────────────────────
 
-const INTRO = candlesFrom(Array.from({ length: 140 }, (_, i) => 4300 + Math.sin(i / 9) * 7 + Math.sin(i / 3.3) * 2.5 + i * 0.05), 11, 2.2);
-
-function IntroFootage() {
+/**
+ * Durağan bir kareyi sahneye çevirir: yavaş bir kamera hareketi (yakınlaşma
+ * ve kayma). Kareler yapay zekâyla üretildi (Higgsfield, Nano Banana Pro);
+ * hareketi kod veriyor. Gerçek video çekimi kredi istiyordu, bu yol istemiyor.
+ */
+function Still({ src, from, to, s0, s1, o0, o1, opacity = 1, fadeIn = 0.6, fadeOut = 0.4 }: {
+  src: string; from: number; to: number; s0: number; s1: number;
+  o0: [number, number]; o1: [number, number]; opacity?: number; fadeIn?: number; fadeOut?: number;
+}) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
-  const shift = (tapeTime(t) - (14 * 3600 + 2 * 60)) * 60;
+  const p = interpolate(t, [from, to], [0, 1], { ...clamp, easing: Easing.inOut(Easing.sin) });
+  const sc = s0 + (s1 - s0) * p;
+  const ox = o0[0] + (o1[0] - o0[0]) * p;
+  const oy = o0[1] + (o1[1] - o0[1]) * p;
+  const fi = Math.max(0.01, fadeIn), fo = Math.max(0.01, fadeOut);
+  const a = interpolate(t, [from, from + fi, to - fo, to], [0, 1, 1, 0], clamp) * opacity;
   return (
-    <AbsoluteFill style={{ opacity: 0.55 }}>
-      <div style={{ position: 'absolute', left: 120 - (shift % 1400) - 200, top: 200 }}>
-        <CandleChart candles={INTRO} w={4200} h={680} lo={4285} hi={4318} />
-      </div>
-      <AbsoluteFill style={{ background: 'linear-gradient(90deg, #050507 0%, transparent 20%, transparent 80%, #050507 100%)' }} />
+    <AbsoluteFill style={{ opacity: a, overflow: 'hidden' }}>
+      <Img src={staticFile(src)} style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${sc})`, transformOrigin: `${ox}% ${oy}%` }} />
     </AbsoluteFill>
   );
 }
+
+// ─── Açılış görüntüsü ─────────────────────────────────────────────────────
 
 /** Kaset takılırken ekrandaki kar. */
 function Snow() {
@@ -665,7 +675,7 @@ function WeekCompare() {
       <Words text="Üç hafta sonra." start={s + 0.05} size={84} stagger={0.1} />
       <div style={{ height: 60 }} />
       <div style={{ opacity: useProgress(s + 0.5, s + 0.9) }}>
-        <Card style={{ width: 1300, display: 'flex', flexDirection: 'column', gap: 44, padding: '44px 54px' }}>
+        <Card style={{ width: 1300, display: 'flex', flexDirection: 'column', gap: 44, padding: '44px 54px', background: 'rgba(12,12,16,0.74)', backdropFilter: 'blur(16px)' }}>
           <Bar label="Kurala uyan işlemler" pnl={1860} n={31} color={C.green} max={1860} />
           <Bar label="İşaretlenen işlemler" pnl={-120} n={2} color={C.red} max={1860} />
         </Card>
@@ -704,7 +714,11 @@ export function Mac({ music = true }: { music?: boolean }) {
       <Window from={0} to={MAC.stop + 0.8}>
         <CrtOff>
           <Footage>
-            <Window from={MAC.rewind} to={K1.start}><IntroFootage /></Window>
+            {/* Açılış: karanlık salonda kaybettiği maçı izleyen boksör. Kamera
+                "Her maçtan sonra…"da geniş, "Kaseti açarlar"da televizyona yaklaşmış. */}
+            <Window from={MAC.rewind} to={K1.start}>
+              <Still src="img/boxer_tv.jpg" from={MAC.rewind} to={K1.start} s0={1.04} s1={1.55} o0={[46, 52]} o1={[63, 41]} fadeIn={0.25} fadeOut={0.3} />
+            </Window>
             <Window from={K1.start} to={K1.end}>
               <ClipTradeDetail c={K1} />
               <DrawCircle cx={1278} cy={512} rx={205} ry={80} at={K1.draw} />
@@ -738,6 +752,12 @@ export function Mac({ music = true }: { music?: boolean }) {
       </Window>
 
       {/* ── Dönüş ── */}
+      {/* Kaset kapanınca: boksörün bakışı. Önce tek başına, sonra cümle
+          gelirken geri çekiliyor; "Amatörler"de sert bir kesmeyle siyaha. */}
+      <Window from={MAC.stop + 0.6} to={MAC.champ2}>
+        <Still src="img/boxer_eyes.jpg" from={MAC.stop + 0.6} to={MAC.champ2} s0={1.0} s1={1.14} o0={[52, 46]} o1={[50, 44]} fadeIn={0.5} fadeOut={0.01} />
+        <AbsoluteFill style={{ background: `rgba(5,5,7,${interpolate(t, [MAC.champ1 - 0.1, MAC.champ1 + 0.5], [0.1, 0.66], clamp)})` }} />
+      </Window>
       <Window from={MAC.champ1} to={MAC.montage}>
         <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', transform: `translate(${shake}px, ${shake * 0.4}px)`, opacity: interpolate(t, [MAC.montage - 0.35, MAC.montage], [1, 0], clamp) }}>
           <div style={{ opacity: champDim }}>
@@ -764,6 +784,13 @@ export function Mac({ music = true }: { music?: boolean }) {
         </Window>
       ))}
 
+      {/* Üç hafta sonra: aynı boksör, bu kez ringe yürüyor. Önce bir an tam
+          parlaklıkta — hikâyenin karşılığı — sonra karta yer açmak için
+          kararıyor; logonun arkasında da çok hafif kalıyor. */}
+      <Window from={MAC.week} to={MAC.duration}>
+        <Still src="img/boxer_ring.jpg" from={MAC.week} to={MAC.duration} s0={1.0} s1={1.2} o0={[50, 44]} o1={[50, 40]} fadeIn={0.35} fadeOut={1.2} />
+        <AbsoluteFill style={{ background: `rgba(5,5,7,${interpolate(t, [MAC.week + 0.7, MAC.week + 1.2, MAC.end - 0.3, MAC.end + 0.4], [0.08, 0.64, 0.64, 0.86], clamp)})` }} />
+      </Window>
       <Window from={MAC.week} to={MAC.end}>
         <WeekCompare />
       </Window>
