@@ -180,7 +180,9 @@ export default function AppShell({
 
             {/* Başlıkla düğmeler arasındaki boşluk boş duruyordu. Sürekli
                 değişen ve bakmadan bilinemeyen iki bilgi oraya yerleşti. */}
-            <div className="flex-1 min-w-0 flex justify-center">
+            {/* overflow-hidden şart: şerit daralamadığında içerik sağdaki
+                düğmelerin üstüne taşıyor ve yazılar iç içe giriyordu. */}
+            <div className="flex-1 min-w-0 overflow-hidden flex justify-center">
               <HeaderStrip onOpenSessions={() => onNavigate('sessions')} onOpenNews={() => onNavigate('news')} />
             </div>
 

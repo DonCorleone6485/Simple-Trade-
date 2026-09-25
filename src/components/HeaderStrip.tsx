@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { SESSIONS, sessionState } from '../lib/sessions';
 import { NewsEvent } from '../lib/news';
 import { Bell } from 'lucide-react';
@@ -42,16 +42,24 @@ const IMPACT_COLOR: Record<string, string> = {
   Medium: '#fbbf24',
 };
 
-function Slot({ dot, label, children, onClick }: {
+function Slot({ dot, label, children, onClick, maxText }: {
   dot: string; label: string; children: React.ReactNode; onClick: () => void;
+  /** Yazının sığabileceği piksel — ölçülen alandan hesaplanıyor. */
+  maxText?: number;
 }) {
   return (
     <button onClick={onClick}
-      className="ui-pill flex items-center gap-2 px-2.5 py-1.5 rounded-lg whitespace-nowrap"
+      className="ui-pill flex items-center gap-2 px-2.5 py-1.5 rounded-lg flex-shrink-0"
       style={{ background: 'transparent', border: '1px solid transparent' }}>
       <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: dot }} />
-      <span className="text-[9.5px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.3)' }}>{label}</span>
-      <span className="text-[12.5px]" style={{ color: 'rgba(255,255,255,0.62)' }}>{children}</span>
+      <span className="text-[9.5px] uppercase tracking-[0.12em] flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }}>{label}</span>
+      {/* Genişliği esnek kutu pazarlığına bırakmak yerine açıkça veriyoruz:
+          iç içe span'lerde üç nokta bir türlü çıkmıyor, yazı kabın kenarından
+          kesiliyordu. Ölçülen alandan hesaplanan piksel sınırı kesin çalışıyor. */}
+      <span className="text-[12.5px] block overflow-hidden text-ellipsis whitespace-nowrap"
+        style={{ color: 'rgba(255,255,255,0.62)', maxWidth: maxText ? `${maxText}px` : undefined }}>
+        {children}
+      </span>
     </button>
   );
 }
@@ -72,6 +80,42 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
     return a.news || a.session;
   });
   const [justOn, setJustOn] = useState(false);
+
+  /**
+   * Şeride KALAN alan.
+   *
+   * Yan taraftaki düğme sayısı ekrandan ekrana ve sayfadan sayfaya değişiyor
+   * (journal ekranında dört düğme var, journal listesinde iki), o yüzden sabit
+   * bir kırılma noktası tutmuyor. Kalan yeri ölçüp ona göre karar veriyoruz:
+   * yer yoksa haber yuvası tamamen gizleniyor. Yarıda kesilmiş bir saat
+   * ("17:0") hiç göstermemekten kötü.
+   *
+   * w-full şart: ölçtüğümüz şey içeriğin genişliği değil, kaba KALAN alan
+   * olmalı. Aksi hâlde haber gizlenince şerit daralıyor, daraldığı için bir
+   * daha asla yer açılmıyor ve haber bir kez kaybolduktan sonra geri
+   * gelmiyordu.
+   */
+  const box = useRef<HTMLDivElement>(null);
+  // Sıfırdan başlıyoruz: ölçüm gelene kadar hiçbir şey çizilmesin. Geniş bir
+  // değerle başlasaydık ilk karede iki yuva birden çizilip düğmelerin üstüne
+  // taşardı — kullanıcının gördüğü o anlık karışıklık.
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(([e]) => setWidth(e.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  // Journal ekranında düğmeler çok: 1140 piksellik başlık çubuğunda şeride
+  // yalnızca ~350 piksel kalıyor, iki yuva oraya sığmıyor. Orada tek yuva
+  // gösterip iki bilgiyi sırayla geçiriyoruz — böylece dar ekranda haber
+  // büsbütün kaybolmuyor.
+  const showBoth = width >= 430;
+  const showAny = width >= 170;
+  // Nokta, etiket, boşluklar ve düğme dolgusu ~110 piksel; kalanı yazıya.
+  // İki yuva birden varsa alan ikiye bölünüyor.
+  const textRoom = Math.max(60, Math.floor(width / (showBoth ? 2 : 1)) - 110);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000);
@@ -145,7 +189,10 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
     return () => clearInterval(id);
   }, [cycle]);
 
-  const fade = { opacity: visible ? 1 : 0, transition: 'opacity 0.25s ease', display: 'inline-block' } as const;
+  // display'i satır içinde 'inline-block' vermek üç noktayı öldürüyordu:
+  // satır içi stil sınıfı yeniyor, öğe içeriği kadar genişleyip kabın
+  // kenarından kesiliyordu. Blok olarak kalmalı ki kısaltma çalışsın.
+  const fade = { opacity: visible ? 1 : 0, transition: 'opacity 0.25s ease' } as const;
 
   /**
    * Keşif buradan oluyor.
@@ -174,27 +221,33 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
   const canOffer = !alertsOn && permissionState() !== 'denied' && permissionState() !== 'unsupported';
   const fact = sessionFacts.length ? sessionFacts[slide % sessionFacts.length] : null;
   const item = upcoming.length ? upcoming[slide % upcoming.length] : null;
+  /**
+   * Dar alanda tek yuva var ve iki bilgi onu sırayla paylaşıyor.
+   * Yalnızca biri varsa sıra hep onda kalıyor — boş yuva göstermiyoruz.
+   */
+  const soloIsSession = !item ? true : !fact ? false : slide % 2 === 0;
 
   return (
     // Dar ekranda tamamen gizleniyor: başlıkla çakışmaktansa hiç görünmesin.
-    <div className="hidden lg:flex items-center gap-1 min-w-0">
-      {fact && (
+    <div ref={box} className="hidden lg:flex items-center justify-center gap-1 w-full min-w-0 overflow-hidden">
+      {fact && showAny && (!showBoth ? soloIsSession : true) && (
         <Slot dot={fact.open ? '#34d399' : 'rgba(255,255,255,0.28)'}
-          label={t('stripSession')} onClick={onOpenSessions}>
-          <span style={fade}>{fact.text}</span>
+          label={t('stripSession')} onClick={onOpenSessions} maxText={textRoom}>
+          <span style={fade} className="truncate">{fact.text}</span>
         </Slot>
       )}
 
-      {item && (
+      {item && showAny && (!showBoth ? !soloIsSession : true) && (
         <Slot dot={IMPACT_COLOR[item.impact] || 'rgba(255,255,255,0.25)'}
-          label={t('stripNext')} onClick={onOpenNews}>
-          <span style={fade}>
+          label={t('stripNext')} onClick={onOpenNews} maxText={textRoom}>
+          {/* Sabit bir genişlikle kesmek yerine kalan yere göre kısalıyor:
+              düğme sayısı ekrandan ekrana değiştiği için sabit ölçü tutmuyordu.
+              Tamamı, tıklayınca açılan sayfada duruyor. */}
+          <span style={fade} className="truncate">
             {dayPrefix(new Date(item.date))}
             {new Date(item.date).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
             {' · '}
-            {/* Uzun haber adları başlığı itiyordu; ekranda kalan yere göre
-                kısalıyor, tamamı tıklayınca açılan sayfada duruyor. */}
-            <span className="inline-block align-bottom truncate max-w-[180px] xl:max-w-[260px]">{item.title}</span>
+            {item.title}
           </span>
         </Slot>
       )}
