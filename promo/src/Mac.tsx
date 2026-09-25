@@ -1,5 +1,5 @@
 import React from 'react';
-import { AbsoluteFill, Html5Audio, Img, interpolate, staticFile, useCurrentFrame, useVideoConfig, Easing } from 'remotion';
+import { AbsoluteFill, Html5Audio, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame, useVideoConfig, Easing } from 'remotion';
 import { MAC } from './cues';
 import { C, mono, sans, serif, signed, money } from './theme';
 import {
@@ -451,6 +451,28 @@ function Still({ src, from, to, s0, s1, o0, o1, opacity = 1, fadeIn = 0.6, fadeO
   );
 }
 
+/**
+ * Hareketli çekim (Higgsfield, Kling 3.0): boksör karelerinden üretildi, o
+ * yüzden yüz aynı kalıyor. Sesi kapalı — sesi müzik motoru veriyor.
+ * `rate` 1'den küçükse ağır çekim: 5 saniyelik çekim daha uzun sahneye yayılıyor.
+ */
+function Clip({ src, from, to, rate = 1, fadeIn = 0.3, fadeOut = 0.3, scale = 1.02 }: {
+  src: string; from: number; to: number; rate?: number; fadeIn?: number; fadeOut?: number; scale?: number;
+}) {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const a = interpolate(t, [from, from + Math.max(0.01, fadeIn), to - Math.max(0.01, fadeOut), to], [0, 1, 1, 0], clamp);
+  return (
+    <Sequence from={Math.round(from * fps)} durationInFrames={Math.round((to - from) * fps)} layout="none">
+      <AbsoluteFill style={{ opacity: a, overflow: 'hidden' }}>
+        <OffthreadVideo src={staticFile(src)} muted playbackRate={rate}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${scale})` }} />
+      </AbsoluteFill>
+    </Sequence>
+  );
+}
+
 // ─── Açılış görüntüsü ─────────────────────────────────────────────────────
 
 /** Kaset takılırken ekrandaki kar. */
@@ -717,7 +739,9 @@ export function Mac({ music = true }: { music?: boolean }) {
             {/* Açılış: karanlık salonda kaybettiği maçı izleyen boksör. Kamera
                 "Her maçtan sonra…"da geniş, "Kaseti açarlar"da televizyona yaklaşmış. */}
             <Window from={MAC.rewind} to={K1.start}>
-              <Still src="img/boxer_tv.jpg" from={MAC.rewind} to={K1.start} s0={1.04} s1={1.55} o0={[46, 52]} o1={[63, 41]} fadeIn={0.25} fadeOut={0.3} />
+              <Clip src="clips/boxer_tv.mp4" from={MAC.rewind} to={MAC.sub2 + 0.05} fadeIn={0.25} fadeOut={0.15} />
+              {/* "Kaseti açarlar": aynı an, başka bir salon — gece journal'ını açan trader. */}
+              <Clip src="clips/trader_night.mp4" from={MAC.sub2 - 0.1} to={K1.start} fadeIn={0.15} fadeOut={0.3} />
             </Window>
             <Window from={K1.start} to={K1.end}>
               <ClipTradeDetail c={K1} />
@@ -755,7 +779,7 @@ export function Mac({ music = true }: { music?: boolean }) {
       {/* Kaset kapanınca: boksörün bakışı. Önce tek başına, sonra cümle
           gelirken geri çekiliyor; "Amatörler"de sert bir kesmeyle siyaha. */}
       <Window from={MAC.stop + 0.6} to={MAC.champ2}>
-        <Still src="img/boxer_eyes.jpg" from={MAC.stop + 0.6} to={MAC.champ2} s0={1.0} s1={1.14} o0={[52, 46]} o1={[50, 44]} fadeIn={0.5} fadeOut={0.01} />
+        <Clip src="clips/boxer_eyes.mp4" from={MAC.stop + 0.6} to={MAC.champ2} rate={0.97} fadeIn={0.5} fadeOut={0.01} />
         <AbsoluteFill style={{ background: `rgba(5,5,7,${interpolate(t, [MAC.champ1 - 0.1, MAC.champ1 + 0.5], [0.1, 0.66], clamp)})` }} />
       </Window>
       <Window from={MAC.champ1} to={MAC.montage}>
@@ -788,7 +812,8 @@ export function Mac({ music = true }: { music?: boolean }) {
           parlaklıkta — hikâyenin karşılığı — sonra karta yer açmak için
           kararıyor; logonun arkasında da çok hafif kalıyor. */}
       <Window from={MAC.week} to={MAC.duration}>
-        <Still src="img/boxer_ring.jpg" from={MAC.week} to={MAC.duration} s0={1.0} s1={1.2} o0={[50, 44]} o1={[50, 40]} fadeIn={0.35} fadeOut={1.2} />
+        {/* Ağır çekim: beş saniyelik yürüyüş, karşılaştırma ve kapanış boyunca sürüyor. */}
+        <Clip src="clips/boxer_ring.mp4" from={MAC.week} to={MAC.duration} rate={0.5} fadeIn={0.35} fadeOut={1.2} />
         <AbsoluteFill style={{ background: `rgba(5,5,7,${interpolate(t, [MAC.week + 0.7, MAC.week + 1.2, MAC.end - 0.3, MAC.end + 0.4], [0.08, 0.64, 0.64, 0.86], clamp)})` }} />
       </Window>
       <Window from={MAC.week} to={MAC.end}>
