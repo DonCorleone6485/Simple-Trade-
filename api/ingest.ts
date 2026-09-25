@@ -79,6 +79,84 @@ function resultOf(net: number, type: 'Buy' | 'Sell', close: number, sl: number, 
   return (sl > 0 || tp > 0) && close > 0 ? 'Manuel Karda' : 'Başarılı';
 }
 
+/**
+ * ELLE GİRİLEN AÇIK İŞLEMİ TAMAMLAMAK
+ *
+ * Kullanıcı pozisyonu MetaTrader'da açtıktan sonra journal'a "işlem öncesi"
+ * olarak girebiliyor: sonuç boş, notlar ve fotoğraflar dolu. Pozisyon kapanınca
+ * EA aynı işlemi getiriyor ve o zamana kadar bu ikinci bir satır olarak
+ * ekleniyordu — kullanıcının yazdığı her şey bir kenarda, gerçek sonuç
+ * başka bir kenarda kalıyordu.
+ *
+ * Artık EA'nın getirdiği işlem, önce bekleyen açık kayıtla eşleştirilmeye
+ * çalışılıyor; eşleşirse o satır DOLDURULUYOR, yeni satır açılmıyor.
+ *
+ * Eşleşmenin ölçütü ne olabilir: elle girilen kaydın platform numarası yok,
+ * yani kesin kimlik yok. Elimizde sembol, yön, giriş fiyatı ve zaman var.
+ * Ayırt edici olan fiyattır — kullanıcı fiyatı MetaTrader'dan kopyalıyor.
+ * Fiyat yazılmamışsa sembol + yön + zaman penceresi ile yetiniyoruz.
+ *
+ * Yanlış eşleşmeye karşı iki kural: fiyatlar belirgin biçimde ayrılıyorsa aday
+ * tamamen düşer, ve her aday tek bir işlemle eşleşir — aynı sembolde iki açık
+ * pozisyonu olan biri iki kaydının ikisini de doğru doldurulmuş görür.
+ */
+
+/** Plan ile gerçek açılış arasındaki en fazla fark. */
+const MATCH_WINDOW_MS = 3 * 24 * 60 * 60 * 1000;
+
+/**
+ * Fiyat bu orandan fazla ayrılıyorsa aynı işlem sayılmaz. Binde beş, EURUSD'de
+ * ~55 pip: kaymayı ve spread'i rahatça kapsar, ayrı bir kuruluma benzemez.
+ */
+const PRICE_TOLERANCE = 0.005;
+
+export interface OpenCandidate {
+  id: string;
+  symbol: string;
+  type: string;
+  date: string;
+  entry_price?: number | null;
+  stop_loss?: number | null;
+  risk?: number | null;
+  rr?: string | null;
+}
+
+export interface MatchInput {
+  symbol: string;
+  type: 'Buy' | 'Sell';
+  openPrice: number;
+  openTime: string;
+}
+
+export function matchOpenTrade(inc: MatchInput, candidates: OpenCandidate[]): OpenCandidate | null {
+  const openMs = new Date(inc.openTime).getTime();
+  let best: OpenCandidate | null = null;
+  // Sıralama ölçütü: fiyatı tutan aday her zaman fiyatı yazılmamış adaydan
+  // önce gelir; sonra fiyat farkı, sonra zaman farkı.
+  let bestTier = 2, bestGap = Infinity, bestDt = Infinity;
+
+  for (const c of candidates) {
+    if ((c.symbol || '').toUpperCase().trim() !== inc.symbol) continue;
+    if (c.type !== inc.type) continue;
+
+    const dt = Math.abs(new Date(c.date).getTime() - openMs);
+    if (!isFinite(dt) || dt > MATCH_WINDOW_MS) continue;
+
+    const price = Number(c.entry_price) || 0;
+    let tier = 1, gap = 0;
+    if (price > 0 && inc.openPrice > 0) {
+      gap = Math.abs(price - inc.openPrice) / inc.openPrice;
+      if (gap > PRICE_TOLERANCE) continue;
+      tier = 0;
+    }
+
+    if (tier < bestTier || (tier === bestTier && (gap < bestGap || (gap === bestGap && dt < bestDt)))) {
+      bestTier = tier; bestGap = gap; bestDt = dt; best = c;
+    }
+  }
+  return best;
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -132,9 +210,30 @@ export default async function handler(req: any, res: any) {
     }
   }
 
+  // Elle girilmiş, henüz sonuçlanmamış işlemler: EA'nın getirdiği kapanışlar
+  // önce bunlarla eşleştirilecek. Yalnızca bu journal'a bakıyoruz — kullanıcı
+  // kaydı hangi journal'a girdiyse tamamlanması gereken yer orası.
+  const openCandidates: OpenCandidate[] = [];
+  {
+    const opens = trades.map(t => toISO(t.openTime)).filter(Boolean).sort() as string[];
+    if (opens.length > 0) {
+      const from = new Date(new Date(opens[0]).getTime() - MATCH_WINDOW_MS).toISOString();
+      const { data } = await supabase
+        .from('trades')
+        .select('id, symbol, type, date, entry_price, stop_loss, risk, rr, result')
+        .eq('user_id', apiKey.user_id)
+        .eq('journal_id', apiKey.journal_id)
+        .is('external_id', null)
+        .gte('date', from)
+        .limit(500);
+      // Sonucu olan kayıt kapanmış demektir; onu doldurmak değil, korumak gerekir.
+      (data || []).forEach((r: any) => { if (!r.result) openCandidates.push(r); });
+    }
+  }
+
   const rows: any[] = [];
+  let merged = 0;
   for (const t of trades) {
-    if (rows.length >= remaining) break;
 
     const externalId = t.externalId != null ? String(t.externalId) : null;
     const date = toISO(t.openTime);
@@ -168,11 +267,41 @@ export default async function handler(req: any, res: any) {
       : '';
 
     const closeISO = toISO(t.closeTime);
+    const exitDate = closeISO && new Date(closeISO) >= new Date(date) ? closeISO : null;
+    const result = resultOf(net, type, closePrice, sl, tp, String(t.closeReason || '').toLowerCase());
+
+    // Bekleyen bir kayıt varsa onu tamamlıyoruz. Kullanıcının yazdığı alanlara
+    // dokunmuyoruz: notlar, fotoğraflar, kurulum, duygular olduğu gibi kalır.
+    // Kendi yazdığı risk / RR / stop da korunur — kendi hesabı bizim
+    // tahminimizden iyidir; yalnızca boş bıraktığı yerleri dolduruyoruz.
+    const hit = matchOpenTrade({ symbol, type, openPrice, openTime: date }, openCandidates);
+    if (hit) {
+      const patch: any = { external_id: externalId, date, exit_date: exitDate, reward: net, result };
+      if (!(Number(hit.risk) > 0) && risk > 0) patch.risk = risk;
+      if (!hit.rr && rr) patch.rr = rr;
+      if (hit.stop_loss == null && sl > 0) patch.stop_loss = sl;
+      if (hit.entry_price == null && openPrice > 0) patch.entry_price = openPrice;
+      if (closePrice > 0) patch.exit_price = closePrice;
+
+      const { error } = await supabase.from('trades').update(patch).eq('id', hit.id);
+      if (!error) {
+        merged++;
+        // Aynı aday ikinci bir pozisyonla eşleşmesin.
+        openCandidates.splice(openCandidates.indexOf(hit), 1);
+        if (externalId) known.add(seenKey(externalId, symbol));
+        continue;
+      }
+    }
+
+    // Tamamlama satır eklemediği için ücretsiz plan sınırına girmiyor; sınır
+    // burada, yeni satır yazılmadan önce işliyor.
+    if (rows.length >= remaining) continue;
+
     rows.push({
       user_id: apiKey.user_id,
       journal_id: apiKey.journal_id,
       date,
-      exit_date: closeISO && new Date(closeISO) >= new Date(date) ? closeISO : null,
+      exit_date: exitDate,
       symbol,
       type,
       timeframe: '',
@@ -181,7 +310,7 @@ export default async function handler(req: any, res: any) {
       risk,
       reward: net,
       rr,
-      result: resultOf(net, type, closePrice, sl, tp, String(t.closeReason || '').toLowerCase()),
+      result,
       pre_trade_notes: '',
       post_trade_notes: '',
       pre_trade_photos: [],
@@ -223,7 +352,8 @@ export default async function handler(req: any, res: any) {
 
   return res.status(200).json({
     inserted,
-    skipped: trades.length - inserted,
+    merged,
+    skipped: trades.length - inserted - merged,
     journalId: apiKey.journal_id,
     ...(remaining !== Infinity && inserted < trades.length
       ? { limit: `Free plan is capped at ${FREE_TRADE_LIMIT} trades.` }
