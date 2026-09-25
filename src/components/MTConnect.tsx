@@ -121,7 +121,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
         </h2>
         <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
           {tr(
-            `MetaTrader 5'e kuracağın küçük bir eklenti, kapanan işlemleri "${journalName}" journal'ına kendiliğinden yazar. Rapor indirip yüklemene gerek kalmaz.`,
+            `MetaTrader 5'e kuracağın küçük bir eklenti, açtığın pozisyonları "${journalName}" journal'ına anında yazar ve kapandıklarında aynı kayıtları sonuçla tamamlar. Rapor indirip yüklemene gerek kalmaz.`,
             `A small add-on installed in MetaTrader 5 writes your closed trades into "${journalName}" on its own. No more exporting and uploading reports.`
           )}
         </p>

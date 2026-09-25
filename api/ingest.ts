@@ -30,6 +30,18 @@ type Incoming = {
   fee?: number;
   /** MT5 pozisyonun neden kapandığını kendisi bilir: 'sl' | 'tp' | 'manual'. */
   closeReason?: string;
+  /**
+   * 'open' — pozisyon hâlâ açık. Kapanış alanları yoktur ve gönderilse de
+   * anlamsızdır. Eski uzmanlar bu alanı hiç göndermez; yokluğu "kapandı"
+   * demektir, yani davranış onlar için değişmiyor.
+   */
+  state?: string;
+  /**
+   * Açık pozisyonun para cinsinden riski. Kapanışta kâr/zarardan
+   * hesaplayabiliyoruz, açıkta hesaplayamıyoruz — stop mesafesinin kaç para
+   * ettiğini yalnızca terminal bilir (lot, sözleşme büyüklüğü, tick değeri).
+   */
+  risk?: number;
 };
 
 const num = (v: any) => (typeof v === 'number' && isFinite(v) ? v : parseFloat(v) || 0);
@@ -187,12 +199,16 @@ export default async function handler(req: any, res: any) {
   // iki ayrı broker aynı pozisyon numarasını verebilir — sembolle birlikte
   // eşleştiriyoruz.
   const ids = trades.map(t => String(t.externalId ?? '')).filter(Boolean);
-  const known = new Set<string>();
   const seenKey = (id: string, symbol: string) => `${id}|${symbol.toUpperCase().trim()}`;
+  const known = new Map<string, OpenCandidate & { closed: boolean }>();
   if (ids.length > 0) {
     const { data: existing } = await supabase
-      .from('trades').select('external_id, symbol').eq('user_id', apiKey.user_id).in('external_id', ids);
-    (existing || []).forEach((r: any) => r.external_id && known.add(seenKey(String(r.external_id), r.symbol || '')));
+      .from('trades')
+      .select('id, external_id, symbol, type, date, result, risk, rr, stop_loss, entry_price')
+      .eq('user_id', apiKey.user_id).in('external_id', ids);
+    (existing || []).forEach((r: any) => {
+      if (r.external_id) known.set(seenKey(String(r.external_id), r.symbol || ''), { ...r, closed: !!r.result });
+    });
   }
 
   // Ücretsiz planın işlem sınırı. Uygulama tarafında elle giriş ve dosyadan
@@ -232,14 +248,21 @@ export default async function handler(req: any, res: any) {
   }
 
   const rows: any[] = [];
-  let merged = 0;
+  /** Bekleyen satırı kapanışla tamamladıklarımız. */
+  let completed = 0;
+  /** Hâlâ açık pozisyonun stop/hedefini tazelediklerimiz. */
+  let refreshed = 0;
+  /** Elle girilmiş kaydı sahiplendiklerimiz. */
+  let adopted = 0;
   for (const t of trades) {
 
     const externalId = t.externalId != null ? String(t.externalId) : null;
     const date = toISO(t.openTime);
     const symbol = (t.symbol || '').toUpperCase().trim();
     if (!date || !symbol) continue;
-    if (externalId && known.has(seenKey(externalId, symbol))) continue;
+
+    // Eski uzmanlar bu alanı göndermez; yokluğu "kapandı" demektir.
+    const stillOpen = String(t.state || '').toLowerCase() === 'open';
 
     const type = String(t.type || '').toLowerCase().startsWith('s') ? 'Sell' : 'Buy';
     const gross = num(t.profit);
@@ -254,7 +277,11 @@ export default async function handler(req: any, res: any) {
     // Risk, stop mesafesinden çıkar: kâr fiyat mesafesiyle orantılıdır.
     const moved = Math.abs(openPrice - closePrice);
     const toStop = Math.abs(openPrice - sl);
-    const risk = (sl > 0 && openPrice > 0 && closePrice > 0 && moved > 0 && gross !== 0)
+    // Açık pozisyonda kâr/zarar yok, oran kurulamaz: terminalin hesapladığı
+    // risk tutarını olduğu gibi alıyoruz.
+    const risk = stillOpen
+      ? Math.abs(num(t.risk))
+      : (sl > 0 && openPrice > 0 && closePrice > 0 && moved > 0 && gross !== 0)
       ? round2((toStop / moved) * Math.abs(gross))
       : (net < 0 ? Math.abs(net) : 0);
 
@@ -267,34 +294,80 @@ export default async function handler(req: any, res: any) {
       : '';
 
     const closeISO = toISO(t.closeTime);
-    const exitDate = closeISO && new Date(closeISO) >= new Date(date) ? closeISO : null;
-    const result = resultOf(net, type, closePrice, sl, tp, String(t.closeReason || '').toLowerCase());
+    const exitDate = !stillOpen && closeISO && new Date(closeISO) >= new Date(date) ? closeISO : null;
+    // Açık pozisyonun sonucu yoktur. Boş sonuç, uygulamada "henüz sonuçlanmadı"
+    // demek: ortalamalara, kazanma oranına ve prop sayacına girmiyor.
+    const result = stillOpen
+      ? ''
+      : resultOf(net, type, closePrice, sl, tp, String(t.closeReason || '').toLowerCase());
 
-    // Bekleyen bir kayıt varsa onu tamamlıyoruz. Kullanıcının yazdığı alanlara
-    // dokunmuyoruz: notlar, fotoğraflar, kurulum, duygular olduğu gibi kalır.
-    // Kendi yazdığı risk / RR / stop da korunur — kendi hesabı bizim
-    // tahminimizden iyidir; yalnızca boş bıraktığı yerleri dolduruyoruz.
+    /**
+     * Var olan bir satırı güncellerken kullanıcının yazdığını ezmeyiz.
+     * Notlar, fotoğraflar, kurulum ve duygulara hiç dokunmuyoruz; risk, RR ve
+     * stop yalnızca boş bırakılmışsa doldurulur — kullanıcının kendi hesabı
+     * bizim türetmemizden iyidir.
+     */
+    const fillEmpties = (prior: OpenCandidate, patch: any) => {
+      if (!(Number(prior.risk) > 0) && risk > 0) patch.risk = risk;
+      if (!prior.rr && rr) patch.rr = rr;
+      if (prior.stop_loss == null && sl > 0) patch.stop_loss = sl;
+      if (prior.entry_price == null && openPrice > 0) patch.entry_price = openPrice;
+      return patch;
+    };
+
+    /** Kapanış bilgisi: açık satırı tamamlayan alanlar. */
+    const closePatch = (prior: OpenCandidate) => {
+      const patch: any = { external_id: externalId, date, exit_date: exitDate, reward: net, result };
+      if (closePrice > 0) patch.exit_price = closePrice;
+      return fillEmpties(prior, patch);
+    };
+
+    // ── 1. Bu pozisyonu daha önce görmüş müyüz? ──
+    const prior = externalId ? known.get(seenKey(externalId, symbol)) : undefined;
+    if (prior) {
+      // Tamamlanmış kayda dokunmuyoruz: uzman her açılışta geçmişi baştan
+      // tarıyor, aynı kapanış günlerce tekrar geliyor.
+      if (prior.closed) continue;
+
+      if (stillOpen) {
+        // Hâlâ açık: stop taşınmış ya da hedef değişmiş olabilir. Stop'un
+        // bugünkü yeri terminalde durur, o yüzden onu tazeliyoruz.
+        const patch: any = { date };
+        if (openPrice > 0) patch.entry_price = openPrice;
+        if (sl > 0) patch.stop_loss = sl;
+        if (rr) patch.rr = rr;
+        if (!(Number(prior.risk) > 0) && risk > 0) patch.risk = risk;
+        const { error } = await supabase.from('trades').update(patch).eq('id', prior.id);
+        if (!error) refreshed++;
+      } else {
+        // KAPANDI: yeni satır açmıyoruz, duran satırı tamamlıyoruz.
+        const { error } = await supabase.from('trades').update(closePatch(prior)).eq('id', prior.id);
+        if (!error) { completed++; prior.closed = true; }
+      }
+      continue;
+    }
+
+    // ── 2. Elle girilmiş, bekleyen bir kayda oturuyor mu? ──
+    // Numarası olmayan kayıtlar için tahmin: sembol + yön + giriş fiyatı +
+    // zaman penceresi. Oturursa o satırı sahipleniyoruz (numarasını yazıyoruz),
+    // böylece bundan sonrası numara üzerinden kesin yürür.
     const hit = matchOpenTrade({ symbol, type, openPrice, openTime: date }, openCandidates);
     if (hit) {
-      const patch: any = { external_id: externalId, date, exit_date: exitDate, reward: net, result };
-      if (!(Number(hit.risk) > 0) && risk > 0) patch.risk = risk;
-      if (!hit.rr && rr) patch.rr = rr;
-      if (hit.stop_loss == null && sl > 0) patch.stop_loss = sl;
-      if (hit.entry_price == null && openPrice > 0) patch.entry_price = openPrice;
-      if (closePrice > 0) patch.exit_price = closePrice;
-
+      const patch = stillOpen
+        ? fillEmpties(hit, { external_id: externalId, date })
+        : closePatch(hit);
       const { error } = await supabase.from('trades').update(patch).eq('id', hit.id);
       if (!error) {
-        merged++;
+        stillOpen ? adopted++ : completed++;
         // Aynı aday ikinci bir pozisyonla eşleşmesin.
         openCandidates.splice(openCandidates.indexOf(hit), 1);
-        if (externalId) known.add(seenKey(externalId, symbol));
+        if (externalId) known.set(seenKey(externalId, symbol), { ...hit, closed: !stillOpen });
         continue;
       }
     }
 
-    // Tamamlama satır eklemediği için ücretsiz plan sınırına girmiyor; sınır
-    // burada, yeni satır yazılmadan önce işliyor.
+    // ── 3. Yeni satır. Tamamlama satır eklemediği için ücretsiz plan sınırı
+    // ancak buraya, gerçekten yeni bir kayıt yazılırken işliyor. ──
     if (rows.length >= remaining) continue;
 
     rows.push({
@@ -308,7 +381,7 @@ export default async function handler(req: any, res: any) {
       order_type: 'Market',
       setup: '',
       risk,
-      reward: net,
+      reward: stillOpen ? 0 : net,
       rr,
       result,
       pre_trade_notes: '',
@@ -319,11 +392,11 @@ export default async function handler(req: any, res: any) {
       // EA fiyatları gönderiyor; formdaki fiyat alanları boş kalmasın.
       entry_price: openPrice > 0 ? openPrice : null,
       stop_loss: sl > 0 ? sl : null,
-      exit_price: closePrice > 0 ? closePrice : null,
+      exit_price: !stillOpen && closePrice > 0 ? closePrice : null,
     });
     // Aynı pakette aynı pozisyon iki kez gelirse (eski EA'lar kısmi kapanışı
     // ayrı ayrı gönderiyordu) ikincisini eklemeyiz.
-    if (externalId) known.add(seenKey(externalId, symbol));
+    if (externalId) known.set(seenKey(externalId, symbol), { id: '', symbol, type, date, closed: !stillOpen });
   }
 
   let inserted = 0;
@@ -352,8 +425,10 @@ export default async function handler(req: any, res: any) {
 
   return res.status(200).json({
     inserted,
-    merged,
-    skipped: trades.length - inserted - merged,
+    completed,
+    refreshed,
+    adopted,
+    skipped: trades.length - inserted - completed - refreshed - adopted,
     journalId: apiKey.journal_id,
     ...(remaining !== Infinity && inserted < trades.length
       ? { limit: `Free plan is capped at ${FREE_TRADE_LIMIT} trades.` }

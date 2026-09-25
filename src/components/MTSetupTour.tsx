@@ -554,8 +554,8 @@ export default function MTSetupTour() {
               <div className="tick">✓</div>
               <h3>{tr('Kurulum bitti', 'Setup complete')}</h3>
               <p>
-                {tr('Bundan sonra kapanan her işlem, sen hiçbir şey yapmadan journal\'ına düşer. MetaTrader açık olduğu sürece eklenti otuz saniyede bir bakar.',
-                    'From now on every closed trade lands in your journal without you doing anything. While MetaTrader is open the add-on checks every thirty seconds.')}
+                {tr('Bundan sonra açtığın her pozisyon, sen hiçbir şey yapmadan journal\'ına düşer — açık işlem olarak. Notunu ve fotoğrafını pozisyon hayattayken yazarsın; kapandığında eklenti aynı kaydı sonuçla tamamlar, ikinci bir satır açmaz. MetaTrader açık olduğu sürece otuz saniyede bir bakar.',
+                    'From now on every position you open lands in your journal by itself, as an open trade. You write the notes and attach the screenshot while it is still live; when it closes the add-on completes that same record instead of adding a second row. It checks every thirty seconds while MetaTrader is open.')}
               </p>
             </div>
           </section>

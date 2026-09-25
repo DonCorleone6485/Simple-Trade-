@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                       SimpleTradingJournal.mq5   |
-//|  Kapanan pozisyonları Simple Trading Journal'a gönderir.         |
+//|  Açık ve kapanan pozisyonları Simple Trading Journal'a gönderir.  |
 //|                                                                  |
 //|  Kurulum:                                                        |
 //|   1) Araçlar > Seçenekler > Uzman Danışmanlar sekmesinde         |
@@ -12,7 +12,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Simple Trading Journal"
 #property link      "https://www.simpletradejournal.io"
-#property version   "1.03"
+#property version   "1.04"
 #property strict
 
 // Girdi etiketleri MQL5'te yorum satırından gelir ve ekranda öyle görünür.
@@ -25,10 +25,29 @@ input int    PollSeconds  = 30;                                   // PollSeconds
 input int    HistoryDays  = 365;                                  // HistoryDays
 input bool   Verbose      = true;                                 // Verbose
 
-// Bu oturumda gönderilmiş pozisyonlar. Sunucu zaten aynı pozisyonu ikinci kez
+// Bu oturumda gönderilmiş KAPANMIŞ pozisyonlar. Sunucu zaten aynı pozisyonu ikinci kez
 // eklemez; bu liste sadece boşuna istek atmamak için.
 long     g_sent[];
 datetime g_scanFrom = 0;
+
+/**
+ * AÇIK POZİSYONLAR
+ *
+ * Kapanmayı beklemiyoruz: pozisyon açıldığı anda journal'a "açık işlem" olarak
+ * giriyor. Sembol, yön, giriş fiyatı, stop ve hedef o anda belli; kullanıcının
+ * bunları elle yazması için bir sebep yok. Notunu ve fotoğrafını hazır kayda
+ * ekliyor, pozisyon kapandığında aynı satır sonuçla tamamlanıyor.
+ *
+ * Bunun mümkün olmasının sebebi: MetaTrader pozisyona açılışta bir numara
+ * veriyor (POSITION_IDENTIFIER) ve kapanış işlemleri de aynı numarayı
+ * taşıyor. Yani açık kayıt ile kapanış kaydı arasında tahmine yer yok.
+ *
+ * Aynı pozisyonu her turda tekrar göndermiyoruz; yalnızca yeniyse ya da
+ * imzası değiştiyse (stop taşındı, hedef değişti, lot eklendi).
+ */
+long     g_open[];      // gönderilmiş açık pozisyonların numaraları
+string   g_openSig[];   // her birinin son gönderilen hâli
+
 int      g_total    = 0;   // bu oturumda gönderilen pozisyon sayısı
 bool     g_fullScanDone = false;  // geçmişin tamamı bir kez tarandı mı
 string   g_status   = "";  // grafiğe yazılan son durum
@@ -104,6 +123,8 @@ int OnInit()
 
    g_scanFrom = TimeCurrent() - (datetime)HistoryDays * 86400;
    ArrayResize(g_sent, 0);
+   ArrayResize(g_open, 0);
+   ArrayResize(g_openSig, 0);
 
    EventSetTimer(PollSeconds < 5 ? 5 : PollSeconds);
    Status("Baglandi. Son " + IntegerToString(HistoryDays) + " gun taraniyor...");
@@ -113,22 +134,31 @@ int OnInit()
    // hesabın gerçek sermayesini bildirir. Yeni işlem beklenirse journal
    // günlerce varsayılan 10.000 ile durur.
    Hello();
+   ScanOpen();
    Scan();
-   if(g_total == 0) Status("Calisiyor. Yeni kapanan islem bekleniyor.");
+   if(g_total == 0)
+      Status("Calisiyor. Acik pozisyonlar journal'a girildi;\n"
+             "kapandiklarinda ayni kayitlar sonucla tamamlanacak.");
    return(INIT_SUCCEEDED);
   }
 
 void OnDeinit(const int reason) { EventKillTimer(); Comment(""); }
 
-void OnTimer() { if(g_ready) Scan(); }
+void OnTimer() { if(g_ready) { ScanOpen(); Scan(); } }
 
 // Pozisyon kapandığı anda beklemeden gönder.
 void OnTradeTransaction(const MqlTradeTransaction &trans,
                         const MqlTradeRequest &request,
                         const MqlTradeResult &result)
   {
-   if(g_ready && trans.type == TRADE_TRANSACTION_DEAL_ADD)
+   if(!g_ready) return;
+   // Bir işlem gerçekleşti: pozisyon açılmış, kapanmış ya da stop taşınmış
+   // olabilir. İkisine de bakmak gerekiyor.
+   if(trans.type == TRADE_TRANSACTION_DEAL_ADD || trans.type == TRADE_TRANSACTION_POSITION)
+     {
+      ScanOpen();
       Scan();
+     }
   }
 
 //+------------------------------------------------------------------+
@@ -144,6 +174,25 @@ void MarkSent(const long positionId)
    int n = ArraySize(g_sent);
    ArrayResize(g_sent, n + 1);
    g_sent[n] = positionId;
+  }
+
+/** Açık pozisyonun son gönderilen hâli; yoksa boş döner. */
+string OpenSig(const long positionId)
+  {
+   for(int i = 0; i < ArraySize(g_open); i++)
+      if(g_open[i] == positionId) return(g_openSig[i]);
+   return("");
+  }
+
+void MarkOpen(const long positionId, const string sig)
+  {
+   for(int i = 0; i < ArraySize(g_open); i++)
+      if(g_open[i] == positionId) { g_openSig[i] = sig; return; }
+   int n = ArraySize(g_open);
+   ArrayResize(g_open, n + 1);
+   ArrayResize(g_openSig, n + 1);
+   g_open[n]    = positionId;
+   g_openSig[n] = sig;
   }
 
 /**
@@ -217,6 +266,103 @@ void Hello()
       // Sunucu kabul etti: anahtar doğru, bir dahaki eklemede hatırlanır.
       SaveKey(g_key);
       Status("Baglanti tamam. Yeni kapanan islem bekleniyor.");
+     }
+  }
+
+//+------------------------------------------------------------------+
+//| Açık pozisyonları gönderir                                        |
+//|                                                                   |
+//| Kapanış beklemeden journal'a düşsün: kullanıcı notunu, fotoğrafını |
+//| ve kurulumunu pozisyon hayattayken yazıyor. Sunucu bu kaydı açık   |
+//| olarak tutuyor, kapanış geldiğinde aynı numaradan bulup            |
+//| tamamlıyor — ikinci bir satır açmıyor.                             |
+//+------------------------------------------------------------------+
+void ScanOpen()
+  {
+   int total = PositionsTotal();
+   if(total <= 0) return;
+
+   int    offset = ServerGmtOffset();
+   string items[];
+   long   ids[];
+   string sigs[];
+   int    ready = 0;
+
+   for(int i = 0; i < total; i++)
+     {
+      if(!PositionGetTicket(i)) continue;
+
+      long   pid    = PositionGetInteger(POSITION_IDENTIFIER);
+      string sym    = PositionGetString(POSITION_SYMBOL);
+      if(pid <= 0 || sym == "") continue;
+
+      long   ptype  = PositionGetInteger(POSITION_TYPE);
+      double volume = PositionGetDouble(POSITION_VOLUME);
+      double price  = PositionGetDouble(POSITION_PRICE_OPEN);
+      double sl     = PositionGetDouble(POSITION_SL);
+      double tp     = PositionGetDouble(POSITION_TP);
+      long   opened = PositionGetInteger(POSITION_TIME);
+
+      int d = (int)SymbolInfoInteger(sym, SYMBOL_DIGITS);
+      if(d <= 0) d = 5;
+
+      // İmza: bunlardan biri değişmedikçe aynı pozisyonu tekrar göndermiyoruz.
+      // Stop taşındığında ya da lot eklendiğinde journal'daki kayıt tazelenmeli.
+      string sig = DoubleToString(price, d) + "|" + DoubleToString(sl, d) + "|" +
+                   DoubleToString(tp, d) + "|" + DoubleToString(volume, 2);
+      if(OpenSig(pid) == sig) continue;
+
+      // Stop mesafesinin kaç para ettiğini yalnızca terminal bilir: lot,
+      // sözleşme büyüklüğü ve tick değeri buradadır. Stop yoksa risk de yok.
+      double risk = 0;
+      if(sl > 0)
+        {
+         double atStop = 0;
+         ENUM_ORDER_TYPE ot = (ptype == POSITION_TYPE_BUY) ? ORDER_TYPE_BUY : ORDER_TYPE_SELL;
+         if(OrderCalcProfit(ot, sym, volume, price, sl, atStop))
+            risk = MathAbs(atStop);
+        }
+
+      string j = "{";
+      j += "\"externalId\":" + IntegerToString(pid) + ",";
+      j += JsonStr("state", "open") + ",";
+      j += "\"openTime\":" + IntegerToString(opened - offset) + ",";
+      j += JsonStr("symbol", sym) + ",";
+      j += JsonStr("type", (ptype == POSITION_TYPE_BUY) ? "buy" : "sell") + ",";
+      j += JsonPrice("openPrice", price, d) + ",";
+      j += JsonPrice("sl", sl, d) + ",";
+      j += JsonPrice("tp", tp, d) + ",";
+      j += JsonNum("risk", risk);
+      j += "}";
+
+      ArrayResize(items, ready + 1);
+      ArrayResize(ids, ready + 1);
+      ArrayResize(sigs, ready + 1);
+      items[ready] = j;
+      ids[ready]   = pid;
+      sigs[ready]  = sig;
+      ready++;
+
+      if(ready >= 100) break;   // sunucu tek istekte en fazla 200 kabul ediyor
+     }
+
+   if(ready == 0) return;
+
+   string json = "{\"key\":\"" + g_key + "\",\"trades\":[";
+   for(int i = 0; i < ready; i++)
+     {
+      if(i > 0) json += ",";
+      json += items[i];
+     }
+   json += "]}";
+
+   // Ancak sunucu kabul ettiyse gönderilmiş sayarız; ağ hatasında bir sonraki
+   // turda yeniden denenir.
+   if(Send(json, 0))
+     {
+      for(int i = 0; i < ready; i++)
+         MarkOpen(ids[i], sigs[i]);
+      if(Verbose) Print(ready, " açık pozisyon gönderildi.");
      }
   }
 
