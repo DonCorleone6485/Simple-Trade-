@@ -330,19 +330,19 @@ export default async function handler(req: any, res: any) {
       if (prior.closed) continue;
 
       if (stillOpen) {
-        // Hâlâ açık: stop taşınmış, hedef değişmiş ya da lot eklenmiş olabilir.
+        // Pozisyon yaşarken EKSİK kalan alanları dolduruyoruz, duranı
+        // değiştirmiyoruz.
         //
-        // Pozisyon yaşarken terminal tek doğru kaynaktır ve stop ile risk BİRLİKTE
-        // gider: stop'u başa başa çekip riski eski tutarında bırakmak, ekranda
-        // birbirini yalanlayan iki sayı demek olurdu. Kapandıktan sonra bu
-        // alanlara bir daha dokunmuyoruz.
-        const patch: any = { date };
-        if (openPrice > 0) patch.entry_price = openPrice;
-        if (sl > 0) patch.stop_loss = sl;
-        if (rr) patch.rr = rr;
-        if (risk > 0) patch.risk = risk;
-        const { error } = await supabase.from('trades').update(patch).eq('id', prior.id);
-        if (!error) refreshed++;
+        // Stop açılıştan sonra konabiliyor; o zaman buraya böyle geliyor. Ama
+        // sonradan TAŞINAN stop kayda işlenmez, çünkü journal'daki risk işleme
+        // girerken göze alınan tutardır ve R hesabı ona bölünür. Stop'u başa başa
+        // çekmiş birinin riskini geriye dönük sıfırlasak, 300 dolarlık kazanç
+        // ekranda 596R diye görünürdü — sınamada tam olarak bu çıktı.
+        const patch = fillEmpties(prior, {});
+        if (Object.keys(patch).length > 0) {
+          const { error } = await supabase.from('trades').update(patch).eq('id', prior.id);
+          if (!error) refreshed++;
+        }
       } else {
         // KAPANDI: yeni satır açmıyoruz, duran satırı tamamlıyoruz.
         const { error } = await supabase.from('trades').update(closePatch(prior)).eq('id', prior.id);
