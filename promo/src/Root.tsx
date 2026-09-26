@@ -6,6 +6,7 @@ import { Hic } from './Hic';
 import { Mac } from './Mac';
 import { MacDikey } from './MacDikey';
 import { Reel } from './Reel';
+import { Reklam } from './Reklam';
 import { ReelFa } from './ReelFa';
 // İlk versiyon: tamamen kodla, yapay zekâ çekimi yok. Karşılaştırma için duruyor.
 import { MacKod } from './MacKod';
@@ -16,7 +17,7 @@ import { HicFa } from './HicFa';
 import { AynaKod } from './AynaKod';
 import { FisKod } from './FisKod';
 import { HicKod } from './HicKod';
-import { AYNA, FIS, HIC, MAC, REEL, FPS } from './cues';
+import { AYNA, FIS, HIC, MAC, REEL, REKLAM, FPS } from './cues';
 
 export const Root: React.FC = () => (
   <>
@@ -35,5 +36,6 @@ export const Root: React.FC = () => (
     <Composition id="Reel" component={Reel} width={1920} height={1080} fps={FPS} durationInFrames={REEL.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="ReelFa" component={ReelFa} width={1920} height={1080} fps={FPS} durationInFrames={REEL.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="MacDikey" component={MacDikey} width={1080} height={1920} fps={FPS} durationInFrames={MAC.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="Reklam" component={Reklam} width={1080} height={1920} fps={FPS} durationInFrames={REKLAM.duration * FPS} defaultProps={{ music: true }} />
   </>
 );

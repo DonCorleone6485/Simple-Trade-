@@ -14,7 +14,7 @@ import {
   reverb, normalize, saturate, fadeEdges, writeWav,
   kick, snare, tom, hat, pad, sub, pluck, riser, impact,
 } from './dsp.mjs';
-import { AYNA, FIS, HIC, MAC, REEL } from '../src/cues.ts';
+import { AYNA, FIS, HIC, MAC, REEL, REKLAM } from '../src/cues.ts';
 
 const OUT = new URL('../public/music/', import.meta.url).pathname;
 import { mkdirSync } from 'node:fs';
@@ -415,8 +415,43 @@ function reel() {
   writeWav(OUT + 'reel.wav', b);
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// REKLAM — seslendirmenin altında hafif, iyimser bir yatak. 100 BPM, Do majör.
+// Ses önde olsun diye sade: tekme, hafif hi-hat, sıcak akorlar; sahne
+// geçişlerinde yumuşak vuruşlar, logoda çözülme.
+// ─────────────────────────────────────────────────────────────────────────
+function reklam() {
+  reseed(606);
+  const C = REKLAM;
+  const b = buffer(C.duration + 0.5);
+  const spb = 60 / 100, bar = spb * 4;
+  const prog = [[36, [55, 60, 64, 67]], [45, [57, 60, 64, 69]], [41, [57, 60, 65, 69]], [43, [55, 59, 62, 67]]];
+  for (let bi = 0; bi * bar < C.end; bi++) {
+    const t0 = bi * bar;
+    const [bass, ch] = prog[bi % 4];
+    const len = Math.min(bar, C.end - t0);
+    ch.forEach((m, i) => keys(b, t0 + 0.02 + i * 0.01, m, len * 0.85, 0.05, (i - 1.5) * 0.3));
+    sub(b, t0, len, bass, { gain: 0.12, attack: 0.03, release: 0.2 });
+    for (let j = 0; j < 4; j++) {
+      const t = t0 + j * spb;
+      if (t >= C.end) break;
+      if (t >= C.s1 - 0.05) kick(b, t, { gain: 0.35, f0: 110, f1: 45, tau: 0.2 });
+      if (j % 2 && t >= C.s1) snare(b, t, 0.07, 0.1);
+      hat(b, t + spb / 2, 0.05, 0.3);
+      if (t >= C.s1) { hat(b, t + spb / 4, 0.025, -0.3); hat(b, t + spb * 3 / 4, 0.025, -0.3); }
+    }
+  }
+  pad(b, C.end, C.duration - C.end - 1.2, [36, 48, 55, 62, 64, 67], { gain: 0.24, attack: 0.3, release: 1.2, cutoff: () => 1800 });
+  [[0.3, 72], [0.8, 76], [1.3, 79], [1.9, 84]].forEach(([dt, m], i) => pluck(b, C.end + dt, m, { gain: 0.1, tau: 1.5, pan: i % 2 ? 0.35 : -0.35 }));
+  reverb(b, { mix: 0.24, size: 0.84, damp: 0.45 });
+  saturate(b, 1.1);
+  fadeEdges(b, 0.3, 1.2);
+  normalize(b, -1);
+  writeWav(OUT + 'reklam.wav', b);
+}
+
 const which = process.argv[2] || 'all';
-const jobs = { ayna, fis, hic, mac, reel };
+const jobs = { ayna, fis, hic, mac, reel, reklam };
 for (const [name, fn] of Object.entries(jobs)) {
   if (which === 'all' || which === name) { fn(); console.log('müzik:', name); }
 }

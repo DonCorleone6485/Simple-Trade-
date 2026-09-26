@@ -107,3 +107,14 @@ export const REEL = {
   beat: 60 / 128,
 };
 export const b = (n: number) => n * REEL.beat;
+
+/** Instagram reklamı — 30 sn, dikey. Seslendirme cümlelerine göre. */
+export const REKLAM = {
+  duration: 30,
+  s1: 7.6,  vo1: 7.8,   // "Simple Trading Journal, MetaTrader'daki işlemlerini kendiliğinden kaydeder."
+  s2: 13.2, vo2: 13.4,  // "Hatalarını işaretler."
+  s3: 16.4, vo3: 16.6,  // "Prop sınırına ne kadar kaldığını her an gösterir."
+  cta: 21.0, vo4: 21.3, // "Ücretsiz başla."
+  vo5: 23.0,            // "Link profilde."
+  end: 25.0,
+};
