@@ -99,3 +99,11 @@ export const MAC = {
   week: 50.2,            // "Bu hafta" karşılaştırması
   end: 53.6,
 };
+
+/** Showreel — 30 sn, 128 BPM. Her şey vuruşa bağlı: b(n) = n. vuruşun saniyesi. */
+export const REEL = {
+  duration: 30,
+  bpm: 128,
+  beat: 60 / 128,
+};
+export const b = (n: number) => n * REEL.beat;

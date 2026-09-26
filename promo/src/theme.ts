@@ -7,7 +7,7 @@ import { loadFont as loadSerif } from '@remotion/google-fonts/Newsreader';
  * latin-ext alt kümesinde; o yüklenmezse harfler yedek fonta düşer ve aynı
  * kelimenin içinde iki ayrı yazı tipi görünür.
  */
-export const sans = loadInter('normal', { weights: ['400', '500', '600'], subsets: ['latin', 'latin-ext'] }).fontFamily;
+export const sans = loadInter('normal', { weights: ['400', '500', '600', '700', '800'], subsets: ['latin', 'latin-ext'] }).fontFamily;
 export const mono = loadMono('normal', { weights: ['400', '500'], subsets: ['latin', 'latin-ext'] }).fontFamily;
 export const serif = loadSerif('normal', { weights: ['400', '500'], subsets: ['latin', 'latin-ext'] }).fontFamily;
 

@@ -14,7 +14,7 @@ import {
   reverb, normalize, saturate, fadeEdges, writeWav,
   kick, snare, tom, hat, pad, sub, pluck, riser, impact,
 } from './dsp.mjs';
-import { AYNA, FIS, HIC, MAC } from '../src/cues.ts';
+import { AYNA, FIS, HIC, MAC, REEL } from '../src/cues.ts';
 
 const OUT = new URL('../public/music/', import.meta.url).pathname;
 import { mkdirSync } from 'node:fs';
@@ -342,8 +342,81 @@ function mac() {
   writeWav(OUT + 'mac.wav', b);
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// SHOWREEL — 128 BPM, Fa minör, elektronik. 64 vuruş = 30 sn.
+// Giriş (0–8) filtreli ve yükselen; 8'de düşüş: dörtlük tekme, pompalayan
+// pad ve bas; her 8 vuruşta bir darbe; 44–48 trampet yuvarlaması; 48'de
+// ikinci düşüş; 56'da final darbesi, 60'ta son vuruş.
+// ─────────────────────────────────────────────────────────────────────────
+function clap(buf, at, gain = 0.5) {
+  const bp = biquad('bp', 1500, 0.9);
+  [0, 0.011, 0.022].forEach((d, i) => add(buf, at + d, 0.25, (t) => bp(noise()) * decay(t, i === 2 ? 0.09 : 0.012) * 2, gain * (i === 2 ? 1 : 0.6)));
+}
+
+function reel() {
+  reseed(505);
+  const bt = REEL.beat;
+  const B = (n) => n * bt;
+  const b = buffer(REEL.duration + 0.5);
+  const drums = (n) => (n >= 8 && n < 44) || (n >= 48 && n < 60);
+  // Akorlar: Fm — D♭ — A♭ — E♭ (her biri 4 vuruş)
+  const prog = [[41, [53, 56, 60, 65]], [37, [53, 56, 61, 65]], [44, [56, 60, 63, 68]], [39, [55, 58, 63, 67]]];
+  for (let bar = 0; bar < 16; bar++) {
+    const t0 = B(bar * 4);
+    const [bass, ch] = prog[bar % 4];
+    const lift = bar < 2 ? smooth(t0, 0, B(8)) : 1;
+    pad(b, t0, B(4), ch, { gain: 0.2 + 0.05 * lift, attack: bar === 0 ? 1.5 : 0.02, release: 0.1, cutoff: (t) => (bar < 2 ? 400 + 1400 * smooth(t0 + t, 0, B(8)) : 2200) });
+    if (bar >= 2 && bar < 15) {
+      // Bas: on altılıklar, oktav zıplamalı
+      for (let j = 0; j < 16; j++) {
+        const t = t0 + j * bt / 4;
+        const m = bass - 12 + (j % 4 === 2 ? 12 : 0);
+        const o = osc('saw'); const lp = biquad('lp', 600, 1.4);
+        add(b, t, bt / 4 - 0.01, (tt) => lp(o(midi(m))) * env(tt, 0.003, 0.07), 0.2);
+      }
+    }
+    // Arpej parıltısı
+    if (bar >= 2 && bar < 15) for (let j = 0; j < 8; j++) pluck(b, t0 + j * bt / 2, ch[(j * 3) % 4] + 12, { gain: 0.05, tau: 0.22, pan: j % 2 ? 0.5 : -0.5, bright: 0.7 });
+  }
+  for (let n = 0; n < 64; n++) {
+    const t = B(n);
+    if (drums(n)) {
+      kick(b, t, { gain: 0.75, f0: 150, f1: 46, tau: 0.2 });
+      hat(b, t + bt / 2, 0.12, 0.3);
+      hat(b, t + bt / 4, 0.05, -0.3); hat(b, t + 3 * bt / 4, 0.05, -0.3);
+      if (n % 2) clap(b, t, 0.45);
+    } else if (n < 8) {
+      for (let k = 0; k < 4; k++) hat(b, t + k * bt / 4, 0.03 + 0.05 * (n / 8), 0.2);
+      if (n >= 4) kick(b, t, { gain: 0.25 + 0.05 * (n - 4), f0: 120, f1: 50, tau: 0.12 });
+    }
+  }
+  // Trampet yuvarlaması: 44–48, sıklaşarak
+  for (let n = 44; n < 48; n += 0.25) snare(b, B(n), 0.12 + 0.3 * ((n - 44) / 4), 0);
+  for (let n = 46; n < 48; n += 0.125) snare(b, B(n), 0.1 + 0.2 * ((n - 46) / 2), 0.2);
+  riser(b, B(4), B(4), 0.3);
+  riser(b, B(44), B(4), 0.35);
+  [8, 16, 24, 32, 40, 48, 56].forEach((n) => impact(b, B(n), n === 48 || n === 56 ? 0.9 : 0.45));
+  // Final: tek büyük akor ve son vuruş
+  pad(b, B(56), B(8), [41, 53, 56, 60, 65], { gain: 0.26, attack: 0.02, release: 1.5, cutoff: (t) => 2600 - 1500 * Math.min(1, t / 3) });
+  impact(b, B(60), 0.8);
+  sub(b, B(56), B(6), 29, { gain: 0.18, attack: 0.02, release: 1.2 });
+
+  reverb(b, { mix: 0.18, size: 0.8, damp: 0.4 });
+  // Pompalama (sidechain): her tekmede ses kısılıp geri geliyor
+  master(b, (t) => {
+    const n = Math.floor(t / bt);
+    if (!drums(n)) return t > B(62) ? Math.max(0, 1 - (t - B(62)) / (REEL.duration - B(62))) : 1;
+    const x = (t - n * bt) / bt;
+    return 0.55 + 0.45 * Math.min(1, x / 0.45);
+  });
+  saturate(b, 1.2);
+  fadeEdges(b, 0.01, 0.4);
+  normalize(b, -1);
+  writeWav(OUT + 'reel.wav', b);
+}
+
 const which = process.argv[2] || 'all';
-const jobs = { ayna, fis, hic, mac };
+const jobs = { ayna, fis, hic, mac, reel };
 for (const [name, fn] of Object.entries(jobs)) {
   if (which === 'all' || which === name) { fn(); console.log('müzik:', name); }
 }

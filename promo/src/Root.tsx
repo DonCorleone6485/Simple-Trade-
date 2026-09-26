@@ -4,6 +4,7 @@ import { Ayna } from './Ayna';
 import { Fis } from './Fis';
 import { Hic } from './Hic';
 import { Mac } from './Mac';
+import { Reel } from './Reel';
 // İlk versiyon: tamamen kodla, yapay zekâ çekimi yok. Karşılaştırma için duruyor.
 import { MacKod } from './MacKod';
 import { MacFa } from './MacFa';
@@ -13,7 +14,7 @@ import { HicFa } from './HicFa';
 import { AynaKod } from './AynaKod';
 import { FisKod } from './FisKod';
 import { HicKod } from './HicKod';
-import { AYNA, FIS, HIC, MAC, FPS } from './cues';
+import { AYNA, FIS, HIC, MAC, REEL, FPS } from './cues';
 
 export const Root: React.FC = () => (
   <>
@@ -29,5 +30,6 @@ export const Root: React.FC = () => (
     <Composition id="AynaFa" component={AynaFa} width={1080} height={1920} fps={FPS} durationInFrames={AYNA.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="FisFa" component={FisFa} width={1080} height={1920} fps={FPS} durationInFrames={FIS.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="HicFa" component={HicFa} width={1080} height={1920} fps={FPS} durationInFrames={HIC.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="Reel" component={Reel} width={1920} height={1080} fps={FPS} durationInFrames={REEL.duration * FPS} defaultProps={{ music: true }} />
   </>
 );
