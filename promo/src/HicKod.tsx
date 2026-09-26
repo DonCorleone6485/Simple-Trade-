@@ -2,7 +2,7 @@ import React from 'react';
 import { AbsoluteFill, Html5Audio, interpolate, staticFile, useCurrentFrame, useVideoConfig, Easing } from 'remotion';
 import { HIC } from './cues';
 import { C, mono, sans, serif } from './theme';
-import { Backdrop, BgClip, Card, Endcard, Exit, Grain, Sfx, Vignette, Words, clamp, easeOut, easeInOut, useProgress } from './ui';
+import { Backdrop, Card, Endcard, Exit, Grain, Sfx, Vignette, Words, clamp, easeOut, easeInOut, useProgress } from './ui';
 
 /**
  * HİÇBİR ŞEY YAPMA — "Journal'a tek tuşa bile basmadın."
@@ -279,7 +279,7 @@ function Window({ from, to, children }: { from: number; to: number; children: Re
   return <AbsoluteFill>{children}</AbsoluteFill>;
 }
 
-export function Hic({ music = true }: { music?: boolean }) {
+export function HicKod({ music = true }: { music?: boolean }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
@@ -290,9 +290,6 @@ export function Hic({ music = true }: { music?: boolean }) {
     <AbsoluteFill style={{ background: C.bg }}>
       {music && <Html5Audio src={staticFile('music/hic.wav')} volume={0.9} />}
       <Backdrop glow={1} gold={t >= HIC.end ? 1 : 0} />
-      {/* "Tek tuşa bile basmadın": arkasına yaslanmış, kahvesini içen trader. */}
-      <BgClip src="clips/hic_relaxed.mp4" from={HIC.verdict - 0.25} to={HIC.duration} rate={0.8}
-        opacity={(t) => interpolate(t, [HIC.verdict, HIC.end - 0.2, HIC.end + 0.4], [0.55, 0.55, 0.16], clamp)} />
 
       <Window from={0} to={HIC.end}>
         <Exit at={HIC.end - 0.3} dur={0.3}>

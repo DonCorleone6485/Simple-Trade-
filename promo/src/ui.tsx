@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  AbsoluteFill, Html5Audio, Sequence, interpolate, spring, staticFile,
+  AbsoluteFill, Html5Audio, OffthreadVideo, Sequence, interpolate, spring, staticFile,
   useCurrentFrame, useVideoConfig, Easing,
 } from 'remotion';
 import { C, sans, serif } from './theme';
@@ -276,5 +276,27 @@ export function Endcard({ start, line, cta = 'Ücretsiz başla', url = 'simpletr
         <div style={{ fontFamily: sans, fontSize: 32, color: C.faint, letterSpacing: '0.04em' }}>{url}</div>
       </div>
     </AbsoluteFill>
+  );
+}
+
+/**
+ * Arka plan çekimi (Higgsfield, Kling 3.0). Yazının arkasında durduğu için
+ * saydamlığı zamana bağlı bir fonksiyonla veriliyor: sahne başında belirgin,
+ * yazı gelince geri çekilir. Sesi kapalı; sesi müzik motoru veriyor.
+ */
+export function BgClip({ src, from, to, rate = 1, opacity }: {
+  src: string; from: number; to: number; rate?: number; opacity: (t: number) => number;
+}) {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const edge = interpolate(t, [from, from + 0.3, to - 0.3, to], [0, 1, 1, 0], clamp);
+  return (
+    <Sequence from={Math.round(from * fps)} durationInFrames={Math.round((to - from) * fps)} layout="none">
+      <AbsoluteFill style={{ opacity: edge * opacity(t) }}>
+        <OffthreadVideo src={staticFile(src)} muted playbackRate={rate}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      </AbsoluteFill>
+    </Sequence>
   );
 }

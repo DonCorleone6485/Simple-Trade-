@@ -6,6 +6,9 @@ import { Hic } from './Hic';
 import { Mac } from './Mac';
 // İlk versiyon: tamamen kodla, yapay zekâ çekimi yok. Karşılaştırma için duruyor.
 import { MacKod } from './MacKod';
+import { AynaKod } from './AynaKod';
+import { FisKod } from './FisKod';
+import { HicKod } from './HicKod';
 import { AYNA, FIS, HIC, MAC, FPS } from './cues';
 
 export const Root: React.FC = () => (
@@ -15,5 +18,8 @@ export const Root: React.FC = () => (
     <Composition id="Hic" component={Hic} width={1080} height={1920} fps={FPS} durationInFrames={HIC.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="Mac" component={Mac} width={1920} height={1080} fps={FPS} durationInFrames={MAC.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="MacKod" component={MacKod} width={1920} height={1080} fps={FPS} durationInFrames={MAC.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="AynaKod" component={AynaKod} width={1080} height={1920} fps={FPS} durationInFrames={AYNA.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="FisKod" component={FisKod} width={1080} height={1920} fps={FPS} durationInFrames={FIS.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="HicKod" component={HicKod} width={1080} height={1920} fps={FPS} durationInFrames={HIC.duration * FPS} defaultProps={{ music: true }} />
   </>
 );

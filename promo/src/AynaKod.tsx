@@ -3,7 +3,7 @@ import { AbsoluteFill, Html5Audio, interpolate, staticFile, useCurrentFrame, use
 import { AYNA } from './cues';
 import { C, mono, sans, serif, signed } from './theme';
 import {
-  Backdrop, BgClip, Card, Endcard, Exit, Grain, Kicker, Rise, Sfx, Vignette, Words,
+  Backdrop, Card, Endcard, Exit, Grain, Kicker, Rise, Sfx, Vignette, Words,
   clamp, easeOut, useCount, useProgress,
 } from './ui';
 
@@ -259,7 +259,7 @@ function Verdict() {
 
 // ─── Kompozisyon ──────────────────────────────────────────────────────────
 
-export function Ayna({ music = true }: { music?: boolean }) {
+export function AynaKod({ music = true }: { music?: boolean }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const sec = (s: number) => Math.round(s * fps);
@@ -277,14 +277,6 @@ export function Ayna({ music = true }: { music?: boolean }) {
 
       {/* Susma anında arka plan ışığı da sönüyor: sadece yazı kalıyor. */}
       <Backdrop glow={inDrop && !atEnd ? 0.3 : 1} gold={atEnd ? 1 : 0} />
-
-      {/* "SEN": iddiaları söyleyen trader. İlk saniye belirgin — kanca — sonra
-          yazının arkasına çekiliyor. Ağır çekim: beş saniye on beşe yayılıyor. */}
-      <BgClip src="clips/ayna_confident.mp4" from={0} to={AYNA.compare} rate={0.34}
-        opacity={(t) => interpolate(t, [0, 0.3, 1.3], [0.75, 0.75, 0.22], clamp)} />
-      {/* Susma anı: aynı adam, gülümsemesi siliniyor, başını eğiyor. */}
-      <BgClip src="clips/ayna_silent.mp4" from={AYNA.drop} to={AYNA.end + 0.1} rate={0.88}
-        opacity={(t) => interpolate(t, [AYNA.drop, AYNA.line1 + 0.6, AYNA.line2, AYNA.line2 + 0.4], [0.6, 0.42, 0.42, 0.3], clamp)} />
 
       <AbsoluteFill style={{ transform: `scale(${zoom})` }}>
         {[0, 1, 2].map(i => (

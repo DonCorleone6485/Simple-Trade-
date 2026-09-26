@@ -3,7 +3,7 @@ import { AbsoluteFill, Html5Audio, interpolate, staticFile, useCurrentFrame, use
 import { FIS } from './cues';
 import { C, mono, sans, money } from './theme';
 import {
-  Backdrop, BgClip, Card, Endcard, Exit, Grain, Rise, Sfx, Vignette, Words,
+  Backdrop, Card, Endcard, Exit, Grain, Rise, Sfx, Vignette, Words,
   clamp, easeOut, useCount, useProgress,
 } from './ui';
 
@@ -224,7 +224,7 @@ function Window({ from, to, children }: { from: number; to: number; children: Re
   return <AbsoluteFill>{children}</AbsoluteFill>;
 }
 
-export function Fis({ music = true }: { music?: boolean }) {
+export function FisKod({ music = true }: { music?: boolean }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
@@ -242,9 +242,6 @@ export function Fis({ music = true }: { music?: boolean }) {
         <AbsoluteFill style={{ background: `rgba(5,5,7,${dark})` }} />
       </Window>
 
-      {/* "Aynı hatayı satın almayı bırak": gece, elleriyle yüzünü kapatan trader. */}
-      <BgClip src="clips/fis_frustrated.mp4" from={FIS.black} to={FIS.prop} rate={1}
-        opacity={(t) => interpolate(t, [FIS.black, FIS.line + 0.4, FIS.lineHit, FIS.prop], [0.7, 0.45, 0.4, 0.35], clamp)} />
       <Window from={FIS.line} to={FIS.prop}>
         <Exit at={FIS.prop - 0.35} dur={0.35}>
           <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center' }}>
