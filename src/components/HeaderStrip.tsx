@@ -172,7 +172,7 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
   const hLabel = t('stripHour');
   const mLabel = t('stripMinute');
   const states = SESSIONS.map(s => sessionState(s, now)).filter(s => !s.weekend);
-  const sessionFacts = [
+  const sessionFacts: { open: boolean; text: string }[] = [
     ...states.filter(s => s.open).sort((a, b) => a.left - b.left)
       .map(s => ({
         open: true,
@@ -184,6 +184,26 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
         text: `${language === 'tr' ? s.session.tr : s.session.en} · ${t('stripToOpen')} ${countdown(s.left, hLabel, mLabel)}`,
       })),
   ];
+
+  // Hafta sonu bütün seanslar düşüyor ve şerit bomboş kalıyordu — insan
+  // bir şeyin bozulduğunu sanıyordu. Kapalıyken de söylenecek bir şey var:
+  // piyasa ne zaman açılıyor. İlk açılacak seansı çeyrek saatlik adımlarla
+  // ileri sararak buluyoruz; yaz saati ve saat dilimi hesabı sessionState'te.
+  if (sessionFacts.length === 0) {
+    for (let q = 1; q <= 4 * 72; q++) {
+      const later = new Date(now.getTime() + q * 15 * 60_000);
+      const first = SESSIONS.map(s => sessionState(s, later)).find(s => s.open);
+      if (first) {
+        // Adım açılıştan biraz sonrasına düşer; açık geçen süreyi geri alıyoruz.
+        const exact = q / 4 - ((first.session.close - first.session.open) - first.left);
+        sessionFacts.push({
+          open: false,
+          text: `${t('stripMarketsClosed')} · ${language === 'tr' ? first.session.tr : first.session.en} ${t('stripToOpen')} ${countdown(Math.max(0, exact), hLabel, mLabel)}`,
+        });
+        break;
+      }
+    }
+  }
 
   const locale = language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US';
 

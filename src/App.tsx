@@ -875,22 +875,22 @@ export default function App() {
   const shellActions =
     view === 'dashboard' ? (
       <>
-      <button onClick={() => setShowCSVImport(true)}
+      <button onClick={() => setShowCSVImport(true)} title={importLabel}
         className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
         style={pillBtn}
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
         <Upload className="w-4 h-4" />
-        <span className="hidden md:inline">{importLabel}</span>
+        <span className="hidden xl:inline">{importLabel}</span>
       </button>
       {/* Telefonda da görünür (simge olarak): sol menüde artık MetaTrader yok. */}
-      <button onClick={() => setShowMTPicker(true)}
+      <button onClick={() => setShowMTPicker(true)} title={t('mtConnectTab')}
         className="flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
         style={pillBtn}
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
         <Plug className="w-4 h-4" />
-        <span className="hidden md:inline">{t('mtConnectTab')}</span>
+        <span className="hidden xl:inline">{t('mtConnectTab')}</span>
       </button>
       <button onClick={handleNewJournalClick}
         className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium"
@@ -911,23 +911,23 @@ export default function App() {
           onMouseEnter={e => { if (filteredTrades.length) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
           <Printer className="w-4 h-4" />
-          <span className="hidden md:inline">{t('printPdf')}</span>
+          <span className="hidden xl:inline">{t('printPdf')}</span>
         </button>
-        <button onClick={() => setShowCSVImport(true)}
+        <button onClick={() => setShowCSVImport(true)} title={importLabel}
           className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
           style={pillBtn}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
           <Upload className="w-4 h-4" />
-          <span className="hidden md:inline">{importLabel}</span>
+          <span className="hidden xl:inline">{importLabel}</span>
         </button>
-        <button onClick={() => goTo({ view: 'expanded', tab: 'mtConnect' })}
+        <button onClick={() => goTo({ view: 'expanded', tab: 'mtConnect' })} title={t('mtConnectTab')}
           className="flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
           style={journalTab === 'mtConnect' ? { ...pillBtn, background: 'rgba(139,92,246,0.15)', color: '#fff', border: '1px solid rgba(139,92,246,0.35)' } : pillBtn}
           onMouseEnter={e => { if (journalTab !== 'mtConnect') (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
           onMouseLeave={e => { if (journalTab !== 'mtConnect') (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
           <Plug className="w-4 h-4" />
-          <span className="hidden md:inline">{t('mtConnectTab')}</span>
+          <span className="hidden xl:inline">{t('mtConnectTab')}</span>
         </button>
         <button onClick={handleNewTradeClick}
           className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium"

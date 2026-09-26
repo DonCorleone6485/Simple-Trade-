@@ -48,6 +48,7 @@ export const translations: Translations = {
   photoLinkAdd: { tr: "Ekle", en: "Add", fa: "افزودن", ar: "إضافة", ru: "Добавить", es: "Añadir", pt: "Adicionar", de: "Hinzufügen", fr: "Ajouter" },
   stripToClose: { tr: "kapanışa", en: "to close", fa: "تا بسته شدن", ar: "حتى الإغلاق", ru: "до закрытия", es: "para el cierre", pt: "para o fecho", de: "bis Schluss", fr: "avant clôture" },
   stripToOpen: { tr: "açılışa", en: "to open", fa: "تا باز شدن", ar: "حتى الافتتاح", ru: "до открытия", es: "para la apertura", pt: "para a abertura", de: "bis Eröffnung", fr: "avant ouverture" },
+  stripMarketsClosed: { tr: "Piyasalar kapalı", en: "Markets closed", fa: "بازارها بسته‌اند", ar: "الأسواق مغلقة", ru: "Рынки закрыты", es: "Mercados cerrados", pt: "Mercados fechados", de: "Märkte geschlossen", fr: "Marchés fermés" },
   stripHour: { tr: "s", en: "h", fa: "س", ar: "س", ru: "ч", es: "h", pt: "h", de: "Std", fr: "h" },
   stripMinute: { tr: "dk", en: "m", fa: "د", ar: "د", ru: "м", es: "m", pt: "m", de: "Min", fr: "min" },
   alertsRemindMe: { tr: "Bana hatırlat", en: "Remind me", fa: "به من یادآوری کن", ar: "ذكّرني", ru: "Напомнить", es: "Recuérdamelo", pt: "Lembra-me", de: "Erinnere mich", fr: "Me le rappeler" },
