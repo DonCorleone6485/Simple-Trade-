@@ -30,7 +30,7 @@ const H = 1080;
 type Mode = 'off' | 'rew' | 'play' | 'pause' | 'stop';
 
 /** Kasetin o anki durumu: oynuyor mu, sarılıyor mu, duruyor mu. */
-function tapeMode(t: number): Mode {
+export function tapeMode(t: number): Mode {
   if (t < MAC.rewind) return 'off';
   if (t < MAC.play) return 'rew';
   if (t >= MAC.stop) return 'stop';
@@ -42,7 +42,7 @@ function tapeMode(t: number): Mode {
 }
 
 /** Kaset sayacı: oynarken ileri, sararken hızla geri, dururken sabit. */
-function tapeTime(t: number) {
+export function tapeTime(t: number) {
   const steps = 240;
   let tc = 14 * 3600 + 2 * 60 + 40;
   const dt = t / steps;
@@ -53,7 +53,7 @@ function tapeTime(t: number) {
   return tc;
 }
 
-const tc = (s: number, fps: number) => {
+export const tc = (s: number, fps: number) => {
   const f = Math.floor((s % 1) * fps);
   const x = Math.floor(s);
   const p = (n: number) => String(n).padStart(2, '0');
@@ -517,7 +517,7 @@ function CrtOff({ children }: { children: React.ReactNode }) {
 
 // ─── Montaj ───────────────────────────────────────────────────────────────
 
-function MontageItem({ i, caption, children, scale = 1 }: { i: number; caption: string; children: React.ReactNode; scale?: number }) {
+function MontageItem({ i, caption, children, scale = 1, bare = false }: { i: number; caption: string; children: React.ReactNode; scale?: number; bare?: boolean }) {
   const at = MAC.montage + i * MAC.beat * 4;
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -527,9 +527,11 @@ function MontageItem({ i, caption, children, scale = 1 }: { i: number; caption: 
   return (
     <AbsoluteFill>
       <AbsoluteFill style={{ transform: `scale(${pop})` }}>
+        {!bare && (
         <div style={{ position: 'absolute', top: 150, left: 0, right: 0 }}>
           <Words text={caption} family={serif} weight={600} letterSpacing="0" start={at} size={72} stagger={0.05} dur={0.35} />
         </div>
+        )}
         <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', paddingTop: 170 }}>
           {/* 1920 genişlikte kartlar küçük kalıyordu; her biri kendi boyuna göre büyütülüyor. */}
           <div style={{ transform: `scale(${scale})` }}>{children}</div>
@@ -681,7 +683,7 @@ function M6({ at }: { at: number }) {
   );
 }
 
-function WeekCompare() {
+function WeekCompare({ bare = false }: { bare?: boolean }) {
   const s = MAC.week;
   const p = useProgress(s + 0.9, s + 2.0, Easing.out(Easing.cubic));
   const Bar = ({ label, pnl, n, color, max }: { label: string; pnl: number; n: number; color: string; max: number }) => (
@@ -700,7 +702,7 @@ function WeekCompare() {
   );
   return (
     <AbsoluteFill style={{ alignItems: 'center', paddingTop: 150 }}>
-      <Words text="سه هفته بعد." family={serif} weight={600} start={s + 0.05} size={84} stagger={0.1} letterSpacing="0" />
+      {!bare && <Words text="سه هفته بعد." family={serif} weight={600} start={s + 0.05} size={84} stagger={0.1} letterSpacing="0" />}
       <div style={{ height: 60 }} />
       <div style={{ opacity: useProgress(s + 0.5, s + 0.9) }}>
         <Card style={{ width: 1300, display: 'flex', flexDirection: 'column', gap: 44, padding: '44px 54px', background: 'rgba(12,12,16,0.74)', backdropFilter: 'blur(16px)' }}>
@@ -723,7 +725,12 @@ function Window({ from, to, children }: { from: number; to: number; children: Re
 
 const [K1, K2, K3] = MAC.clips;
 
-export function MacFa({ music = true }: { music?: boolean }) {
+/**
+ * bare: yazı katmanları (kaset yazıları, altyazılar, sloganlar, kapanış) çizilmez —
+ * dikey sürüm (MacDikey) onları dikey ekrana göre kendisi diziyor.
+ * silent: ses yok — dikey sürümün bulanık arka plan kopyası için.
+ */
+export function MacFa({ music = true, bare = false, silent = false }: { music?: boolean; bare?: boolean; silent?: boolean }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
@@ -734,8 +741,8 @@ export function MacFa({ music = true }: { music?: boolean }) {
   const beats = Array.from({ length: 6 }, (_, i) => MAC.montage + i * MAC.beat * 4);
 
   return (
-    <AbsoluteFill style={{ background: C.bg, direction: 'rtl' }}>
-      {music && <Html5Audio src={staticFile('music/mac.wav')} volume={0.9} />}
+    <AbsoluteFill style={{ background: C.bg }}>
+      {music && !silent && <Html5Audio src={staticFile('music/mac.wav')} volume={0.9} />}
       <Backdrop glow={t < MAC.stop ? 0.5 : t < MAC.montage ? 0.25 : 1} gold={t >= MAC.end ? 1 : 0} />
 
       {/* ── Kaset ── */}
@@ -772,12 +779,12 @@ export function MacFa({ music = true }: { music?: boolean }) {
           </Footage>
           <Snow />
           <TapeTexture />
-          <TapeOverlay />
-          <Subtitle text="بعد از هر مسابقه همین کار را می‌کنند." from={MAC.sub1} to={MAC.sub2 - 0.1} />
-          <Subtitle text="فیلم مسابقه را می‌گذارند." from={MAC.sub2} to={K1.start} />
-          <Subtitle text="اینجا. حد ضررت را دورتر بردی." from={K1.sub} to={K1.end} />
-          <Subtitle text="باختی. چهار دقیقه بعد دوباره وارد شدی." from={K2.sub} to={K2.end} />
-          <Subtitle text="یازده معامله در یک روز." from={K3.sub} to={MAC.stop} />
+          {!bare && <TapeOverlay />}
+          {!bare && <Subtitle text="بعد از هر مسابقه همین کار را می‌کنند." from={MAC.sub1} to={MAC.sub2 - 0.1} />}
+          {!bare && <Subtitle text="فیلم مسابقه را می‌گذارند." from={MAC.sub2} to={K1.start} />}
+          {!bare && <Subtitle text="اینجا. حد ضررت را دورتر بردی." from={K1.sub} to={K1.end} />}
+          {!bare && <Subtitle text="باختی. چهار دقیقه بعد دوباره وارد شدی." from={K2.sub} to={K2.end} />}
+          {!bare && <Subtitle text="یازده معامله در یک روز." from={K3.sub} to={MAC.stop} />}
         </CrtOff>
       </Window>
 
@@ -788,6 +795,7 @@ export function MacFa({ music = true }: { music?: boolean }) {
         <Clip src="clips/boxer_eyes.mp4" from={MAC.stop + 0.6} to={MAC.champ2} rate={0.97} fadeIn={0.5} fadeOut={0.01} />
         <AbsoluteFill style={{ background: `rgba(5,5,7,${interpolate(t, [MAC.champ1 - 0.1, MAC.champ1 + 0.5], [0.1, 0.66], clamp)})` }} />
       </Window>
+      {!bare && (
       <Window from={MAC.champ1} to={MAC.montage}>
         <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', transform: `translate(${shake}px, ${shake * 0.4}px)`, opacity: interpolate(t, [MAC.montage - 0.35, MAC.montage], [1, 0], clamp) }}>
           <div style={{ opacity: champDim }}>
@@ -797,6 +805,7 @@ export function MacFa({ music = true }: { music?: boolean }) {
           <Words text={'آماتورها\nسراغ مسابقه‌ی بعدی می‌دوند.'} family={serif} weight={600} letterSpacing="0" lineHeight={1.45} start={MAC.champ2} size={108} stagger={0.28} dur={0.6} accentColor={C.red} accent={['می‌دوند']} />
         </AbsoluteFill>
       </Window>
+      )}
 
       {/* ── Montaj ── */}
       {[
@@ -808,7 +817,7 @@ export function MacFa({ music = true }: { music?: boolean }) {
         ['هفته‌ات را در یک نگاه ببین.', M6, 1.3],
       ].map(([cap, Comp, sc], i) => (
         <Window key={i} from={beats[i]} to={i < 5 ? beats[i + 1] : MAC.week}>
-          <MontageItem i={i} caption={cap as string} scale={sc as number}>
+          <MontageItem i={i} caption={cap as string} scale={sc as number} bare={bare}>
             {React.createElement(Comp as React.FC<{ at: number }>, { at: beats[i] })}
           </MontageItem>
         </Window>
@@ -823,16 +832,18 @@ export function MacFa({ music = true }: { music?: boolean }) {
         <AbsoluteFill style={{ background: `rgba(5,5,7,${interpolate(t, [MAC.week + 0.7, MAC.week + 1.2, MAC.end - 0.3, MAC.end + 0.4], [0.08, 0.64, 0.64, 0.86], clamp)})` }} />
       </Window>
       <Window from={MAC.week} to={MAC.end}>
-        <WeekCompare />
+        <WeekCompare bare={bare} />
       </Window>
 
+      {!bare && (
       <Window from={MAC.end} to={MAC.duration}>
         <Endcard start={MAC.end} line="مبارزه‌ات را دوباره ببین." cta="رایگان شروع کنید" lineFamily={serif} ctaFamily={sans} logoWidth={1150} gap={64} />
       </Window>
+      )}
 
       <Vignette strength={0.75} />
       <Grain opacity={0.1} />
-      <Sounds />
+      {!silent && <Sounds />}
     </AbsoluteFill>
   );
 }

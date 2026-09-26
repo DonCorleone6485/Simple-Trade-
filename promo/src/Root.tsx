@@ -4,6 +4,7 @@ import { Ayna } from './Ayna';
 import { Fis } from './Fis';
 import { Hic } from './Hic';
 import { Mac } from './Mac';
+import { MacDikey } from './MacDikey';
 import { Reel } from './Reel';
 import { ReelFa } from './ReelFa';
 // İlk versiyon: tamamen kodla, yapay zekâ çekimi yok. Karşılaştırma için duruyor.
@@ -33,5 +34,6 @@ export const Root: React.FC = () => (
     <Composition id="HicFa" component={HicFa} width={1080} height={1920} fps={FPS} durationInFrames={HIC.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="Reel" component={Reel} width={1920} height={1080} fps={FPS} durationInFrames={REEL.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="ReelFa" component={ReelFa} width={1920} height={1080} fps={FPS} durationInFrames={REEL.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="MacDikey" component={MacDikey} width={1080} height={1920} fps={FPS} durationInFrames={MAC.duration * FPS} defaultProps={{ music: true }} />
   </>
 );
