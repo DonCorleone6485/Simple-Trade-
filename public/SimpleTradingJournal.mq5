@@ -12,7 +12,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Simple Trading Journal"
 #property link      "https://www.simpletradejournal.io"
-#property version   "1.04"
+#property version   "1.05"
 #property strict
 
 // Girdi etiketleri MQL5'te yorum satırından gelir ve ekranda öyle görünür.
@@ -254,11 +254,26 @@ string JsonPrice(const string key, const double value, const int digits)
    return("\"" + key + "\":" + DoubleToString(value, digits));
   }
 
+/**
+ * Her isteğin başı: anahtar ve hangi MetaTrader hesabından geldiği.
+ *
+ * Hesap numarasıyla sunucu adı birlikte bir hesabı tanımlar — aynı numara
+ * başka bir aracı kurumda başka bir hesaptır. Sunucu bunları açık hâlde
+ * saklamaz, yalnızca özetini tutar; deneme süresinin aynı hesapla tekrar
+ * tekrar açılmasını engellemek için kullanılıyor.
+ */
+string Head()
+  {
+   return("{\"key\":\"" + g_key + "\",\"account\":{\"login\":"
+          + IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN)) + ","
+          + JsonStr("server", AccountInfoString(ACCOUNT_SERVER)) + "}");
+  }
+
 /** İşlemsiz ilk istek: anahtarı doğrular, sermayeyi bildirir. */
 void Hello()
   {
    double deposit = InitialDeposit();
-   string json = "{\"key\":\"" + g_key + "\"";
+   string json = Head();
    if(deposit > 0) json += ",\"startingCapital\":" + DoubleToString(deposit, 2);
    json += ",\"trades\":[]}";
    if(Send(json, 0))
@@ -348,7 +363,7 @@ void ScanOpen()
 
    if(ready == 0) return;
 
-   string json = "{\"key\":\"" + g_key + "\",\"trades\":[";
+   string json = Head() + ",\"trades\":[";
    for(int i = 0; i < ready; i++)
      {
       if(i > 0) json += ",";
@@ -539,7 +554,7 @@ void Scan()
 
    if(ready == 0) { g_fullScanDone = true; return; }
 
-   string json = "{\"key\":\"" + g_key + "\"";
+   string json = Head();
    double deposit = InitialDeposit();
    if(deposit > 0) json += ",\"startingCapital\":" + DoubleToString(deposit, 2);
    json += ",\"trades\":[";

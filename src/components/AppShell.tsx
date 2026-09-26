@@ -21,6 +21,8 @@ interface AppShellProps {
   subtitle?: React.ReactNode;
   actions?: React.ReactNode;
   isPro?: boolean;
+  /** Deneme sürüyorsa kalan gün; rozet PRO yerine bunu gösterir. */
+  trialDaysLeft?: number;
   userLabel?: string;
   userImage?: string;
   onSignOut: () => void;
@@ -42,7 +44,7 @@ const CONTENT = 'w-full max-w-[1140px] mx-auto px-5 sm:px-8';
 
 export default function AppShell({
   active, onNavigate, activeJournalName, title, subtitle, actions,
-  isPro, userLabel, userImage, onSignOut, languageMenu, children,
+  isPro, trialDaysLeft, userLabel, userImage, onSignOut, languageMenu, children,
 }: AppShellProps) {
   const { t, language } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -131,7 +133,11 @@ export default function AppShell({
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.6)' }}>{userLabel}</div>
-            {isPro && <div className="text-[10px] tracking-wider" style={{ color: '#a78bfa' }}>PRO</div>}
+            {isPro && (
+              <div className="text-[10px] tracking-wider" style={{ color: '#a78bfa' }}>
+                {trialDaysLeft ? t('trialBadge').replace('{n}', String(trialDaysLeft)) : 'PRO'}
+              </div>
+            )}
           </div>
           <button onClick={onSignOut} className="ui-icon-btn ui-icon-btn-danger p-1.5 rounded-lg flex-shrink-0"
             title={tr('Çıkış Yap', 'Sign Out')}>

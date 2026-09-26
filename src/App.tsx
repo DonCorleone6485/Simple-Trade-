@@ -7,7 +7,7 @@ import {
   Upload, Check, Shield, Home, Printer, Plug
 } from 'lucide-react';
 import {
-  SignIn, SignUp, useUser, useClerk, SignedIn, SignedOut
+  SignIn, SignUp, useUser, useClerk, useAuth, SignedIn, SignedOut
 } from '@clerk/clerk-react';
 import TradeForm from './components/TradeForm';
 import TradeHistory from './components/TradeHistory';
@@ -127,6 +127,7 @@ export default function App() {
   const { language, setLanguage, t } = useLanguage();
   const { user, isSignedIn, isLoaded } = useUser();
   const { signOut } = useClerk();
+  const { getToken } = useAuth();
   const [page, setPage] = useState<Page>(getInitialPage);
   const [view, setView] = useState<View>('dashboard');
   const [journalTab, setJournalTab] = useState<JournalTab>('trades');
@@ -163,6 +164,10 @@ export default function App() {
   const [modalBilling, setModalBilling] = useState<'monthly' | 'yearly'>('yearly');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showExpiredPricing, setShowExpiredPricing] = useState(false);
+  /** Deneme sürüyorsa bitiş anı; rozet kalan günü buradan sayıyor. */
+  const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
+  /** Deneme, MT hesabı başka bir denemede kullanıldığı için bittiyse bir kez söylenir. */
+  const [trialNotice, setTrialNotice] = useState(false);
 
   const isRTL = language === 'fa' || language === 'ar';
 
@@ -215,9 +220,26 @@ export default function App() {
 
   const checkProStatus = async () => {
     if (!user) return;
-    const { data } = await supabase.from('users').select('is_pro, has_paid, pro_until').eq('user_id', user.id).single();
+    const cols = 'is_pro, has_paid, pro_until, trial_started_at, trial_ends_at, trial_denied';
+    let { data } = await supabase.from('users').select(cols).eq('user_id', user.id).maybeSingle();
+
+    // Deneme bir kez, ilk açılışta. Kararı sunucu veriyor (e-posta kontrolü
+    // orada); başarısız olursa bir sonraki açılışta yeniden denenir.
+    if (!data?.trial_started_at) {
+      try {
+        const token = await getToken();
+        const r = await fetch('/api/trial', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+        if (r.ok) ({ data } = await supabase.from('users').select(cols).eq('user_id', user.id).maybeSingle());
+      } catch { /* deneme olmadan devam */ }
+    }
+
     if (data) {
-      const isStillPro = data.is_pro && data.pro_until && new Date(data.pro_until) > new Date();
+      // pro_until saat dilimsiz tutuluyor ve UTC yazılıyor. Olduğu gibi
+      // okununca Türkiye'de süre üç saat geç bitiyordu.
+      const until = data.pro_until
+        ? new Date(/(Z|[+-]\d\d:?\d\d)$/.test(data.pro_until) ? data.pro_until : data.pro_until + 'Z')
+        : null;
+      const isStillPro = data.is_pro && until && until > new Date();
       const proExpired = data.is_pro && !isStillPro && data.pro_until;
 
       if (proExpired) {
@@ -228,6 +250,15 @@ export default function App() {
 
       setIsPro(!!isStillPro);
       setHasPaid(data.has_paid || false);
+
+      const trialEnd = data.trial_ends_at ? new Date(data.trial_ends_at) : null;
+      setTrialEndsAt(isStillPro && !data.has_paid && !data.trial_denied && trialEnd && trialEnd > new Date() ? trialEnd : null);
+
+      if (data.trial_denied === 'mt_reused') {
+        try {
+          if (!localStorage.getItem('trialNoticeSeen')) setTrialNotice(true);
+        } catch { setTrialNotice(true); }
+      }
     }
   };
 
@@ -982,6 +1013,26 @@ export default function App() {
         />
       )}
 
+      {/* ── Deneme erken bitti: aynı MetaTrader hesabı ── */}
+      {trialNotice && page === 'journal' && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md rounded-2xl p-6 space-y-4" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <h2 className="font-display text-[20px] font-medium text-white">{t('trialEndedTitle')}</h2>
+            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('trialEndedMtReused')}</p>
+            <div className="flex justify-end gap-2 pt-2">
+              <button onClick={() => { try { localStorage.setItem('trialNoticeSeen', '1'); } catch { /* yok */ } setTrialNotice(false); }}
+                className="px-4 py-2 text-sm rounded-xl" style={{ color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.05)' }}>
+                {t('trialEndedOk')}
+              </button>
+              <button onClick={() => { try { localStorage.setItem('trialNoticeSeen', '1'); } catch { /* yok */ } setTrialNotice(false); setShowPaymentModal(true); }}
+                className="cta px-4 py-2 text-sm font-semibold rounded-xl" style={{ background: '#8b5cf6', color: '#fff' }}>
+                {t('trialEndedUpgrade')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── PAYMENT MODAL ── */}
       {showPaymentModal && <PaymentModal onClose={() => setShowPaymentModal(false)} />}
 
@@ -1436,6 +1487,7 @@ export default function App() {
           subtitle={shellSubtitle}
           actions={shellActions}
           isPro={isPro}
+          trialDaysLeft={trialEndsAt ? Math.max(1, Math.ceil((trialEndsAt.getTime() - Date.now()) / 86_400_000)) : undefined}
           userLabel={user?.firstName || user?.emailAddresses[0]?.emailAddress}
           userImage={user?.imageUrl}
           onSignOut={() => signOut()}

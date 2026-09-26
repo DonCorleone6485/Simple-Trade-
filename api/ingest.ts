@@ -169,12 +169,35 @@ export function matchOpenTrade(inc: MatchInput, candidates: OpenCandidate[]): Op
   return best;
 }
 
+/** Bu MT hesabı, deneme süresi başlamış başka bir kullanıcıda görüldü mü? */
+async function usedInAnotherTrial(fingerprint: string, userId: string): Promise<boolean> {
+  const { data: others } = await supabase
+    .from('mt_accounts').select('user_id').eq('fingerprint', fingerprint).neq('user_id', userId);
+  if (!others || others.length === 0) return false;
+  const { data: tried } = await supabase
+    .from('users').select('user_id')
+    .in('user_id', others.map((o: any) => o.user_id))
+    .not('trial_started_at', 'is', null)
+    .limit(1);
+  return !!tried && tried.length > 0;
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-  const { key, trades, startingCapital } = body as
-    { key?: string; trades?: Incoming[]; startingCapital?: number };
+  const { key, trades, startingCapital, account: mt } = body as {
+    key?: string; trades?: Incoming[]; startingCapital?: number;
+    /** EA 1.05 ve sonrası: hangi MetaTrader hesabından geldiği. */
+    account?: { login?: number | string; server?: string };
+  };
+
+  // MetaTrader hesabının kimliği. Numara tek başına yetmez — aynı numara başka
+  // bir kurumda başka bir hesaptır — sunucu adıyla birlikte. Açık hâlde
+  // saklanmıyor, yalnızca özeti.
+  const login = Number(mt?.login) > 0 ? String(Math.trunc(Number(mt!.login))) : '';
+  const server = typeof mt?.server === 'string' ? mt.server.trim().toLowerCase() : '';
+  const fingerprint = login && server ? hash(`mt|${server}|${login}`) : null;
 
   if (!key || typeof key !== 'string') return res.status(401).json({ error: 'Missing key' });
   if (!Array.isArray(trades)) return res.status(400).json({ error: 'trades must be an array' });
@@ -215,10 +238,41 @@ export default async function handler(req: any, res: any) {
   // aktarma zaten sınırlı; buradan sınırsız yazılabilseydi sınır anlamsız
   // olurdu — bir yıllık geçmiş çeken biri binlerce satır yollayabilir.
   let remaining = Infinity;
+  /** Bu istekte deneme süresi sona erdirildi mi (aynı MT hesabı başka denemede kullanılmış). */
+  let trialEnded = false;
   {
     const { data: account } = await supabase
-      .from('users').select('is_pro, pro_until').eq('user_id', apiKey.user_id).maybeSingle();
-    const isPro = !!account?.is_pro && (!account.pro_until || new Date(account.pro_until) > new Date());
+      .from('users').select('is_pro, pro_until, has_paid, trial_ends_at')
+      .eq('user_id', apiKey.user_id).maybeSingle();
+    let isPro = !!account?.is_pro && (!account.pro_until || new Date(account.pro_until) > new Date());
+
+    // Deneme süresindeki kullanıcı: bu MT hesabı daha önce başka bir hesabın
+    // denemesinde kullanıldıysa deneme burada biter. Her 3 günde bir yeni
+    // e-postayla açıp aynı hesabı bağlamanın önü böyle kesiliyor.
+    const inTrial = isPro && !account?.has_paid
+      && !!account?.trial_ends_at && new Date(account.trial_ends_at) > new Date();
+    if (inTrial) {
+      if (!fingerprint) {
+        // Eski EA hesap bilgisini göndermiyor, kontrol edilemiyor: deneme
+        // otomatik kaydı kapsamıyor, Ücretsiz planın sınırı geçerli.
+        isPro = false;
+      } else if (await usedInAnotherTrial(fingerprint, apiKey.user_id)) {
+        const nowIso = new Date().toISOString();
+        await supabase.from('users')
+          .update({ is_pro: false, pro_until: nowIso, trial_ends_at: nowIso, trial_denied: 'mt_reused' })
+          .eq('user_id', apiKey.user_id);
+        isPro = false;
+        trialEnded = true;
+      }
+    }
+
+    // Deneme olsun olmasın her bağlanan hesap kaydediliyor: yarın başka bir
+    // e-postayla gelen bu hesabın denemesini ancak böyle tanıyabiliriz.
+    if (fingerprint) {
+      await supabase.from('mt_accounts')
+        .upsert({ fingerprint, user_id: apiKey.user_id }, { onConflict: 'fingerprint,user_id', ignoreDuplicates: true });
+    }
+
     if (!isPro) {
       const { count } = await supabase
         .from('trades').select('*', { count: 'exact', head: true }).eq('user_id', apiKey.user_id);
@@ -434,6 +488,7 @@ export default async function handler(req: any, res: any) {
     adopted,
     skipped: trades.length - inserted - completed - refreshed - adopted,
     journalId: apiKey.journal_id,
+    ...(trialEnded ? { trialEnded: 'This MetaTrader account was already used in another trial.' } : {}),
     ...(remaining !== Infinity && inserted < trades.length
       ? { limit: `Free plan is capped at ${FREE_TRADE_LIMIT} trades.` }
       : {}),
