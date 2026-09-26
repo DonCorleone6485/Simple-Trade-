@@ -113,33 +113,22 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
       { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso));
   };
 
-  return (
-    <div className="space-y-10 max-w-3xl">
-      <div>
-        <h2 className="font-display text-[24px] mb-3" style={{ letterSpacing: '-0.02em' }}>
-          {tr('MetaTrader Bağlantısı', 'MetaTrader Connection')}
-        </h2>
-        <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
-          {tr(
-            `MetaTrader 5'e kuracağın küçük bir eklenti, açtığın pozisyonları "${journalName}" journal'ına anında yazar ve kapandıklarında aynı kayıtları sonuçla tamamlar. Rapor indirip yüklemene gerek kalmaz.`,
-            `A small add-on installed in MetaTrader 5 writes your closed trades into "${journalName}" on its own. No more exporting and uploading reports.`
-          )}
-        </p>
-      </div>
-
-      {error && (
-        <div className="rounded-xl p-4" style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)' }}>
-          <div className="flex items-center gap-2 mb-1">
-            <AlertTriangle className="w-4 h-4" style={{ color: '#f87171' }} />
-            <span className="text-sm font-semibold" style={{ color: '#f87171' }}>{tr('Hata', 'Error')}</span>
-          </div>
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>{error}</p>
-        </div>
-      )}
-
-      {/* Yeni üretilen anahtar — bir kez gösterilir. */}
+  /**
+   * Anahtar, kurulumun 4. adımında — tam kullanılacağı yerde — üretiliyor.
+   * Düğme eskiden sayfanın en üstündeydi; kullanıcı 4. adıma gelince
+   * "anahtarı yapıştır" okuyup yukarı dönmek zorunda kalıyordu. Yeni anahtar
+   * da düğmenin hemen altında beliriyor, gözden kaçmasın.
+   */
+  const keyBlock = (
+    <div className="mt-3">
+      <button onClick={create} disabled={creating}
+        className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium disabled:opacity-50"
+        style={{ background: '#8b5cf6', color: '#fff' }}>
+        {creating ? <Loader className="w-4 h-4 animate-spin" /> : <Plug className="w-4 h-4" />}
+        {tr('Anahtar Oluştur', 'Create Key')}
+      </button>
       {fresh && (
-        <div className="rounded-xl p-5" style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.25)' }}>
+        <div className="mt-4 rounded-xl p-5" style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.25)' }}>
           <div className="flex items-center gap-2 mb-2">
             <KeyRound className="w-4 h-4" style={{ color: '#34d399' }} />
             <span className="text-sm font-semibold" style={{ color: '#34d399' }}>
@@ -164,17 +153,37 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
           </div>
         </div>
       )}
+    </div>
+  );
+
+  return (
+    <div className="space-y-10 max-w-3xl">
+      <div>
+        <h2 className="font-display text-[24px] mb-3" style={{ letterSpacing: '-0.02em' }}>
+          {tr('MetaTrader Bağlantısı', 'MetaTrader Connection')}
+        </h2>
+        <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+          {tr(
+            `MetaTrader 5'e kuracağın küçük bir eklenti, açtığın pozisyonları "${journalName}" journal'ına anında yazar ve kapandıklarında aynı kayıtları sonuçla tamamlar. Rapor indirip yüklemene gerek kalmaz.`,
+            `A small add-on installed in MetaTrader 5 writes your closed trades into "${journalName}" on its own. No more exporting and uploading reports.`
+          )}
+        </p>
+      </div>
+
+      {error && (
+        <div className="rounded-xl p-4" style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <AlertTriangle className="w-4 h-4" style={{ color: '#f87171' }} />
+            <span className="text-sm font-semibold" style={{ color: '#f87171' }}>{tr('Hata', 'Error')}</span>
+          </div>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>{error}</p>
+        </div>
+      )}
 
       {/* Mevcut anahtarlar */}
       <div style={card} className="p-6">
-        <div className="flex items-center justify-between mb-5">
+        <div className="mb-5">
           <span style={label}>{tr('Anahtarlar', 'Keys')}</span>
-          <button onClick={create} disabled={creating}
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium disabled:opacity-50"
-            style={{ background: '#8b5cf6', color: '#fff' }}>
-            {creating ? <Loader className="w-4 h-4 animate-spin" /> : <Plug className="w-4 h-4" />}
-            {tr('Anahtar Oluştur', 'Create Key')}
-          </button>
         </div>
 
         {loading ? (
@@ -231,9 +240,10 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             },
             {
               t: tr('Grafiğe sürükle ve anahtarı yapıştır', 'Drag it onto a chart and paste the key'),
-              d: tr('SimpleTradingJournal\'ı bir grafiğin üstüne sürükle. Açılan pencerede Girdiler sekmesine geç, ApiKey satırına yukarıdaki anahtarı yapıştır, Tamam. Grafiğin sol üstünde "Baglanti tamam" yazısı belirir.',
-                    'Drag SimpleTradingJournal onto a chart. In the window that opens, go to the Inputs tab, paste the key above into ApiKey, and click OK. "Connected" appears at the top-left of the chart.'),
-              extra: (
+              d: tr('SimpleTradingJournal\'ı bir grafiğin üstüne sürükle. Açılan pencerede Girdiler sekmesine geç, ApiKey satırına aşağıdaki düğmeyle oluşturduğun anahtarı yapıştır, Tamam. Grafiğin sol üstünde "Baglanti tamam" yazısı belirir.',
+                    'Drag SimpleTradingJournal onto a chart. In the window that opens, go to the Inputs tab, paste the key you create with the button below into ApiKey, and click OK. "Connected" appears at the top-left of the chart.'),
+              extra: (<>
+                {keyBlock}
                 <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.18)' }}>
                   <div className="text-[14px] font-medium mb-2" style={{ color: '#c4b5fd' }}>
                     {tr('Hangi grafiğe koymalıyım?', 'Which chart should it go on?')}
@@ -255,7 +265,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                     </div>
                   </div>
                 </div>
-              ),
+              </>),
             },
           ].map((s: { t: string; d: string; code?: string; download?: string; extra?: React.ReactNode }, i: number) => (
             <li key={i} className="flex gap-4">
