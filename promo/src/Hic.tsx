@@ -292,7 +292,11 @@ export function Hic({ music = true }: { music?: boolean }) {
       <Backdrop glow={1} gold={t >= HIC.end ? 1 : 0} />
       {/* "Tek tuşa bile basmadın": arkasına yaslanmış, kahvesini içen trader. */}
       <BgClip src="clips/hic_relaxed.mp4" from={HIC.verdict - 0.25} to={HIC.duration} rate={0.8}
-        opacity={(t) => interpolate(t, [HIC.verdict, HIC.end - 0.2, HIC.end + 0.4], [0.55, 0.55, 0.16], clamp)} />
+        opacity={(t) => interpolate(t, [HIC.verdict, HIC.end - 0.2, HIC.end + 0.4], [0.36, 0.36, 0.12], clamp)} />
+      {/* Oda aydınlık: beyaz yazı okunsun diye ortası koyulaşıyor. */}
+      {t >= HIC.verdict - 0.25 && t < HIC.end && (
+        <AbsoluteFill style={{ background: 'radial-gradient(ellipse 80% 40% at 50% 50%, rgba(5,5,7,0.55), transparent 75%)' }} />
+      )}
 
       <Window from={0} to={HIC.end}>
         <Exit at={HIC.end - 0.3} dur={0.3}>
