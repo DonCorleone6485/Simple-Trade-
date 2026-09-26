@@ -38,5 +38,5 @@ export const money = (v: number, d = 0) =>
 // Farsçada harf aralığı (letterSpacing) kullanılmaz: harflerin bitişmesini bozar.
 import { loadFont as loadVazir } from '@remotion/google-fonts/Vazirmatn';
 import { loadFont as loadNaskh } from '@remotion/google-fonts/NotoNaskhArabic';
-export const faSans = loadVazir('normal', { weights: ['400', '500', '600', '700'], subsets: ['arabic', 'latin'] }).fontFamily;
+export const faSans = loadVazir('normal', { weights: ['400', '500', '600', '700', '800', '900'], subsets: ['arabic', 'latin'] }).fontFamily;
 export const faSerif = loadNaskh('normal', { weights: ['500', '600', '700'], subsets: ['arabic'] }).fontFamily;

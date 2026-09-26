@@ -5,6 +5,7 @@ import { Fis } from './Fis';
 import { Hic } from './Hic';
 import { Mac } from './Mac';
 import { Reel } from './Reel';
+import { ReelFa } from './ReelFa';
 // İlk versiyon: tamamen kodla, yapay zekâ çekimi yok. Karşılaştırma için duruyor.
 import { MacKod } from './MacKod';
 import { MacFa } from './MacFa';
@@ -31,5 +32,6 @@ export const Root: React.FC = () => (
     <Composition id="FisFa" component={FisFa} width={1080} height={1920} fps={FPS} durationInFrames={FIS.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="HicFa" component={HicFa} width={1080} height={1920} fps={FPS} durationInFrames={HIC.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="Reel" component={Reel} width={1920} height={1080} fps={FPS} durationInFrames={REEL.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="ReelFa" component={ReelFa} width={1920} height={1080} fps={FPS} durationInFrames={REEL.duration * FPS} defaultProps={{ music: true }} />
   </>
 );
