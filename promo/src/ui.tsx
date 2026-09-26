@@ -123,11 +123,11 @@ export function Words({
 }
 
 /** Küçük, aralıklı büyük harfli etiket: "SEN", "JOURNAL'IN". */
-export function Kicker({ text, start, color = C.faint, size = 26 }: { text: string; start: number; color?: string; size?: number }) {
+export function Kicker({ text, start, color = C.faint, size = 26, family = sans, spacing = '0.26em' }: { text: string; start: number; color?: string; size?: number; family?: string; spacing?: string }) {
   const p = useProgress(start, start + 0.5);
   return (
     <div style={{
-      fontFamily: sans, fontSize: size, fontWeight: 500, letterSpacing: '0.26em',
+      fontFamily: family, fontSize: size, fontWeight: 500, letterSpacing: spacing,
       color, opacity: p, transform: `translateY(${(1 - p) * 10}px)`,
     }}>{text}</div>
   );

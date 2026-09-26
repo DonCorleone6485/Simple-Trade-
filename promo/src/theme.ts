@@ -26,10 +26,11 @@ export const C = {
 };
 
 /** Sitedeki tutar yazımı: "−$1,380" — tipografik eksi, binlik virgül. */
+// LRI…PDI (görünmez): Farsça gibi sağdan sola metinde tutarın işareti ve $ yer değiştirmesin.
 export const signed = (v: number) =>
-  `${v >= 0 ? '+' : '−'}$${Math.abs(Math.round(v)).toLocaleString('en-US')}`;
+  `\u2066${v >= 0 ? '+' : '−'}$${Math.abs(Math.round(v)).toLocaleString('en-US')}\u2069`;
 export const money = (v: number, d = 0) =>
-  `$${Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}`;
+  `\u2066$${Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}\u2069`;
 
 // ── Farsça ──
 // Başlıklar: Noto Naskh Arabic — klasik nesih, serif başlıkların karşılığı.

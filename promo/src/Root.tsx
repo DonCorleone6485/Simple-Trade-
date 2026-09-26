@@ -7,6 +7,9 @@ import { Mac } from './Mac';
 // İlk versiyon: tamamen kodla, yapay zekâ çekimi yok. Karşılaştırma için duruyor.
 import { MacKod } from './MacKod';
 import { MacFa } from './MacFa';
+import { AynaFa } from './AynaFa';
+import { FisFa } from './FisFa';
+import { HicFa } from './HicFa';
 import { AynaKod } from './AynaKod';
 import { FisKod } from './FisKod';
 import { HicKod } from './HicKod';
@@ -23,5 +26,8 @@ export const Root: React.FC = () => (
     <Composition id="FisKod" component={FisKod} width={1080} height={1920} fps={FPS} durationInFrames={FIS.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="HicKod" component={HicKod} width={1080} height={1920} fps={FPS} durationInFrames={HIC.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="MacFa" component={MacFa} width={1920} height={1080} fps={FPS} durationInFrames={MAC.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="AynaFa" component={AynaFa} width={1080} height={1920} fps={FPS} durationInFrames={AYNA.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="FisFa" component={FisFa} width={1080} height={1920} fps={FPS} durationInFrames={FIS.duration * FPS} defaultProps={{ music: true }} />
+    <Composition id="HicFa" component={HicFa} width={1080} height={1920} fps={FPS} durationInFrames={HIC.duration * FPS} defaultProps={{ music: true }} />
   </>
 );
