@@ -197,7 +197,14 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             {keys.map((k, i) => (
               <li key={k.id} className="flex items-center gap-4 py-3"
                 style={{ borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.05)' }}>
-                <code className="font-mono text-[13px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{k.key_hint}</code>
+                <code className="font-mono text-[15px] px-2.5 py-1 rounded-lg" style={{ color: '#fff', background: 'rgba(0,0,0,0.3)' }}>{k.key_hint}</code>
+                {/* "Aktif": uzman son bir haftada bu anahtarla veri göndermiş. */}
+                {k.last_used_at && Date.now() - new Date(k.last_used_at).getTime() < 7 * 86400000 && (
+                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-full"
+                    style={{ color: '#34d399', background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.25)' }}>
+                    {tr('Aktif', 'Active')}
+                  </span>
+                )}
                 <span className="text-[12px] ms-auto" style={{ color: 'rgba(255,255,255,0.3)' }}>
                   {tr('son kullanım', 'last used')}: {fmt(k.last_used_at)}
                 </span>
@@ -210,6 +217,13 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             ))}
           </ul>
         )}
+        {/* Anahtarın tamamı sunucuda hiç saklanmıyor, yalnızca özeti — o yüzden
+            burada sadece ipucu var. Neden görünmediğini söylemezsek kullanıcı
+            bunu bir eksik sanıyor. */}
+        <p className="text-[12.5px] leading-relaxed mt-4 pt-4" style={{ color: 'rgba(255,255,255,0.35)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          {tr('Güvenlik için anahtarın tamamı saklanmaz, yalnızca ilk ve son harfleri görünür. MetaTrader anahtarı zaten hatırlar; kaybettiysen 4. adımdan yenisini oluştur ve eskisini buradan iptal et.',
+              'For security the full key is never stored; only its first and last characters are shown. MetaTrader remembers the key anyway; if you lose it, create a new one in step 4 and revoke the old one here.')}
+        </p>
       </div>
 
       {/* Kurulum. Tur, aşağıdaki dört maddenin aynısını oynatır; ayrı bir
