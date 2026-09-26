@@ -24,6 +24,12 @@ interface CSVImportProps {
   userId: string;
   /** Açık journal'da hâlihazırda bulunan işlemlerin anahtarları. */
   existingKeys?: string[];
+  /**
+   * Journal listesinden açıldığında seçilebilecek journal'lar ve her birinin
+   * mevcut işlem anahtarları — hangisi seçilirse onun tekrarları ayıklanır.
+   */
+  journals?: { id: string; name: string }[];
+  keysByJournal?: Record<string, string[]>;
 }
 
 interface ParseResult {
@@ -523,9 +529,18 @@ function saveMap(headers: string[], map: ColumnMap) {
   try { localStorage.setItem(mapKey(headers), JSON.stringify(map)); } catch { /* kotayı doldurduysa önemsiz */ }
 }
 
-export default function CSVImport({ onImport, onClose, journalId, journalName, userId, existingKeys = [] }: CSVImportProps) {
-  // Açık journal yoksa tek seçenek yeni journal oluşturmaktır.
+export default function CSVImport({ onImport, onClose, journalId, journalName, userId, existingKeys = [], journals = [], keysByJournal = {} }: CSVImportProps) {
+  /**
+   * Hedef:
+   * - Bir journal'ın içinden açıldıysa yalnızca o journal — seçim yok. Kullanıcı
+   *   o journal'dayken "içe aktar" diyor; başka yere gitmesi beklenmez.
+   * - Journal listesinden açıldıysa: yeni journal ya da mevcutlardan biri.
+   */
+  const locked = !!journalId;
   const [target, setTarget] = useState<'existing' | 'new'>(journalId ? 'existing' : 'new');
+  const [picked, setPicked] = useState<string>(journalId || journals[0]?.id || '');
+  const targetId = locked ? journalId! : picked;
+  const targetKeys = locked ? existingKeys : (keysByJournal[picked] || []);
   const [newName, setNewName] = useState('');
   const { language, t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -611,8 +626,8 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
 
   // Mevcut journal'a eklerken zaten kayıtlı olanları ayır: aynı raporu tekrar
   // yüklemek işlemleri ikinci kez eklememeli.
-  const known = React.useMemo(() => new Set(existingKeys), [existingKeys]);
-  const checkDuplicates = target === 'existing' && !!journalId && known.size > 0;
+  const known = React.useMemo(() => new Set(targetKeys), [targetKeys]);
+  const checkDuplicates = target === 'existing' && !!targetId && known.size > 0;
   const freshTrades = React.useMemo(
     () => !parseResult ? []
       : checkDuplicates ? parseResult.trades.filter(t => !known.has(tradeKey(t)))
@@ -623,14 +638,14 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
 
   const canImport =
     !!parseResult && freshTrades.length > 0 &&
-    (target === 'existing' ? !!journalId : newName.trim().length > 0);
+    (target === 'existing' ? !!targetId : newName.trim().length > 0);
 
   const handleImport = () => {
     if (!canImport) return;
     onImport(
       freshTrades,
-      target === 'existing' && journalId
-        ? { kind: 'existing', journalId }
+      target === 'existing' && targetId
+        ? { kind: 'existing', journalId: targetId }
         : { kind: 'new', name: newName.trim() }
     );
     onClose();
@@ -915,6 +930,14 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                     {t('importTarget')}
                   </div>
 
+                  {locked ? (
+                    // Journal'ın içinden: yalnızca bu journal.
+                    <div className="px-4 py-3 rounded-xl text-sm"
+                      style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)', color: '#fff' }}>
+                      {t('importToExisting')}
+                      {journalName && <span style={{ color: 'rgba(255,255,255,0.5)' }}> — {journalName}</span>}
+                    </div>
+                  ) : (
                   <div className="space-y-2">
                     <button type="button" onClick={() => setTarget('new')}
                       className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all"
@@ -938,7 +961,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                           color: '#fff', borderRadius: '12px', padding: '10px 14px', marginInlineStart: 0 }} />
                     )}
 
-                    {journalId && (
+                    {journals.length > 0 && (
                       <button type="button" onClick={() => setTarget('existing')}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all"
                         style={target === 'existing'
@@ -950,11 +973,23 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                         </span>
                         <span className="text-sm" style={{ color: target === 'existing' ? '#fff' : 'rgba(255,255,255,0.6)' }}>
                           {t('importToExisting')}
-                          {journalName && <span style={{ color: 'rgba(255,255,255,0.4)' }}> — {journalName}</span>}
                         </span>
                       </button>
                     )}
+
+                    {/* Journal sayısı ne olursa olsun hepsi listede. */}
+                    {target === 'existing' && journals.length > 0 && (
+                      <select value={picked} onChange={e => setPicked(e.target.value)}
+                        className="w-full outline-none text-sm"
+                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                          color: '#fff', borderRadius: '12px', padding: '10px 14px' }}>
+                        {journals.map(j => (
+                          <option key={j.id} value={j.id} style={{ background: '#1a1b2e', color: '#fff' }}>{j.name}</option>
+                        ))}
+                      </select>
+                    )}
                   </div>
+                  )}
                 </div>
               </div>
             )}

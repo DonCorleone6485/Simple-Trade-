@@ -1035,6 +1035,9 @@ export default function App() {
           existingKeys={view === 'expanded' && activeJournal
             ? trades.filter(tr => tr.journal_id === activeJournal.id).map(tradeKey)
             : []}
+          journals={accounts.map(a => ({ id: a.id, name: a.name }))}
+          keysByJournal={view === 'expanded' ? {} : Object.fromEntries(
+            accounts.map(a => [a.id, trades.filter(tr => tr.journal_id === a.id).map(tradeKey)]))}
         />
       )}
 
