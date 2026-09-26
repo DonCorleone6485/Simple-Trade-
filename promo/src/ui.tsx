@@ -112,7 +112,7 @@ export function Words({
                 transform: `translateY(${(1 - p) * size * 0.32}px)`,
                 filter: `blur(${(1 - p) * 10}px)`,
                 color: isAccent ? accentColor : undefined,
-                marginRight: '0.26em',
+                marginInlineEnd: '0.26em',
               }}>{w}</span>
             );
           })}
@@ -244,8 +244,9 @@ export function Wordmark({ width, style }: { width: number; style?: React.CSSPro
  * Dikey videoda yatay kilit (işaret + isim yan yana) telefonda küçük kalıyor;
  * `stacked` işaretin kendisini büyütüp ismi altına alıyor.
  */
-export function Endcard({ start, line, cta = 'Ücretsiz başla', url = 'simpletradejournal.io', logoWidth = 860, gap = 70, stacked = false }: {
+export function Endcard({ start, line, cta = 'Ücretsiz başla', url = 'simpletradejournal.io', logoWidth = 860, gap = 70, stacked = false, lineFamily = serif, ctaFamily = sans }: {
   start: number; line?: string; cta?: string; url?: string; logoWidth?: number; gap?: number; stacked?: boolean;
+  lineFamily?: string; ctaFamily?: string;
 }) {
   const p0 = useProgress(start + 0.55, start + 1.2);
   const p1 = useProgress(start + 1.0, start + 1.7);
@@ -263,13 +264,13 @@ export function Endcard({ start, line, cta = 'Ücretsiz başla', url = 'simpletr
         <LogoReveal start={start} width={logoWidth} />
       )}
       {line && (
-        <div style={{ opacity: p1, transform: `translateY(${(1 - p1) * 16}px)`, fontFamily: serif, fontSize: 50, color: C.dim, letterSpacing: '-0.01em' }}>
+        <div style={{ opacity: p1, transform: `translateY(${(1 - p1) * 16}px)`, fontFamily: lineFamily, fontSize: 50, color: C.dim, letterSpacing: '-0.01em' }}>
           {line}
         </div>
       )}
       <div style={{ opacity: p2, transform: `translateY(${(1 - p2) * 16}px)`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22 }}>
         <div style={{
-          fontFamily: sans, fontWeight: 600, fontSize: 40, color: '#0a0a0c',
+          fontFamily: ctaFamily, fontWeight: 600, fontSize: 40, color: '#0a0a0c',
           background: C.gold, borderRadius: 999, padding: '24px 56px',
           boxShadow: '0 0 0 1px rgba(240,180,41,0.5), 0 18px 60px rgba(240,180,41,0.28)',
         }}>{cta}</div>
