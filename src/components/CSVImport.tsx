@@ -538,10 +538,21 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
    */
   const locked = !!journalId;
   const [target, setTarget] = useState<'existing' | 'new'>(journalId ? 'existing' : 'new');
+  const [newName, setNewName] = useState('');
   const [picked, setPicked] = useState<string>(journalId || journals[0]?.id || '');
   const targetId = locked ? journalId! : picked;
   const targetKeys = locked ? existingKeys : (keysByJournal[picked] || []);
-  const [newName, setNewName] = useState('');
+  /**
+   * Journal listesinden açıldığında önce "nereye" sorulur, dosya sonra gelir:
+   * journal belli değilken dosya yüklemek, hedefi sona bırakıyor ve insan ne
+   * yaptığını dosyayı seçtikten sonra öğreniyordu. Journal'ın içinde bu adım
+   * yok — hedef zaten o journal.
+   */
+  const [step, setStep] = useState<'target' | 'file'>(locked ? 'file' : 'target');
+  const targetReady = target === 'new' ? newName.trim().length > 0 : !!picked;
+  const targetLabel = locked ? (journalName || '')
+    : target === 'new' ? newName.trim()
+    : (journals.find(j => j.id === picked)?.name || '');
   const { language, t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -678,6 +689,89 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
           <button onClick={onClose} className="p-2 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {step === 'target' ? (
+          <div style={card}>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3"
+              style={{ color: 'rgba(255,255,255,0.3)' }}>
+              {t('importTarget')}
+            </div>
+                  <div className="space-y-2">
+                    <button type="button" onClick={() => setTarget('new')}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all"
+                      style={target === 'new'
+                        ? { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)' }
+                        : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <span className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center"
+                        style={{ border: `2px solid ${target === 'new' ? '#8b5cf6' : 'rgba(255,255,255,0.25)'}` }}>
+                        {target === 'new' && <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#8b5cf6' }} />}
+                      </span>
+                      <span className="text-sm" style={{ color: target === 'new' ? '#fff' : 'rgba(255,255,255,0.6)' }}>
+                        {t('importToNew')}
+                      </span>
+                    </button>
+
+                    {target === 'new' && (
+                      <input type="text" value={newName} onChange={e => setNewName(e.target.value)}
+                        placeholder={t('journalNamePlaceholder')}
+                        className="w-full outline-none text-sm"
+                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                          color: '#fff', borderRadius: '12px', padding: '10px 14px', marginInlineStart: 0 }} />
+                    )}
+
+                    {journals.length > 0 && (
+                      <button type="button" onClick={() => setTarget('existing')}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all"
+                        style={target === 'existing'
+                          ? { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)' }
+                          : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <span className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center"
+                          style={{ border: `2px solid ${target === 'existing' ? '#8b5cf6' : 'rgba(255,255,255,0.25)'}` }}>
+                          {target === 'existing' && <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#8b5cf6' }} />}
+                        </span>
+                        <span className="text-sm" style={{ color: target === 'existing' ? '#fff' : 'rgba(255,255,255,0.6)' }}>
+                          {t('importToExisting')}
+                        </span>
+                      </button>
+                    )}
+
+                    {/* Journal sayısı ne olursa olsun hepsi listede. */}
+                    {target === 'existing' && journals.length > 0 && (
+                      <select value={picked} onChange={e => setPicked(e.target.value)}
+                        className="w-full outline-none text-sm"
+                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                          color: '#fff', borderRadius: '12px', padding: '10px 14px' }}>
+                        {journals.map(j => (
+                          <option key={j.id} value={j.id} style={{ background: '#1a1b2e', color: '#fff' }}>{j.name}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+            <div className="flex justify-end mt-5">
+              <button onClick={() => targetReady && setStep('file')} disabled={!targetReady}
+                className="cta px-6 py-2 text-sm font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: '#8b5cf6', color: '#fff' }}>
+                {language === 'tr' ? 'Devam' : 'Continue'}
+              </button>
+            </div>
+          </div>
+        ) : (<>
+        {/* Hedef özeti: dosya bu journal'a gidecek. */}
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm"
+          style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)', color: '#fff' }}>
+          <span style={{ color: 'rgba(255,255,255,0.55)' }}>
+            {!locked && target === 'new'
+              ? (language === 'tr' ? 'Yeni journal:' : 'New journal:')
+              : (language === 'tr' ? 'Eklenecek journal:' : 'Adding to:')}
+          </span>
+          <span className="font-medium">{targetLabel}</span>
+          {!locked && (
+            <button onClick={() => { setStep('target'); setParseResult(null); setFileName(''); setContent(''); setShowMapping(false); }}
+              className="ms-auto text-[13px]" style={{ color: '#a78bfa' }}>
+              {language === 'tr' ? 'Değiştir' : 'Change'}
+            </button>
+          )}
         </div>
 
         <div style={card}>
@@ -923,74 +1017,6 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                   )}
                 </div>
 
-                {/* Hedef: yeni journal mı, açık journal mı */}
-                <div className="mt-6">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3"
-                    style={{ color: 'rgba(255,255,255,0.3)' }}>
-                    {t('importTarget')}
-                  </div>
-
-                  {locked ? (
-                    // Journal'ın içinden: yalnızca bu journal.
-                    <div className="px-4 py-3 rounded-xl text-sm"
-                      style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)', color: '#fff' }}>
-                      {t('importToExisting')}
-                      {journalName && <span style={{ color: 'rgba(255,255,255,0.5)' }}> — {journalName}</span>}
-                    </div>
-                  ) : (
-                  <div className="space-y-2">
-                    <button type="button" onClick={() => setTarget('new')}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all"
-                      style={target === 'new'
-                        ? { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)' }
-                        : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                      <span className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center"
-                        style={{ border: `2px solid ${target === 'new' ? '#8b5cf6' : 'rgba(255,255,255,0.25)'}` }}>
-                        {target === 'new' && <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#8b5cf6' }} />}
-                      </span>
-                      <span className="text-sm" style={{ color: target === 'new' ? '#fff' : 'rgba(255,255,255,0.6)' }}>
-                        {t('importToNew')}
-                      </span>
-                    </button>
-
-                    {target === 'new' && (
-                      <input type="text" value={newName} onChange={e => setNewName(e.target.value)}
-                        placeholder={t('journalNamePlaceholder')}
-                        className="w-full outline-none text-sm"
-                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-                          color: '#fff', borderRadius: '12px', padding: '10px 14px', marginInlineStart: 0 }} />
-                    )}
-
-                    {journals.length > 0 && (
-                      <button type="button" onClick={() => setTarget('existing')}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-start transition-all"
-                        style={target === 'existing'
-                          ? { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)' }
-                          : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <span className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center"
-                          style={{ border: `2px solid ${target === 'existing' ? '#8b5cf6' : 'rgba(255,255,255,0.25)'}` }}>
-                          {target === 'existing' && <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#8b5cf6' }} />}
-                        </span>
-                        <span className="text-sm" style={{ color: target === 'existing' ? '#fff' : 'rgba(255,255,255,0.6)' }}>
-                          {t('importToExisting')}
-                        </span>
-                      </button>
-                    )}
-
-                    {/* Journal sayısı ne olursa olsun hepsi listede. */}
-                    {target === 'existing' && journals.length > 0 && (
-                      <select value={picked} onChange={e => setPicked(e.target.value)}
-                        className="w-full outline-none text-sm"
-                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-                          color: '#fff', borderRadius: '12px', padding: '10px 14px' }}>
-                        {journals.map(j => (
-                          <option key={j.id} value={j.id} style={{ background: '#1a1b2e', color: '#fff' }}>{j.name}</option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                  )}
-                </div>
               </div>
             )}
 
@@ -1030,6 +1056,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
             <span>{fileName}</span>
           </div>
         )}
+        </>)}
       </div>
     </div>
   );
