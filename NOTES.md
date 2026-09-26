@@ -81,3 +81,36 @@ Site denetimi (2026-09-26): genel olgunluk ~%45. Ürün ve tasarım güçlü
 - MT5 anahtarını hesap numarasına bağlamak (aynı anahtar iki hesaba
   yapıştırılınca işlemler karışıyor — iki kez yaşandı).
 - CSV/HTML içe aktarma, açık kaydı tamamlama mantığını henüz kullanmıyor.
+
+### MetaTrader kurulum videosu (bekliyor: kullanıcının ekran kaydı)
+Yapay zekâ videosu değil — gerçek ekran kaydı + Remotion kurgusu (yakınlaşma,
+imleç vurgusu, adım numaraları, 9 dile altyazı). Kredi gerekmez.
+Kayıt: demo hesap + kayıt için geçici anahtar (sonra iptal), Rahatsız Etme
+açık, Cmd+Shift+5 "Fare Tıklamalarını Göster". Dosyalar masaüstünde
+`STJ-Kayit/`: 01-indir, 02-klasor, 03-izin, 04-yeniden-baslat, 05-anahtar,
+06-grafik, 07-sonuc. Kullanıcı "kayıtlar hazır" deyince kurguya başlanacak.
+
+### Fiyatlandırma planı (öneri 2026-09-26 — kararlar bekliyor)
+Rakipler: TradeZella $35–99, TraderSync $29.95–79.95, Tradervue $29.95–49.95,
+Edgewonk $197/yıl, TradesViz ücretsiz + $19.99–29.99, FX Replay ücretsiz +
+$17.99–35. Mevcut planımız: Ücretsiz (toplam 20 işlem) + Pro $12.99/ay, $99/yıl.
+Öneri:
+- 14 gün tam Pro, kartsız (tersine deneme) → sonra Ücretsiz'e düşüş.
+- Ücretsiz: 1 journal, ayda 30 işlem (her ay yenilenir), elle giriş + CSV,
+  temel istatistik, takvim, seans/haber sayfaları, prop puanlama; disiplin
+  analizi yalnız önizleme.
+- Pro $14.99/ay, $119/yıl: 3 journal, sınırsız işlem, MT5 otomatik kayıt
+  (1 hesap), disiplin, ısı haritası, bildirimler, AI, 1 prop hesabı, CSV dışa aktarma.
+- Prop $24.99/ay, $199/yıl: sınırsız journal ve prop hesabı, 10 MT5 hesabı,
+  yüksek AI limiti, öncelikli destek.
+- Yıllıkta 14 gün para iadesi; 6 aylık plan yok.
+- Türkiye TL (KDV dahil): Pro 349 TL/ay, 2.790 TL/yıl; Prop 599 TL/ay,
+  4.790 TL/yıl. 6 ayda bir gözden geçir. Diğer ülkeler 3 grup
+  (tam / %30 / %50 indirim). İran'dan yaptırımlar nedeniyle ödeme alınamaz.
+- Kurucu üye kampanyası: ilk 500 kişi / ilk 3 ay, Pro yıllık $79 (1.990 TL),
+  ömür boyu bu fiyat; karşılığında kullanıcı yorumu.
+- E-posta dizisi: gün 0, 1, 3, 7, 12, 14, 30 (Resend/Loops gerekir).
+- İptal akışı: dondurma veya 2 ay %50; davet: iki tarafa 1 ay Pro.
+- Altyapı: Paddle veya Lemon Squeezy (MoR, yerel fiyat, KDV). Stripe
+  Türkiye'deki şirketlere doğrudan açık değil.
+Açık kararlar: Prop kademesi olsun mu, TR fiyatı 349 TL mi, kurucu kampanyası.
