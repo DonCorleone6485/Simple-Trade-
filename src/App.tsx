@@ -1164,6 +1164,12 @@ export default function App() {
           /* Giriş yapmış kullanıcı için ana sayfa — CTA'lar journal'a götürür */
           <LandingPage
             signedIn
+            account={{
+              label: user?.firstName || user?.emailAddresses[0]?.emailAddress,
+              image: user?.imageUrl,
+              isPro,
+              onSignOut: () => signOut(),
+            }}
             onGetStarted={() => navigate('journal')}
             onSignIn={() => navigate('journal')}
           />

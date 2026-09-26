@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import {
   TrendingUp, BookOpen, BarChart2, CalendarDays, Target, Sparkles, Upload,
   Check, ChevronDown, ArrowRight, Shield, Globe, Zap, Mic, ListChecks, Clock,
-  Newspaper, Wallet, Gauge, Lock,
+  Newspaper, Wallet, Gauge, Lock, LogOut,
 } from 'lucide-react';
 import {
   AreaChart, Area, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip,
@@ -18,6 +18,12 @@ interface LandingPageProps {
   onSignIn: () => void;
   /** Kullanıcı zaten giriş yapmışsa CTA'lar auth yerine journal'a yönlenir. */
   signedIn?: boolean;
+  /**
+   * Giriş yapmış kullanıcının hesap menüsü. Çıkış yalnızca journal'ın sol
+   * menüsündeydi: ana sayfaya dönen biri çıkmak için önce journal'a girmek
+   * zorunda kalıyordu.
+   */
+  account?: { label?: string; image?: string; isPro?: boolean; onSignOut: () => void };
 }
 
 const equityData = [
@@ -108,12 +114,22 @@ function PropScore({ language }: { language: string }) {
   );
 }
 
-export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }: LandingPageProps) {
+export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, account }: LandingPageProps) {
   const { language, setLanguage } = useLanguage();
   const isRTL = language === 'fa' || language === 'ar';
   const shouldReduceMotion = useReducedMotion();
   const [scrolled, setScrolled] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!accountOpen) return;
+    const close = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) setAccountOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [accountOpen]);
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
 
   /**
@@ -462,6 +478,46 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false }
               {signedIn && <BookOpen className="w-4 h-4" />}
               {ctaLabel}
             </button>
+
+            {signedIn && account && (
+              <div className="relative" ref={accountRef}>
+                <button onClick={() => setAccountOpen(o => !o)}
+                  title={account.label}
+                  className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
+                  style={{ background: 'rgba(139,92,246,0.18)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  {account.image
+                    ? <img src={account.image} alt="" className="w-full h-full object-cover" />
+                    : <span className="text-[13px] font-medium" style={{ color: '#a78bfa' }}>
+                        {(account.label || '?').charAt(0).toUpperCase()}
+                      </span>}
+                </button>
+                {accountOpen && (
+                  <div className="absolute top-full end-0 mt-2 w-56 rounded-xl shadow-xl overflow-hidden z-50 py-1"
+                    style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div className="text-sm truncate" style={{ color: '#fff' }}>{account.label}</div>
+                      {account.isPro && <div className="text-[10px] tracking-wider mt-0.5" style={{ color: '#a78bfa' }}>PRO</div>}
+                    </div>
+                    <button onClick={() => { setAccountOpen(false); onGetStarted(); }}
+                      className="w-full flex items-center gap-2.5 text-start px-4 py-2.5 text-sm transition-colors"
+                      style={{ color: 'rgba(255,255,255,0.75)' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                      <BookOpen className="w-4 h-4" />
+                      {t("Journal'a Git", 'Go to Journal', 'رفتن به ژورنال')}
+                    </button>
+                    <button onClick={() => { setAccountOpen(false); account.onSignOut(); }}
+                      className="w-full flex items-center gap-2.5 text-start px-4 py-2.5 text-sm transition-colors"
+                      style={{ color: '#f87171' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(248,113,113,0.08)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                      <LogOut className="w-4 h-4" />
+                      {t('Çıkış Yap', 'Sign Out', 'خروج')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </header>
