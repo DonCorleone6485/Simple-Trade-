@@ -4,7 +4,7 @@ import {
   Trash2, BookOpen, Clock, TrendingUp, X,
   Target, DollarSign, Activity, PieChart,
   CalendarDays, BarChart2, List, LogOut, User,
-  Upload, Check, Shield, Home, Printer
+  Upload, Check, Shield, Home, Printer, Plug
 } from 'lucide-react';
 import {
   SignIn, SignUp, useUser, useClerk, SignedIn, SignedOut
@@ -17,6 +17,7 @@ import PricingPage from './components/PricingPage';
 import PaymentModal from './components/PaymentModal';
 import CSVImport, { ImportTarget } from './components/CSVImport';
 import MTConnect from './components/MTConnect';
+import MTTargetPicker, { MTTarget } from './components/MTTargetPicker';
 import SessionsView from './components/SessionsView';
 import NewsView from './components/NewsView';
 import DisciplineView from './components/DisciplineView';
@@ -719,6 +720,44 @@ export default function App() {
 
   const openJournal = (account: Account) => goTo({ view: 'expanded', journal: account, tab: 'trades' });
 
+  /**
+   * MetaTrader düğmesi — İçe Aktar'ın yanında. Journal'ın içinden: doğrudan o
+   * journal'ın bağlantı sayfası. Journal listesinden: önce hedef seçilir (yeni
+   * ya da mevcut), sonra o journal'ın bağlantı sayfasına gidilir.
+   */
+  const [showMTPicker, setShowMTPicker] = useState(false);
+  const handleMTTarget = async (target: MTTarget) => {
+    if (!user) return;
+    if (target.kind === 'existing') {
+      const acc = accounts.find(a => a.id === target.journalId);
+      setShowMTPicker(false);
+      if (acc) goTo({ view: 'expanded', journal: acc, tab: 'mtConnect' });
+      return;
+    }
+    if (!isPro && accounts.length >= 1) {
+      setShowMTPicker(false);
+      setUpgradeReason('journal');
+      setShowUpgradeModal(true);
+      return;
+    }
+    // Sermaye varsayılan 10.000 ile açılıyor; uzman ilk bağlandığında hesabın
+    // gerçek başlangıç sermayesini kendisi yazıyor.
+    const { data, error } = await supabase.from('journals').insert({
+      user_id: user.id,
+      name: target.name,
+      start_date: new Date().toISOString().slice(0, 10),
+      starting_capital: 10000,
+    }).select().single();
+    if (error || !data) {
+      alert(language === 'tr' ? 'Journal oluşturulamadı.' : 'Could not create the journal.');
+      return;
+    }
+    const acc = accountFromRow(data);
+    setAccounts(prev => [...prev, acc]);
+    setShowMTPicker(false);
+    goTo({ view: 'expanded', journal: acc, tab: 'mtConnect' });
+  };
+
   const goToAuth = (targetView: AuthView) => {
     // Clear any in-page anchor hash left by the landing page (#features etc.)
     // so it can't be mistaken for one of Clerk's own hash-routing steps.
@@ -844,6 +883,15 @@ export default function App() {
         <Upload className="w-4 h-4" />
         <span className="hidden md:inline">{importLabel}</span>
       </button>
+      {/* Telefonda da görünür (simge olarak): sol menüde artık MetaTrader yok. */}
+      <button onClick={() => setShowMTPicker(true)}
+        className="flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
+        style={pillBtn}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+        <Plug className="w-4 h-4" />
+        <span className="hidden md:inline">{t('mtConnectTab')}</span>
+      </button>
       <button onClick={handleNewJournalClick}
         className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium"
         style={{ background: '#8b5cf6', color: '#fff', transition: 'all 150ms cubic-bezier(0.4,0,0.2,1)' }}
@@ -872,6 +920,14 @@ export default function App() {
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
           <Upload className="w-4 h-4" />
           <span className="hidden md:inline">{importLabel}</span>
+        </button>
+        <button onClick={() => goTo({ view: 'expanded', tab: 'mtConnect' })}
+          className="flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
+          style={journalTab === 'mtConnect' ? { ...pillBtn, background: 'rgba(139,92,246,0.15)', color: '#fff', border: '1px solid rgba(139,92,246,0.35)' } : pillBtn}
+          onMouseEnter={e => { if (journalTab !== 'mtConnect') (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
+          onMouseLeave={e => { if (journalTab !== 'mtConnect') (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
+          <Plug className="w-4 h-4" />
+          <span className="hidden md:inline">{t('mtConnectTab')}</span>
         </button>
         <button onClick={handleNewTradeClick}
           className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium"
@@ -1022,6 +1078,15 @@ export default function App() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* MetaTrader: journal listesinden hedef seçimi */}
+      {showMTPicker && user && (
+        <MTTargetPicker
+          journals={accounts.map(a => ({ id: a.id, name: a.name }))}
+          onChoose={handleMTTarget}
+          onClose={() => setShowMTPicker(false)}
+        />
       )}
 
       {/* CSV Import */}
