@@ -827,7 +827,7 @@ export function MacFa({ music = true }: { music?: boolean }) {
       </Window>
 
       <Window from={MAC.end} to={MAC.duration}>
-        <Endcard start={MAC.end} line="بازی‌ات را دوباره ببین." cta="رایگان شروع کنید" lineFamily={serif} ctaFamily={sans} logoWidth={1150} gap={64} />
+        <Endcard start={MAC.end} line="مبارزه‌ات را دوباره ببین." cta="رایگان شروع کنید" lineFamily={serif} ctaFamily={sans} logoWidth={1150} gap={64} />
       </Window>
 
       <Vignette strength={0.75} />

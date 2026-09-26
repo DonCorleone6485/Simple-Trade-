@@ -95,7 +95,7 @@ for a, b in [('Her işlem kendiliğinden kaydolur.', 'هر معامله خودب
              ('Grafiğin ve notun, hepsi yerinde.', 'نمودار و یادداشتت، همه سر جایش.'), ('Haftanı tek bakışta gör.', 'هفته‌ات را در یک نگاه ببین.')]:
     r(f"['{a}',", f"['{b}',")
 r("<Words text={caption} start={at} size={72} stagger={0.05} dur={0.35} />", "<Words text={caption} family={serif} weight={600} letterSpacing=\"0\" start={at} size={72} stagger={0.05} dur={0.35} />")
-r('<Endcard start={MAC.end} line="Kasetini izle." logoWidth={1150} gap={64} />', '<Endcard start={MAC.end} line="بازی‌ات را دوباره ببین." cta="رایگان شروع کنید" lineFamily={serif} ctaFamily={sans} logoWidth={1150} gap={64} />')
+r('<Endcard start={MAC.end} line="Kasetini izle." logoWidth={1150} gap={64} />', '<Endcard start={MAC.end} line="مبارزه‌ات را دوباره ببین." cta="رایگان شروع کنید" lineFamily={serif} ctaFamily={sans} logoWidth={1150} gap={64} />')
 r("color: C.text, marginTop: 8 }}>$202.50</div>", "color: C.text, marginTop: 8, direction: 'ltr', textAlign: 'right' }}>$202.50</div>")
 r("color: C.red, marginTop: 8 }}>−$351.00</div>", "color: C.red, marginTop: 8, direction: 'ltr', textAlign: 'right' }}>−$351.00</div>")
 r('title="Hemen geri girme" desc="Kaybettikten sonra 15 dakika içinde açılan işlemler"', 'title="بازگشت فوری" desc="معاملات باز شده تا ۱۵ دقیقه پس از ضرر"')
