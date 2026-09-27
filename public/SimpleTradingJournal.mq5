@@ -12,7 +12,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Simple Trading Journal"
 #property link      "https://www.simpletradejournal.io"
-#property version   "1.05"
+#property version   "1.06"
 #property strict
 
 // Girdi etiketleri MQL5'te yorum satırından gelir ve ekranda öyle görünür.
@@ -619,6 +619,13 @@ bool Send(const string json, const int count)
         {
          Status("Anahtar gecersiz ya da iptal edilmis.\nSiteden yeni anahtar olusturup buraya yapistir.");
          Print("Anahtar geçersiz ya da iptal edilmiş. Journal'dan yeni anahtar oluştur.");
+        }
+      else if(status == 409)
+        {
+         // Anahtar başka bir MetaTrader hesabına bağlı: işlemler yanlış
+         // journal'a gitmesin diye sunucu reddetti.
+         Status("Bu anahtar baska bir MetaTrader hesabina bagli.\nBu hesap icin siteden yeni anahtar olusturup buraya yapistir.");
+         Print("Bu anahtar başka bir MetaTrader hesabına bağlı. Bu hesap için sitede yeni anahtar oluştur.");
         }
       else
          Status("Sunucu hatasi (" + IntegerToString(status) + ").");

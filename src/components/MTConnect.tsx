@@ -12,6 +12,8 @@ interface ApiKey {
   label: string | null;
   created_at: string;
   last_used_at: string | null;
+  /** Anahtarın kilitlendiği MetaTrader hesabı: "•••4521 · Sunucu". Henüz bağlanmadıysa yok. */
+  mt_hint?: string | null;
 }
 
 interface MTConnectProps {
@@ -203,9 +205,14 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
         ) : (
           <ul>
             {keys.map((k, i) => (
-              <li key={k.id} className="flex items-center gap-4 py-3"
+              <li key={k.id} className="flex items-center gap-4 py-3 flex-wrap"
                 style={{ borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.05)' }}>
                 <code className="font-mono text-[15px] px-2.5 py-1 rounded-lg" style={{ color: '#fff', background: 'rgba(0,0,0,0.3)' }}>{k.key_hint}</code>
+                {/* Hangi MetaTrader hesabına kilitli: aynı anahtar başka hesapta reddediliyor. */}
+                <span className="text-[12px] font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}
+                  title={tr('Bu anahtar yalnızca bu MetaTrader hesabından veri kabul eder.', 'This key only accepts data from this MetaTrader account.')}>
+                  {k.mt_hint || tr('henüz hesaba bağlanmadı', 'not linked to an account yet')}
+                </span>
                 {/* "Aktif": uzman son bir haftada bu anahtarla veri göndermiş. */}
                 {k.last_used_at && Date.now() - new Date(k.last_used_at).getTime() < 7 * 86400000 && (
                   <span className="text-[11px] font-medium px-2 py-0.5 rounded-full"
@@ -231,6 +238,9 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
         <p className="text-[12.5px] leading-relaxed mt-4 pt-4" style={{ color: 'rgba(255,255,255,0.35)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           {tr('Güvenlik için anahtarın tamamı saklanmaz, yalnızca ilk ve son harfleri görünür. MetaTrader anahtarı zaten hatırlar; kaybettiysen 4. adımdan yenisini oluştur ve eskisini buradan iptal et.',
               'For security the full key is never stored; only its first and last characters are shown. MetaTrader remembers the key anyway; if you lose it, create a new one in step 4 and revoke the old one here.')}
+          {' '}
+          {tr('Her anahtar ilk bağlandığı MetaTrader hesabına kilitlenir; başka bir hesabın grafiğine yapıştırılırsa işlem göndermez. Her hesap için ayrı anahtar oluştur.',
+              'Each key locks to the first MetaTrader account it connects from; pasted into another account\'s chart it sends nothing. Create a separate key for each account.')}
         </p>
       </div>
 

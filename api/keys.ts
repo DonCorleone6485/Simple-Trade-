@@ -56,7 +56,7 @@ export default async function handler(req: any, res: any) {
   if (req.method === 'GET') {
     const { data } = await supabase
       .from('api_keys')
-      .select('id, journal_id, key_hint, label, created_at, last_used_at')
+      .select('id, journal_id, key_hint, label, created_at, last_used_at, mt_hint')
       .eq('user_id', userId)
       .eq('revoked', false)
       .order('created_at', { ascending: false });

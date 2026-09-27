@@ -203,12 +203,32 @@ export default async function handler(req: any, res: any) {
 
   const { data: apiKey } = await supabase
     .from('api_keys')
-    .select('id, user_id, journal_id')
+    .select('id, user_id, journal_id, mt_fingerprint')
     .eq('key_hash', hash(key))
     .eq('revoked', false)
     .maybeSingle();
 
   if (!apiKey) return res.status(401).json({ error: 'Invalid key' });
+
+  // Anahtar ilk bağlandığı MetaTrader hesabına kilitlenir. Aynı anahtar başka
+  // bir hesabın grafiğine yapıştırılınca o hesabın işlemleri yanlış journal'a
+  // akıyordu (iki kez yaşandı: Instant Funding işlemleri başka journal'a
+  // düştü). Artık reddediliyor ve EA ne yapılacağını söylüyor. Eski EA hesap
+  // bilgisi göndermediği için onda kontrol yapılamıyor.
+  if (fingerprint) {
+    if (!apiKey.mt_fingerprint) {
+      const hint = `•••${login.slice(-4)} · ${String(mt?.server || '').trim().slice(0, 60)}`;
+      await supabase.from('api_keys')
+        .update({ mt_fingerprint: fingerprint, mt_hint: hint })
+        .eq('id', apiKey.id)
+        .is('mt_fingerprint', null);
+    } else if (apiKey.mt_fingerprint !== fingerprint) {
+      return res.status(409).json({
+        error: 'This key is linked to another MetaTrader account. Create a new key for this account on the site.',
+        code: 'key_bound_elsewhere',
+      });
+    }
+  }
 
   // Kullanıcının hangi işlemleri zaten var — aynı pozisyon iki kez gönderilse
   // de ikinci kez eklenmesin. EA her açılışta geçmişi baştan taradığı için bu
