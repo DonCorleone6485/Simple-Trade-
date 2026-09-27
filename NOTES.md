@@ -114,7 +114,10 @@ Okunabilirlik (kontrast, aria etiketleri). Uygulamanın 9 dile çevirisi
 E-posta: Google Workspace (admin@simpletradejournal.io; takma adlar info@,
 support@, billing@, privacy@ aynı kutuya düşer). Namecheap'te MX (1 smtp.google.com), SPF,
 DKIM (google._domainkey, 2048 bit), DMARC ve Google doğrulama kaydı var.
-İleride DMARC p=none → p=quarantine yapılabilir. Paket: Business Starter, Esnek (aylık) plan;
+İleride DMARC p=none → p=quarantine yapılabilir (önce admin@'e gelen DMARC
+raporlarında Google, Clerk ve Resend'in geçtiği görülsün). 2026-09-27: Outlook
+hem Clerk kodunu hem Resend hoş geldin postasını Gereksiz'e attı — yeni alan adı
+itibarı; kimlik doğrulama kayıtları doğru. Kod ekranına "Spam'e bak" notu eklendi. Paket: Business Starter, Esnek (aylık) plan;
 ücretli dönem 2026-10-11'de başlıyor — o tarihe kadar ödeme yöntemi ekli olmalı.
 Abonelik hatırlatması 2026-10-25'e kuruldu.
 
