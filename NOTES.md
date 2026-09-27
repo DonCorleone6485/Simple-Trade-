@@ -87,8 +87,10 @@ hesap ya da karar bekliyor.
 4. **Blog / eğitim içeriği** — YAPILDI (2026-09-28): /blog, 2 rehber + 3 yazı,
    ön çizimli. 9 DİLDE (2026-09-28): metinler src/content/articles/<dil>.ts, sıra ve
    tarih src/content/articles.ts; eksik dil İngilizceye düşer. Sayfa, sitemap ve
-   yönlendirme kendiliğinden. Kalan: rakip karşılaştırmaları — rakiplerin güncel fiyat/özellikleri
-   doğrulanmadan yazılmamalı; daha fazla yazı.
+   yönlendirme kendiliğinden. Rakip karşılaştırmaları YAPILDI (2026-09-28): Tradezella, TraderSync,
+   Edgewonk — /blog/<ad>-alternative, 9 dil; rakip verileri tek tabloda
+   (üretici betik: compare_gen, veriler Eylül 2026) — fiyatlar 3-6 ayda bir
+   kontrol edilmeli. Kalan: daha fazla yazı.
 5. **Yardım merkezi** — 13 soru + rehber bağlantıları. Kalan: yol haritası sayfası.
 6. **PWA + bildirim** — manifest YAPILDI; sekme kapalıyken bildirim YAPILDI (2026-09-28):
    public/sw.js (yalnız push, önbellek yok), src/lib/push.ts (abonelik),
