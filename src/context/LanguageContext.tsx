@@ -1,4 +1,5 @@
 import { cur } from '../lib/format';
+import { loadAppCopy, needsAppCopy } from '../lib/appCopy';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Language = 'tr' | 'en' | 'fa' | 'ar' | 'ru' | 'es' | 'pt' | 'de' | 'fr';
@@ -416,8 +417,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   /** Seçim kalıcı olsun: yenilemede ya da ertesi gün sıfırlanmasın. */
   const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
     try { localStorage.setItem(STORAGE_KEY, lang); } catch { /* önemsiz */ }
+    // Çeviri tablosu ayrı dosyada; dil, tablo gelince değişsin (bkz. appCopy.ts).
+    if (needsAppCopy(lang)) loadAppCopy().then(() => setLanguageState(lang));
+    else setLanguageState(lang);
   };
 
   // Tarayıcı dili tanıdık değilse ülkeye bakarız — İngilizce'ye düşürmeden
@@ -431,7 +434,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       .then(data => {
         const guess = data && COUNTRY_LANGUAGE[data.country];
         // Seçimi kaydetmiyoruz: tahmin, kullanıcının kararı değil.
-        if (!cancelled && guess) setLanguageState(guess);
+        if (!cancelled && guess) loadAppCopy().then(() => { if (!cancelled) setLanguageState(guess); });
       })
       .catch(() => { /* ülke öğrenilemedi, İngilizce kalır */ });
     return () => { cancelled = true; };

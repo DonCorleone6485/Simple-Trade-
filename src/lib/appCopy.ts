@@ -12,12 +12,31 @@
  *
  * {0}, {1}… yer tutucuları çağıran taraftan gelen değerlerle doluyor.
  */
-import { APP_COPY } from './appCopyData';
+
+/**
+ * Tablo (~90 KB) ana pakette değil, ayrı dosyada: Türkçe ve İngilizce
+ * kullanıcıların hiç ihtiyacı yok. Öbür dillerde uygulama çizilmeden önce
+ * yükleniyor (main.tsx, LanguageContext.setLanguage) — yoksa bir an
+ * İngilizce görünürdü. Yüklenene kadar pick() İngilizceye düşer.
+ */
+let APP_COPY: Record<string, Record<string, string>> = {};
+let loading: Promise<void> | null = null;
+
+export const needsAppCopy = (language: string) => language !== 'tr' && language !== 'en';
+
+export function loadAppCopy(): Promise<void> {
+  if (!loading) {
+    loading = import('./appCopyData')
+      .then(m => { APP_COPY = m.APP_COPY as Record<string, Record<string, string>>; })
+      .catch(() => { loading = null; /* bir dahaki dil değişiminde yeniden denenir */ });
+  }
+  return loading;
+}
 
 export function pick(language: string, trText: string, enText: string, ...args: (string | number | null | undefined)[]): string {
   const base = language === 'tr' ? trText
     : language === 'en' ? enText
-    : (APP_COPY[enText] as Record<string, string> | undefined)?.[language] ?? enText;
+    : APP_COPY[enText]?.[language] ?? enText;
   return args.length ? base.replace(/\{(\d+)\}/g, (m, i) => (args[+i] == null ? '' : String(args[+i]))) : base;
 }
 

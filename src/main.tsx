@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
 import App from './App';
-import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { LanguageProvider, useLanguage, detectLanguage } from './context/LanguageContext';
+import { loadAppCopy, needsAppCopy } from './lib/appCopy';
 import './index.css';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -37,12 +38,17 @@ function ClerkWithLanguage({ children }: { children: React.ReactNode }) {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <LanguageProvider>
-      <ClerkWithLanguage>
-        <App />
-      </ClerkWithLanguage>
-    </LanguageProvider>
-  </React.StrictMode>
-);
+// Türkçe/İngilizce dışındaki dillerde çeviri tablosu gelmeden çizmiyoruz;
+// yoksa ilk anda İngilizce görünür (bkz. lib/appCopy.ts).
+const initial = detectLanguage();
+(needsAppCopy(initial) ? loadAppCopy() : Promise.resolve()).then(() => {
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <LanguageProvider>
+        <ClerkWithLanguage>
+          <App />
+        </ClerkWithLanguage>
+      </LanguageProvider>
+    </React.StrictMode>
+  );
+});
