@@ -99,9 +99,13 @@ Kararlar (kullanıcı):
 - İki plan: Ücretsiz ve Pro. Prop kademesi yok.
 - Asıl sınır işlem sayısı (Google Flow'un günlük kredisi gibi), istatistik değil.
 - Ücretsizde kapalı: sesli not, yapay zekâ (analiz + not düzeltme).
-- Deneme 3 gün tam Pro, kartsız — YAPILDI (b5ad7db): /api/trial; geçici
-  e-postaya deneme yok; EA 1.05 hesap no + sunucu gönderiyor, aynı MT hesabı
-  başka bir denemede görüldüyse deneme biter (mt_accounts, yalnız özet).
+- Deneme 3 gün tam Pro, kartsız — YAPILDI. Kayıtta başlamaz: kullanıcı önce
+  Ücretsiz'i kullanır, ilk sınıra takılınca yükseltme penceresinde "Pro'yu 3 gün
+  ücretsiz dene · kart gerekmez" görür ve kendisi başlatır (/api/trial start).
+  EA 1.05 hesap no + sunucu gönderiyor; aynı MT hesabı başka bir denemede
+  görüldüyse deneme biter (mt_accounts, yalnız özet).
+- Tek kullanımlık e-posta: ne deneme ne ücretsiz — hesap açılmaz, "gerçek
+  e-posta" ekranında durur (e-posta pazarlaması için gerçek adres şart).
 
 Önerim, onay bekliyor:
 - Ücretsiz: 1 journal, günde 2 işlem. MetaTrader ve içe aktarma günde 2;
@@ -113,5 +117,9 @@ Kararlar (kullanıcı):
 - Altyapı: Paddle veya Lemon Squeezy (MoR). Kilitlerden ÖNCE ödeme kurulmalı —
   şu an ödeme düğmesi "Yakında".
 Açık: fiyat, kurucu kampanyası, günlük sınırın sayısı (2?).
-Güvenlik: public.users RLS herkese açık (users_policy ALL true) — anon anahtarla
-is_pro yazılabiliyor; deneme ve Pro kısıtları bu kapanmadan gerçek koruma değil.
+Güvenlik: users tablosunda Pro/deneme alanlarını tarayıcı yazamıyor
+(protect_user_privileges tetikleyicisi, silme yetkisi yok), referrals RLS açık,
+/api/referral kimliği Clerk oturumundan alıyor — YAPILDI.
+AÇIK KALAN (ACİL): trades ve journals politikaları `true` — herkese açık anon
+anahtarla bütün kullanıcıların işlemleri okunup silinebiliyor. Çözüm: Clerk ↔
+Supabase third-party auth + user_id = auth.jwt()->>'sub' politikaları.

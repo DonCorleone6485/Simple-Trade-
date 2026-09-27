@@ -168,6 +168,11 @@ export default function App() {
   const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
   /** Deneme, MT hesabı başka bir denemede kullanıldığı için bittiyse bir kez söylenir. */
   const [trialNotice, setTrialNotice] = useState(false);
+  /** Deneme hiç kullanılmadı: sınıra takılınca "3 gün ücretsiz dene" teklif edilir. */
+  const [trialAvailable, setTrialAvailable] = useState(false);
+  const [startingTrial, setStartingTrial] = useState(false);
+  /** Tek kullanımlık e-postayla açılmış hesap: uygulama açılmıyor. */
+  const [emailBlocked, setEmailBlocked] = useState(false);
 
   const isRTL = language === 'fa' || language === 'ar';
 
@@ -220,19 +225,25 @@ export default function App() {
 
   const checkProStatus = async () => {
     if (!user) return;
-    const cols = 'is_pro, has_paid, pro_until, trial_started_at, trial_ends_at, trial_denied';
+    const cols = 'is_pro, has_paid, pro_until, trial_started_at, trial_ends_at, trial_denied, email_checked_at, email_disposable';
     let { data } = await supabase.from('users').select(cols).eq('user_id', user.id).maybeSingle();
 
-    // Deneme bir kez, ilk açılışta. Kararı sunucu veriyor (e-posta kontrolü
-    // orada); başarısız olursa bir sonraki açılışta yeniden denenir.
-    if (!data?.trial_started_at) {
+    // E-posta bir kez, sunucuda kontrol ediliyor (Clerk'ten okunuyor).
+    // Başarısız olursa kimse engellenmiyor; bir sonraki açılışta yeniden denenir.
+    if (!data?.email_checked_at) {
       try {
         const token = await getToken();
-        const r = await fetch('/api/trial', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+        const r = await fetch('/api/trial', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: 'check' }),
+        });
         if (r.ok) ({ data } = await supabase.from('users').select(cols).eq('user_id', user.id).maybeSingle());
-      } catch { /* deneme olmadan devam */ }
+      } catch { /* kontrol olmadan devam */ }
     }
+    setEmailBlocked(!!data?.email_disposable);
 
+    if (!data) setTrialAvailable(true);
     if (data) {
       // pro_until saat dilimsiz tutuluyor ve UTC yazılıyor. Olduğu gibi
       // okununca Türkiye'de süre üç saat geç bitiyordu.
@@ -254,6 +265,7 @@ export default function App() {
 
       setIsPro(!!isStillPro);
       setHasPaid(data.has_paid || false);
+      setTrialAvailable(!data.trial_started_at && !isStillPro && !data.has_paid && !data.email_disposable);
 
       const trialEnd = data.trial_ends_at ? new Date(data.trial_ends_at) : null;
       setTrialEndsAt(isStillPro && !data.has_paid && !data.trial_denied && trialEnd && trialEnd > new Date() ? trialEnd : null);
@@ -263,6 +275,23 @@ export default function App() {
           if (!localStorage.getItem('trialNoticeSeen')) setTrialNotice(true);
         } catch { setTrialNotice(true); }
       }
+    }
+  };
+
+  /** Sınıra takılan kullanıcı "3 gün ücretsiz dene"ye bastı. */
+  const startTrial = async () => {
+    setStartingTrial(true);
+    try {
+      const token = await getToken();
+      const r = await fetch('/api/trial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'start' }),
+      });
+      if (r.ok) setShowUpgradeModal(false);
+      await checkProStatus();
+    } finally {
+      setStartingTrial(false);
     }
   };
 
@@ -1096,21 +1125,35 @@ export default function App() {
               )}
             </div>
 
-            <div className="flex items-center gap-2 mb-6 mt-4 px-3 py-2 rounded-xl"
-              style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.15)' }}>
-              <Shield className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
-              <span className="text-xs font-medium" style={{ color: '#34d399' }}>
-                {language === 'tr' ? '3 Gün Ücretsiz Dene — 3. günün sonunda ödeme alınır' : '3-Day Free Trial — charged on day 3'}
-              </span>
-            </div>
-
-            <button onClick={() => { setShowUpgradeModal(false); setShowPaymentModal(true); }}
-              className="w-full py-3 rounded-full text-sm font-medium mb-6 transition-all"
-              style={{ background: '#8b5cf6', color: '#fff' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
-              {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
-            </button>
+            {trialAvailable ? (
+              <div className="mt-5 mb-6">
+                {/* Deneme hakkı olan kullanıcıya önce deneme: kart istemeden
+                    bütün Pro'yu görsün, satın alma kararını ondan sonra versin. */}
+                <button onClick={startTrial} disabled={startingTrial}
+                  className="w-full py-3 rounded-full text-sm font-semibold transition-all disabled:opacity-60"
+                  style={{ background: '#8b5cf6', color: '#fff' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+                  {t('trialStartCta')}
+                </button>
+                <div className="flex items-center justify-center gap-1.5 mt-2.5">
+                  <Shield className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#34d399' }} />
+                  <span className="text-xs" style={{ color: '#34d399' }}>{t('trialNoCard')}</span>
+                </div>
+                <button onClick={() => { setShowUpgradeModal(false); setShowPaymentModal(true); }}
+                  className="w-full mt-3 text-xs underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  {t('trialOrUpgrade')}
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => { setShowUpgradeModal(false); setShowPaymentModal(true); }}
+                className="w-full py-3 rounded-full text-sm font-medium mt-5 mb-6 transition-all"
+                style={{ background: '#8b5cf6', color: '#fff' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
+                {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
+              </button>
+            )}
 
             <div className="space-y-3 mb-6">
               {proFeaturesList.map((f, i) => (
@@ -1215,6 +1258,21 @@ export default function App() {
       )}
 
       <SignedIn>
+        {/* Tek kullanımlık e-postayla açılmış hesap: ne deneme ne ücretsiz plan.
+            İleride e-postayla ulaşabileceğimiz gerçek bir adres istiyoruz. */}
+        {emailBlocked && (
+          <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: '#0d0e1a' }}>
+            <div className="w-full max-w-md rounded-2xl p-7 space-y-4 text-center"
+              style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <h2 className="font-display text-[21px] font-medium text-white">{t('emailBlockedTitle')}</h2>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('emailBlockedBody')}</p>
+              <button onClick={() => signOut()}
+                className="cta w-full py-3 rounded-full text-sm font-semibold" style={{ background: '#8b5cf6', color: '#fff' }}>
+                {t('emailBlockedSignOut')}
+              </button>
+            </div>
+          </div>
+        )}
         {page === 'home' ? (
           /* Giriş yapmış kullanıcı için ana sayfa — CTA'lar journal'a götürür */
           <LandingPage

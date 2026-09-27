@@ -8,23 +8,25 @@ const supabase = createClient(
 );
 
 /**
- * Deneme süresi.
+ * Hesap kontrolü ve deneme süresi.
  *
- * Her hesap bir kez, kayıttan sonraki ilk açılışta 3 gün tam Pro alır; süre
- * bitince kendiliğinden Ücretsiz'e düşer. Kart istenmez.
+ * action: 'check' — e-postayı Clerk'ten okuyup tek kullanımlık mı diye
+ * bakar, sonucu users satırına yazar. Tek kullanımlık e-postayla açılan hesap
+ * siteyi hiç kullanamaz, ücretsiz planı da: ileride e-postayla ulaşamayacağımız
+ * bir kullanıcıyı ağırlamanın anlamı yok. Uygulama bu işareti görünce "gerçek
+ * bir e-postayla kayıt ol" ekranında durur.
  *
- * Bir kez verildiği trial_started_at'ten bilinir — verilmese bile (geçici
- * e-posta) o sütun dolar ki her açılışta yeniden denenmesin.
+ * action: 'start' — 3 günlük Pro denemesini başlatır. Kayıtta kendiliğinden
+ * başlamıyor: kullanıcı önce Ücretsiz'i kullanıyor, bir sınıra ilk
+ * takıldığında "3 gün ücretsiz dene, kart gerekmez" teklifini görüyor ve
+ * kendisi başlatıyor. Her hesaba bir kez; kart istenmez; bitince kendiliğinden
+ * Ücretsiz'e düşer.
  *
- * İki kötüye kullanım önlemi var:
- *   1. Tek kullanımlık e-posta servisleriyle açılan hesaba deneme verilmez.
- *      Ücretsiz plan yine açık; yalnızca deneme yok.
- *   2. Deneme sırasında bağlanan MetaTrader hesabı daha önce başka bir
- *      hesabın denemesinde kullanıldıysa deneme biter (bkz. api/ingest.ts).
- *      E-posta değiştirmek kolay, MT hesabı değiştirmek zor.
+ * Denemenin öbür koruması api/ingest.ts'te: aynı MetaTrader hesabı başka bir
+ * hesabın denemesinde kullanıldıysa deneme biter.
  *
- * Karar sunucuda veriliyor: e-posta Clerk'ten okunuyor, tarayıcının
- * söylediğine bakılmıyor.
+ * Varsayılan 'check': eski sürüm sayfa bu uca gövdesiz istek atıp denemeyi
+ * kendiliğinden başlatıyordu; önbellekte kalmış o sayfa artık başlatamasın.
  */
 const TRIAL_DAYS = 3;
 
@@ -56,41 +58,43 @@ export default async function handler(req: any, res: any) {
   } catch { /* aşağıda 401 */ }
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
+  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+  const action = body.action === 'start' ? 'start' : 'check';
+
   const { data: row } = await supabase
     .from('users')
-    .select('is_pro, pro_until, has_paid, trial_started_at, trial_ends_at, trial_denied')
+    .select('is_pro, pro_until, has_paid, trial_started_at, email_checked_at, email_disposable')
     .eq('user_id', userId)
     .maybeSingle();
 
-  // Deneme bir kez: verildiyse ya da reddedildiyse olduğu gibi bildir.
-  if (row?.trial_started_at) {
-    return res.status(200).json({ status: row.trial_denied ? 'denied' : 'used', endsAt: row.trial_ends_at, reason: row.trial_denied });
-  }
-
-  // Zaten Pro olana (ödemiş ya da davetle kazanmış) deneme harcamıyoruz.
-  const proActive = row?.is_pro && (!row.pro_until || utc(row.pro_until) > new Date());
-  if (row?.has_paid || proActive) return res.status(200).json({ status: 'pro' });
-
-  const now = new Date();
-  let email = '';
-  try {
-    const clerk = createClerkClient({ secretKey: secret });
-    const user = await clerk.users.getUser(userId);
-    email = user.emailAddresses.find(e => e.id === user.primaryEmailAddressId)?.emailAddress
-      || user.emailAddresses[0]?.emailAddress || '';
-  } catch {
-    // Clerk'e ulaşılamadıysa denemeyi yakmayalım; bir sonraki açılışta tekrar denenir.
-    return res.status(502).json({ error: 'Could not read the account' });
-  }
-
-  if (!email || isDisposable(email)) {
+  // E-posta kontrolü: bir kez yapılıyor, deneme başlatılırken de şart.
+  let disposable = !!row?.email_disposable;
+  if (!row?.email_checked_at) {
+    let email = '';
+    try {
+      const user = await createClerkClient({ secretKey: secret }).users.getUser(userId);
+      email = user.emailAddresses.find(e => e.id === user.primaryEmailAddressId)?.emailAddress
+        || user.emailAddresses[0]?.emailAddress || '';
+    } catch {
+      // Clerk'e ulaşılamadı: kimseyi yanlışlıkla engellemeyelim, sonra yeniden denenir.
+      return res.status(502).json({ error: 'Could not read the account' });
+    }
+    disposable = !!email && isDisposable(email);
     await supabase.from('users').upsert(
-      { user_id: userId, trial_started_at: now.toISOString(), trial_denied: 'disposable' },
+      { user_id: userId, email_checked_at: new Date().toISOString(), email_disposable: disposable },
       { onConflict: 'user_id' },
     );
-    return res.status(200).json({ status: 'denied', reason: 'disposable' });
   }
 
+  if (action === 'check') return res.status(200).json({ blocked: disposable });
+
+  // ── Denemeyi başlat ──
+  if (disposable) return res.status(403).json({ error: 'disposable' });
+  if (row?.trial_started_at) return res.status(409).json({ error: 'already_used' });
+  const proActive = row?.is_pro && (!row.pro_until || utc(row.pro_until) > new Date());
+  if (row?.has_paid || proActive) return res.status(409).json({ error: 'already_pro' });
+
+  const now = new Date();
   const endsAt = new Date(now.getTime() + TRIAL_DAYS * 86_400_000);
   await supabase.from('users').upsert(
     {
