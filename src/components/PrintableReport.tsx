@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { pick, localeOf } from '../lib/appCopy';
+import { pick, localeOf, pct } from '../lib/appCopy';
 import { createPortal } from 'react-dom';
 import { Trade, Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -153,7 +153,7 @@ export default function PrintableReport({ journal, trades, single = false, onDon
         <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', paddingBottom: 16, marginBottom: 18, borderBottom: `1px solid ${ink.rule}` }}>
           {[
             { l: t('totalTrades'), v: String(trades.length), c: ink.text },
-            { l: t('winRate'), v: `%${winRate}`, c: ink.text },
+            { l: t('winRate'), v: pct(winRate, language), c: ink.text },
             { l: t('netProfit'), v: signedMoney(net), c: net >= 0 ? ink.win : ink.loss },
             { l: t('profitFactor'), v: profitFactor, c: ink.text },
           ].map((s, i) => (

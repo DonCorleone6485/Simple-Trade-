@@ -1782,7 +1782,8 @@ export default function App() {
                         // Şirketler kuralı yüzdeyle ilan eder, kullanıcı parayla
                         // düşünür. İkisini birden göstermek yanlış rakamı anında
                         // fark ettiriyor.
-                        const pct = cap > 0 && n > 0 ? `%${((n / cap) * 100).toFixed(1).replace(/\.0$/, '')}` : null;
+                        const ratio = cap > 0 && n > 0 ? Math.round((n / cap) * 1000) / 10 : null;
+                        const share = ratio == null ? null : pct(ratio, language, Number.isInteger(ratio) ? 0 : 1);
                         return (
                           <div key={f.label}>
                             <label style={uiLabel}>{f.label}</label>
@@ -1790,8 +1791,8 @@ export default function App() {
                               <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{cur().trim()}</span>
                               <input type="number" min="0" step="0.01" value={f.v} onChange={e => f.set(e.target.value)} placeholder={f.ph}
                                 className="font-mono" style={{ ...uiInput, paddingInlineStart: '30px' }} />
-                              {pct && (
-                                <span className="absolute end-3 top-1/2 -translate-y-1/2 text-[12px] font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}>{pct}</span>
+                              {share && (
+                                <span className="absolute end-3 top-1/2 -translate-y-1/2 text-[12px] font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}>{share}</span>
                               )}
                             </div>
                           </div>
@@ -1938,7 +1939,7 @@ export default function App() {
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 {[
                   { label: t('totalTrades'), value: String(activeStats.total), color: 'rgba(255,255,255,0.85)' },
-                  { label: t('winRate'), value: `%${activeStats.winRate}`, color: 'rgba(255,255,255,0.85)' },
+                  { label: t('winRate'), value: pct(activeStats.winRate, language), color: 'rgba(255,255,255,0.85)' },
                   { label: t('netProfit'), value: signedMoney(activeStats.netPnL), color: activeStats.netPnL >= 0 ? '#34d399' : '#f87171' },
                   { label: t('profitFactor'), value: activeStats.profitFactor, color: 'rgba(255,255,255,0.85)' },
                 ].map((s, i) => (

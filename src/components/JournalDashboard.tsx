@@ -1,5 +1,5 @@
 import React from 'react';
-import { pick, localeOf } from '../lib/appCopy';
+import { pick, localeOf, pct } from '../lib/appCopy';
 import { Plus, Trash2, Pencil, ArrowUpRight, Lock } from 'lucide-react';
 import { Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -179,7 +179,7 @@ export default function JournalDashboard({
 
                     <div className="flex items-center gap-7 sm:gap-12 flex-shrink-0">
                       <div className="hidden md:block"><Cell width={COL.trades} value={String(stats.total)} /></div>
-                      <div className="hidden sm:block"><Cell width={COL.winRate} value={`%${stats.winRate}`} /></div>
+                      <div className="hidden sm:block"><Cell width={COL.winRate} value={pct(stats.winRate, language)} /></div>
                       <Cell width={COL.net} value={signedMoney(stats.netPnL)}
                         color={stats.netPnL >= 0 ? '#34d399' : '#f87171'} />
                     </div>

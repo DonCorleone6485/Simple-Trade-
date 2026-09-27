@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { localeOf } from '../lib/appCopy';
+import { localeOf, pct } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { ChevronLeft, ChevronRight, X, Lock } from 'lucide-react';
 import { Trade } from '../types';
@@ -124,7 +124,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-8 pb-9" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           {[
             { label: t('totalTrades'), value: String(monthTrades.length), color: '#fff' },
-            { label: t('winRate'), value: `%${monthWinRate}`, color: '#fff' },
+            { label: t('winRate'), value: pct(monthWinRate, language), color: '#fff' },
             { label: t('netProfit'), value: signedMoney(monthNetPnL), color: monthNetPnL >= 0 ? '#34d399' : '#f87171' },
             { label: t('bestDay'), value: (() => {
               const days: Record<string, number> = {};
