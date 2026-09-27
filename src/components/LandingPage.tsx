@@ -813,7 +813,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               border: '1px solid rgba(255,255,255,0.06)',
             }}>
 
-            <motion.div variants={fadeUp} className="p-8 sm:p-10">
+            <motion.div variants={fadeUp} className="p-8 sm:p-10 flex flex-col">
               <h3 className="text-[15px] font-medium tracking-wide" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {t('Ücretsiz', 'Free', 'رایگان')}
               </h3>
@@ -830,6 +830,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                   t('Günde 2 işlem (fazlası kilitli saklanır)', '2 trades a day (extras kept locked)', '۲ معامله در روز (بقیه قفل نگه داشته می‌شوند)'),
                   t('MetaTrader otomatik kayıt ve içe aktarma', 'MetaTrader auto-sync & file import', 'ثبت خودکار متاتریدر و وارد کردن فایل'),
                   t('Tüm istatistikler, takvim ve disiplin analizi', 'All statistics, calendar & discipline analysis', 'همه آمارها، تقویم و تحلیل انضباط'),
+                  t('Seanslar, günün haberleri ve prop değerlendirme', 'Sessions, daily news & prop review', 'سشن‌ها، اخبار روز و ارزیابی پراپ'),
                 ].map((f, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <Check className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }} />
@@ -838,7 +839,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 ))}
               </div>
               <button onClick={onGetStarted}
-                className="w-full py-3 rounded-full text-sm font-medium transition-all"
+                className="mt-auto w-full py-3 rounded-full text-sm font-medium transition-all"
                 style={{ background: 'transparent', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.14)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
@@ -846,7 +847,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               </button>
             </motion.div>
 
-            <motion.div variants={fadeUp} className="p-8 sm:p-10 relative"
+            <motion.div variants={fadeUp} className="p-8 sm:p-10 relative flex flex-col"
               style={{
                 borderInlineStart: '1px solid rgba(139,92,246,0.22)',
                 background: 'linear-gradient(180deg, rgba(139,92,246,0.09), transparent 70%)',
@@ -879,8 +880,10 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               <div className="space-y-3 mb-9">
                 {[
                   t('Her gün sınırsız işlem ve journal', 'Unlimited trades & journals, every day', 'معامله و ژورنال نامحدود، هر روز'),
+                  t('MetaTrader otomatik kayıt, sınırsız', 'Unlimited MetaTrader auto-sync', 'ثبت خودکار متاتریدر، نامحدود'),
                   t('Sesli not ve yapay zekâ analizi', 'Voice notes & AI analysis', 'یادداشت صوتی و تحلیل هوش مصنوعی'),
                   t('İşlem öncesi ve sonrası 3\'er fotoğraf', '3 Photos Before and 3 After Each Trade', '۳ عکس قبل و ۳ عکس بعد از هر معامله'),
+                  t('Ücretsiz plandaki her şey', 'Everything in Free', 'همه امکانات پلن رایگان'),
                 ].map((f, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <Check className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#a78bfa' }} />
@@ -889,7 +892,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 ))}
               </div>
               <button onClick={onGetStarted}
-                className="cta w-full py-3 rounded-full text-sm font-medium"
+                className="cta mt-auto w-full py-3 rounded-full text-sm font-medium"
                 style={{ background: '#8b5cf6', color: '#fff' }}>
                 {signedIn ? ctaLabel : t('3 Gün Ücretsiz Dene', 'Try Free for 3 Days', '۳ روز رایگان امتحان کن')}
               </button>
