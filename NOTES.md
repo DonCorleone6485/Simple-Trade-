@@ -77,8 +77,10 @@ hesap ya da karar bekliyor.
 ### C. Bilgi gerektirmeyen, sonra yapılacaklar
 1. **Vercel Analytics** — YAPILDI (2026-09-28, ücretsiz plan): src/main.tsx;
    /journal/<id> adresleri /journal olarak sayılıyor.
-2. **Dil başına adresler** (/tr, /de, /fa…) + hreflang + her dilde ön çizim —
-   SEO'nun sonraki adımı (şu an ön çizim yalnız İngilizce).
+2. **Dil başına adresler** — YAPILDI (2026-09-28): /tr, /fa, /ar, /ru, /es, /pt, /de, /fr
+   altında ana sayfa, yardım, değişiklikler, blog ve yazılar; 81 ön çizimli sayfa,
+   hreflang + x-default, dilli sitemap. Tek yer: src/lib/langPath.ts (yol),
+   src/lib/seoMeta.ts (başlık/açıklama), src/prerender.tsx (PAGES).
 3. **Tam içerik güvenlik politikası** (script-src CSP) — Clerk, Supabase, Google
    Fonts, Cloudflare Turnstile ve fotoğraf bağlantıları için izin listesiyle; önce
    Report-Only olarak denenmeli (bozulursa giriş çalışmaz).
