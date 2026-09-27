@@ -374,11 +374,11 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
   const faqs = [
     {
       q: t('Ücretsiz olarak kullanabilir miyim?', 'Can I use it for free?', 'آیا می‌توانم رایگان استفاده کنم؟'),
-      a: t('Evet. Free plan 1 journal, günde 1 / toplamda 20 işlem ve işlem öncesi ve sonrası 1\'er fotoğrafla, tüm istatistiklere ve takvim görünümüne süresiz erişim sağlar. Kart bilgisi istemiyoruz.', 'Yes. The Free plan gives you 1 journal, 1 trade a day (20 total), 1 photo before and 1 after each trade, and unlimited access to all statistics and the calendar view. No card required.', 'بله. طرح رایگان به شما امکان دسترسی نامحدود به آمار می‌دهد.'),
+      a: t('Evet. Ücretsiz plan 1 journal ve günde 2 işlemle süresiz senin; fazladan girilen işlemler silinmez, kilitli saklanır. MetaTrader otomatik kaydı, içe aktarma, tüm istatistikler, takvim ve disiplin analizi dahil. Kart bilgisi istemiyoruz.', 'Yes. The Free plan is yours for good with 1 journal and 2 trades a day; extra trades aren\'t deleted, they\'re kept locked. MetaTrader auto-sync, importing, all statistics, the calendar and discipline analysis are included. No card required.', 'بله. پلن رایگان با ۱ ژورنال و ۲ معامله در روز همیشه در اختیار توست؛ معاملات اضافه حذف نمی‌شوند و قفل نگه داشته می‌شوند. ثبت خودکار متاتریدر، وارد کردن فایل، همه آمارها، تقویم و تحلیل انضباط شامل است. کارت لازم نیست.'),
     },
     {
       q: t('Pro deneme için kart bilgisi gerekiyor mu?', 'Does the Pro trial require a card?', 'آیا آزمایش Pro نیاز به کارت دارد؟'),
-      a: t('Evet — 3 günlük ücretsiz deneme kart bilgisiyle başlar, 3. günün sonunda ücretlendirilir. İstediğin an, tek tıkla iptal edebilirsin.', 'Yes — the 3-day free trial starts with a card on file and you\'re charged at the end of day 3. Cancel anytime with one click.', 'بله — آزمایش ۳ روزه با کارت شروع می‌شود.'),
+      a: t('Hayır. Ücretsiz planı kullanırken bir sınıra geldiğinde 3 günlük Pro denemesini tek tıkla başlatabilirsin. Kart istemiyoruz; deneme bitince kendiliğinden Ücretsiz plana dönersin, hiçbir ücret alınmaz.', 'No. While on the Free plan, you can start a 3-day Pro trial in one click when you hit a limit. We don\'t ask for a card; when the trial ends you drop back to Free on your own and nothing is charged.', 'نه. در پلن رایگان وقتی به یک محدودیت برسی، می‌توانی آزمایش ۳ روزه Pro را با یک کلیک شروع کنی. کارت نمی‌خواهیم؛ بعد از پایان آزمایش خودکار به رایگان برمی‌گردی و هزینه‌ای گرفته نمی‌شود.'),
     },
     {
       q: t('Verilerim güvende mi?', 'Is my data private?', 'آیا داده‌های من امن است؟'),
@@ -827,8 +827,9 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               <div className="space-y-3 mb-9">
                 {[
                   t('1 Journal', '1 Journal', '۱ ژورنال'),
-                  t('Günde 1 / Toplam 20 Trade', '1/Day, 20 Total Trades', 'روزانه ۱ / مجموعاً ۲۰ معامله'),
-                  t('Tüm İstatistikler & Takvim', 'All Statistics & Calendar', 'همه آمارها و تقویم'),
+                  t('Günde 2 işlem (fazlası kilitli saklanır)', '2 trades a day (extras kept locked)', '۲ معامله در روز (بقیه قفل نگه داشته می‌شوند)'),
+                  t('MetaTrader otomatik kayıt ve içe aktarma', 'MetaTrader auto-sync & file import', 'ثبت خودکار متاتریدر و وارد کردن فایل'),
+                  t('Tüm istatistikler, takvim ve disiplin analizi', 'All statistics, calendar & discipline analysis', 'همه آمارها، تقویم و تحلیل انضباط'),
                 ].map((f, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <Check className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }} />
@@ -856,7 +857,14 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               {/* Vurgu: kutunun tamamını boyamak yerine üstte tek bir çizgi. */}
               <span className="absolute top-0 start-0 end-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #8b5cf6, transparent)' }} />
               <div className="flex items-baseline justify-between">
-                <h3 className="text-[15px] font-medium tracking-wide">Pro</h3>
+                <h3 className="text-[15px] font-medium tracking-wide">
+                  Pro
+                  {/* Deneme kartsız: bunu fiyatın hemen yanında söylemek,
+                      "önce kartımı mı isteyecekler" korkusunu baştan siliyor. */}
+                  <span className="ms-2 text-[12.5px] font-normal" style={{ color: '#34d399' }}>
+                    {t('(3 gün kartsız deneme)', '(3-day trial, no card)', '(۳ روز آزمایش بدون کارت)')}
+                  </span>
+                </h3>
                 <span className="text-[10px] uppercase tracking-[0.16em]" style={{ color: '#a78bfa' }}>
                   {t('En Popüler', 'Most Popular', 'محبوب‌ترین')}
                 </span>
@@ -870,9 +878,9 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               </div>
               <div className="space-y-3 mb-9">
                 {[
-                  t('Sınırsız Journal & Trade', 'Unlimited Journals & Trades', 'ژورنال و معامله نامحدود'),
-                  t('AI Analiz & Gelişmiş İstatistik', 'AI Analysis & Advanced Stats', 'تحلیل هوش مصنوعی'),
-                  t('Isı Haritası & Setup Analizi', 'Heat Map & Setup Analysis', 'نقشه حرارتی و تحلیل ستاپ'),
+                  t('Her gün sınırsız işlem ve journal', 'Unlimited trades & journals, every day', 'معامله و ژورنال نامحدود، هر روز'),
+                  t('Sesli not ve yapay zekâ analizi', 'Voice notes & AI analysis', 'یادداشت صوتی و تحلیل هوش مصنوعی'),
+                  t('İşlem öncesi ve sonrası 3\'er fotoğraf', '3 Photos Before and 3 After Each Trade', '۳ عکس قبل و ۳ عکس بعد از هر معامله'),
                 ].map((f, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <Check className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#a78bfa' }} />
@@ -883,7 +891,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               <button onClick={onGetStarted}
                 className="cta w-full py-3 rounded-full text-sm font-medium"
                 style={{ background: '#8b5cf6', color: '#fff' }}>
-                {signedIn ? ctaLabel : t('Ücretsiz Dene', 'Start Free Trial', 'شروع آزمایشی رایگان')}
+                {signedIn ? ctaLabel : t('3 Gün Ücretsiz Dene', 'Try Free for 3 Days', '۳ روز رایگان امتحان کن')}
               </button>
             </motion.div>
           </motion.div>

@@ -23,12 +23,10 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   const totalPrice = billing === 'monthly' ? monthlyPrice : yearlyPrice;
 
   const proFeatures = [
-    language === 'tr' ? 'Sınırsız Journal & Trade' : 'Unlimited Journals & Trades',
-    language === 'tr' ? 'İşlem Öncesi ve Sonrası 3\'er Fotoğraf' : '3 Photos Before and 3 After Each Trade',
-    language === 'tr' ? 'AI Analiz' : 'AI Analysis',
-    language === 'tr' ? 'Gelişmiş İstatistikler' : 'Advanced Statistics',
-    language === 'tr' ? 'Drawdown & Streak Analizi' : 'Drawdown & Streak Analysis',
-    language === 'tr' ? 'Öncelikli Destek' : 'Priority Support',
+    language === 'tr' ? 'Her gün sınırsız işlem ve journal' : 'Unlimited trades & journals, every day',
+    language === 'tr' ? 'Sesli not ve yapay zekâ analizi' : 'Voice notes & AI analysis',
+    language === 'tr' ? 'MetaTrader otomatik kayıt, sınırsız' : 'Unlimited MetaTrader auto-sync',
+    language === 'tr' ? 'İşlem öncesi ve sonrası 3\'er fotoğraf' : '3 photos before and 3 after each trade',
   ];
 
   const validateCode = async () => {

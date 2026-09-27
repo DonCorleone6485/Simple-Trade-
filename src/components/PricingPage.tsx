@@ -29,26 +29,16 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
 
   const freeFeatures = [
     t('1 Journal', '1 Journal', '۱ ژورنال'),
-    t('Günde 1 Trade (Maks. 20 Trade)', 'Daily 1 Trade (Max. 20 Trades)', 'روزانه ۱ معامله (حداکثر ۲۰ معامله)'),
+    t('Günde 2 işlem (fazlası kilitli saklanır)', '2 trades a day (extras kept locked)', '۲ معامله در روز (بقیه قفل نگه داشته می‌شوند)'),
+    t('MetaTrader otomatik kayıt ve içe aktarma', 'MetaTrader auto-sync & file import', 'ثبت خودکار متاتریدر و وارد کردن فایل'),
+    t('Tüm istatistikler, takvim ve disiplin analizi', 'All statistics, calendar & discipline analysis', 'همه آمارها، تقویم و تحلیل انضباط'),
     t('İşlem Öncesi ve Sonrası 1\'er Fotoğraf', '1 Photo Before and 1 After Each Trade', '۱ عکس قبل و ۱ عکس بعد از هر معامله'),
-    t('Tüm İstatistikler', 'All Statistics', 'همه آمارها'),
-    t('Takvim Görünümü', 'Calendar View', 'نمای تقویم'),
-    t('Hedef & Kural Sistemi', 'Goals & Rules System', 'سیستم اهداف و قوانین'),
-    t('Isı Haritası', 'Heat Map', 'نقشه حرارتی'),
-    t('Setup Performans Analizi', 'Setup Performance Analysis', 'تحلیل عملکرد ستاپ'),
   ];
 
   const proFeatures = [
-    t('Sınırsız Journal', 'Unlimited Journals', 'ژورنال نامحدود'),
-    t('Sınırsız Trade', 'Unlimited Trades', 'معاملات نامحدود'),
+    t('Her gün sınırsız işlem ve journal', 'Unlimited trades & journals, every day', 'معامله و ژورنال نامحدود، هر روز'),
+    t('Sesli not ve yapay zekâ analizi', 'Voice notes & AI analysis', 'یادداشت صوتی و تحلیل هوش مصنوعی'),
     t('İşlem Öncesi ve Sonrası 3\'er Fotoğraf', '3 Photos Before and 3 After Each Trade', '۳ عکس قبل و ۳ عکس بعد از هر معامله'),
-    t('AI Analiz', 'AI Analysis', 'تحلیل هوش مصنوعی'),
-    t('Gelişmiş İstatistikler', 'Advanced Statistics', 'آمار پیشرفته'),
-    t('Hedef & Kural Sistemi', 'Goals & Rules System', 'سیستم اهداف و قوانین'),
-    t('Drawdown & Streak Analizi', 'Drawdown & Streak Analysis', 'تحلیل افت و سری'),
-    t('Isı Haritası', 'Heat Map', 'نقشه حرارتی'),
-    t('Setup Performans Analizi', 'Setup Performance Analysis', 'تحلیل عملکرد ستاپ'),
-    t('Öncelikli Destek', 'Priority Support', 'پشتیبانی اولویت‌دار'),
   ];
 
   const monthlyPrice = 12.99;
