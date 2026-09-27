@@ -29,6 +29,8 @@ export default defineConfig(({ mode }) => {
           manualChunks(id: string) {
             if (!id.includes('node_modules')) return undefined;
             if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'react';
+            // Giriş penceresi çevirileri dil başına ayrı dosyada kalsın (main.tsx).
+            if (id.includes('node_modules/@clerk/localizations/')) return undefined;
             if (id.includes('node_modules/@clerk/')) return 'clerk';
             if (id.includes('node_modules/@supabase/')) return 'supabase';
             return undefined;

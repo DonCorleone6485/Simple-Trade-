@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { Analytics } from '@vercel/analytics/react';
@@ -26,23 +26,57 @@ const CODE_HINT: Record<string, string> = {
   fr: 'Nous vous avons envoyé un code. S\'il n\'arrive pas d\'ici quelques secondes, vérifiez vos spams / courriers indésirables.',
 };
 
+/**
+ * Giriş/kayıt pencereleri (Clerk) sitenin dilinde. Clerk'in hazır çevirileri
+ * dil başına ~20 KB; hepsini ana pakete koymak yerine yalnızca seçili dil
+ * yükleniyor (ilk çizimden önce ve dil değişince). İngilizce Clerk'in kendi
+ * varsayılanı.
+ */
+const CLERK_LOCALES: Record<string, () => Promise<{ [k: string]: any }>> = {
+  tr: () => import('@clerk/localizations/tr-TR'),
+  fa: () => import('@clerk/localizations/fa-IR'),
+  ar: () => import('@clerk/localizations/ar-SA'),
+  ru: () => import('@clerk/localizations/ru-RU'),
+  es: () => import('@clerk/localizations/es-ES'),
+  pt: () => import('@clerk/localizations/pt-PT'),
+  de: () => import('@clerk/localizations/de-DE'),
+  fr: () => import('@clerk/localizations/fr-FR'),
+};
+const clerkLocaleCache: Record<string, any> = {};
+function loadClerkLocale(lang: string): Promise<any> {
+  if (lang in clerkLocaleCache) return Promise.resolve(clerkLocaleCache[lang]);
+  const load = CLERK_LOCALES[lang];
+  if (!load) return Promise.resolve(undefined);
+  return load()
+    .then(m => (clerkLocaleCache[lang] = Object.values(m).find(v => v && typeof v === 'object' && 'locale' in v)))
+    .catch(() => undefined);
+}
+
 function ClerkWithLanguage({ children }: { children: React.ReactNode }) {
   const { language } = useLanguage();
+  const [base, setBase] = useState<any>(() => clerkLocaleCache[language]);
+  useEffect(() => {
+    let live = true;
+    loadClerkLocale(language).then(l => { if (live) setBase(l); });
+    return () => { live = false; };
+  }, [language]);
   const hint = CODE_HINT[language] || CODE_HINT.en;
+  const localization = {
+    ...base,
+    signUp: { ...base?.signUp, emailCode: { ...base?.signUp?.emailCode, subtitle: hint } },
+    signIn: { ...base?.signIn, emailCode: { ...base?.signIn?.emailCode, subtitle: hint } },
+  };
   return (
-    <ClerkProvider
-      publishableKey={PUBLISHABLE_KEY}
-      localization={{ signUp: { emailCode: { subtitle: hint } }, signIn: { emailCode: { subtitle: hint } } }}
-    >
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} localization={localization}>
       {children}
     </ClerkProvider>
   );
 }
 
-// Türkçe/İngilizce dışındaki dillerde çeviri tablosu gelmeden çizmiyoruz;
+// Çeviri tablosu (TR/EN dışı) ve giriş penceresinin dili gelmeden çizmiyoruz;
 // yoksa ilk anda İngilizce görünür (bkz. lib/appCopy.ts).
 const initial = detectLanguage();
-(needsAppCopy(initial) ? loadAppCopy() : Promise.resolve()).then(() => {
+Promise.all([needsAppCopy(initial) ? loadAppCopy() : null, loadClerkLocale(initial)]).then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <LanguageProvider>
