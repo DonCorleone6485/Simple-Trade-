@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
+import { Analytics } from '@vercel/analytics/react';
 import App from './App';
 import { LanguageProvider, useLanguage, detectLanguage } from './context/LanguageContext';
 import { loadAppCopy, needsAppCopy } from './lib/appCopy';
@@ -48,6 +49,9 @@ const initial = detectLanguage();
         <ClerkWithLanguage>
           <App />
         </ClerkWithLanguage>
+        {/* Çerezsiz ziyaretçi sayımı (Vercel). Journal adresleri kişiye özel
+            kimlik taşıyor (/journal/<id>/…); istatistiğe yalnızca /journal gitsin. */}
+        <Analytics beforeSend={e => ({ ...e, url: e.url.replace(/\/journal\/.*$/, '/journal') })} />
       </LanguageProvider>
     </React.StrictMode>
   );
