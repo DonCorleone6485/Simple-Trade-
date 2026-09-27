@@ -61,12 +61,6 @@ hesap ya da karar bekliyor.
    kampanyası kaynak olabilir.
 9. **MetaTrader kurulum videosu** — kullanıcının ekran kayıtları (aşağıdaki bölüm).
 
-10. **E-posta DKIM imzası** — Google, Gmail açıldıktan 24–72 saat sonra izin
-   veriyor (en erken 2026-09-28). Admin → Uygulamalar → Google Workspace →
-   Gmail → E-posta kimlik doğrulaması → 2048 bit anahtar oluştur → Namecheap'e
-   TXT `google._domainkey` → "Kimlik doğrulamasını başlat". Sonra DMARC
-   `p=none` → `p=quarantine`.
-
 ### B. Karar bekleyen
 - **Kurucu üye kampanyası**: ilk 500 kişiye yıllık $79 (1.990 TL), ömür boyu bu
   fiyat; karşılığında yorum. Yapılsın mı? (Ödeme sistemi gelince.)
@@ -112,8 +106,9 @@ Değişiklikler sayfaları. Hesap ayarları (para birimi, saat dilimi, profil).
 Okunabilirlik (kontrast, aria etiketleri). Uygulamanın 9 dile çevirisi
 (src/lib/appCopy*.ts) ve dile göre tarih/yüzde biçimi.
 E-posta: Google Workspace (admin@simpletradejournal.io; takma adlar info@,
-support@, billing@, privacy@ aynı kutuya düşer). Namecheap'te MX (Gmail), SPF,
-DMARC ve Google doğrulama kaydı var. Paket: Business Starter, Esnek (aylık) plan;
+support@, billing@, privacy@ aynı kutuya düşer). Namecheap'te MX (1 smtp.google.com), SPF,
+DKIM (google._domainkey, 2048 bit), DMARC ve Google doğrulama kaydı var.
+İleride DMARC p=none → p=quarantine yapılabilir. Paket: Business Starter, Esnek (aylık) plan;
 ücretli dönem 2026-10-11'de başlıyor — o tarihe kadar ödeme yöntemi ekli olmalı.
 Abonelik hatırlatması 2026-10-25'e kuruldu.
 
