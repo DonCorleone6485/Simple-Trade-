@@ -932,6 +932,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 { label: t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری'), href: '#pricing' },
                 { label: t('Yardım', 'Help', 'راهنما'), href: '/help' },
                 { label: t('Blog', 'Blog', 'بلاگ'), href: '/blog' },
+                { label: t('İletişim', 'Contact', 'تماس با ما'), href: 'mailto:support@simpletradejournal.io' },
                 { label: t('Değişiklikler', 'Changelog', 'تغییرات'), href: '/changelog' },
               ].map(l => (
                 /* Renk satır içi stille verilmiyordu diye değil — veriliyordu

@@ -3,7 +3,7 @@ import { pick } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import {
   TrendingUp, BookOpen, List, CalendarDays, BarChart2, Target,
-  Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Clock, Newspaper, ShieldCheck, ClipboardList, Gauge, LifeBuoy,
+  Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Clock, Newspaper, ShieldCheck, ClipboardList, Gauge, LifeBuoy, Mail,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import HeaderStrip from './HeaderStrip';
@@ -125,6 +125,12 @@ export default function AppShell({
         )}
         <NavItem icon={<Gift className="w-4 h-4" />} label={tr('Referans Kodu', 'Referral Code')} itemKey="referral" />
         <NavItem icon={<LifeBuoy className="w-4 h-4" />} label={t('helpNav')} itemKey="help" />
+        {/* Doğrudan posta: yardım sayfasını açıp aşağı inmeden bize ulaşılsın. */}
+        <a href="mailto:support@simpletradejournal.io" onClick={() => setMobileOpen(false)}
+          className="ui-nav w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-[13.5px]">
+          <Mail className="w-4 h-4" />
+          {tr('Bize yaz', 'Contact us')}
+        </a>
         <NavItem icon={<Home className="w-4 h-4" />} label={tr('Ana Sayfa', 'Home')} itemKey="home" />
       </nav>
 
