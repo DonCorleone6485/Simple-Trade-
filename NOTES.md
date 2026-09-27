@@ -107,11 +107,18 @@ Kararlar (kullanıcı):
 - Tek kullanımlık e-posta: ne deneme ne ücretsiz — hesap açılmaz, "gerçek
   e-posta" ekranında durur (e-posta pazarlaması için gerçek adres şart).
 
-Önerim, onay bekliyor:
-- Ücretsiz: 1 journal, günde 2 işlem. MetaTrader ve içe aktarma günde 2;
-  fazlası silinmez, kilitli kaydedilir (tarih/sembol/yön görünür, sonuç
-  bulanık; istatistiğe girmez; Pro'ya geçince açılır; silmek hakkı geri vermez).
-- Her kısıtlamanın yanında bağlamsal Pro mesajı + "Bugün 1/2" sayacı.
+- Ücretsiz model — YAPILDI (2026-09-27): 1 journal, günde 2 işlem, toplam sınır
+  yok. Fazlası silinmez, kilitli kaydedilir — kararı veritabanı veriyor
+  (lock_free_trades tetikleyicisi, users.timezone'a göre gün). Kilitli satır:
+  saat/sembol/yön görünür, sonuç bulanık; istatistiğe girmez; Pro'da açılır.
+  Sesli not, not düzeltme, yapay zekâ analizi Pro (sunucuda da kontrol).
+  "Yeni İşlem" düğmesinde 1/2 sayacı; her kısıtlamada kendi mesajıyla pencere.
+- Ana sayfa fiyat kartları + SSS yeni modele göre; Pro'nun yanında
+  "(3 gün kartsız deneme)". Fiyatlar hâlâ eski ($12.99/ay, $99/yıl).
+- Kayıtsız gezinti — YAPILDI: "Ücretsiz Başla" örnek verili uygulamayı açar
+  (src/lib/demo.ts, iki journal, dört disiplin alışkanlığı bilerek içeride);
+  kayıt gerektiren her şey "ücretsiz hesap aç" penceresini açar.
+- Eksik: takvimde ve journal kartında "+N kilitli" göstergesi yok.
 - Pro $14.99/ay, $119/yıl; TR 349 TL/ay, 2.790 TL/yıl. Yıllıkta 14 gün iade.
 - Kurucu üye: ilk 500 kişi yıllık $79 (1.990 TL), ömür boyu.
 - Altyapı: Paddle veya Lemon Squeezy (MoR). Kilitlerden ÖNCE ödeme kurulmalı —
