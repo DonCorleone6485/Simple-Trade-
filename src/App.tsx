@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import {
   PlusCircle, Globe, ChevronDown, ChevronLeft,
   Trash2, BookOpen, Clock, TrendingUp, X,
@@ -9,27 +9,11 @@ import {
 import {
   SignIn, SignUp, useUser, useClerk, useAuth
 } from '@clerk/clerk-react';
-import TradeForm from './components/TradeForm';
-import TradeHistory from './components/TradeHistory';
-import CalendarView from './components/CalendarView';
-import GoalsView from './components/GoalsView';
-import PricingPage from './components/PricingPage';
-import PaymentModal from './components/PaymentModal';
-import CSVImport, { ImportTarget } from './components/CSVImport';
-import MTConnect from './components/MTConnect';
-import MTTargetPicker, { MTTarget } from './components/MTTargetPicker';
-import SessionsView from './components/SessionsView';
-import NewsView from './components/NewsView';
-import DisciplineView from './components/DisciplineView';
-import ChecklistLibrary from './components/ChecklistLibrary';
-import PropEvaluation from './components/PropEvaluation';
+import type { ImportTarget } from './components/CSVImport';
+import type { MTTarget } from './components/MTTargetPicker';
 import { tradeKey } from './lib/tradeKey';
-import LandingPage from './components/LandingPage';
-import JournalDashboard from './components/JournalDashboard';
 import AppShell, { NavKey } from './components/AppShell';
-import PrintableReport from './components/PrintableReport';
 import { Trade, Account, JournalGoals, JournalKind, DrawdownType } from './types';
-import PropStatus from './components/PropStatus';
 import { useLanguage } from './context/LanguageContext';
 import { PlanProvider, UpgradeReason, FREE_DAILY_TRADES } from './context/PlanContext';
 import { demoData } from './lib/demo';
@@ -39,6 +23,31 @@ import { supabase } from './lib/supabase';
 import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
 import { signedMoney, int } from './lib/format';
+
+/**
+ * Ekranlar ihtiyaç anında yükleniyor. Hepsi tek parçaydı (~2 MB): ana sayfaya
+ * gelen biri istatistik grafiklerini, içe aktarma ayrıştırıcısını, prop
+ * değerlendirme metinlerini de indiriyordu. Şimdi her ekran açıldığında kendi
+ * parçası geliyor.
+ */
+const TradeForm = lazy(() => import('./components/TradeForm'));
+const TradeHistory = lazy(() => import('./components/TradeHistory'));
+const CalendarView = lazy(() => import('./components/CalendarView'));
+const GoalsView = lazy(() => import('./components/GoalsView'));
+const PricingPage = lazy(() => import('./components/PricingPage'));
+const PaymentModal = lazy(() => import('./components/PaymentModal'));
+const CSVImport = lazy(() => import('./components/CSVImport'));
+const MTConnect = lazy(() => import('./components/MTConnect'));
+const MTTargetPicker = lazy(() => import('./components/MTTargetPicker'));
+const SessionsView = lazy(() => import('./components/SessionsView'));
+const NewsView = lazy(() => import('./components/NewsView'));
+const DisciplineView = lazy(() => import('./components/DisciplineView'));
+const ChecklistLibrary = lazy(() => import('./components/ChecklistLibrary'));
+const PropEvaluation = lazy(() => import('./components/PropEvaluation'));
+const LandingPage = lazy(() => import('./components/LandingPage'));
+const JournalDashboard = lazy(() => import('./components/JournalDashboard'));
+const PrintableReport = lazy(() => import('./components/PrintableReport'));
+const PropStatus = lazy(() => import('./components/PropStatus'));
 
 type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news' | 'discipline' | 'checklists' | 'propReview';
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect';
@@ -1156,12 +1165,14 @@ export default function App() {
 
       {/* ── PRO SÜRESİ DOLDU EKRANI ── */}
       {showExpiredPricing && page === 'journal' && (
+        <Suspense fallback={null}>
         <PricingPage
           onboardingMode
           onFreeStart={() => setShowExpiredPricing(false)}
           onProStart={() => { setShowExpiredPricing(false); setShowPaymentModal(true); }}
           expiredMode
         />
+        </Suspense>
       )}
 
       {/* ── Deneme erken bitti: aynı MetaTrader hesabı ── */}
@@ -1185,7 +1196,7 @@ export default function App() {
       )}
 
       {/* ── PAYMENT MODAL ── */}
-      {showPaymentModal && <PaymentModal onClose={() => setShowPaymentModal(false)} />}
+      {showPaymentModal && <Suspense fallback={null}><PaymentModal onClose={() => setShowPaymentModal(false)} /></Suspense>}
 
       {/* ── UPGRADE MODAL ── */}
       {showUpgradeModal && (
@@ -1298,15 +1309,18 @@ export default function App() {
 
       {/* MetaTrader: journal listesinden hedef seçimi */}
       {showMTPicker && user && (
+        <Suspense fallback={null}>
         <MTTargetPicker
           journals={accounts.map(a => ({ id: a.id, name: a.name }))}
           onChoose={handleMTTarget}
           onClose={() => setShowMTPicker(false)}
         />
+        </Suspense>
       )}
 
       {/* CSV Import */}
       {showCSVImport && user && (
+        <Suspense fallback={null}>
         <CSVImport
           onImport={handleCSVImport}
           onClose={() => setShowCSVImport(false)}
@@ -1320,6 +1334,7 @@ export default function App() {
           keysByJournal={view === 'expanded' ? {} : Object.fromEntries(
             accounts.map(a => [a.id, trades.filter(tr => tr.journal_id === a.id).map(tradeKey)]))}
         />
+        </Suspense>
       )}
 
       {/* AUTH */}
@@ -1332,10 +1347,12 @@ export default function App() {
         })()}
 
         {authStage === 'landing' ? (
+          <Suspense fallback={<div className="min-h-screen" style={{ background: '#0d0e1a' }} />}>
           <LandingPage
             onGetStarted={startGuest}
             onSignIn={() => goToAuth('signin')}
           />
+          </Suspense>
         ) : (
           <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: '#0d0e1a' }}>
             <button onClick={() => setAuthStage('landing')}
@@ -1367,12 +1384,14 @@ export default function App() {
       </>)}
 
       {printJob && activeJournal && (
+        <Suspense fallback={null}>
         <PrintableReport
           journal={activeJournal}
           trades={printJob.trades}
           single={printJob.single}
           onDone={() => setPrintJob(null)}
         />
+        </Suspense>
       )}
 
       {(isSignedIn || (isGuest && page === 'journal' && authStage !== 'auth')) && (
@@ -1478,6 +1497,7 @@ export default function App() {
         )}
         {page === 'home' ? (
           /* Giriş yapmış kullanıcı için ana sayfa — CTA'lar journal'a götürür */
+          <Suspense fallback={<div className="min-h-screen" style={{ background: '#0d0e1a' }} />}>
           <LandingPage
             signedIn
             account={{
@@ -1489,6 +1509,7 @@ export default function App() {
             onGetStarted={() => navigate('journal')}
             onSignIn={() => navigate('journal')}
           />
+          </Suspense>
         ) : (
         <>
 
@@ -1770,6 +1791,11 @@ export default function App() {
               </button>
             </div>
           )}
+          <Suspense fallback={
+            <div className="flex items-center justify-center py-24">
+              <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
+            </div>
+          }>
           {loading && (
             <div className="flex items-center justify-center py-24">
               <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
@@ -1875,6 +1901,7 @@ export default function App() {
               {journalTab === 'mtConnect' && <MTConnect journalId={activeJournal.id} journalName={activeJournal.name} />}
             </div>
           )}
+          </Suspense>
         </AppShell>
 
         </>

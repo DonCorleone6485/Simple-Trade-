@@ -5,14 +5,12 @@ import {
   Check, ChevronDown, ArrowRight, Shield, Globe, Zap, Mic, ListChecks, Clock,
   Newspaper, Wallet, Gauge, Lock, LogOut,
 } from 'lucide-react';
-import {
-  AreaChart, Area, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip,
-} from 'recharts';
 import { useLanguage } from '../context/LanguageContext';
 import { SESSIONS, sessionState } from '../lib/sessions';
 import { copy } from '../lib/landingCopy';
 import { Lock as LogoLock } from './Logo';
 import PricingCards from './PricingCards';
+import HeroEquityChart from './HeroEquityChart';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -633,23 +631,9 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               animate={{ clipPath: 'inset(0 0% 0 0)' }}
               transition={{ duration: shouldReduceMotion ? 0 : 1.4, delay: shouldReduceMotion ? 0 : 0.9, ease: [0.65, 0, 0.35, 1] }}
             >
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={equityData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="heroGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="i" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.22)', fontSize: 11 }} dy={8} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.22)', fontSize: 11 }} dx={-8} tickFormatter={v => `$${v}`} />
-                  <Tooltip contentStyle={{ background: '#12131f', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }}
-                    formatter={(value: number) => [`$${value}`, t('Kümülatif PnL', 'Cumulative PnL', 'سود/زیان انباشته')]}
-                    labelFormatter={label => `${t('İşlem', 'Trade', 'معامله')} #${label}`} />
-                  <Area type="monotone" dataKey="v" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#heroGradient)" />
-                </AreaChart>
-              </ResponsiveContainer>
+              <HeroEquityChart data={equityData}
+                seriesLabel={t('Kümülatif PnL', 'Cumulative PnL', 'سود/زیان انباشته')}
+                tradeWord={t('İşlem', 'Trade', 'معامله')} />
             </motion.div>
           </div>
 

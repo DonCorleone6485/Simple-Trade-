@@ -21,5 +21,20 @@ export default defineConfig(({ mode }) => {
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
     },
+    build: {
+      rollupOptions: {
+        output: {
+          // Nadiren değişen kütüphaneler ayrı dosyalarda: her yayında uygulama
+          // kodu değişse de bunlar tarayıcının önbelleğinde kalıyor.
+          manualChunks(id: string) {
+            if (!id.includes('node_modules')) return undefined;
+            if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'react';
+            if (id.includes('node_modules/@clerk/')) return 'clerk';
+            if (id.includes('node_modules/@supabase/')) return 'supabase';
+            return undefined;
+          },
+        },
+      },
+    },
   };
 });
