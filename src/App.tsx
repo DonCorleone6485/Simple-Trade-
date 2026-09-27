@@ -1674,9 +1674,9 @@ export default function App() {
 
           {!loading && view === 'pricing' && (
             <PricingPage
-              freeLabel={isPro ? t('pricingBackToJournals') : t('pricingCurrentPlan')}
+              freeLabel={isGuest ? t('guestSignUp') : isPro ? t('pricingBackToJournals') : t('pricingCurrentPlan')}
               freeDisabled={!isPro && !isGuest}
-              onFreeStart={() => goTo({ view: 'dashboard', journal: null })}
+              onFreeStart={() => { if (!needAccount()) goTo({ view: 'dashboard', journal: null }); }}
               proLabel={isGuest ? t('trialStartCta')
                 : trialEndsAt ? t('pricingTrialActive')
                 : isPro ? t('pricingCurrentPlan')
