@@ -47,8 +47,9 @@ hesap ya da karar bekliyor.
    Metni, Çerez Politikası, İade Politikası, risk uyarısı ("yatırım tavsiyesi
    değildir"). Gerekli: sitede görünecek isim/unvan ve iletişim adresi. Taslağı
    ben yazarım; son hâli avukata gösterilmeli. Ödeme hesabı onayı için şart.
-3. **İletişim + Hakkımızda** — support@ ve privacy@ sitede (yardım sayfası
-   sonu, ana sayfa altı, JSON-LD). Kalan: Hakkımızda metni, sosyal medya
+3. **İletişim + Hakkımızda** — "Bize yaz" FORMU (2026-09-28): uygulama menüsü, ana
+   sayfa altı ve yardım sayfasından açılıyor (lib/contact.ts, ContactModal.tsx),
+   mesaj api/emails.ts POST → Resend → support@, Yanıtla gönderene gider. Kalan: Hakkımızda metni, sosyal medya
    hesapları, varsa Discord/Telegram topluluğu.
 4. **Meta Pixel** — Meta Business'ta Pixel oluşturup kimliği vermek. Instagram
    reklamından ÖNCE. Çerez onay bandı da gerekecek (KVKK/GDPR).
