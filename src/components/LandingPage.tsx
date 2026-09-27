@@ -455,6 +455,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             <button onClick={() => scrollTo('pricing')} className="nav-link text-sm font-medium">
               {t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری')}
             </button>
+            <a href="/blog" className="nav-link text-sm font-medium">Blog</a>
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
