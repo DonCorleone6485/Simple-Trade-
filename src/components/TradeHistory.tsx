@@ -8,7 +8,7 @@ import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
   Award, AlertTriangle, Zap, TrendingDown, Edit2, Eye,
-  CheckSquare, Square, X, Save, Upload, Loader, Sparkles, Printer, FolderInput, Lock,
+  CheckSquare, Square, X, Save, Upload, Loader, Sparkles, Printer, FolderInput, Lock, Download,
 } from 'lucide-react';
 import MTFAnalysis, { MTFAnalysisView } from './MTFAnalysis';
 import Checklist, { ChecklistView } from './Checklist';
@@ -17,6 +17,8 @@ import EmotionPicker, { EmotionChips } from './EmotionPicker';
 import NoteField from './NoteField';
 import { useLanguage } from '../context/LanguageContext';
 import { usePlan } from '../context/PlanContext';
+import { downloadCsv, csvDate, safeFileName } from '../lib/exportCsv';
+import { emotionLabel } from '../lib/emotions';
 import { fetchPhotoFromLink } from '../lib/photoLink';
 import PhotoLinkRow from './PhotoLinkRow';
 import { useUser, useAuth } from '@clerk/clerk-react';
@@ -41,6 +43,8 @@ interface TradeHistoryProps {
   statsOnly?: boolean;
   /** Tek bir işlemi PDF/yazdırma görünümüne gönderir. */
   onPrintTrade?: (trade: Trade) => void;
+  /** Dışa aktarılan dosyanın adı için. */
+  journalName?: string;
 }
 
 /** İstatistik başlığı — ince, aralıklı, sayfayı bölümlere ayırır. */
@@ -92,6 +96,7 @@ export default function TradeHistory({
   onUpdate,
   statsOnly = false,
   onPrintTrade,
+  journalName = '',
 }: TradeHistoryProps) {
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
   const { isPro, askUpgrade, isGuest, requireAccount } = usePlan();
@@ -500,6 +505,46 @@ export default function TradeHistory({
     if (next.has(id)) next.delete(id);
     else next.add(id);
     setSelectedIds(next);
+  };
+
+  /**
+   * Excel'e aktarma: seçim varsa seçilenler, yoksa hepsi. Kilitli işlemler
+   * (ücretsiz planın günlük hakkını aşanlar) dosyaya da girmiyor — sonuçları
+   * ekranda gizliyken dosyada açık olsaydı kilidin anlamı kalmazdı.
+   */
+  const exportTrades = () => {
+    const chosen = (selectedIds.size > 0 ? trades.filter(tr => selectedIds.has(tr.id)) : trades)
+      .filter(tr => isPro || !tr.locked)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const resultLabel: Record<string, string> = {
+      'Başarılı': t('resultWin'), 'Başarısız': t('resultLoss'), 'Manuel Karda': t('resultManualWin'),
+      'Manuel Zararda': t('resultManualLoss'), 'Başa Baş': t('resultBreakeven'), '': t('openStatus'),
+    };
+    const orderLabel: Record<string, string> = { Market: t('orderMarket'), Limit: t('orderLimit'), Stop: t('orderStop') };
+    const header = [
+      t('dateTime'), t('exitDateTime'), t('symbol'), t('type'), t('orderType'), t('setup'),
+      language === 'tr' ? 'Giriş fiyatı' : 'Entry price',
+      language === 'tr' ? 'Stop' : 'Stop loss',
+      language === 'tr' ? 'Çıkış fiyatı' : 'Exit price',
+      t('risk'), language === 'tr' ? 'Kâr/Zarar' : 'P&L', t('realizedR'), t('plannedRR'), t('result'),
+      t('emotion'), t('preTrade'), t('postTrade'), t('photos'),
+      language === 'tr' ? 'Pozisyon no' : 'Position ID',
+    ];
+    const rows = chosen.map(tr => [
+      csvDate(tr.date), csvDate(tr.exitDate), tr.symbol,
+      tr.type === 'Buy' ? t('buy') : t('sell'),
+      tr.orderType ? orderLabel[tr.orderType] || tr.orderType : '',
+      tr.setup || '',
+      tr.entryPrice ?? null, tr.stopLoss ?? null, tr.exitPrice ?? null,
+      tr.risk || 0, tradePnL(tr), realizedR(tr), tr.rr || '',
+      resultLabel[tr.result] ?? tr.result,
+      (tr.emotions || []).map(e => emotionLabel(e, language)).join(', '),
+      tr.preTradeNotes || '', tr.postTradeNotes || '',
+      [...(tr.preTradePhotos || []), ...(tr.postTradePhotos || [])].join(' '),
+      tr.externalId || '',
+    ]);
+    const today = new Date().toISOString().slice(0, 10);
+    downloadCsv(`${safeFileName(journalName || 'journal')}-${today}.csv`, header, rows, language);
   };
 
   const toggleSelectAll = () => {
@@ -1580,6 +1625,16 @@ export default function TradeHistory({
             {selectedIds.size} {language === 'tr' ? 'işlemi taşı' : 'trades — move'}
           </button>
         )}
+
+        <button onClick={exportTrades} disabled={trades.length === 0}
+          className="ui-pill flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all disabled:opacity-40 order-last ms-3"
+          style={{ color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
+          title={language === 'tr' ? "Excel'de açılan CSV dosyası olarak indir" : 'Download as a CSV file that opens in Excel'}>
+          <Download className="w-4 h-4" />
+          {selectedIds.size > 0
+            ? (language === 'tr' ? `${selectedIds.size} işlemi dışa aktar` : `Export ${selectedIds.size}`)
+            : (language === 'tr' ? 'Excel’e aktar' : 'Export to Excel')}
+        </button>
 
         {selectedIds.size > 0 && (
           <button onClick={handleDeleteSelected}

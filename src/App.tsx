@@ -1865,7 +1865,7 @@ export default function App() {
               </div>
               )}
 
-              {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} onPrintTrade={trade => setPrintJob({ trades: [trade], single: true })}
+              {journalTab === 'trades' && <TradeHistory trades={filteredTrades} journalName={activeJournal.name} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} onPrintTrade={trade => setPrintJob({ trades: [trade], single: true })}
                 otherJournals={accounts.filter(a => a.id !== activeJournal.id).map(a => ({ id: a.id, name: a.name }))}
                 onMoveTrades={handleMoveTrades} account={activeJournal} />}
               {journalTab === 'calendar' && <CalendarView trades={filteredOpen} onDelete={handleDeleteTrade}
