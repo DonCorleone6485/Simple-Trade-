@@ -3,7 +3,7 @@ import { Plus, Trash2, Pencil, ArrowUpRight, Lock } from 'lucide-react';
 import { Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { usePlan } from '../context/PlanContext';
-import { signedMoney, int } from '../lib/format';
+import { signedMoney, int, cur } from '../lib/format';
 
 export interface JournalStats {
   total: number;
@@ -155,7 +155,7 @@ export default function JournalDashboard({
                           {formatDate(acc.startDate)}
                           {acc.startingCapital != null && (
                             <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                              {'  ·  '}${int(acc.startingCapital)}
+                              {'  ·  '}{cur()}{int(acc.startingCapital)}
                             </span>
                           )}
                         </span>

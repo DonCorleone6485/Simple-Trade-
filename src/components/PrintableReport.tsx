@@ -4,7 +4,7 @@ import { Trade, Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
 import { MTF_TIMEFRAMES } from './MTFAnalysis';
-import { money, signedMoney, int } from '../lib/format';
+import { money, signedMoney, int, cur } from '../lib/format';
 import { emotionLabel } from '../lib/emotions';
 
 interface PrintableReportProps {
@@ -137,7 +137,7 @@ export default function PrintableReport({ journal, trades, single = false, onDon
                 ? tr('İşlem Raporu', 'Trade Report')
                 : `${tr('Journal Raporu', 'Journal Report')} · ${trades.length} ${tr('işlem', 'trades')}`}
               {journal.startDate ? ` · ${tr('Başlangıç', 'Start')}: ${fmtDate(journal.startDate)}` : ''}
-              {journal.startingCapital != null ? ` · ${tr('Sermaye', 'Capital')}: $${int(journal.startingCapital)}` : ''}
+              {journal.startingCapital != null ? ` · ${tr('Sermaye', 'Capital')}: ${cur()}${int(journal.startingCapital)}` : ''}
             </div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 10, color: ink.faint, lineHeight: 1.5 }}>

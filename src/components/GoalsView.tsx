@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Trade, Account, JournalGoals } from '../types';
 import { useLanguage } from '../context/LanguageContext';
-import { money, signedMoney } from '../lib/format';
+import { money, signedMoney, cur } from '../lib/format';
 import { isWinTrade, isLossTrade, lossAmount, winAmount } from '../lib/tradeMath';
 import { Target, TrendingUp, DollarSign, Activity, Clock, AlertTriangle, CheckCircle, Check, Edit3, Save, X } from 'lucide-react';
 
@@ -278,7 +278,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label style={lbl}>{t('monthlyPnLGoal')} ($)</label>
+              <label style={lbl}>{t('monthlyPnLGoal')} ({cur().trim()})</label>
               <input
                 type="number" min="0"
                 value={goals.monthlyPnL || ''}
@@ -308,7 +308,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
               />
             </div>
             <div>
-              <label style={lbl}>{t('maxRiskPerTrade')} ($)</label>
+              <label style={lbl}>{t('maxRiskPerTrade')} ({cur().trim()})</label>
               <input
                 type="number" min="0"
                 value={goals.maxRiskPerTrade || ''}

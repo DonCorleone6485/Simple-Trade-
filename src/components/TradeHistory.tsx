@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trade, OrderType } from '../types';
 import { isWinTrade, isLossTrade, isBreakevenTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
-import { money, signedMoney } from '../lib/format';
+import { money, signedMoney, cur } from '../lib/format';
 import { analyseDiscipline } from '../lib/discipline';
 import { splitByNews, eventsAround, NewsEvent } from '../lib/news';
 import {
@@ -854,7 +854,7 @@ export default function TradeHistory({
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                   <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `$${v}`} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `${cur()}${v}`} />
                   <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [money(value), t('cumulativePnl')]} labelFormatter={label => `Trade #${label}`} />
                   <Area type="monotone" dataKey="cumulative" stroke={netProfit >= 0 ? '#10b981' : '#f43f5e'} strokeWidth={2} fillOpacity={1} fill="url(#colorCumulative)" />
                 </AreaChart>
@@ -893,7 +893,7 @@ export default function TradeHistory({
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                 <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `$${v}`} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `${cur()}${v}`} />
                 <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [money(value), 'Drawdown']} labelFormatter={label => `Trade #${label}`} />
                 <Area type="monotone" dataKey="drawdown" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#colorDrawdown)" />
               </AreaChart>
@@ -909,7 +909,7 @@ export default function TradeHistory({
                 <BarChart data={monthlyStats} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                   <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `$${v}`} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `${cur()}${v}`} />
                   <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }}
                     formatter={(value: number) => [signedMoney(value), t('netProfit')]} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                   <Bar dataKey="pnl" radius={[6, 6, 0, 0]}>

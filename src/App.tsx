@@ -22,7 +22,7 @@ import { usePrices } from './lib/pricing';
 import { supabase } from './lib/supabase';
 import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
-import { signedMoney, int } from './lib/format';
+import { signedMoney, int, cur, CURRENCIES, setCurrency } from './lib/format';
 
 /**
  * Ekranlar ihtiyaç anında yükleniyor. Hepsi tek parçaydı (~2 MB): ana sayfaya
@@ -143,7 +143,7 @@ const optionalColumns = (trade: Trade) => ({
 export default function App() {
   const { language, setLanguage, t } = useLanguage();
   const { user, isSignedIn, isLoaded } = useUser();
-  const { signOut } = useClerk();
+  const { signOut, openUserProfile } = useClerk();
   const { getToken } = useAuth();
   const [page, setPage] = useState<Page>(getInitialPage);
   const [view, setView] = useState<View>('dashboard');
@@ -200,6 +200,10 @@ export default function App() {
    */
   const [guest, setGuest] = useState(() => {
     try { return sessionStorage.getItem('stjGuest') === '1'; } catch { return false; }
+  });
+  /** Gösterilen para birimi (users.currency); değişince ekran yeniden çizilsin diye state'te de. */
+  const [currencyCode, setCurrencyCode] = useState<string>(() => {
+    try { return localStorage.getItem('stjCurrency') || 'USD'; } catch { return 'USD'; }
   });
   /** Hesap penceresi ve hesabı silme adımları. */
   const [showAccount, setShowAccount] = useState(false);
@@ -269,7 +273,7 @@ export default function App() {
 
   const checkProStatus = async () => {
     if (!user) return;
-    const cols = 'is_pro, has_paid, pro_until, trial_started_at, trial_ends_at, trial_denied, email_checked_at, email_disposable, timezone';
+    const cols = 'is_pro, has_paid, pro_until, trial_started_at, trial_ends_at, trial_denied, email_checked_at, email_disposable, timezone, currency';
     let { data } = await supabase.from('users').select(cols).eq('user_id', user.id).maybeSingle();
 
     // E-posta bir kez, sunucuda kontrol ediliyor (Clerk'ten okunuyor).
@@ -286,6 +290,7 @@ export default function App() {
       } catch { /* kontrol olmadan devam */ }
     }
     setEmailBlocked(!!data?.email_disposable);
+    if (data?.currency) { setCurrency(data.currency); setCurrencyCode(data.currency); }
 
     // Günlük işlem hakkı kullanıcının kendi gününe göre sayılıyor (veritabanı
     // kuralı bu saat dilimini kullanıyor). Yolculukta değişirse güncellenir.
@@ -1056,7 +1061,7 @@ export default function App() {
     view === 'expanded' && journalTab === 'newTrade' && activeJournal
       ? activeJournal.name
       : view === 'expanded' && activeJournal
-      ? [formatDate(activeJournal.startDate), activeJournal.startingCapital ? `$${int(activeJournal.startingCapital)}` : null]
+      ? [formatDate(activeJournal.startDate), activeJournal.startingCapital ? `${cur()}${int(activeJournal.startingCapital)}` : null]
           .filter(Boolean).join('  ·  ')
       : view === 'dashboard'
       ? `${accounts.length} journal  ·  ${trades.length} ${language === 'tr' ? 'işlem' : 'trades'}`
@@ -1441,6 +1446,38 @@ export default function App() {
                 {trialEndsAt ? t('accountPlanTrial') : isPro ? t('accountPlanPro') : t('accountPlanFree')}
               </div>
 
+              {/* Para birimi: yalnızca simge, kur çevrimi yok (bkz. lib/format.ts). */}
+              <div>
+                <label className="block text-[12px] font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('accountCurrency')}</label>
+                <select value={currencyCode}
+                  onChange={async e => {
+                    const code = e.target.value;
+                    setCurrency(code);
+                    setCurrencyCode(code);
+                    if (user) await supabase.from('users').upsert({ user_id: user.id, currency: code }, { onConflict: 'user_id' });
+                  }}
+                  className="w-full outline-none text-sm" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: '12px', padding: '10px 14px' }}>
+                  {CURRENCIES.map(c => (
+                    <option key={c.code} value={c.code} style={{ background: '#1a1b2e', color: '#fff' }}>{c.code} ({c.symbol.trim()})</option>
+                  ))}
+                </select>
+                <p className="text-[12px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('accountCurrencyNote')}</p>
+              </div>
+
+              {/* Saat dilimi: günlük hak bu dilime göre sayılıyor; tarayıcıdan geliyor. */}
+              <div>
+                <div className="text-[12px] font-medium mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('accountTimezone')}</div>
+                <div className="text-sm font-mono" style={{ color: '#fff' }}>
+                  {(() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { return 'UTC'; } })()}
+                </div>
+                <p className="text-[12px] mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('accountTimezoneNote')}</p>
+              </div>
+
+              <button onClick={() => { setShowAccount(false); openUserProfile(); }}
+                className="w-full py-2.5 rounded-full text-sm font-medium" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.85)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                {t('accountProfile')}
+              </button>
+
               {!deleteStep ? (
                 <button onClick={() => setDeleteStep(true)} className="text-[13px] underline underline-offset-2" style={{ color: '#f87171' }}>
                   {t('accountDelete')}
@@ -1720,7 +1757,7 @@ export default function App() {
                   <div>
                     <label style={uiLabel}>{t('startingCapital')}</label>
                     <div className="relative">
-                      <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                      <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{cur().trim()}</span>
                       <input type="number" min="0" step="0.01" value={newJournalCapital} onChange={e => setNewJournalCapital(e.target.value)} placeholder="10000"
                         className="font-mono"
                         style={{ ...uiInput, paddingInlineStart: '30px' }} />
@@ -1751,7 +1788,7 @@ export default function App() {
                           <div key={f.label}>
                             <label style={uiLabel}>{f.label}</label>
                             <div className="relative">
-                              <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                              <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{cur().trim()}</span>
                               <input type="number" min="0" step="0.01" value={f.v} onChange={e => f.set(e.target.value)} placeholder={f.ph}
                                 className="font-mono" style={{ ...uiInput, paddingInlineStart: '30px' }} />
                               {pct && (

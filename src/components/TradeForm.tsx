@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { cur } from '../lib/format';
 import { Upload, X, Search, ChevronDown, Loader } from 'lucide-react';
 import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
@@ -511,7 +512,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
           <div>
               <label style={lbl}>{t('risk')} <span style={optHint}>({t('optionalLabel')})</span></label>
               <div className="relative">
-                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{cur().trim()}</span>
                 <input type="number" min="0" step="0.01" value={risk} onChange={e => setRisk(e.target.value)}
                   style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
               </div>
@@ -540,7 +541,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
                 {isClosed && <Req />}
               </label>
               <div className="relative">
-                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>$</span>
+                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{cur().trim()}</span>
                 <input type="number" min="0" step="0.01" required={isClosed} readOnly={isBreakevenResult}
                   value={reward} onChange={e => setReward(e.target.value)}
                   style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace', opacity: isBreakevenResult ? 0.6 : 1 }}
