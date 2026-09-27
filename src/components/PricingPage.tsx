@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { copy } from '../lib/landingCopy';
 import PricingCards from './PricingCards';
+import { usePrices } from '../lib/pricing';
 
 interface PricingPageProps {
   /** Tam ekran: deneme ya da Pro süresi bittiğinde bir kez açılıyor. */
@@ -38,10 +39,8 @@ export default function PricingPage({
     return copy(en, language);
   };
 
-  const monthlyPrice = 12.99;
-  const yearlyPrice = 99;
-  const yearlyMonthly = (yearlyPrice / 12).toFixed(2);
-  const savings = Math.round(((monthlyPrice * 12 - yearlyPrice) / (monthlyPrice * 12)) * 100);
+  const prices = usePrices();
+  const savings = prices.savings;
 
   const content = (
     <div className={onboardingMode ? 'min-h-screen py-16 px-4' : 'py-4'} style={onboardingMode ? { background: '#0d0e1a' } : undefined}>
@@ -98,8 +97,8 @@ export default function PricingPage({
           disabled: proDisabled,
         }}
         proPrice={billing === 'monthly'
-          ? { amount: `$${monthlyPrice}`, note: t('/ ay', '/ month', '/ ماه') }
-          : { amount: `$${yearlyMonthly}`, note: t('/ ay (yıllık $99)', '/ mo (billed $99/yr)', '/ ماه (سالانه ۹۹$)') }}
+          ? { amount: prices.fmt(prices.monthly), note: t('/ ay', '/ month', '/ ماه') }
+          : { amount: prices.fmt(prices.yearlyMonthly), note: t('/ ay (yıllık {p})', '/ mo (billed {p}/yr)', '/ ماه (سالانه {p})').replace('{p}', prices.fmt(prices.yearly)) }}
       />
 
       <p className="text-center text-[13px] mt-8" style={{ color: 'rgba(255,255,255,0.35)' }}>

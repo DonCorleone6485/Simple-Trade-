@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { Check } from 'lucide-react';
+import { usePrices } from '../lib/pricing';
 
 /**
  * Ücretsiz ve Pro kartları — ana sayfa ile uygulamadaki "Pro'ya Geç" sayfası
@@ -49,7 +50,8 @@ export default function PricingCards({ t, free, pro, proPrice }: {
     t('İşlem öncesi ve sonrası 3\'er fotoğraf', '3 Photos Before and 3 After Each Trade', '۳ عکس قبل و ۳ عکس بعد از هر معامله'),
     t('Ücretsiz plandaki her şey', 'Everything in Free', 'همه امکانات پلن رایگان'),
   ];
-  const price = proPrice || { amount: '$8.25', note: t('/ ay (yıllık)', '/ mo (yearly)', '/ ماه') };
+  const prices = usePrices();
+  const price = proPrice || { amount: prices.fmt(prices.yearlyMonthly), note: t('/ ay (yıllık)', '/ mo (yearly)', '/ ماه') };
 
   return (
     // İki plan tek yüzey üstünde, aralarında ince bir çizgi. Pro'yu doygun

@@ -33,6 +33,7 @@ import PropStatus from './components/PropStatus';
 import { useLanguage } from './context/LanguageContext';
 import { PlanProvider, UpgradeReason, FREE_DAILY_TRADES } from './context/PlanContext';
 import { demoData } from './lib/demo';
+import { usePrices } from './lib/pricing';
 import { supabase } from './lib/supabase';
 import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
@@ -168,6 +169,7 @@ export default function App() {
   /** İçe aktarmada kilitli kaydedilen işlem sayısı — pencerede söyleniyor. */
   const [importLockedCount, setImportLockedCount] = useState(0);
   const [modalBilling, setModalBilling] = useState<'monthly' | 'yearly'>('yearly');
+  const prices = usePrices();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showExpiredPricing, setShowExpiredPricing] = useState(false);
   /** Deneme sürüyorsa bitiş anı; rozet kalan günü buradan sayıyor. */
@@ -1182,21 +1184,21 @@ export default function App() {
                 {language === 'tr' ? 'Yıllık' : 'Yearly'}
                 <span className="ms-1 px-1.5 py-0.5 rounded-full text-xs font-semibold"
                   style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
-                  %36
+                  %{prices.savings}
                 </span>
               </span>
             </div>
 
             <div className="mb-2">
               <span className="text-5xl font-bold text-white">
-                ${modalBilling === 'monthly' ? '12.99' : '8.25'}
+                {prices.fmt(modalBilling === 'monthly' ? prices.monthly : prices.yearlyMonthly)}
               </span>
               <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 {language === 'tr' ? '/ ay' : '/ month'}
               </span>
               {modalBilling === 'yearly' && (
                 <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  {language === 'tr' ? 'Yıllık $99 faturalandırılır' : 'Billed $99/year'}
+                  {(language === 'tr' ? 'Yıllık {p} faturalandırılır' : 'Billed {p}/year').replace('{p}', prices.fmt(prices.yearly))}
                 </p>
               )}
             </div>

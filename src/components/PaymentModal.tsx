@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Check, Shield, Tag } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser, useAuth } from '@clerk/clerk-react';
+import { usePrices } from '../lib/pricing';
 
 interface PaymentModalProps {
   onClose: () => void;
@@ -17,10 +18,9 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   const [rewardDays, setRewardDays] = useState(0);
   const [validating, setValidating] = useState(false);
 
-  const monthlyPrice = 12.99;
-  const yearlyPrice = 99;
-  const savings = Math.round(((monthlyPrice * 12 - yearlyPrice) / (monthlyPrice * 12)) * 100);
-  const totalPrice = billing === 'monthly' ? monthlyPrice : yearlyPrice;
+  const prices = usePrices();
+  const savings = prices.savings;
+  const totalPrice = prices.fmt(billing === 'monthly' ? prices.monthly : prices.yearly);
 
   const proFeatures = [
     language === 'tr' ? 'Her gün sınırsız işlem ve journal' : 'Unlimited trades & journals, every day',
@@ -94,7 +94,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                 ? { background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.4)' }
                 : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div>{language === 'tr' ? 'Aylık' : 'Monthly'}</div>
-              <div className="text-xs mt-0.5 font-normal">$12.99 / {language === 'tr' ? 'ay' : 'mo'}</div>
+              <div className="text-xs mt-0.5 font-normal">{prices.fmt(prices.monthly)} / {language === 'tr' ? 'ay' : 'mo'}</div>
             </button>
             <button onClick={() => handleBillingChange('yearly')}
               className="flex-1 py-3 px-4 rounded-full text-sm font-medium transition-all relative"
@@ -104,7 +104,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
               <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-xs font-bold"
                 style={{ background: '#34d399', color: '#000' }}>%{savings}</span>
               <div>{language === 'tr' ? 'Yıllık' : 'Yearly'}</div>
-              <div className="text-xs mt-0.5 font-normal">$8.25 / {language === 'tr' ? 'ay' : 'mo'}</div>
+              <div className="text-xs mt-0.5 font-normal">{prices.fmt(prices.yearlyMonthly)} / {language === 'tr' ? 'ay' : 'mo'}</div>
             </button>
           </div>
 
@@ -184,7 +184,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                 {language === 'tr' ? 'Toplam' : 'Total'}
               </span>
               <div className="text-end">
-                <span className="font-display text-[26px] font-medium text-white">${totalPrice}</span>
+                <span className="font-display text-[26px] font-medium text-white">{totalPrice}</span>
                 <span className="text-sm ms-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
                   {billing === 'yearly'
                     ? (language === 'tr' ? '/ yıl' : '/ year')
