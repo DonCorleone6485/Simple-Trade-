@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Check, Shield, Tag } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 
 interface PaymentModalProps {
   onClose: () => void;
@@ -10,6 +10,7 @@ interface PaymentModalProps {
 export default function PaymentModal({ onClose }: PaymentModalProps) {
   const { language } = useLanguage();
   const { user } = useUser();
+  const { getToken } = useAuth();
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly');
   const [referralCode, setReferralCode] = useState('');
   const [referralStatus, setReferralStatus] = useState<null | 'valid' | 'invalid'>(null);
@@ -36,8 +37,8 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     try {
       const res = await fetch('/api/referral', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'validate', userId: user.id, code: referralCode.trim() }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await getToken()}` },
+        body: JSON.stringify({ action: 'validate', code: referralCode.trim() }),
       });
       const data = await res.json();
       if (data.valid) {

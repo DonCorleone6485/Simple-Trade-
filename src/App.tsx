@@ -207,11 +207,11 @@ export default function App() {
       const pendingRefCode = localStorage.getItem('pendingRefCode');
       if (pendingRefCode) {
         localStorage.removeItem('pendingRefCode');
-        fetch('/api/referral', {
+        getToken().then(token => fetch('/api/referral', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'use', userId: user.id, code: pendingRefCode }),
-        }).then(res => res.json()).then(data => {
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: 'use', code: pendingRefCode }),
+        })).then(res => res.json()).then(data => {
           if (data.success) setIsPro(true);
         });
       }
@@ -243,9 +243,13 @@ export default function App() {
       const proExpired = data.is_pro && !isStillPro && data.pro_until;
 
       if (proExpired) {
-        // Pro süresi doldu, DB'yi güncelle
-        await supabase.from('users').update({ is_pro: false }).eq('user_id', user.id);
-        setShowExpiredPricing(true);
+        // Pro'yu tarayıcı artık yazamıyor (bkz. protect_user_privileges); süre
+        // zaten pro_until'den okunuyor. "Süren doldu" ekranı her süre için bir
+        // kez gösteriliyor — yoksa her açılışta yeniden çıkardı.
+        const seenKey = `proExpiredSeen:${data.pro_until}`;
+        let seen = false;
+        try { seen = !!localStorage.getItem(seenKey); localStorage.setItem(seenKey, '1'); } catch { /* yok */ }
+        if (!seen) setShowExpiredPricing(true);
       }
 
       setIsPro(!!isStillPro);
@@ -266,8 +270,8 @@ export default function App() {
     if (!user) return;
     const res = await fetch('/api/referral', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'generate', userId: user.id }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await getToken()}` },
+      body: JSON.stringify({ action: 'generate' }),
     });
     const data = await res.json();
     if (data.code) setReferralCode(data.code);
@@ -277,8 +281,8 @@ export default function App() {
     if (!user || !referralInput.trim()) return;
     const res = await fetch('/api/referral', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'use', userId: user.id, code: referralInput.trim() }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await getToken()}` },
+      body: JSON.stringify({ action: 'use', code: referralInput.trim() }),
     });
     const data = await res.json();
     if (data.success) { setReferralMsg('🎉 1 ay ücretsiz Pro kazandınız!'); setIsPro(true); }
@@ -1287,8 +1291,8 @@ export default function App() {
                   const newCode = `ST-${user.id.slice(-6).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
                   const res = await fetch('/api/referral', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'generate_new', userId: user.id, splitType, code: newCode }),
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await getToken()}` },
+                    body: JSON.stringify({ action: 'generate_new', splitType, code: newCode }),
                   });
                   const data = await res.json();
                   if (data.code) {
