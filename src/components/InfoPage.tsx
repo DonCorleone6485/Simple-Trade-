@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Mail } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { Lock as LogoLock } from './Logo';
 
@@ -15,6 +15,9 @@ type Lang = 'tr' | 'en' | 'fa' | 'ar' | 'ru' | 'es' | 'pt' | 'de' | 'fr';
 type L9 = Record<Lang, string>;
 
 export type InfoKind = 'help' | 'changelog';
+
+const SUPPORT_EMAIL = 'support@simpletradejournal.io';
+const PRIVACY_EMAIL = 'privacy@simpletradejournal.io';
 
 const UI: Record<string, L9> = {
   helpTitle: { tr: 'Yardım', en: 'Help', fa: 'راهنما', ar: 'المساعدة', ru: 'Помощь', es: 'Ayuda', pt: 'Ajuda', de: 'Hilfe', fr: 'Aide' },
@@ -40,6 +43,29 @@ const UI: Record<string, L9> = {
     pt: 'O que há de novo no site, do mais recente ao mais antigo.',
     de: 'Was es Neues gibt, das Neueste zuerst.',
     fr: 'Les nouveautés du site, des plus récentes aux plus anciennes.',
+  },
+  contactTitle: { tr: 'Cevabını bulamadın mı?', en: 'Didn\'t find your answer?', fa: 'پاسخت را پیدا نکردی؟', ar: 'لم تجد إجابتك؟', ru: 'Не нашли ответ?', es: '¿No encontraste tu respuesta?', pt: 'Não encontraste a resposta?', de: 'Keine Antwort gefunden?', fr: 'Vous n\'avez pas trouvé la réponse ?' },
+  contactLead: {
+    tr: 'Bize yaz, genelde bir iş günü içinde dönüyoruz.',
+    en: 'Write to us — we usually reply within one business day.',
+    fa: 'به ما بنویس؛ معمولاً ظرف یک روز کاری پاسخ می‌دهیم.',
+    ar: 'راسلنا، وعادةً نرد خلال يوم عمل واحد.',
+    ru: 'Напишите нам — обычно отвечаем в течение рабочего дня.',
+    es: 'Escríbenos: solemos responder en un día hábil.',
+    pt: 'Escreve-nos: normalmente respondemos num dia útil.',
+    de: 'Schreib uns – wir antworten meist innerhalb eines Werktags.',
+    fr: 'Écrivez-nous : nous répondons généralement sous un jour ouvré.',
+  },
+  contactPrivacy: {
+    tr: 'Verilerin ve gizlilikle ilgili talepler için:',
+    en: 'For data and privacy requests:',
+    fa: 'برای درخواست‌های مربوط به داده و حریم خصوصی:',
+    ar: 'لطلبات البيانات والخصوصية:',
+    ru: 'По вопросам данных и конфиденциальности:',
+    es: 'Para solicitudes de datos y privacidad:',
+    pt: 'Para pedidos sobre dados e privacidade:',
+    de: 'Für Anfragen zu Daten und Datenschutz:',
+    fr: 'Pour les demandes relatives aux données et à la confidentialité :',
   },
   home: { tr: 'Ana sayfa', en: 'Home', fa: 'صفحه اصلی', ar: 'الرئيسية', ru: 'Главная', es: 'Inicio', pt: 'Início', de: 'Startseite', fr: 'Accueil' },
   seeChangelog: { tr: 'Değişikliklere bak', en: 'See the changelog', fa: 'دیدن تغییرات', ar: 'عرض سجل التغييرات', ru: 'Что нового', es: 'Ver novedades', pt: 'Ver novidades', de: 'Änderungen ansehen', fr: 'Voir les nouveautés' },
@@ -307,6 +333,20 @@ export default function InfoPage({ kind, onHome, onOther, cta }: {
                 <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>{h.a[lang]}</p>
               </section>
             ))}
+            {/* Soruların altında: yardım sayfası, cevabı bulamayanın
+                bakacağı son yer; uygulamadaki "Yardım" da buraya geliyor. */}
+            <section className="rounded-2xl p-6" style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}>
+              <h2 className="text-[17px] font-medium text-white mb-2">{s('contactTitle')}</h2>
+              <p className="text-[15px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.65)' }}>{s('contactLead')}</p>
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 text-[15px] font-medium" style={{ color: '#a78bfa' }} dir="ltr">
+                <Mail className="w-4 h-4" />
+                {SUPPORT_EMAIL}
+              </a>
+              <p className="text-[13px] leading-relaxed mt-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                {s('contactPrivacy')}{' '}
+                <a href={`mailto:${PRIVACY_EMAIL}`} className="underline" dir="ltr">{PRIVACY_EMAIL}</a>
+              </p>
+            </section>
           </div>
         ) : (
           <ol className="space-y-10">

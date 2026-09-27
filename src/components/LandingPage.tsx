@@ -919,6 +919,9 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               <p className="text-[13.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم دفترچه معاملات')}
               </p>
+              <a href="mailto:support@simpletradejournal.io" className="nav-link nav-link-dim inline-block mt-3 text-[13px]" dir="ltr">
+                support@simpletradejournal.io
+              </a>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
