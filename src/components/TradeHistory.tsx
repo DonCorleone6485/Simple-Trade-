@@ -8,7 +8,7 @@ import {
   ArrowUpRight, ArrowDownRight, Calendar, Target, Trash2,
   ChevronLeft, PieChart, DollarSign, TrendingUp, Activity,
   Award, AlertTriangle, Zap, TrendingDown, Edit2, Eye,
-  CheckSquare, Square, X, Save, Upload, Loader, Sparkles, Printer, FolderInput
+  CheckSquare, Square, X, Save, Upload, Loader, Sparkles, Printer, FolderInput, Lock,
 } from 'lucide-react';
 import MTFAnalysis, { MTFAnalysisView } from './MTFAnalysis';
 import Checklist, { ChecklistView } from './Checklist';
@@ -16,6 +16,7 @@ import SetupPicker from './SetupPicker';
 import EmotionPicker, { EmotionChips } from './EmotionPicker';
 import NoteField from './NoteField';
 import { useLanguage } from '../context/LanguageContext';
+import { usePlan } from '../context/PlanContext';
 import { fetchPhotoFromLink } from '../lib/photoLink';
 import PhotoLinkRow from './PhotoLinkRow';
 import { useUser, useAuth } from '@clerk/clerk-react';
@@ -93,6 +94,7 @@ export default function TradeHistory({
   onPrintTrade,
 }: TradeHistoryProps) {
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
+  const { isPro, askUpgrade } = usePlan();
   const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
   const [editForm, setEditForm] = useState<Partial<Trade>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -210,15 +212,17 @@ export default function TradeHistory({
 
 
   const runAiAnalysis = async () => {
+    if (!isPro) { askUpgrade('ai'); return; }
     setAiLoading(true);
     setAiError('');
     setShowAi(true);
     setAiAnalysis('');
     try {
+      const token = await getToken();
       const res = await fetch('/api/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trades, language, journalName: '', startingCapital: 0 }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ trades: trades.filter(tr => !tr.locked), language, journalName: '', startingCapital: 0 }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -1005,6 +1009,7 @@ export default function TradeHistory({
             <button onClick={runAiAnalysis} disabled={aiLoading}
               className="cta px-4 py-2 rounded-full text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ background: '#8b5cf6', color: '#fff' }}>
+              {!isPro && <Lock className="w-3.5 h-3.5 inline -mt-0.5 me-1.5" />}
               {aiLoading ? t('aiAnalyzeLoading') : t('aiAnalyzeBtn')}
             </button>
           </div>
@@ -1597,6 +1602,9 @@ export default function TradeHistory({
                   const isW = trade.result === 'Başarılı' || trade.result === 'Manuel Karda';
                   const isL = trade.result === 'Başarısız' || trade.result === 'Manuel Zararda';
                   const isSelected = selectedIds.has(trade.id);
+                  // Ücretsiz planın günlük hakkını aşan işlem: var olduğu
+                  // görünüyor (saat, sembol, yön), sonucu gizli, açılmıyor.
+                  const isLocked = !!trade.locked && !isPro;
 
                   return (
                     <div key={trade.id}
@@ -1610,7 +1618,8 @@ export default function TradeHistory({
                         background: isSelected ? 'rgba(139,92,246,0.08)' : undefined,
                         border: isSelected ? '1px solid rgba(139,92,246,0.2)' : '1px solid transparent',
                       }}
-                      onClick={() => openOverlay(() => setSelectedTrade(trade))}
+                      onClick={() => (isLocked ? askUpgrade('locked') : openOverlay(() => setSelectedTrade(trade)))}
+                      title={isLocked ? t('lockedTradeTitle') : undefined}
                     >
                       {/* Kutu her zaman görünür. Saydam bırakılınca kimse tek
                           tek seçebildiğini fark etmiyordu. */}
@@ -1625,7 +1634,10 @@ export default function TradeHistory({
                       <span className="hidden sm:inline w-12 font-mono text-[13px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
                         {new Date(trade.date).toLocaleTimeString(language === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                       </span>
-                      <span className="hover-title w-20 sm:w-24 font-medium">{trade.symbol}</span>
+                      <span className="hover-title w-20 sm:w-24 font-medium flex items-center gap-1.5">
+                        {isLocked && <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#a78bfa' }} />}
+                        {trade.symbol}
+                      </span>
                       <span className="w-10 sm:w-14 text-sm font-medium" style={{ color: trade.type === 'Buy' ? '#34d399' : '#f87171' }}>
                         {trade.type === 'Buy' ? t('buy') : t('sell')}
                       </span>
@@ -1634,6 +1646,17 @@ export default function TradeHistory({
                           {trade.setup}
                         </span>
                       )}
+                      {isLocked ? (
+                        <span className="ms-auto flex items-center gap-2">
+                          <span className="font-mono text-sm select-none" style={{ filter: 'blur(5px)', color: 'rgba(255,255,255,0.55)' }}>
+                            +$000.00
+                          </span>
+                          <span className="text-[11px] px-2 py-0.5 rounded-full whitespace-nowrap"
+                            style={{ background: 'rgba(139,92,246,0.14)', color: '#a78bfa' }}>
+                            {t('lockedTradeBadge')}
+                          </span>
+                        </span>
+                      ) : (<>
                       {(() => {
                         const r = realizedR(trade);
                         return (
@@ -1651,10 +1674,12 @@ export default function TradeHistory({
                               {t('incompleteTrade')}
                             </span>}
                       </span>
+                      </>)}
 
                       <div className="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                         style={{ background: '#1a1b2e', borderRadius: '8px', padding: '2px', border: '1px solid rgba(255,255,255,0.08)' }}
                         onClick={e => e.stopPropagation()}>
+                        {!isLocked && <>
                         <button onClick={e => startEdit(trade, e)}
                           className="ui-pill p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                           style={{ color: '#a78bfa' }}
@@ -1675,6 +1700,7 @@ export default function TradeHistory({
                             <FolderInput className="w-3.5 h-3.5" />
                           </button>
                         )}
+                        </>}
                         <button onClick={e => { e.stopPropagation(); onDelete(trade.id); }}
                           className="ui-pill ui-pill-danger p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                           style={{ color: '#f87171' }}

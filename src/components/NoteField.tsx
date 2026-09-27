@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic, Square, Wand2, Undo2, Loader } from 'lucide-react';
+import { Mic, Square, Wand2, Undo2, Loader, Lock } from 'lucide-react';
 import { useAuth } from '@clerk/clerk-react';
 import { useLanguage } from '../context/LanguageContext';
+import { usePlan } from '../context/PlanContext';
 import { fixTerms, countTerms } from '../lib/tradingTerms';
 
 interface NoteFieldProps {
@@ -99,6 +100,8 @@ const LOCALE: Record<string, string> = {
 export default function NoteField({ value, onChange, placeholder, height = '190px', style }: NoteFieldProps) {
   const { getToken } = useAuth();
   const { language } = useLanguage();
+  // Sesli not ve yazım düzeltme yapay zekâ kullanıyor: Pro'ya ait.
+  const { isPro, askUpgrade } = usePlan();
   const tr = (a: string, b: string) => (language === 'tr' ? a : b);
 
   const [listening, setListening] = useState(false);
@@ -322,11 +325,12 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
 
       <div className="flex items-center gap-2 mt-2 flex-wrap">
         {(Recognition || CanRecord) && (
-          <button type="button" onClick={listening ? stopListening : startListening}
+          <button type="button" onClick={!isPro ? () => askUpgrade('voice') : listening ? stopListening : startListening}
             style={listening
               ? { ...chip, background: 'rgba(248,113,113,0.15)', borderColor: 'rgba(248,113,113,0.35)', color: '#f87171' }
               : chip}>
             {listening ? <Square className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+            {!isPro && <Lock className="w-3 h-3" style={{ color: '#a78bfa' }} />}
             {listening ? tr('Durdur', 'Stop') : tr('Konuşarak yaz', 'Dictate')}
           </button>
         )}
@@ -334,7 +338,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
         {/* Dikte bitince düzeltme kendiliğinden olur. Bu bağlantı yazarak not
             tutan için: adı ne yaptığını söylüyor, "Düzelt" ise söylemiyordu. */}
         {!listening && !tidying && !transcribing && before == null && value.trim().length > 1 && (
-          <button type="button" onClick={tidy}
+          <button type="button" onClick={() => (isPro ? tidy() : askUpgrade('ai'))}
             className="ui-pill flex items-center gap-1.5 text-[12.5px]"
             style={{ color: 'rgba(255,255,255,0.4)' }}>
             <Wand2 className="w-3.5 h-3.5" />

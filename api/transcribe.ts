@@ -1,4 +1,5 @@
 import { verifyToken } from '@clerk/backend';
+import { createClient } from '@supabase/supabase-js';
 
 /**
  * Kaydedilmiş sesli notu yazıya çevirir.
@@ -23,6 +24,23 @@ const HINT =
   'Order Block, FVG, CHoCH, BOS, MSS, Liquidity Sweep, Displacement, Premium, Discount, ' +
   'Stop Loss, Take Profit, Break Even, Risk/Reward, Long, Short, Swing High, Swing Low, ' +
   'HTF, LTF, Killzone, EURUSD, GBPUSD, XAUUSD, NAS100, US30.';
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
+  process.env.SUPABASE_SERVICE_KEY!
+);
+
+/**
+ * Yapay zekâ özellikleri Pro'ya ait (ücretsiz planda kapalı). Tarayıcıdaki
+ * kilit yalnızca görünüş; asıl kontrol burada, çünkü her çağrı bize maliyet.
+ */
+async function isPro(userId: string): Promise<boolean> {
+  const { data } = await supabase.from('users').select('is_pro, pro_until').eq('user_id', userId).maybeSingle();
+  if (!data?.is_pro) return false;
+  if (!data.pro_until) return true;
+  const s = String(data.pro_until);
+  return new Date(/(Z|[+-]\d\d:?\d\d)$/.test(s) ? s : s + 'Z') > new Date();
+}
 
 async function userFromRequest(req: any): Promise<string | null> {
   const secret = process.env.CLERK_SECRET_KEY;
@@ -49,6 +67,7 @@ export default async function handler(req: any, res: any) {
   // Groq çağrısı kota harcıyor; kimliği doğrulanmamış istek kabul etmeyiz.
   const userId = await userFromRequest(req);
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  if (!(await isPro(userId))) return res.status(402).json({ error: 'pro_required' });
 
   const { audio, mime, language } = req.body || {};
   if (typeof audio !== 'string' || audio.length < 100) return res.status(400).json({ error: 'No audio' });

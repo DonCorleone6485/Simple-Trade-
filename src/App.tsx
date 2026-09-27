@@ -31,6 +31,7 @@ import PrintableReport from './components/PrintableReport';
 import { Trade, Account, JournalGoals, JournalKind, DrawdownType } from './types';
 import PropStatus from './components/PropStatus';
 import { useLanguage } from './context/LanguageContext';
+import { PlanProvider, UpgradeReason, FREE_DAILY_TRADES } from './context/PlanContext';
 import { supabase } from './lib/supabase';
 import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
@@ -113,6 +114,7 @@ const tradeFromRow = (t: any): Trade => ({
   entryPrice: t.entry_price ?? undefined,
   stopLoss: t.stop_loss ?? undefined,
   exitPrice: t.exit_price ?? undefined,
+  locked: !!t.locked,
 });
 
 /** Formdan gelen isteğe bağlı alanların sütun karşılıkları. */
@@ -160,7 +162,9 @@ export default function App() {
   const [referralMsg, setReferralMsg] = useState('');
   const [showReferral, setShowReferral] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [upgradeReason, setUpgradeReason] = useState<'daily' | 'total' | 'journal'>('total');
+  const [upgradeReason, setUpgradeReason] = useState<UpgradeReason>('daily');
+  /** İçe aktarmada kilitli kaydedilen işlem sayısı — pencerede söyleniyor. */
+  const [importLockedCount, setImportLockedCount] = useState(0);
   const [modalBilling, setModalBilling] = useState<'monthly' | 'yearly'>('yearly');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showExpiredPricing, setShowExpiredPricing] = useState(false);
@@ -176,23 +180,28 @@ export default function App() {
 
   const isRTL = language === 'fa' || language === 'ar';
 
-  const upgradeReasonText: Record<string, string> = {
-    daily: language === 'tr' ? 'Günlük 1 işlem limitini aştınız.' : "You've reached the daily 1 trade limit.",
-    total: language === 'tr' ? 'Toplam 20 işlem limitini aştınız.' : "You've reached the 20 trade limit.",
-    journal: language === 'tr' ? '1 Journal limitini aştınız.' : "You've reached the 1 journal limit.",
+  const upgradeReasonText: Record<UpgradeReason, string> = {
+    daily: t('upgradeDaily').replace('{n}', String(FREE_DAILY_TRADES)),
+    journal: t('upgradeJournal'),
+    locked: t('upgradeLocked').replace('{n}', String(FREE_DAILY_TRADES)),
+    importLocked: t('upgradeImportLocked').replace('{n}', String(importLockedCount)),
+    voice: t('upgradeVoice'),
+    ai: t('upgradeAi'),
+  };
+
+  /** Kilitli bir şeye dokunulduğunda: o kısıtlamayı anlatan pencere. */
+  const askUpgrade = (reason: UpgradeReason) => {
+    setUpgradeReason(reason);
+    setShowUpgradeModal(true);
   };
 
   const proFeaturesList = [
-    language === 'tr' ? 'Sınırsız Journal' : 'Unlimited Journals',
-    language === 'tr' ? 'Sınırsız Trade' : 'Unlimited Trades',
-    language === 'tr' ? 'İşlem Öncesi ve Sonrası 3\'er Fotoğraf' : '3 Photos Before and 3 After Each Trade',
-    language === 'tr' ? 'AI Analiz' : 'AI Analysis',
-    language === 'tr' ? 'Gelişmiş İstatistikler' : 'Advanced Statistics',
-    language === 'tr' ? 'Hedef & Kural Sistemi' : 'Goals & Rules System',
-    language === 'tr' ? 'Drawdown & Streak Analizi' : 'Drawdown & Streak Analysis',
-    language === 'tr' ? 'Isı Haritası' : 'Heat Map',
-    language === 'tr' ? 'Setup Performans Analizi' : 'Setup Performance Analysis',
-    language === 'tr' ? 'Öncelikli Destek' : 'Priority Support',
+    t('proFeatTrades'),
+    t('proFeatJournals'),
+    t('proFeatMt'),
+    t('proFeatVoice'),
+    t('proFeatAi'),
+    t('proFeatPhotos'),
   ];
 
   useEffect(() => {
@@ -225,7 +234,7 @@ export default function App() {
 
   const checkProStatus = async () => {
     if (!user) return;
-    const cols = 'is_pro, has_paid, pro_until, trial_started_at, trial_ends_at, trial_denied, email_checked_at, email_disposable';
+    const cols = 'is_pro, has_paid, pro_until, trial_started_at, trial_ends_at, trial_denied, email_checked_at, email_disposable, timezone';
     let { data } = await supabase.from('users').select(cols).eq('user_id', user.id).maybeSingle();
 
     // E-posta bir kez, sunucuda kontrol ediliyor (Clerk'ten okunuyor).
@@ -242,6 +251,15 @@ export default function App() {
       } catch { /* kontrol olmadan devam */ }
     }
     setEmailBlocked(!!data?.email_disposable);
+
+    // Günlük işlem hakkı kullanıcının kendi gününe göre sayılıyor (veritabanı
+    // kuralı bu saat dilimini kullanıyor). Yolculukta değişirse güncellenir.
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (tz && data?.timezone !== tz) {
+        await supabase.from('users').upsert({ user_id: user.id, timezone: tz }, { onConflict: 'user_id' });
+      }
+    } catch { /* saat dilimi yoksa UTC sayılır */ }
 
     if (!data) setTrialAvailable(true);
     if (data) {
@@ -572,32 +590,9 @@ export default function App() {
 
   // ── TRADE LİMİT KONTROLÜ ──
   const handleNewTradeClick = async () => {
-    if (!isPro && user) {
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-
-      const { count: totalCount } = await supabase
-        .from('trades')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-
-      if ((totalCount || 0) >= 20) {
-        setUpgradeReason('total');
-        setShowUpgradeModal(true);
-        return;
-      }
-
-      const { count: todayCount } = await supabase
-        .from('trades')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('date', todayStart.toISOString());
-
-      if ((todayCount || 0) >= 1) {
-        setUpgradeReason('daily');
-        setShowUpgradeModal(true);
-        return;
-      }
+    if (!isPro && todayOpenCount >= FREE_DAILY_TRADES) {
+      askUpgrade('daily');
+      return;
     }
     goTo({ view: 'expanded', tab: 'newTrade' });
   };
@@ -618,6 +613,8 @@ export default function App() {
       const newTrade = tradeFromRow(data);
       setTrades(prev => [newTrade, ...prev]);
       goTo({ view: 'expanded', tab: 'trades' });
+      // Geçmiş bir güne, o günün hakkı dolmuşken girildiyse kilitli kaydedildi.
+      if (newTrade.locked && !isPro) askUpgrade('locked');
     }
   };
 
@@ -676,12 +673,6 @@ export default function App() {
       setAccounts(prev => [...prev, targetJournal as Account]);
     }
     if (!targetJournal) return;
-    if (!isPro) {
-      const currentCount = trades.filter(tr => tr.user_id === user.id).length;
-      const remaining = 20 - currentCount;
-      if (remaining <= 0) { setUpgradeReason('total'); setShowUpgradeModal(true); return; }
-      importedTrades = importedTrades.slice(0, remaining);
-    }
     // Ekran zaten mevcutları eliyor; burada bir kez daha süzüyoruz ki iki
     // sekmeden aynı rapor yüklendiğinde de kopya oluşmasın.
     const known = new Set(
@@ -707,6 +698,12 @@ export default function App() {
     // Yeni journal açıldıysa doğrudan içine gir.
     if (target.kind === 'new') {
       goTo({ view: 'expanded', journal: targetJournal, tab: 'trades' });
+    }
+    // Hiçbiri atılmadı; günlük hakkı aşanlar kilitli kaydedildi.
+    const lockedNow = inserted.filter(tr => tr.locked).length;
+    if (lockedNow > 0 && !isPro) {
+      setImportLockedCount(lockedNow);
+      askUpgrade('importLocked');
     }
   };
 
@@ -840,9 +837,20 @@ export default function App() {
   };
 
   const filteredTrades = activeJournal ? trades.filter(tr => tr.accountId === activeJournal.id) : [];
+  /**
+   * İstatistik, takvim, hedef ve disiplin kilitli işlemleri saymaz — yoksa
+   * gizli sonuç rakamlardan okunabilirdi. Liste ise hepsini gösterir.
+   */
+  const openTrades = isPro ? trades : trades.filter(tr => !tr.locked);
+  const filteredOpen = isPro ? filteredTrades : filteredTrades.filter(tr => !tr.locked);
+  /** Bugün (kullanıcının günü) kaydedilmiş açık işlem sayısı — ücretsiz planın sayacı. */
+  const todayOpenCount = (() => {
+    const today = new Date().toDateString();
+    return trades.filter(tr => !tr.locked && new Date(tr.date).toDateString() === today).length;
+  })();
 
   const getJournalStats = (accountId: string) => {
-    const jt = trades.filter(tr => tr.accountId === accountId);
+    const jt = openTrades.filter(tr => tr.accountId === accountId);
     const wins = jt.filter(isWinTrade);
     const losses = jt.filter(isLossTrade);
     // Başa baş işlemler ne kazanç ne kayıp — oranın paydasına girmezler.
@@ -1000,6 +1008,14 @@ export default function App() {
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
           <PlusCircle className="w-4 h-4" />
           <span className="hidden sm:inline">{t('newTradeTab')}</span>
+          {/* Google Flow'daki kredi gibi: ücretsiz planda bugünkü hak görünsün. */}
+          {!isPro && (
+            <span className="text-[11.5px] font-mono px-1.5 py-0.5 rounded-full"
+              title={t('todayQuotaTitle')}
+              style={{ background: 'rgba(255,255,255,0.18)' }}>
+              {Math.min(todayOpenCount, FREE_DAILY_TRADES)}/{FREE_DAILY_TRADES}
+            </span>
+          )}
         </button>
       </>
     ) : undefined;
@@ -1258,6 +1274,7 @@ export default function App() {
       )}
 
       <SignedIn>
+        <PlanProvider value={{ isPro, askUpgrade }}>
         {/* Tek kullanımlık e-postayla açılmış hesap: ne deneme ne ücretsiz plan.
             İleride e-postayla ulaşabileceğimiz gerçek bir adres istiyoruz. */}
         {emailBlocked && (
@@ -1575,7 +1592,7 @@ export default function App() {
 
           {!loading && view === 'discipline' && (
             <DisciplineView
-              trades={trades.filter(tr => tr.user_id === user?.id)}
+              trades={openTrades.filter(tr => tr.user_id === user?.id)}
               journalCount={accounts.length}
             />
           )}
@@ -1611,7 +1628,7 @@ export default function App() {
                   Takvim ve istatistik sekmeleri kendi özetlerini gösterdiği
                   için oralarda tekrarlanmıyor. */}
               {activeJournal.kind === 'prop' && journalTab !== 'stats' && journalTab !== 'calendar' && journalTab !== 'mtConnect' && (
-                <PropStatus account={activeJournal} trades={filteredTrades} />
+                <PropStatus account={activeJournal} trades={filteredOpen} />
               )}
 
               {journalTab !== 'stats' && journalTab !== 'calendar' && journalTab !== 'mtConnect' && (
@@ -1637,9 +1654,9 @@ export default function App() {
               {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} onPrintTrade={trade => setPrintJob({ trades: [trade], single: true })}
                 otherJournals={accounts.filter(a => a.id !== activeJournal.id).map(a => ({ id: a.id, name: a.name }))}
                 onMoveTrades={handleMoveTrades} account={activeJournal} />}
-              {journalTab === 'calendar' && <CalendarView trades={filteredTrades} onDelete={handleDeleteTrade} />}
-              {journalTab === 'stats' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} account={activeJournal} statsOnly />}
-              {journalTab === 'goals' && <GoalsView trades={filteredTrades} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
+              {journalTab === 'calendar' && <CalendarView trades={filteredOpen} onDelete={handleDeleteTrade} />}
+              {journalTab === 'stats' && <TradeHistory trades={filteredOpen} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} account={activeJournal} statsOnly />}
+              {journalTab === 'goals' && <GoalsView trades={filteredOpen} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
               {journalTab === 'mtConnect' && <MTConnect journalId={activeJournal.id} journalName={activeJournal.name} />}
             </div>
           )}
@@ -1647,6 +1664,7 @@ export default function App() {
 
         </>
         )}
+        </PlanProvider>
       </SignedIn>
     </div>
   );

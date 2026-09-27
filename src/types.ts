@@ -113,4 +113,9 @@ export interface Trade {
   entryPrice?: number;
   stopLoss?: number;
   exitPrice?: number;
+  /**
+   * Ücretsiz planın günlük hakkını aştığı için kilitli kaydedildi. Veritabanı
+   * karar veriyor (lock_free_trades); işlem silinmiyor, Pro'da açılıyor.
+   */
+  locked?: boolean;
 }

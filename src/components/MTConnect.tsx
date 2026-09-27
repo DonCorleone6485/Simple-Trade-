@@ -3,6 +3,7 @@ import { Plug, Copy, Check, Trash2, KeyRound, AlertTriangle, Loader, Download } 
 import { useAuth } from '@clerk/clerk-react';
 import { useLanguage } from '../context/LanguageContext';
 import MTSetupTour from './MTSetupTour';
+import { usePlan } from '../context/PlanContext';
 
 interface ApiKey {
   id: string;
@@ -27,7 +28,8 @@ interface MTConnectProps {
  */
 export default function MTConnect({ journalId, journalName }: MTConnectProps) {
   const { getToken } = useAuth();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
+  const { isPro } = usePlan();
   const tr = (a: string, b: string) => (language === 'tr' ? a : b);
 
   const [keys, setKeys] = useState<ApiKey[]>([]);
@@ -168,6 +170,12 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             `A small add-on installed in MetaTrader 5 writes your closed trades into "${journalName}" on its own. No more exporting and uploading reports.`
           )}
         </p>
+        {!isPro && (
+          <p className="text-[13px] leading-relaxed mt-3 px-3.5 py-2.5 rounded-xl"
+            style={{ color: '#c4b5fd', background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.18)' }}>
+            {t('mtFreeNote')}
+          </p>
+        )}
       </div>
 
       {error && (

@@ -11,8 +11,6 @@ const hash = (key: string) => createHash('sha256').update(key).digest('hex');
 /** Tek seferde kabul edilen işlem sayısı — kazara ya da kasten dev gövde gelmesin. */
 const MAX_TRADES = 200;
 
-/** Ücretsiz planın toplam işlem sınırı — uygulamadakiyle aynı. */
-const FREE_TRADE_LIMIT = 20;
 
 type Incoming = {
   externalId?: string | number;
@@ -234,36 +232,31 @@ export default async function handler(req: any, res: any) {
     });
   }
 
-  // Ücretsiz planın işlem sınırı. Uygulama tarafında elle giriş ve dosyadan
-  // aktarma zaten sınırlı; buradan sınırsız yazılabilseydi sınır anlamsız
-  // olurdu — bir yıllık geçmiş çeken biri binlerce satır yollayabilir.
-  let remaining = Infinity;
+  // Ücretsiz planın sınırı burada değil, veritabanında: her işlem gününün ilk
+  // 2 işlemi açık, fazlası kilitli kaydediliyor (lock_free_trades
+  // tetikleyicisi). Elle giriş ve dosyadan aktarma da aynı kuraldan geçiyor;
+  // hiçbir işlem atılmıyor, Pro'ya geçince hepsi açılıyor.
   /** Bu istekte deneme süresi sona erdirildi mi (aynı MT hesabı başka denemede kullanılmış). */
   let trialEnded = false;
   {
     const { data: account } = await supabase
       .from('users').select('is_pro, pro_until, has_paid, trial_ends_at')
       .eq('user_id', apiKey.user_id).maybeSingle();
-    let isPro = !!account?.is_pro && (!account.pro_until || new Date(account.pro_until) > new Date());
+    const isPro = !!account?.is_pro && (!account.pro_until || new Date(account.pro_until) > new Date());
 
     // Deneme süresindeki kullanıcı: bu MT hesabı daha önce başka bir hesabın
     // denemesinde kullanıldıysa deneme burada biter. Her 3 günde bir yeni
     // e-postayla açıp aynı hesabı bağlamanın önü böyle kesiliyor.
     const inTrial = isPro && !account?.has_paid
       && !!account?.trial_ends_at && new Date(account.trial_ends_at) > new Date();
-    if (inTrial) {
-      if (!fingerprint) {
-        // Eski EA hesap bilgisini göndermiyor, kontrol edilemiyor: deneme
-        // otomatik kaydı kapsamıyor, Ücretsiz planın sınırı geçerli.
-        isPro = false;
-      } else if (await usedInAnotherTrial(fingerprint, apiKey.user_id)) {
-        const nowIso = new Date().toISOString();
-        await supabase.from('users')
-          .update({ is_pro: false, pro_until: nowIso, trial_ends_at: nowIso, trial_denied: 'mt_reused' })
-          .eq('user_id', apiKey.user_id);
-        isPro = false;
-        trialEnded = true;
-      }
+    // Eski EA (1.05 öncesi) hesap bilgisini göndermiyor; o zaman kontrol
+    // edilemiyor ve deneme sürüyor.
+    if (inTrial && fingerprint && await usedInAnotherTrial(fingerprint, apiKey.user_id)) {
+      const nowIso = new Date().toISOString();
+      await supabase.from('users')
+        .update({ is_pro: false, pro_until: nowIso, trial_ends_at: nowIso, trial_denied: 'mt_reused' })
+        .eq('user_id', apiKey.user_id);
+      trialEnded = true;
     }
 
     // Deneme olsun olmasın her bağlanan hesap kaydediliyor: yarın başka bir
@@ -271,12 +264,6 @@ export default async function handler(req: any, res: any) {
     if (fingerprint) {
       await supabase.from('mt_accounts')
         .upsert({ fingerprint, user_id: apiKey.user_id }, { onConflict: 'fingerprint,user_id', ignoreDuplicates: true });
-    }
-
-    if (!isPro) {
-      const { count } = await supabase
-        .from('trades').select('*', { count: 'exact', head: true }).eq('user_id', apiKey.user_id);
-      remaining = Math.max(0, FREE_TRADE_LIMIT - (count || 0));
     }
   }
 
@@ -424,9 +411,7 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    // ── 3. Yeni satır. Tamamlama satır eklemediği için ücretsiz plan sınırı
-    // ancak buraya, gerçekten yeni bir kayıt yazılırken işliyor. ──
-    if (rows.length >= remaining) continue;
+    // ── 3. Yeni satır. ──
 
     rows.push({
       user_id: apiKey.user_id,
@@ -458,10 +443,13 @@ export default async function handler(req: any, res: any) {
   }
 
   let inserted = 0;
+  /** Ücretsiz planın günlük hakkını aştığı için kilitli kaydedilenler. */
+  let locked = 0;
   if (rows.length > 0) {
-    const { data, error } = await supabase.from('trades').insert(rows).select('id');
+    const { data, error } = await supabase.from('trades').insert(rows).select('id, locked');
     if (error) return res.status(500).json({ error: error.message });
     inserted = (data || []).length;
+    locked = (data || []).filter((r: any) => r.locked).length;
   }
 
   // Hesabın gerçek sermayesi EA'dan geliyorsa, journal hâlâ varsayılan
@@ -489,8 +477,6 @@ export default async function handler(req: any, res: any) {
     skipped: trades.length - inserted - completed - refreshed - adopted,
     journalId: apiKey.journal_id,
     ...(trialEnded ? { trialEnded: 'This MetaTrader account was already used in another trial.' } : {}),
-    ...(remaining !== Infinity && inserted < trades.length
-      ? { limit: `Free plan is capped at ${FREE_TRADE_LIMIT} trades.` }
-      : {}),
+    ...(locked > 0 ? { locked, limit: 'Free plan: the first 2 trades of each day are open; the rest are saved locked.' } : {}),
   });
 }
