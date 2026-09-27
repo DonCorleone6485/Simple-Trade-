@@ -2,17 +2,20 @@
 
 ## Teknik Yapı
 - Frontend: React + Vite + TypeScript + Tailwind
-- Hosting: Vercel (simple-trade-nu.vercel.app)
+- Hosting: Vercel — https://www.simpletradejournal.io (main'e push = otomatik yayın)
 - Veritabanı: Supabase
-- Kullanıcı sistemi: Clerk
-- AI: Groq (llama-3.3-70b-versatile)
+- Kullanıcı sistemi: Clerk (canlıda Production instance, pk_live)
+- AI: Groq (llama-3.3-70b-versatile; ses için Whisper)
 - Repo: github.com/DonCorleone6485/Simple-Trade-
 
 ## Önemli Notlar
-- `src/lib/supabase.ts` → URL ve key direkt yazılı (env variable Vite'da çalışmadı)
-- Supabase RLS açık → güvenli
-- Fotoğraflar base64 olarak Supabase'e kaydediliyor
-- Groq API key Vercel'de GROQ_API_KEY olarak kayıtlı
+- `src/lib/supabase.ts` → URL ve anon key direkt yazılı (env variable Vite'da çalışmadı);
+  her isteğe Clerk oturum anahtarı ekleniyor (accessToken).
+- Supabase RLS: herkes yalnız kendi satırlarını görür (user_id = Clerk JWT `sub`).
+  Clerk, Supabase'e üçüncü taraf kimlik sağlayıcı olarak ekli. Sunucu uçları service key ile.
+- Fotoğraflar Supabase Storage'da (`trade-photos` kovası, `user_id/...` klasörleri);
+  işlemde yalnız bağlantıları duruyor.
+- Groq API key Vercel'de GROQ_API_KEY olarak kayıtlı.
 
 ## Vercel Environment Variables
 - VITE_CLERK_PUBLISHABLE_KEY
@@ -26,38 +29,82 @@
 
 ## Yapılacaklar
 
-Site denetimi (2026-09-26): genel olgunluk ~%45. Ürün ve tasarım güçlü
-(~%85); eksikler ürünün etrafında — para alma, güven, bulunabilirlik, ölçüm.
-Önerilen sıra aşağıdaki gibi.
+Site denetimi (2026-09-26) ~%45 olgunluk bulmuştu; 27 Eylül'de bilgi gerektirmeyen
+her şey yapıldı (aşağıda "Yapılanlar"). Kalanların çoğu kullanıcıdan bir bilgi,
+hesap ya da karar bekliyor.
 
-### Durum (2026-09-27 sonu)
-YAPILDI: güvenlik açıkları (analyze/referral/RLS), Pro kilitleri, kayıtsız gezinti,
-güvenlik başlıkları (vercel.json; script-src CSP bilerek yok), SEO (ön çizim:
-scripts/prerender.mjs — ana sayfa, /help, /changelog; OG resmi, JSON-LD,
-robots, sitemap, gerçek 404), hız (kod bölme; ana sayfa ~1 MB), Excel'e aktarma,
-MT anahtarının hesaba kilitlenmesi (EA 1.06), içe aktarmada bekleyen kaydı
-tamamlama, hesap ayarları (para birimi, saat dilimi, profil, silme),
-okunabilirlik (kontrast ≥%50, aria etiketleri), uygulamanın 9 dile çevirisi
-(src/lib/appCopy*.ts), dile göre tarih/yüzde biçimi, Yardım ve Değişiklikler.
+### A. Kullanıcıdan bilgi / hesap bekleyenler
+1. **Ödeme sistemi** — şirket kurulunca Paddle veya Lemon Squeezy hesabı (şirket +
+   banka bilgileri). Sonra: abonelik, fatura, iptal akışı; PaymentModal'daki
+   "Ödeme Yap — Yakında" düğmesi; ödeme olayıyla (webhook) users.has_paid /
+   pro_until güncelleme; yıllıkta 14 gün iade; iptalde dondurma veya 2 ay %50.
+   Şu an kimse Pro satın alamıyor — yalnız 3 günlük deneme var.
+2. **Yasal sayfalar** — Gizlilik Politikası, Kullanım Şartları, KVKK Aydınlatma
+   Metni, Çerez Politikası, İade Politikası, risk uyarısı ("yatırım tavsiyesi
+   değildir"). Gerekli: sitede görünecek isim/unvan ve iletişim adresi. Taslağı
+   ben yazarım; son hâli avukata gösterilmeli. Ödeme hesabı onayı için şart.
+3. **İletişim + Hakkımızda** — destek e-postası (ör. destek@simpletradejournal.io;
+   alan adında e-posta kurulumu gerekebilir), sosyal medya hesapları, varsa
+   Discord/Telegram topluluğu. Sitede hiçbir yerde iletişim yolu yok.
+4. **Meta Pixel** — Meta Business'ta Pixel oluşturup kimliği vermek. Instagram
+   reklamından ÖNCE. Çerez onay bandı da gerekecek (KVKK/GDPR).
+5. **Google Search Console** — siteyi Google hesabıyla eklemek; doğrulama için
+   DNS kaydı ya da benim ekleyeceğim doğrulama dosyası. Sonra sitemap gönderilir.
+6. **E-posta akışları** — Resend (veya Loops) hesabı + alan adı doğrulaması (DNS).
+   Hoş geldin, "deneme yarın bitiyor", "deneme bitti", haftalık özet. En çok
+   satışı getireni deneme bitiş e-postası.
+7. **Diğer ülkelere bölgesel fiyat** — onay: grup 1 tam fiyat (ABD, Batı Avrupa,
+   İngiltere, Körfez), grup 2 %30 indirim (Doğu Avrupa, Latin Amerika), grup 3
+   %50 indirim (Mısır, Hindistan, Pakistan, Nijerya, Endonezya…). Teknik yer:
+   src/lib/pricing.ts TABLE + /api/geo. İran'dan ödeme alınamaz.
+8. **Sosyal kanıt** — gerçek kullanıcı yorumları (uydurulmayacak). Kurucu üye
+   kampanyası kaynak olabilir.
+9. **MetaTrader kurulum videosu** — kullanıcının ekran kayıtları (aşağıdaki bölüm).
 
-### 🔴 Kritik (kalan)
-1. **Ödeme sistemi** — şirket kurulunca Paddle/Lemon Squeezy.
-2. **Yasal sayfalar** — Gizlilik, Kullanım Şartları, KVKK, çerez, iade, risk
-   uyarısı. Kullanıcıdan: görünecek isim + iletişim adresi.
-3. **Ölçüm** — Vercel Analytics açılabilir; Meta Pixel için Pixel kimliği lazım.
+### B. Karar bekleyen
+- **Kurucu üye kampanyası**: ilk 500 kişiye yıllık $79 (1.990 TL), ömür boyu bu
+  fiyat; karşılığında yorum. Yapılsın mı? (Ödeme sistemi gelince.)
 
-### 🟠 / 🟡 Kalan
-- İletişim + Hakkımızda (destek e-postası lazım), sosyal kanıt (gerçek yorum).
-- E-posta (hoş geldin, deneme bitiyor) — Resend hesabı lazım.
-- Diğer ülkelere bölgesel fiyat (onay lazım).
-- Dil başına adresler (/de, /tr…) + hreflang — ön çizimin bir sonraki adımı.
-- Blog/eğitim içeriği, yardım merkezi genişletme, PWA, yeni entegrasyonlar,
-  Sentry/testler.
+### C. Bilgi gerektirmeyen, sonra yapılacaklar
+1. **Vercel Analytics** — çerezsiz ziyaretçi sayımı; Vercel panelinde açılıp
+   `@vercel/analytics` eklenir.
+2. **Dil başına adresler** (/tr, /de, /fa…) + hreflang + her dilde ön çizim —
+   SEO'nun sonraki adımı (şu an ön çizim yalnız İngilizce).
+3. **Tam içerik güvenlik politikası** (script-src CSP) — Clerk, Supabase, Google
+   Fonts, Cloudflare Turnstile ve fotoğraf bağlantıları için izin listesiyle; önce
+   Report-Only olarak denenmeli (bozulursa giriş çalışmaz).
+4. **Blog / eğitim içeriği** — "prop firm trading journal", "MT5 trading journal"
+   aramaları için sayfalar, rakip karşılaştırmaları.
+5. **Yardım merkezini genişletmek** (şu an 10 soru) ve yol haritası sayfası.
+6. **PWA** (telefona eklenebilen uygulama) + sekme kapalıyken bildirim (web push).
+7. **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate.
+8. **Sentry** (hata izleme), otomatik testler, durum sayfası.
+9. **Paket boyutu** — çeviri tablosu (src/lib/appCopyData.ts, ~89 KB) ana pakette;
+   yalnız tr/en dışındaki diller için ayrı yüklenebilir (ön yüklemeyle, yoksa
+   Farsça/Arapçada bir an İngilizce görünür).
 
-### Diğer açık işler
-- MT5 anahtarını hesap numarasına bağlamak (aynı anahtar iki hesaba
-  yapıştırılınca işlemler karışıyor — iki kez yaşandı).
-- CSV/HTML içe aktarma, açık kaydı tamamlama mantığını henüz kullanmıyor.
+### D. Kullanıcının kontrol etmesi gerekenler
+- Hesabım penceresi: para birimi seçimi, saat dilimi, "ad/e-posta/şifre" düğmesi.
+- MetaTrader sayfası: anahtarın bağlı olduğu hesap ("•••1234 · Sunucu").
+- EA'yı 1.06'ya güncellemek (grafikte "başka hesaba bağlı" uyarısı için).
+  Not: iki hesapta aynı anahtar varsa, yayından sonra ilk bağlanan hesap sahiplenir.
+- İlk gerçek yeni üyede: kayıttan sonra örnek verinin kalkması, deneme akışı.
+- Hesap silme — kendi hesabıyla değil, boş bir test hesabıyla denenmeli.
+- Çeviriler — Farsça ve Arapçayı ana dili olan birine kontrol ettirmek
+  (src/lib/appCopyData.ts, InfoPage.tsx, LanguageContext.tsx).
+
+### Yapılanlar (2026-09-27)
+Güvenlik: /api/analyze ve /api/referral kimlik + Pro kontrolü; satır bazlı erişim
+(Clerk JWT); Pro/deneme alanlarını tarayıcı yazamıyor; güvenlik başlıkları
+(vercel.json). Ücretsiz model ve kilitli işlemler; 3 günlük kartsız deneme ve
+kötüye kullanım önlemleri; ücretsizde silme yok; hesap silme. Kayıtsız gezinti
+(örnek veri). Fiyatlar ($14.99/$119, TR 349/2.790 TL). MT anahtarı hesaba kilitli
+(EA 1.06); dosya içe aktarması bekleyen kaydı tamamlıyor. Excel'e aktarma. Hız
+(kod bölme; ana sayfa ~1 MB). SEO: ön çizim (scripts/prerender.mjs — ana sayfa,
+/help, /changelog), OG resmi, JSON-LD, robots, sitemap, gerçek 404. Yardım ve
+Değişiklikler sayfaları. Hesap ayarları (para birimi, saat dilimi, profil).
+Okunabilirlik (kontrast, aria etiketleri). Uygulamanın 9 dile çevirisi
+(src/lib/appCopy*.ts) ve dile göre tarih/yüzde biçimi.
 
 ### MetaTrader kurulum videosu (bekliyor: kullanıcının ekran kaydı)
 Yapay zekâ videosu değil — gerçek ekran kaydı + Remotion kurgusu (yakınlaşma,
@@ -101,11 +148,8 @@ Kararlar (kullanıcı):
   (src/lib/demo.ts, iki journal, dört disiplin alışkanlığı bilerek içeride);
   kayıt gerektiren her şey "ücretsiz hesap aç" penceresini açar.
 - Takvim ve journal kartında "N kilitli" göstergesi — YAPILDI.
-- Pro $14.99/ay, $119/yıl; TR 349 TL/ay, 2.790 TL/yıl. Yıllıkta 14 gün iade.
-- Kurucu üye: ilk 500 kişi yıllık $79 (1.990 TL), ömür boyu.
-- Altyapı: Paddle veya Lemon Squeezy (MoR). Kilitlerden ÖNCE ödeme kurulmalı —
-  şu an ödeme düğmesi "Yakında".
-Açık: fiyat, kurucu kampanyası, günlük sınırın sayısı (2?).
+- Yıllıkta 14 gün iade ve kurucu üye kampanyası: ödeme sistemi gelince (bkz. A1, B).
+Karar verildi: fiyat ($14.99 / 349 TL) ve günlük sınır (2 işlem). Açık: kurucu kampanyası.
 Güvenlik: users tablosunda Pro/deneme alanlarını tarayıcı yazamıyor
 (protect_user_privileges tetikleyicisi, silme yetkisi yok), referrals RLS açık,
 /api/referral kimliği Clerk oturumundan alıyor — YAPILDI.
