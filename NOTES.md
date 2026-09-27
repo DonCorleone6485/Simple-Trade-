@@ -52,8 +52,10 @@ hesap ya da karar bekliyor.
    hesapları, varsa Discord/Telegram topluluğu.
 4. **Meta Pixel** — Meta Business'ta Pixel oluşturup kimliği vermek. Instagram
    reklamından ÖNCE. Çerez onay bandı da gerekecek (KVKK/GDPR).
-5. **Google Search Console** — siteyi Google hesabıyla eklemek; doğrulama için
-   DNS kaydı ya da benim ekleyeceğim doğrulama dosyası. Sonra sitemap gönderilir.
+5. **Google Search Console** — YAPILDI (2026-09-27): alan adı mülkü admin@ ile
+   (otomatik doğrulandı), sitemap gönderildi (9 sayfa), ana sayfa, /blog ve MT5
+   rehberi için dizine ekleme istendi. Yeni önemli sayfada: URL denetimi →
+   Dizine eklenmesini iste.
 6. **E-posta akışları** — ÇALIŞIYOR (2026-09-27, Outlook ile denendi): hoş geldin,
    "deneme bitiyor", "deneme bitti", 9 dilde (api/_email.ts, api/emails.ts; günlük
    görev 09:00 UTC). Resend (updates.simpletradejournal.io, doğrulandı). Kalan:
