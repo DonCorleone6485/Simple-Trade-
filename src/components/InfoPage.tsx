@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { ArrowLeft, Mail } from 'lucide-react';
+import { openContact } from '../lib/contact';
 import { useLanguage } from '../context/LanguageContext';
 import { Lock as LogoLock } from './Logo';
 
@@ -399,7 +400,7 @@ export default function InfoPage({ kind, onHome, onOther, cta }: {
             <section className="rounded-2xl p-6" style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}>
               <h2 className="text-[17px] font-medium text-white mb-2">{s('contactTitle')}</h2>
               <p className="text-[15px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.65)' }}>{s('contactLead')}</p>
-              <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 text-[15px] font-medium" style={{ color: '#a78bfa' }} dir="ltr">
+              <a href={`mailto:${SUPPORT_EMAIL}`} onClick={openContact} className="inline-flex items-center gap-2 text-[15px] font-medium" style={{ color: '#a78bfa' }} dir="ltr">
                 <Mail className="w-4 h-4" />
                 {SUPPORT_EMAIL}
               </a>

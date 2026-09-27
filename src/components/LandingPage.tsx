@@ -5,6 +5,7 @@ import {
   Check, ChevronDown, ArrowRight, Shield, Globe, Zap, Mic, ListChecks, Clock,
   Newspaper, Wallet, Gauge, Lock, LogOut,
 } from 'lucide-react';
+import { openContact } from '../lib/contact';
 import { useLanguage } from '../context/LanguageContext';
 import { SESSIONS, sessionState } from '../lib/sessions';
 import { copy } from '../lib/landingCopy';
@@ -920,7 +921,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               <p className="text-[13.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم دفترچه معاملات')}
               </p>
-              <a href="mailto:support@simpletradejournal.io" className="nav-link nav-link-dim inline-block mt-3 text-[13px]" dir="ltr">
+              <a href="mailto:support@simpletradejournal.io" onClick={openContact} className="nav-link nav-link-dim inline-block mt-3 text-[13px]" dir="ltr">
                 support@simpletradejournal.io
               </a>
             </div>
@@ -938,7 +939,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 /* Renk satır içi stille verilmiyordu diye değil — veriliyordu
                    diye sorun çıkıyordu: onMouseEnter beyazı doğrudan elemana
                    yazınca, imleç gelince altına çeviren kural yeniliyordu. */
-                <a key={l.href} href={l.href} className="nav-link nav-link-dim text-[13.5px]">
+                <a key={l.href} href={l.href} className="nav-link nav-link-dim text-[13.5px]"
+                  onClick={l.href.startsWith('mailto:') ? openContact : undefined}>
                   {l.label}
                 </a>
               ))}

@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { createClerkClient } from '@clerk/backend';
+import { createClerkClient, verifyToken } from '@clerk/backend';
 import { timingSafeEqual } from 'crypto';
-import { emailEnabled, sendEmail, toLang, unsubscribeToken } from './_email.js';
+import { emailEnabled, sendContactMessage, sendEmail, toLang, unsubscribeToken } from './_email.js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -9,10 +9,11 @@ const supabase = createClient(
 );
 
 /**
- * Otomatik e-postaların iki ucu tek dosyada — Vercel'in ücretsiz planı en
- * fazla 12 fonksiyona izin veriyor:
- *   /api/emails?u=…&t=…  → abonelikten çıkma (aşağıda unsubscribe)
- *   /api/emails          → günlük gönderim görevi (vercel.json → crons)
+ * E-postayla ilgili üç uç tek dosyada — Vercel'in ücretsiz planı en fazla
+ * 12 fonksiyona izin veriyor:
+ *   /api/emails?u=…&t=…      → abonelikten çıkma (aşağıda unsubscribe)
+ *   POST /api/emails         → sitedeki iletişim formu (aşağıda contact)
+ *   GET /api/emails          → günlük gönderim görevi (vercel.json → crons)
  *
  * Günde bir kez çalışan otomatik e-postalar:
  *
@@ -80,8 +81,48 @@ async function unsubscribe(req: any, res: any) {
 <a href="https://www.simpletradejournal.io/" style="color:#a78bfa;font-size:14px">simpletradejournal.io</a></main></body></html>`);
 }
 
+const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]{2,}$/;
+
+/**
+ * İletişim formu. Giriş yapmışsa e-posta Clerk'ten okunuyor (formdakine
+ * güvenmiyoruz); değilse formdaki adres. Botlara karşı iki basit önlem:
+ * insanın görmediği bir alan (website) boş olmalı ve form açıldıktan en az
+ * 3 saniye sonra gönderilmiş olmalı. Resend'in günlük sınırı da üst sınır.
+ */
+async function contact(req: any, res: any) {
+  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+  const message = String(body.message || '').trim();
+  const name = String(body.name || '').trim().slice(0, 80);
+  if (body.website) return res.status(200).json({ ok: true }); // bot: sessizce yut
+  if (typeof body.openedAt !== 'number' || Date.now() - body.openedAt < 3000) return res.status(400).json({ error: 'too_fast' });
+  if (message.length < 5 || message.length > 5000) return res.status(400).json({ error: 'message' });
+
+  let email = String(body.email || '').trim().slice(0, 200);
+  let userId = '';
+  const auth = req.headers.authorization || '';
+  const secret = process.env.CLERK_SECRET_KEY;
+  if (auth.startsWith('Bearer ') && secret) {
+    try {
+      userId = (await verifyToken(auth.slice(7), { secretKey: secret })).sub || '';
+      if (userId) {
+        const u = await createClerkClient({ secretKey: secret }).users.getUser(userId);
+        email = u.emailAddresses.find(e => e.id === u.primaryEmailAddressId)?.emailAddress || email;
+      }
+    } catch { /* oturum yoksa formdaki adresle devam */ }
+  }
+  if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'email' });
+
+  const ok = await sendContactMessage({
+    email, message, name: name || undefined, userId: userId || undefined,
+    lang: String(body.language || '').slice(0, 5) || undefined,
+    page: String(body.page || '').slice(0, 200) || undefined,
+  });
+  return ok ? res.status(200).json({ ok: true }) : res.status(502).json({ error: 'send' });
+}
+
 export default async function handler(req: any, res: any) {
   if (req.query?.u) return unsubscribe(req, res);
+  if (req.method === 'POST') return contact(req, res);
   if (req.method !== 'GET') return res.status(405).end();
   const secret = process.env.CRON_SECRET;
   if (secret && req.headers.authorization !== `Bearer ${secret}`) return res.status(401).json({ error: 'Unauthorized' });

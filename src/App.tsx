@@ -17,6 +17,7 @@ import { tradeKey } from './lib/tradeKey';
 import AppShell, { NavKey } from './components/AppShell';
 import { Trade, Account, JournalGoals, JournalKind, DrawdownType } from './types';
 import { useLanguage } from './context/LanguageContext';
+import { CONTACT_EVENT } from './lib/contact';
 import { PlanProvider, UpgradeReason, FREE_DAILY_TRADES } from './context/PlanContext';
 import { demoData } from './lib/demo';
 import { matchOpenTrade } from './lib/matchOpen';
@@ -49,6 +50,7 @@ const PropEvaluation = lazy(() => import('./components/PropEvaluation'));
 const LandingPage = lazy(() => import('./components/LandingPage'));
 const InfoPage = lazy(() => import('./components/InfoPage'));
 const ArticlePage = lazy(() => import('./components/ArticlePage'));
+const ContactModal = lazy(() => import('./components/ContactModal'));
 const JournalDashboard = lazy(() => import('./components/JournalDashboard'));
 const PrintableReport = lazy(() => import('./components/PrintableReport'));
 const PropStatus = lazy(() => import('./components/PropStatus'));
@@ -212,6 +214,13 @@ export default function App() {
   });
   /** Hesap penceresi ve hesabı silme adımları. */
   const [showAccount, setShowAccount] = useState(false);
+  // "Bize yaz" formu; her sayfadan lib/contact.ts → openContact ile açılıyor.
+  const [showContact, setShowContact] = useState(false);
+  useEffect(() => {
+    const open = () => setShowContact(true);
+    window.addEventListener(CONTACT_EVENT, open);
+    return () => window.removeEventListener(CONTACT_EVENT, open);
+  }, []);
   const [deleteStep, setDeleteStep] = useState(false);
   const [deleteWord, setDeleteWord] = useState('');
   const [deleting, setDeleting] = useState(false);
@@ -1374,6 +1383,16 @@ export default function App() {
           keysByJournal={view === 'expanded' ? {} : Object.fromEntries(
             accounts.map(a => [a.id, trades.filter(tr => tr.journal_id === a.id).map(tradeKey)]))}
         />
+        </Suspense>
+      )}
+
+      {showContact && (
+        <Suspense fallback={null}>
+          <ContactModal
+            onClose={() => setShowContact(false)}
+            accountEmail={isSignedIn ? user?.primaryEmailAddress?.emailAddress : null}
+            getToken={isSignedIn ? () => getToken() : undefined}
+          />
         </Suspense>
       )}
 

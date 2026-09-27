@@ -314,3 +314,42 @@ export async function sendEmail(kind: Kind, to: string, opts: { userId: string; 
     return false;
   }
 }
+
+/**
+ * Sitedeki iletişim formundan gelen mesajı support@'a iletir. Gönderen
+ * bizim adresimiz (başkası adına posta atamayız), "Yanıtla" ise doğrudan
+ * mesajı yazan kişiye gider.
+ */
+export async function sendContactMessage(m: { email: string; message: string; name?: string; userId?: string; lang?: string; page?: string }): Promise<boolean> {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return false;
+  const who = m.name ? `${m.name} <${m.email}>` : m.email;
+  const text = [
+    m.message,
+    '',
+    '—',
+    `From: ${who}`,
+    m.userId ? `Account: ${m.userId}` : 'Account: not signed in',
+    m.lang ? `Language: ${m.lang}` : '',
+    m.page ? `Page: ${m.page}` : '',
+  ].filter(Boolean).join('\n');
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'Simple Trading Journal <contact@updates.simpletradejournal.io>',
+        to: [REPLY_TO],
+        reply_to: m.email,
+        subject: `[Contact] ${m.message.replace(/\s+/g, ' ').slice(0, 60)}`,
+        text,
+        tags: [{ name: 'kind', value: 'contact' }],
+      }),
+    });
+    if (!r.ok) console.error('resend contact', r.status, await r.text().catch(() => ''));
+    return r.ok;
+  } catch (e) {
+    console.error('resend contact', e);
+    return false;
+  }
+}
