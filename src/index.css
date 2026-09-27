@@ -84,7 +84,7 @@ body::before {
 .rmdp-calendar { padding: 4px 6px 2px; }
 .rmdp-top-class { background: transparent !important; }
 .rmdp-header-values { color: #fff !important; font-weight: 500; }
-.rmdp-week-day { color: rgba(255,255,255,0.35) !important; font-weight: 500; }
+.rmdp-week-day { color: rgba(255,255,255,0.5) !important; font-weight: 500; }
 .rmdp-day span,
 .rmdp-month-picker span,
 .rmdp-year-picker span { color: rgba(255,255,255,0.85) !important; }
@@ -118,7 +118,7 @@ body::before {
   width: 30px !important;
   font-variant-numeric: tabular-nums;
 }
-.rmdp-time-picker .dvdr { color: rgba(255,255,255,0.35) !important; }
+.rmdp-time-picker .dvdr { color: rgba(255,255,255,0.5) !important; }
 .rmdp-time-picker div .rmdp-am { color: rgba(255,255,255,0.7) !important; }
 /* Girişten takvime uzanan küçük ok. */
 .rmdp-ep-arrow[direction="top"] { border-bottom-color: #1a1b2e !important; }
@@ -157,7 +157,7 @@ body::before {
   text-transform: uppercase;
   font-size: 11px;
   letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.5);
 }
 /* Bölüm numarası: yayın kanalı gibi okunsun, başlıktan önce gelir. */
 .channel {
@@ -330,7 +330,7 @@ body::before {
    ve footer'ın mor çağrısı. Sadece duruş rengini değiştiriyorlar, imleç
    gelince üçü de aynı yere gidiyor. .nav-link'ten SONRA gelmeleri şart —
    ikisi de aynı ağırlıkta, sonra yazılan kazanıyor. */
-.nav-link-dim { color: rgba(255, 255, 255, 0.4); }
+.nav-link-dim { color: rgba(255, 255, 255, 0.55); }
 .nav-link-accent { color: #a78bfa; }
 
 .nav-link:hover { color: var(--gold); }
@@ -415,7 +415,7 @@ body::before {
    yendiği için bu, eklenen her kuralı sessizce iptal eden bir tuzak —
    ana sayfada tam dört kez buna yakalandık. */
 .ui-nav {
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.55);
   transition: color 0.18s ease, background 0.18s ease;
 }
 .ui-nav:hover { color: var(--gold); background: rgba(255, 255, 255, 0.03); }
@@ -439,7 +439,7 @@ body::before {
 
 /* Satırın ucundaki küçük düğmeler. Silme kırmızı kalıyor: onun rengi bir
    süs değil, uyarı. */
-.ui-icon-btn { color: rgba(255, 255, 255, 0.25); transition: color 0.18s ease; }
+.ui-icon-btn { color: rgba(255, 255, 255, 0.5); transition: color 0.18s ease; }
 .ui-icon-btn:hover { color: var(--gold); }
 .ui-icon-btn-danger:hover { color: #f87171; }
 
@@ -588,7 +588,7 @@ body::before {
 }
 .mt-tour .chart .sym {
   position: absolute; right: 10px; bottom: 8px; font-size: 11px;
-  color: rgba(255,255,255,0.35); letter-spacing: .04em;
+  color: rgba(255,255,255,0.5); letter-spacing: .04em;
 }
 .mt-tour .candles { position: absolute; inset: 0; }
 .mt-tour .candle { position: absolute; }

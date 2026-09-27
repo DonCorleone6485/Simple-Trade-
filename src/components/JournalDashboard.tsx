@@ -42,7 +42,7 @@ const COL = { trades: 'w-14', winRate: 'w-20', net: 'w-28 sm:w-32' };
 
 function ColumnHead({ children, width, className = '' }: { children: React.ReactNode; width: string; className?: string }) {
   return (
-    <div className={`${width} ${className} text-end text-[11px] uppercase tracking-[0.1em] whitespace-nowrap`} style={{ color: 'rgba(255,255,255,0.25)' }}>
+    <div className={`${width} ${className} text-end text-[11px] uppercase tracking-[0.1em] whitespace-nowrap`} style={{ color: 'rgba(255,255,255,0.5)' }}>
       {children}
     </div>
   );
@@ -77,7 +77,7 @@ export default function JournalDashboard({
             {t('dashboardTitle')}
           </h1>
           {userLabel && (
-            <p className="text-sm mt-3" style={{ color: 'rgba(255,255,255,0.35)' }}>{userLabel}</p>
+            <p className="text-sm mt-3" style={{ color: 'rgba(255,255,255,0.5)' }}>{userLabel}</p>
           )}
         </div>
 
@@ -96,7 +96,7 @@ export default function JournalDashboard({
           <div className="flex items-baseline gap-10 sm:gap-16 mb-10 pb-10"
             style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <div>
-              <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {tr('Toplam Net', 'Net Total')}
               </div>
               <div className="font-mono text-3xl sm:text-4xl"
@@ -105,7 +105,7 @@ export default function JournalDashboard({
               </div>
             </div>
             <div>
-              <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {t('tradeCount')}
               </div>
               <div className="font-mono text-3xl sm:text-4xl" style={{ color: 'rgba(255,255,255,0.85)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
@@ -113,7 +113,7 @@ export default function JournalDashboard({
               </div>
             </div>
             <div className="hidden sm:block">
-              <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {t('myJournals')}
               </div>
               <div className="font-mono text-3xl sm:text-4xl" style={{ color: 'rgba(255,255,255,0.85)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
@@ -150,7 +150,7 @@ export default function JournalDashboard({
                         <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 flex-shrink-0"
                           style={{ color: '#f0b429', transition: 'opacity 150ms' }} />
                       </div>
-                      <div className="text-[13px] mt-1.5 flex items-center gap-2.5 flex-wrap" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                      <div className="text-[13px] mt-1.5 flex items-center gap-2.5 flex-wrap" style={{ color: 'rgba(255,255,255,0.5)' }}>
                         <span>
                           {formatDate(acc.startDate)}
                           {acc.startingCapital != null && (

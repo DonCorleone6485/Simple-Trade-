@@ -52,7 +52,7 @@ function Slot({ dot, label, children, onClick, maxText }: {
       className="ui-pill flex items-center gap-2 px-2.5 py-1.5 rounded-lg flex-shrink-0"
       style={{ background: 'transparent', border: '1px solid transparent' }}>
       <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: dot }} />
-      <span className="text-[9.5px] uppercase tracking-[0.12em] flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }}>{label}</span>
+      <span className="text-[9.5px] uppercase tracking-[0.12em] flex-shrink-0" style={{ color: 'rgba(255,255,255,0.5)' }}>{label}</span>
       {/* Genişliği esnek kutu pazarlığına bırakmak yerine açıkça veriyoruz:
           iç içe span'lerde üç nokta bir türlü çıkmıyor, yazı kabın kenarından
           kesiliyordu. Ölçülen alandan hesaplanan piksel sınırı kesin çalışıyor. */}
@@ -308,7 +308,7 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
       {showBell && (fact || item) && (
         <button onClick={turnOn} title={t('alertsRemindMe')}
           className="ui-pill flex items-center gap-1.5 px-2 py-1.5 rounded-lg flex-shrink-0"
-          style={{ background: 'transparent', border: '1px solid transparent', color: 'rgba(255,255,255,0.35)' }}>
+          style={{ background: 'transparent', border: '1px solid transparent', color: 'rgba(255,255,255,0.5)' }}>
           <Bell className="w-3.5 h-3.5" />
           {bellLabel && <span className="text-[11.5px]">{t('alertsRemindMe')}</span>}
         </button>

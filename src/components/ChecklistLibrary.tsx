@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { aria } from '../lib/aria';
 import { Plus, X, Pencil, Check, ClipboardList, Loader } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { ChecklistItem } from '../types';
@@ -106,7 +107,7 @@ export default function ChecklistLibrary() {
     return (
       <div className="flex items-center gap-3 py-8">
         <Loader className="w-4 h-4 animate-spin" style={{ color: '#8b5cf6' }} />
-        <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{tr('Yükleniyor…', 'Loading…')}</span>
+        <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{tr('Yükleniyor…', 'Loading…')}</span>
       </div>
     );
   }
@@ -132,7 +133,7 @@ export default function ChecklistLibrary() {
                   ? { ...chip, background: 'rgba(139,92,246,0.16)', borderColor: 'rgba(139,92,246,0.4)', color: '#fff' }
                   : chip}>
                 {l.name}
-                <span className="ms-2 text-[11px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{l.items.length}</span>
+                <span className="ms-2 text-[11px]" style={{ color: 'rgba(255,255,255,0.5)' }}>{l.items.length}</span>
               </button>
             )}
           </span>
@@ -162,7 +163,7 @@ export default function ChecklistLibrary() {
       {!active ? (
         <div style={card} className="p-8 text-center">
           <ClipboardList className="w-8 h-8 mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.15)' }} />
-          <p className="text-[14.5px] mb-4" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <p className="text-[14.5px] mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {tr('Henüz listen yok.', 'You have no lists yet.')}
           </p>
           <button
@@ -177,11 +178,11 @@ export default function ChecklistLibrary() {
             <span className="text-[15px] font-medium">{active.name}</span>
             <span className="flex items-center gap-3">
               <button onClick={() => { setRenamingId(active.id); setDraftName(active.name); }}
-                className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.3)' }} title={tr('Adını değiştir', 'Rename')}>
+                className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.5)' }} title={tr('Adını değiştir', 'Rename')}>
                 <Pencil className="w-4 h-4" />
               </button>
               <button onClick={() => removeList(active.id)}
-                className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.3)' }} title={tr('Listeyi sil', 'Delete list')}>
+                className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.5)' }} title={tr('Listeyi sil', 'Delete list')}>
                 <X className="w-4 h-4" />
               </button>
             </span>
@@ -193,9 +194,9 @@ export default function ChecklistLibrary() {
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium">{item.title}</div>
-                  {item.desc && <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.38)' }}>{item.desc}</p>}
+                  {item.desc && <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{item.desc}</p>}
                 </div>
-                <button onClick={() => updateItems(active.items.filter(i => i.id !== item.id))}
+                <button onClick={() => updateItems(active.items.filter(i => i.id !== item.id))} aria-label={aria('removeItem', language)}
                   className="p-1 rounded-md opacity-0 group-hover:opacity-100 flex-shrink-0"
                   style={{ color: '#f87171' }}>
                   <X className="w-3.5 h-3.5" />
@@ -218,7 +219,7 @@ export default function ChecklistLibrary() {
                   <Check className="w-4 h-4 inline-block -mt-0.5 me-1" />{tr('Ekle', 'Add')}
                 </button>
                 <button onClick={() => setAddingItem(false)} className="px-4 py-2 text-sm"
-                  style={{ color: 'rgba(255,255,255,0.45)' }}>{tr('Vazgeç', 'Cancel')}</button>
+                  style={{ color: 'rgba(255,255,255,0.5)' }}>{tr('Vazgeç', 'Cancel')}</button>
               </div>
             </div>
           ) : (

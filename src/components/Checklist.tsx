@@ -29,13 +29,13 @@ export function ChecklistView({ items }: { items: ChecklistItem[] }) {
           style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
           {item.checked
             ? <CheckSquare className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#34d399' }} />
-            : <Square className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.25)' }} />}
+            : <Square className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.5)' }} />}
           <div className="min-w-0">
             <div className="text-sm font-medium" style={{ color: item.checked ? '#fff' : 'rgba(255,255,255,0.55)' }}>
               {item.title}
             </div>
             {item.desc && (
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{item.desc}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{item.desc}</p>
             )}
           </div>
         </div>
@@ -228,7 +228,7 @@ export default function Checklist({ value, onChange, syncTemplate = false, selec
         </button>
         <button type="button" onClick={cancelDraft}
           className="px-4 py-2 rounded-xl text-sm transition-all"
-          style={{ color: 'rgba(255,255,255,0.45)' }}>
+          style={{ color: 'rgba(255,255,255,0.5)' }}>
           {tr('Vazgeç', 'Cancel')}
         </button>
       </div>
@@ -281,7 +281,7 @@ export default function Checklist({ value, onChange, syncTemplate = false, selec
       {/* Tek listesi olan için sessiz bir giriş: yeni liste açmak isterse. */}
       {syncTemplate && library.length <= 1 && !namingNew && (
         <button type="button" onClick={() => setNamingNew(true)}
-          className="text-[12.5px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          className="text-[12.5px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
           + {tr('Yeni liste', 'New list')}
         </button>
       )}
@@ -299,7 +299,7 @@ export default function Checklist({ value, onChange, syncTemplate = false, selec
               className="flex-shrink-0 mt-0.5" title={tr('İşaretle', 'Toggle')}>
               {item.checked
                 ? <CheckSquare className="w-5 h-5" style={{ color: '#34d399' }} />
-                : <Square className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.3)' }} />}
+                : <Square className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.5)' }} />}
             </button>
 
             <button type="button" onClick={() => toggle(item.id)} className="flex-1 min-w-0 text-start">
@@ -307,17 +307,17 @@ export default function Checklist({ value, onChange, syncTemplate = false, selec
                 {item.title}
               </div>
               {item.desc && (
-                <p className="text-xs mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{item.desc}</p>
+                <p className="text-xs mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{item.desc}</p>
               )}
             </button>
 
             <div className="flex items-center gap-1 flex-shrink-0">
               <button type="button" onClick={() => startEdit(item)} title={tr('Düzenle', 'Edit')}
-                className="ui-pill p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                className="ui-pill p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 <Pencil className="w-3.5 h-3.5" />
               </button>
               <button type="button" onClick={() => removeItem(item.id)} title={tr('Sil', 'Delete')}
-                className="ui-pill ui-pill-danger p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                className="ui-pill ui-pill-danger p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -349,7 +349,7 @@ export default function Checklist({ value, onChange, syncTemplate = false, selec
       )}
 
       {syncTemplate && items.length > 0 && (
-        <p className="text-xs pt-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
+        <p className="text-xs pt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {tr(
             'Maddeler kaydedilir ve her yeni işlemde işaretsiz olarak karşına gelir.',
             'Items are saved and appear unchecked on every new trade.'

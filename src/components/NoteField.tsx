@@ -340,7 +340,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
         {!listening && !tidying && !transcribing && before == null && value.trim().length > 1 && (
           <button type="button" onClick={() => (isPro ? tidy() : askUpgrade('ai'))}
             className="ui-pill flex items-center gap-1.5 text-[12.5px]"
-            style={{ color: 'rgba(255,255,255,0.4)' }}>
+            style={{ color: 'rgba(255,255,255,0.5)' }}>
             <Wand2 className="w-3.5 h-3.5" />
             {tr('Yazımı düzelt', 'Fix the writing')}
           </button>
@@ -368,7 +368,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
         )}
 
         {before != null && !tidying && (
-          <span className="flex items-center gap-3 text-[12.5px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <span className="flex items-center gap-3 text-[12.5px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {tr('Yazım düzeltildi', 'Writing tidied')}
             <button type="button" onClick={undo} className="flex items-center gap-1.5" style={{ color: '#a78bfa' }}>
               <Undo2 className="w-3.5 h-3.5" />
@@ -382,7 +382,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
         <p className="text-[12px] mt-2" style={{ color: '#f87171' }}>{error}</p>
       )}
       {!Recognition && !CanRecord && (
-        <p className="text-[11.5px] mt-2" style={{ color: 'rgba(255,255,255,0.28)' }}>
+        <p className="text-[11.5px] mt-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {tr('Konuşarak yazma bu tarayıcıda çalışmıyor — güncel bir tarayıcı kullan.',
               'Dictation is not available in this browser — use an up-to-date browser.')}
         </p>

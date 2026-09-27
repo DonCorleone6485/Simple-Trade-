@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { aria } from './lib/aria';
 import {
   PlusCircle, Globe, ChevronDown, ChevronLeft,
   Trash2, BookOpen, Clock, TrendingUp, X,
@@ -1152,9 +1153,9 @@ export default function App() {
     <div className="relative" ref={langMenuRef}>
       <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
         className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[13px]"
-        style={{ color: 'rgba(255,255,255,0.45)', transition: 'color 150ms' }}
+        style={{ color: 'rgba(255,255,255,0.5)', transition: 'color 150ms' }}
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.45)'; }}>
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
         <Globe className="w-4 h-4" />
         <span className="hidden sm:inline uppercase text-[11px] tracking-wider">{language}</span>
         <ChevronDown className={`w-3 h-3 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
@@ -1220,7 +1221,7 @@ export default function App() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="p-8 relative w-full max-w-md my-8"
             style={{ ...modalCard, background: 'linear-gradient(180deg, rgba(139,92,246,0.12), rgba(18,19,31,1) 45%)', border: '1px solid rgba(139,92,246,0.22)' }}>
-            <button onClick={() => setShowUpgradeModal(false)}
+            <button onClick={() => setShowUpgradeModal(false)} aria-label={aria('close', language)}
               className="absolute top-4 end-4 p-1.5 rounded-lg"
               style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }}>
               <X className="w-4 h-4" />
@@ -1232,7 +1233,7 @@ export default function App() {
                 {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
               </h2>
             </div>
-            <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {upgradeReasonText[upgradeReason]}
             </p>
 
@@ -1243,6 +1244,7 @@ export default function App() {
               </span>
               <button
                 onClick={() => setModalBilling(modalBilling === 'monthly' ? 'yearly' : 'monthly')}
+                role="switch" aria-checked={modalBilling === 'yearly'} aria-label={aria('yearlyBilling', language)}
                 className="relative w-12 h-6 rounded-full transition-all flex-shrink-0"
                 style={{ background: modalBilling === 'yearly' ? '#8b5cf6' : 'rgba(255,255,255,0.1)' }}>
                 <div className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all"
@@ -1261,11 +1263,11 @@ export default function App() {
               <span className="text-5xl font-bold text-white">
                 {prices.fmt(modalBilling === 'monthly' ? prices.monthly : prices.yearlyMonthly)}
               </span>
-              <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {language === 'tr' ? '/ ay' : '/ month'}
               </span>
               {modalBilling === 'yearly' && (
-                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {(language === 'tr' ? 'Yıllık {p} faturalandırılır' : 'Billed {p}/year').replace('{p}', prices.fmt(prices.yearly))}
                 </p>
               )}
@@ -1287,7 +1289,7 @@ export default function App() {
                   <span className="text-xs" style={{ color: '#34d399' }}>{t('trialNoCard')}</span>
                 </div>
                 <button onClick={() => { setShowUpgradeModal(false); setShowPaymentModal(true); }}
-                  className="w-full mt-3 text-xs underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  className="w-full mt-3 text-xs underline underline-offset-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {t('trialOrUpgrade')}
                 </button>
               </div>
@@ -1315,9 +1317,9 @@ export default function App() {
 
             <button onClick={() => setShowUpgradeModal(false)}
               className="w-full py-2 rounded-full text-sm transition-all text-center"
-              style={{ color: 'rgba(255,255,255,0.4)' }}
+              style={{ color: 'rgba(255,255,255,0.5)' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
               {language === 'tr' ? 'Şimdilik Devam Et' : 'Continue for Now'}
             </button>
           </div>
@@ -1438,7 +1440,7 @@ export default function App() {
                   <h2 className="font-display text-[21px] font-medium text-white">{t('accountTitle')}</h2>
                   <p className="text-sm mt-1 truncate" style={{ color: 'rgba(255,255,255,0.5)' }}>{user?.primaryEmailAddress?.emailAddress}</p>
                 </div>
-                <button onClick={() => setShowAccount(false)} className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
+                <button onClick={() => setShowAccount(false)} aria-label={aria('close', language)} className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.05)' }}>
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -1536,7 +1538,7 @@ export default function App() {
                 <button onClick={() => { setShowJoin(false); goToAuth('signin'); }} style={{ color: '#a78bfa' }}>
                   {t('guestSignIn')}
                 </button>
-                <button onClick={() => setShowJoin(false)} style={{ color: 'rgba(255,255,255,0.45)' }}>
+                <button onClick={() => setShowJoin(false)} style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {t('joinContinue')}
                 </button>
               </div>
@@ -1583,12 +1585,12 @@ export default function App() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-display text-[22px] text-white" style={{ letterSpacing: '-0.01em' }}>{language === 'tr' ? 'Referans Kodu Oluştur' : 'Create Referral Code'}</h3>
-                  <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {language === 'tr' ? 'Her tıklamada yeni kod oluşturulur' : 'A new code is generated each time'}
                   </p>
                 </div>
-                <button onClick={() => { setShowReferral(false); setReferralMsg(''); setReferralInput(''); }}
-                  className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
+                <button onClick={() => { setShowReferral(false); setReferralMsg(''); setReferralInput(''); }} aria-label={aria('close', language)}
+                  className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.05)' }}>
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -1621,7 +1623,7 @@ export default function App() {
                         : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                       <div className="font-semibold text-sm text-white">{opt.title}</div>
                       <div className="text-xs mt-0.5" style={{ color: '#34d399' }}>{opt.desc}</div>
-                      <div className="text-xs mt-1.5 whitespace-pre-line" style={{ color: 'rgba(255,255,255,0.4)' }}>{opt.detail}</div>
+                      <div className="text-xs mt-1.5 whitespace-pre-line" style={{ color: 'rgba(255,255,255,0.5)' }}>{opt.detail}</div>
                     </button>
                   ))}
                 </div>
@@ -1675,7 +1677,7 @@ export default function App() {
                     </button>
                   </div>
                   {referralMsg && <p className="text-sm font-medium" style={{ color: '#34d399' }}>{referralMsg}</p>}
-                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {language === 'tr'
                       ? '⚠️ Bu kod bir kez kullanılabilir. Kullanıldıktan sonra yeni kod oluşturun.'
                       : '⚠️ This code can only be used once. Generate a new code after it\'s used.'}
@@ -1691,7 +1693,7 @@ export default function App() {
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="p-7 w-full max-w-md" style={modalCard}>
               <h3 className="font-display text-[22px] mb-2" style={{ color: '#f87171', letterSpacing: '-0.01em' }}>{t('deleteAccountTitle')}</h3>
-              <p className="text-sm mb-8 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{t('deleteAccountDesc')}</p>
+              <p className="text-sm mb-8 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('deleteAccountDesc')}</p>
               <div className="flex justify-end gap-2">
                 <button onClick={() => setAccountToDelete(null)} style={quietBtn}>{t('cancel')}</button>
                 <button onClick={confirmDeleteAccount} className="rounded-full"
@@ -1716,7 +1718,7 @@ export default function App() {
               <h3 className="font-display text-[22px] mb-1.5" style={{ letterSpacing: '-0.01em' }}>
                 {editingJournal ? t('editJournal') : t('newJournal')}
               </h3>
-              <p className="text-sm mb-7" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <p className="text-sm mb-7" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {editingJournal ? t('editJournalDesc') : t('newJournalDesc')}
               </p>
               <div className="space-y-4">
@@ -1757,7 +1759,7 @@ export default function App() {
                   <div>
                     <label style={uiLabel}>{t('startingCapital')}</label>
                     <div className="relative">
-                      <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{cur().trim()}</span>
+                      <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{cur().trim()}</span>
                       <input type="number" min="0" step="0.01" value={newJournalCapital} onChange={e => setNewJournalCapital(e.target.value)} placeholder="10000"
                         className="font-mono"
                         style={{ ...uiInput, paddingInlineStart: '30px' }} />
@@ -1769,7 +1771,7 @@ export default function App() {
                     bu alanlar yok — kimse kendi parasına kâr hedefi dayatmaz. */}
                 {newJournalKind === 'prop' && (
                   <div className="pt-4 space-y-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                    <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.38)' }}>
+                    <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
                       {t('propRulesHint')}
                     </p>
                     <div className="grid sm:grid-cols-2 gap-4">
@@ -1788,11 +1790,11 @@ export default function App() {
                           <div key={f.label}>
                             <label style={uiLabel}>{f.label}</label>
                             <div className="relative">
-                              <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{cur().trim()}</span>
+                              <span className="absolute start-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{cur().trim()}</span>
                               <input type="number" min="0" step="0.01" value={f.v} onChange={e => f.set(e.target.value)} placeholder={f.ph}
                                 className="font-mono" style={{ ...uiInput, paddingInlineStart: '30px' }} />
                               {pct && (
-                                <span className="absolute end-3 top-1/2 -translate-y-1/2 text-[12px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>{pct}</span>
+                                <span className="absolute end-3 top-1/2 -translate-y-1/2 text-[12px] font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}>{pct}</span>
                               )}
                             </div>
                           </div>
@@ -1944,7 +1946,7 @@ export default function App() {
                   { label: t('profitFactor'), value: activeStats.profitFactor, color: 'rgba(255,255,255,0.85)' },
                 ].map((s, i) => (
                   <div key={i}>
-                    <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(255,255,255,0.3)' }}>{s.label}</div>
+                    <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.label}</div>
                     <div className="font-mono text-2xl sm:text-3xl"
                       style={{ color: s.color, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
                       {s.value}

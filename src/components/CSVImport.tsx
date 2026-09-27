@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { aria } from '../lib/aria';
 import { Upload, X, CheckCircle, AlertTriangle, FileText, Columns } from 'lucide-react';
 import { Trade, TradeResult } from '../types';
 import { useLanguage, detectLanguage } from '../context/LanguageContext';
@@ -680,13 +681,13 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
             <h2 className="font-display text-[22px] font-medium text-white">
               {language === 'tr' ? 'İşlem Geçmişi İçe Aktar' : 'Import Trade History'}
             </h2>
-            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {language === 'tr' ? 'Trade geçmişinizi otomatik içe aktarın' :
                language === 'fa' ? 'تاریخچه معاملات خود را وارد کنید' :
                'Automatically import your trade history'}
             </p>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
+          <button onClick={onClose} aria-label={aria('close', language)} className="p-2 rounded-lg" style={{ color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.05)' }}>
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -694,7 +695,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
         {step === 'target' ? (
           <div style={card}>
             <div className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-3"
-              style={{ color: 'rgba(255,255,255,0.3)' }}>
+              style={{ color: 'rgba(255,255,255,0.5)' }}>
               {t('importTarget')}
             </div>
                   <div className="space-y-2">
@@ -775,7 +776,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
         </div>
 
         <div style={card}>
-          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {language === 'tr' ? 'Desteklenen Platformlar' : 'Supported Platforms'}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -807,7 +808,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
              language === 'fa' ? 'فایل گزارش را بکشید یا کلیک کنید' :
              'Drag & drop your report, or click to browse'}
           </p>
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {language === 'tr'
               ? 'CSV veya HTML · MetaTrader raporu doğrudan yüklenebilir · Platform otomatik tanınır'
               : 'CSV or HTML · MetaTrader reports work as-is · Platform auto-detected'}
@@ -853,7 +854,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                       {language === 'tr' ? 'Sütunları Eşleştir' : 'Match the columns'}
                     </span>
                   </div>
-                  <p className="text-xs mt-1.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  <p className="text-xs mt-1.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {language === 'tr'
                       ? 'Dosyandaki hangi sütunun ne olduğunu seç. Bir kere seçmen yeterli — aynı biçimdeki dosyalarda hatırlanır.'
                       : 'Tell us which column is which. You only do this once — the same file format is remembered.'}
@@ -863,7 +864,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                 <div className="grid sm:grid-cols-2 gap-2.5">
                   {MAP_FIELDS.map(f => (
                     <label key={f.key} className="block">
-                      <span className="block text-[11px] mb-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                      <span className="block text-[11px] mb-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
                         {language === 'tr' ? f.tr : f.en}
                         {f.required && <span style={{ color: '#f87171' }}> *</span>}
                       </span>
@@ -891,13 +892,13 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                 {parseResult.rows.length > 0 && (
                   <div className="rounded-lg p-3 text-[11px] leading-relaxed"
                     style={{ background: 'rgba(0,0,0,0.25)', color: 'rgba(255,255,255,0.5)' }}>
-                    <span style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>
                       {language === 'tr' ? 'İlk satır: ' : 'First row: '}
                     </span>
                     {MAP_FIELDS.filter(f => parseResult.map[f.key] >= 0).map((f, i) => (
                       <span key={f.key}>
                         {i > 0 && ' · '}
-                        <span style={{ color: 'rgba(255,255,255,0.35)' }}>{(language === 'tr' ? f.tr : f.en)}: </span>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{(language === 'tr' ? f.tr : f.en)}: </span>
                         <span className="font-mono" style={{ color: '#fff' }}>
                           {parseResult.rows[0][parseResult.map[f.key]] || '—'}
                         </span>
@@ -988,7 +989,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
             {parseResult.trades.length > 0 && (
               <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider grid grid-cols-4 gap-2"
-                  style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.3)' }}>
+                  style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)' }}>
                   <span>{language === 'tr' ? 'Tarih' : 'Date'}</span>
                   <span>Symbol</span>
                   <span>Type</span>
@@ -1011,7 +1012,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                     </div>
                   ))}
                   {(freshTrades.length > 0 ? freshTrades : parseResult.trades).length > 50 && (
-                    <div className="px-4 py-2 text-sm text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    <div className="px-4 py-2 text-sm text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>
                       +{(freshTrades.length > 0 ? freshTrades : parseResult.trades).length - 50} {language === 'tr' ? 'daha...' : 'more...'}
                     </div>
                   )}
@@ -1024,7 +1025,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
               {parseResult.headers.length > 0 && !showMapping && !parseResult.needsMapping && !parseResult.noTrades && (
                 <button onClick={() => setShowMapping(true)}
                   className="me-auto flex items-center gap-1.5 text-sm"
-                  style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  style={{ color: 'rgba(255,255,255,0.5)' }}>
                   <Columns className="w-3.5 h-3.5" />
                   {language === 'tr' ? 'Sütunları kendim eşleştir' : 'Match columns myself'}
                 </button>
@@ -1051,7 +1052,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
         )}
 
         {fileName && !loading && (
-          <div className="flex items-center gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <div className="flex items-center gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
             <FileText className="w-4 h-4" />
             <span>{fileName}</span>
           </div>

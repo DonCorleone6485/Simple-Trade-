@@ -67,17 +67,17 @@ export default function PricingCards({ t, free, pro, proPrice }: {
         <h3 className="text-[15px] font-medium tracking-wide" style={{ color: 'rgba(255,255,255,0.6)' }}>
           {t('Ücretsiz', 'Free', 'رایگان')}
         </h3>
-        <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {t('Başlamak için ideal', 'Perfect to get started', 'ایده‌آل برای شروع')}
         </p>
         <div className="mt-7 mb-8 flex items-baseline gap-2">
           <span className="font-display" style={{ fontSize: '52px', letterSpacing: '-0.04em', lineHeight: 1 }}>{prices.fmt(0)}</span>
-          <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('/ sonsuza kadar', '/ forever', '/ برای همیشه')}</span>
+          <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('/ sonsuza kadar', '/ forever', '/ برای همیشه')}</span>
         </div>
         <div className="space-y-3 mb-9">
           {freeFeatures.map((f, i) => (
             <div key={i} className="flex items-start gap-3">
-              <Check className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }} />
+              <Check className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }} />
               <span className="text-[14.5px]" style={{ color: 'rgba(255,255,255,0.6)' }}>{f}</span>
             </div>
           ))}
@@ -114,12 +114,12 @@ export default function PricingCards({ t, free, pro, proPrice }: {
             {t('En Popüler', 'Most Popular', 'محبوب‌ترین')}
           </span>
         </div>
-        <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {t('Ciddi traderlar için', 'For serious traders', 'برای معامله‌گران جدی')}
         </p>
         <div className="mt-7 mb-8 flex items-baseline gap-2">
           <span className="font-display" style={{ fontSize: '52px', letterSpacing: '-0.04em', lineHeight: 1 }}>{price.amount}</span>
-          <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{price.note}</span>
+          <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>{price.note}</span>
         </div>
         <div className="space-y-3 mb-9">
           {proFeatures.map((f, i) => (

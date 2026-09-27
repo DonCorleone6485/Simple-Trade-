@@ -98,7 +98,7 @@ function PropScore({ language }: { language: string }) {
     <div className="mt-5 space-y-2 max-w-md">
       {rows.map(r => (
         <div key={r.name} className="flex items-center gap-3">
-          <span className="text-[12px] w-16 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <span className="text-[12px] w-16 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {language === 'tr' ? 'Firma' : 'Firm'} {r.name}
           </span>
           <span className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
@@ -601,7 +601,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               {ctaLabel}
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
             </motion.button>
-            <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {t('Kredi kartı gerekmez · 30 saniyede başla', 'No credit card required · Start in 30 seconds', 'نیازی به کارت اعتباری نیست')}
             </span>
           </motion.div>
@@ -617,18 +617,18 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
           <div className="relative rounded-3xl p-6 sm:p-8"
             style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))', boxShadow: '0 40px 120px -20px rgba(139,92,246,0.25)' }}>
             <div className="flex items-center justify-between mb-6">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {t('Kümülatif PnL', 'Cumulative PnL', 'سود/زیان انباشته')}
               </span>
               <div className="flex items-center gap-8 sm:gap-10">
                 <div className="text-end">
-                  <div className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  <div className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {t('Kazanma Oranı', 'Win Rate', 'نرخ برد')}
                   </div>
                   <div className="font-mono text-[15px]" style={{ color: '#fff', fontVariantNumeric: 'tabular-nums' }}>%68</div>
                 </div>
                 <div className="text-end">
-                  <div className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  <div className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {t('Net', 'Net', 'خالص')}
                   </div>
                   <div className="font-mono text-[15px]" style={{ color: '#34d399', fontVariantNumeric: 'tabular-nums' }}>+$1,840</div>
@@ -654,7 +654,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: shouldReduceMotion ? 0 : 1.1 }}
             className="mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
-            <span className="text-[10.5px] uppercase tracking-[0.18em]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <span className="text-[10.5px] uppercase tracking-[0.18em]" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {t('Şuralardan aktarır', 'Imports from', 'وارد می‌کند از')}
             </span>
             {['MetaTrader 5', 'MetaTrader 4', 'cTrader', 'TradeLocker', 'DXtrade', 'Match-Trader'].map((name, i) => (
@@ -682,7 +682,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             <h2 className="poster text-[2.4rem] sm:text-[3.4rem]">
               {t('Neden Journal Tutmak İşe Yarar?', 'Why Trade Journaling Works', 'چرا ثبت معاملات مؤثر است؟')}
             </h2>
-            <p className="text-[17px] leading-relaxed mt-6 max-w-xl" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            <p className="text-[17px] leading-relaxed mt-6 max-w-xl" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {t('İyi işlemlerin ortak bir yanı vardır — ama bunu ancak yazılı bir kayıt gösterir. Journal, işe yarayanı görünür kılar; yarına da taşır.', 'Your good trades have something in common — but only a written record shows you what. A journal makes what works visible, and carries it into tomorrow.', 'معاملات خوب شما وجه مشترکی دارند — و فقط یک ثبت مکتوب آن را نشان می‌دهد.')}
             </p>
           </motion.div>
@@ -698,7 +698,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 <div className="hover-icon mb-5">{item.icon}</div>
                 <h3 className="hover-title text-[17px] font-medium" style={{ letterSpacing: '-0.01em' }}>{item.title}</h3>
                 <span className="hover-rule" />
-                <p className="text-[14.5px] leading-relaxed mt-2.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{item.desc}</p>
+                <p className="text-[14.5px] leading-relaxed mt-2.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -714,7 +714,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             <h2 className="poster text-[2.1rem] sm:text-[3rem] mb-4">
               {t('İhtiyacın Olan Her Araç, Tek Ekranda', 'Every Tool You Need, One Screen', 'هر ابزاری که نیاز دارید، در یک صفحه')}
             </h2>
-            <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {t('İşlem kendiliğinden gelir, sayıya döner, alışkanlığa dönüşür.', 'The trade arrives on its own, becomes a number, then becomes a habit.', 'معامله خودش می‌آید، به عدد تبدیل می‌شود و بعد به عادت.')}
             </p>
           </motion.div>
@@ -750,7 +750,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                     )}
                     <div className="mb-5" style={{ color: f.accent }}>{f.icon}</div>
                     <h4 className="hover-title text-[16px] font-medium mb-2.5 pe-10" style={{ letterSpacing: '-0.01em' }}>{f.title}</h4>
-                    <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{f.desc}</p>
+                    <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{f.desc}</p>
                     {f.widget}
                   </motion.div>
                 ))}
@@ -779,7 +779,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 style={i > 0 ? { borderInlineStart: '1px solid rgba(255,255,255,0.07)' } : undefined}>
                 {/* Numara rozet değil, tipografi: sayfanın serifiyle büyük ve sessiz. */}
                 <div className="relative font-display leading-none mb-6 w-fit"
-                  style={{ fontSize: '46px', color: 'rgba(255,255,255,0.28)', letterSpacing: '-0.03em' }}>
+                  style={{ fontSize: '46px', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.03em' }}>
                   {/* Sayının arkasında dağınık bir mor ışık: numara arka plandan
                       ayrılsın, ama rozet gibi kutulanmasın. */}
                   <span className="pointer-events-none absolute -inset-6 rounded-full blur-2xl"
@@ -788,7 +788,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 </div>
                 <h3 className="hover-title text-[16px] font-medium" style={{ letterSpacing: '-0.01em' }}>{s.title}</h3>
                 <span className="hover-rule" />
-                <p className="text-[14.5px] leading-relaxed mt-2.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.desc}</p>
+                <p className="text-[14.5px] leading-relaxed mt-2.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -804,7 +804,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             <h2 className="poster text-[2.1rem] sm:text-[3rem] mb-4">
               {t('Sade ve Şeffaf Fiyatlandırma', 'Simple & Transparent Pricing', 'قیمت‌گذاری ساده و شفاف')}
             </h2>
-            <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {t('Ücretsiz başla, büyüdükçe yükselt.', 'Start free, upgrade as you grow.', 'رایگان شروع کنید، با رشد ارتقا دهید.')}
             </p>
           </motion.div>
@@ -822,7 +822,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             className="max-w-4xl mx-auto mt-6 flex items-center gap-2.5 px-4 py-3 rounded-xl"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <Lock className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
-            <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {t(
                 'Verilerin satır bazlı güvenlikle (RLS) izole — başka hiçbir kullanıcı senin journal\'ını, işlemlerini ya da fotoğraflarını göremez. Kart bilgisi istemiyoruz.',
                 'Your data is isolated with row-level security (RLS) — no other user can see your journals, trades or screenshots. We never ask for a card.',
@@ -873,7 +873,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                     </button>
                     <motion.div initial={false} animate={{ height: isOpen ? 'auto' : 0 }} className="overflow-hidden"
                       transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}>
-                      <p className="pb-7 pe-10 ps-9 text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{faq.a}</p>
+                      <p className="pb-7 pe-10 ps-9 text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{faq.a}</p>
                     </motion.div>
                   </motion.div>
                 );
@@ -894,7 +894,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             <h2 className="poster text-[2.4rem] sm:text-[3.6rem] mb-6">
               {t('İşlemlerini Bugün Kaydetmeye Başla', 'Start Logging Your Trades Today', 'همین امروز معاملات خود را ثبت کنید')}
             </h2>
-            <p className="text-[16px] mb-10" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            <p className="text-[16px] mb-10" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {t('Ücretsiz, kart bilgisi olmadan, 30 saniyede.', 'Free, no card required, in 30 seconds.', 'رایگان، بدون کارت، در ۳۰ ثانیه.')}
             </p>
             <motion.button onClick={onGetStarted}
@@ -916,7 +916,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-10">
             <div className="max-w-xs">
               <LogoLock className="h-[24px] w-auto mb-3" />
-              <p className="text-[13.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              <p className="text-[13.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {t('İşlem Günlüğü Platformu', 'Trading Journal Platform', 'پلتفرم دفترچه معاملات')}
               </p>
             </div>
@@ -948,7 +948,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
           </div>
 
           <div className="mt-12 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-            <p className="text-[12px]" style={{ color: 'rgba(255,255,255,0.22)' }}>
+            <p className="text-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
               © {new Date().getFullYear()} Simple Trading Journal
             </p>
           </div>

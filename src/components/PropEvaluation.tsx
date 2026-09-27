@@ -46,7 +46,7 @@ function Detail({ blocks }: { blocks: DetailBlock[] }) {
             <ul key={i} className="space-y-1.5">
               {b.ul.map((item, j) => (
                 <li key={j} className="flex gap-2.5 text-[14px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  <span style={{ color: 'rgba(255,255,255,0.25)' }}>—</span>
+                  <span style={{ color: 'rgba(255,255,255,0.5)' }}>—</span>
                   <span><RichText text={item} /></span>
                 </li>
               ))}
@@ -61,7 +61,7 @@ function Detail({ blocks }: { blocks: DetailBlock[] }) {
                   <tr>
                     {b.table.head.map((h, j) => (
                       <th key={j} className="text-start font-medium py-2 pe-4 whitespace-nowrap"
-                        style={{ color: 'rgba(255,255,255,0.4)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                        style={{ color: 'rgba(255,255,255,0.5)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                         {h}
                       </th>
                     ))}
@@ -202,7 +202,7 @@ export default function PropEvaluation() {
         <h2 className="font-display text-[24px] mb-3" style={{ letterSpacing: '-0.02em' }}>
           {t('propReviewTitle')}
         </h2>
-        <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+        <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {t('propReviewIntro')}
         </p>
       </div>
@@ -212,7 +212,7 @@ export default function PropEvaluation() {
         <div className="flex flex-wrap items-end gap-3">
           {firms.map((f, i) => (
             <div key={i} className="relative">
-              <label className="block text-[11px] uppercase tracking-[0.14em] mb-1.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              <label className="block text-[11px] uppercase tracking-[0.14em] mb-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {t('propFirm')} {String.fromCharCode(65 + i)}
               </label>
               <div className="flex items-center gap-1.5">
@@ -222,7 +222,7 @@ export default function PropEvaluation() {
                   style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', width: '170px' }} />
                 {firms.length > 1 && (
                   <button type="button" onClick={() => removeFirm(i)} title={t('propRemove')}
-                    className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     <X className="w-4 h-4" />
                   </button>
                 )}
@@ -250,17 +250,17 @@ export default function PropEvaluation() {
               <div className="p-5">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="flex gap-3 min-w-0">
-                    <span className="font-display flex-shrink-0" style={{ fontSize: '19px', color: 'rgba(255,255,255,0.2)', lineHeight: 1.3 }}>
+                    <span className="font-display flex-shrink-0" style={{ fontSize: '19px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.3 }}>
                       {String(index + 1).padStart(2, '0')}
                     </span>
                     <div className="min-w-0">
                       <h3 className="text-[16px] font-medium" style={{ letterSpacing: '-0.01em' }}>
                         {copy[c.id].title}
-                        <span className="ms-2 text-[12px] font-normal" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                        <span className="ms-2 text-[12px] font-normal" style={{ color: 'rgba(255,255,255,0.5)' }}>
                           {c.max} {t('propPoints')}
                         </span>
                       </h3>
-                      <p className="text-[13.5px] leading-relaxed mt-1.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                      <p className="text-[13.5px] leading-relaxed mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                         <RichText text={copy[c.id].short} />
                       </p>
                     </div>
@@ -283,7 +283,7 @@ export default function PropEvaluation() {
                     style={{ background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(139,92,246,0.18)' }}>
                     <Detail blocks={copy[c.id].detail} />
                     <p className="text-[12px] mt-5 pt-3 leading-relaxed"
-                      style={{ color: 'rgba(255,255,255,0.28)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                      style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                       {t('propInRulebook')} {c.keywords}
                     </p>
                   </div>
@@ -294,7 +294,7 @@ export default function PropEvaluation() {
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                 {firms.length > 1 && (
                   <div className="grid items-center px-5 py-2 text-[11px] uppercase tracking-wider"
-                    style={{ gridTemplateColumns: cols, color: 'rgba(255,255,255,0.3)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    style={{ gridTemplateColumns: cols, color: 'rgba(255,255,255,0.5)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                     <span />
                     {firms.map((_, i) => (
                       <span key={i} className="text-center truncate px-1" title={firmLabel(i)}>
@@ -317,7 +317,7 @@ export default function PropEvaluation() {
                       }}>
                       <span className="text-[13.5px] pe-3" style={{ color: red ? 'rgba(248,113,113,0.85)' : 'rgba(255,255,255,0.75)' }}>
                         {opt}
-                        <span className="ms-2 font-mono text-[12px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        <span className="ms-2 font-mono text-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
                           {c.points[oi]}
                         </span>
                       </span>
@@ -358,7 +358,7 @@ export default function PropEvaluation() {
           <h3 className="font-display text-[20px]" style={{ letterSpacing: '-0.02em' }}>{t('propResult')}</h3>
           <div className="flex items-center gap-4">
             <button type="button" onClick={reset} className="flex items-center gap-1.5 text-[13px]"
-              style={{ color: 'rgba(255,255,255,0.35)' }}>
+              style={{ color: 'rgba(255,255,255,0.5)' }}>
               <RotateCcw className="w-3.5 h-3.5" />
               {t('propClear')}
             </button>
@@ -383,22 +383,22 @@ export default function PropEvaluation() {
                   <span className="font-display" style={{ fontSize: '34px', lineHeight: 1, color: blocked ? '#f87171' : bandColor }}>
                     {r.score}
                   </span>
-                  <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.3)' }}>/ 100</span>
+                  <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>/ 100</span>
                 </div>
-                <div className="font-mono text-[12.5px] mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                <div className="font-mono text-[12.5px] mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {(r.score / 10).toFixed(1)} / 10
                 </div>
                 <div className="text-[13px] mt-2.5" style={{ color: blocked ? '#f87171' : bandColor }}>
                   {blocked ? t('propNotSuitable') : band(r.score)}
                 </div>
                 {blocked && (
-                  <p className="text-[12px] mt-1.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  <p className="text-[12px] mt-1.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {t('propYourRedLine')}{' '}
                     {r.broken.map(c => copy[c.id].title).join(', ')}
                   </p>
                 )}
                 {r.answered < PROP_CRITERIA.length && (
-                  <p className="text-[12px] mt-1.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                  <p className="text-[12px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {r.answered} / {PROP_CRITERIA.length} {t('propAnswered')}
                   </p>
                 )}
@@ -433,7 +433,7 @@ export default function PropEvaluation() {
           </div>
         )}
 
-        <p className="text-[12.5px] leading-relaxed mt-6 pt-4" style={{ color: 'rgba(255,255,255,0.3)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <p className="text-[12.5px] leading-relaxed mt-6 pt-4" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           {t('propFloorNote').replace('{n}', String(PROP_MIN_SCORE))}
         </p>
       </div>

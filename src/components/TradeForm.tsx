@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { aria } from '../lib/aria';
 import { cur } from '../lib/format';
 import { Upload, X, Search, ChevronDown, Loader } from 'lucide-react';
 import DatePicker, { DateObject } from "react-multi-date-picker";
@@ -48,7 +49,7 @@ const Req = () => <span style={{ color: '#f87171', marginInlineStart: '3px' }}>*
 const selStyle: React.CSSProperties = { ...inp, cursor: 'pointer' };
 const optStyle: React.CSSProperties = { background: '#1a1b2e', color: '#fff' };
 const divider: React.CSSProperties = { borderTop: hairline, paddingTop: '40px' };
-const optHint: React.CSSProperties = { color: 'rgba(255,255,255,0.3)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 };
+const optHint: React.CSSProperties = { color: 'rgba(255,255,255,0.5)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 };
 const sectionTitle: React.CSSProperties = { ...sectionLabel, marginBottom: '18px' };
 
 const SYMBOLS: Record<string, string[]> = {
@@ -131,18 +132,18 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
         className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-mono font-medium transition-all"
         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}>
         <span>{value || (language === 'tr' ? 'Sembol seç...' : 'Pick a symbol...')}</span>
-        <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.4)' }} />
+        <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.5)' }} />
       </button>
       {open && (
         <div className="absolute top-full start-0 mt-2 w-full z-50 rounded-2xl overflow-hidden shadow-2xl"
           style={{ background: '#12131f', border: '1px solid rgba(255,255,255,0.1)', minWidth: '280px' }}>
           <div className="p-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <Search className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }} />
+              <Search className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.5)' }} />
               <input ref={searchRef} type="text" value={search} onChange={e => setSearch(e.target.value)} onKeyDown={handleKeyDown}
                 placeholder={language === 'tr' ? 'Sembol ara veya yaz... (Enter ile ekle)' : 'Search or type a symbol... (Enter to add)'}
                 className="flex-1 bg-transparent outline-none text-sm text-white placeholder-gray-500" style={{ color: '#fff' }} />
-              {search && <button type="button" onClick={() => setSearch('')}><X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} /></button>}
+              {search && <button type="button" onClick={() => setSearch('')} aria-label={aria('clearSearch', language)}><X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.5)' }} /></button>}
             </div>
           </div>
           {!search && (
@@ -159,12 +160,12 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
           <div className="overflow-y-auto" style={{ maxHeight: '280px' }}>
             {!search && recentlyUsed.length > 0 && (
               <div>
-                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{language === 'tr' ? 'Son Kullanılanlar' : 'Recently Used'}</div>
+                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{language === 'tr' ? 'Son Kullanılanlar' : 'Recently Used'}</div>
                 {recentlyUsed.map(symbol => (
                   <button key={`recent-${symbol}`} type="button" onClick={() => handleSelect(symbol)}
                     className="ui-pill w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all" style={{ color: '#fff' }}>
                     <span className="font-mono font-medium">{symbol}</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.35)' }}>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
                       {Object.entries(SYMBOLS).find(([, v]) => v.includes(symbol))?.[0] || 'Custom'}
                     </span>
                   </button>
@@ -172,10 +173,10 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
                 <div className="mx-4 my-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
               </div>
             )}
-            {search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{filteredSymbols.length > 0
+            {search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{filteredSymbols.length > 0
                 ? (language === 'tr' ? 'Sonuçlar' : 'Results')
                 : (language === 'tr' ? 'Bulunamadı — Enter ile ekle' : 'No match — press Enter to add')}</div>}
-            {!search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>{category}</div>}
+            {!search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{category}</div>}
             {filteredSymbols.map(symbol => (
               <button key={symbol} type="button" onClick={() => handleSelect(symbol)}
                 className="ui-pill w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all"
@@ -212,7 +213,7 @@ function PhotoUploader({ photos, onUpload, onRemove, onAddLink, isUnlimited, lim
   uploading?: boolean;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const canUploadMore = isUnlimited ? true : photos.length < limit;
 
   return (
@@ -224,8 +225,8 @@ function PhotoUploader({ photos, onUpload, onRemove, onAddLink, isUnlimited, lim
           {uploading
             ? <><Loader className="w-4 h-4 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Yükleniyor...</span></>
             : <>
-                <Upload className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.3)' }} />
-                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('photoUpload')}</span>
+                <Upload className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.5)' }} />
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('photoUpload')}</span>
                 {isUnlimited && <span className="text-xs" style={{ color: 'rgba(139,92,246,0.7)' }}>∞</span>}
               </>
           }
@@ -240,7 +241,7 @@ function PhotoUploader({ photos, onUpload, onRemove, onAddLink, isUnlimited, lim
           {photos.map((photo, index) => (
             <div key={index} className="relative aspect-square rounded-xl overflow-hidden group" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
               <img src={photo} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
-              <button type="button" onClick={() => onRemove(index)}
+              <button type="button" onClick={() => onRemove(index)} aria-label={aria('removePhoto', language)}
                 className="absolute top-1 end-1 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
                 style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}>
                 <X className="w-4 h-4" />
@@ -438,7 +439,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
           <h2 className="font-display text-[21px] text-white" style={{ letterSpacing: '-0.01em' }}>
             Checklist <span style={{ ...optHint, fontSize: '13px' }}>({t('optionalLabel')})</span>
           </h2>
-          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {language === 'tr'
               ? 'İşleme girmeden önce kendi kurallarını kontrol et.'
               : 'Run through your own rules before taking the trade.'}
@@ -454,7 +455,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
       {!hideTitle && (
         <div className="p-6" style={{ borderBottom: hairline }}>
           <h2 className="font-display text-[21px] text-white" style={{ letterSpacing: '-0.01em' }}>{t('formTitle')}</h2>
-          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('formSubtitle')}</p>
+          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('formSubtitle')}</p>
         </div>
       )}
 
@@ -512,7 +513,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
           <div>
               <label style={lbl}>{t('risk')} <span style={optHint}>({t('optionalLabel')})</span></label>
               <div className="relative">
-                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{cur().trim()}</span>
+                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{cur().trim()}</span>
                 <input type="number" min="0" step="0.01" value={risk} onChange={e => setRisk(e.target.value)}
                   style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace' }} placeholder="0.00" />
               </div>
@@ -528,7 +529,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
                 <option value="Başa Baş" style={optStyle}>{t('resultBreakeven')}</option>
               </select>
               {!isClosed && (
-                <p className="text-[11px] mt-2 leading-snug" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <p className="text-[11px] mt-2 leading-snug" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {t('finishLater')}
                 </p>
               )}
@@ -541,7 +542,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
                 {isClosed && <Req />}
               </label>
               <div className="relative">
-                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{cur().trim()}</span>
+                <span className="absolute start-3 top-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{cur().trim()}</span>
                 <input type="number" min="0" step="0.01" required={isClosed} readOnly={isBreakevenResult}
                   value={reward} onChange={e => setReward(e.target.value)}
                   style={{ ...inp, paddingLeft: '28px', fontFamily: 'monospace', opacity: isBreakevenResult ? 0.6 : 1 }}
@@ -620,7 +621,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
       </div>
 
       <div className="p-6 flex items-center justify-between gap-4 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
           <span style={{ color: '#f87171' }}>*</span> {t('requiredNote')} — {t('requiredHint')}
         </p>
         <button type="submit" disabled={uploadingPre || uploadingPost}

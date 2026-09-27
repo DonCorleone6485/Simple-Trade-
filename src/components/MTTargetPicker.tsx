@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { aria } from '../lib/aria';
 import { X, Plug } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -46,11 +47,11 @@ export default function MTTargetPicker({ journals, onChoose, onClose }: {
               <Plug className="w-5 h-5" style={{ color: '#a78bfa' }} />
               {tr('MetaTrader Bağlantısı', 'MetaTrader Connection')}
             </h2>
-            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {tr('İşlemler hangi journal\'a yazılsın?', 'Which journal should the trades go to?')}
             </p>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
+          <button onClick={onClose} aria-label={aria('close', language)} className="p-2 rounded-lg" style={{ color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.05)' }}>
             <X className="w-5 h-5" />
           </button>
         </div>

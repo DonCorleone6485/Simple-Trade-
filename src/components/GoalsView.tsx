@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { aria } from '../lib/aria';
 import { Trade, Account, JournalGoals } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { money, signedMoney, cur } from '../lib/format';
@@ -118,7 +119,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-[22px] font-medium text-white">{t('goalsTitle')}</h2>
-          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{getMonthLabel()}</p>
+          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{getMonthLabel()}</p>
         </div>
         <button
           onClick={() => editing ? handleSave() : setEditing(true)}
@@ -160,11 +161,11 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
           {goals.monthlyPnL ? (
             <div style={card}>
               <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <div className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   <DollarSign className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">{t('monthlyPnLGoal')}</span>
                 </div>
-                <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {signedMoney(monthlyPnL, 0)} / {money(goals.monthlyPnL, 0)}
                 </span>
               </div>
@@ -175,18 +176,18 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
             </div>
           ) : (
             <div style={{ ...card, border: '1px dashed rgba(255,255,255,0.1)' }} className="flex items-center justify-center">
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.2)' }}>{t('noMonthlyPnLGoal')}</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('noMonthlyPnLGoal')}</p>
             </div>
           )}
 
           {goals.winRate ? (
             <div style={card}>
               <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <div className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   <TrendingUp className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">{t('winRateGoal')}</span>
                 </div>
-                <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   %{currentWinRate.toFixed(0)} / %{goals.winRate}
                 </span>
               </div>
@@ -197,18 +198,18 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
             </div>
           ) : (
             <div style={{ ...card, border: '1px dashed rgba(255,255,255,0.1)' }} className="flex items-center justify-center">
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.2)' }}>{t('noWinRateGoal')}</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('noWinRateGoal')}</p>
             </div>
           )}
 
           {goals.maxDailyTrades ? (
             <div style={card}>
               <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <div className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   <Activity className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">{t('maxDailyTrades')}</span>
                 </div>
-                <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {todayTrades.length} / {goals.maxDailyTrades}
                 </span>
               </div>
@@ -225,14 +226,14 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
             </div>
           ) : (
             <div style={{ ...card, border: '1px dashed rgba(255,255,255,0.1)' }} className="flex items-center justify-center">
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.2)' }}>{t('noMaxDailyTrades')}</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('noMaxDailyTrades')}</p>
             </div>
           )}
 
           {goals.maxRiskPerTrade ? (
             <div style={card}>
               <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <div className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   <Target className="w-4 h-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">{t('maxRiskPerTrade')}</span>
                 </div>
@@ -240,13 +241,13 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
               <div className="font-mono text-[26px] mt-2 text-white">
                 ${goals.maxRiskPerTrade}
               </div>
-              <p className="text-xs mt-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <p className="text-xs mt-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {t('maxRiskDesc')}
               </p>
             </div>
           ) : (
             <div style={{ ...card, border: '1px dashed rgba(255,255,255,0.1)' }} className="flex items-center justify-center">
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.2)' }}>{t('noMaxRisk')}</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('noMaxRisk')}</p>
             </div>
           )}
         </div>
@@ -255,14 +256,14 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
       {/* Yasak Saatler */}
       {!editing && goals.noTradeHoursStart !== undefined && goals.noTradeHoursEnd !== undefined && (
         <div style={card}>
-          <div className="flex items-center gap-2 mb-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <div className="flex items-center gap-2 mb-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
             <Clock className="w-4 h-4" />
             <span className="text-xs font-medium uppercase tracking-wider">{t('noTradeHours')}</span>
           </div>
           <p className="text-lg font-semibold text-white">
             {String(goals.noTradeHoursStart).padStart(2, '0')}:00 — {String(goals.noTradeHoursEnd).padStart(2, '0')}:00
           </p>
-          <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('noTradeHoursDesc')}</p>
+          <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('noTradeHoursDesc')}</p>
         </div>
       )}
 
@@ -271,7 +272,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
         <div style={card} className="space-y-6">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-white">{t('editGoals')}</h3>
-            <button onClick={() => setEditing(false)} style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <button onClick={() => setEditing(false)} aria-label={aria('close', language)} style={{ color: 'rgba(255,255,255,0.5)' }}>
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -365,7 +366,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
         <div className="text-center py-16 rounded-2xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
           <Target className="w-12 h-12 mx-auto mb-4" style={{ color: 'rgba(255,255,255,0.15)' }} />
           <p className="font-medium text-white mb-1">{t('noGoalsTitle')}</p>
-          <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('noGoalsDesc')}</p>
+          <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('noGoalsDesc')}</p>
           <button
             onClick={() => setEditing(true)}
             className="cta px-6 py-2 text-sm font-semibold rounded-xl transition-all"

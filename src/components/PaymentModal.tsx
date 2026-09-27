@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { aria } from '../lib/aria';
 import { X, Check, Shield, Tag } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useUser, useAuth } from '@clerk/clerk-react';
@@ -74,12 +75,12 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
             <h2 className="text-lg font-bold text-white">
               {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
             </h2>
-            <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {language === 'tr' ? 'Tüm özelliklere sınırsız erişim' : 'Unlimited access to all features'}
             </p>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg"
-            style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
+          <button onClick={onClose} aria-label={aria('close', language)} className="p-1.5 rounded-lg"
+            style={{ color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.05)' }}>
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -185,7 +186,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
               </span>
               <div className="text-end">
                 <span className="font-display text-[26px] font-medium text-white">{totalPrice}</span>
-                <span className="text-sm ms-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <span className="text-sm ms-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {billing === 'yearly'
                     ? (language === 'tr' ? '/ yıl' : '/ year')
                     : (language === 'tr' ? '/ ay' : '/ month')}
@@ -195,10 +196,10 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
             <button disabled
               className="w-full py-3 rounded-full text-sm font-medium cursor-not-allowed"
-              style={{ background: 'rgba(139,92,246,0.15)', color: 'rgba(255,255,255,0.35)', border: '1px solid rgba(139,92,246,0.15)' }}>
+              style={{ background: 'rgba(139,92,246,0.15)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(139,92,246,0.15)' }}>
               💳 {language === 'tr' ? 'Ödeme Yap — Yakında' : 'Pay Now — Coming Soon'}
             </button>
-            <p className="text-center text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            <p className="text-center text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {language === 'tr'
                 ? 'Ödeme sistemi çok yakında aktif olacak'
                 : 'Payment system coming very soon'}

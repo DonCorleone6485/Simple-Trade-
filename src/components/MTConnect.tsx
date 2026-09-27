@@ -108,7 +108,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
   };
   const label: React.CSSProperties = {
     fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.14em',
-    color: 'rgba(255,255,255,0.3)', marginBottom: '10px',
+    color: 'rgba(255,255,255,0.5)', marginBottom: '10px',
   };
 
   const fmt = (iso: string | null) => {
@@ -166,7 +166,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
         <h2 className="font-display text-[24px] mb-3" style={{ letterSpacing: '-0.02em' }}>
           {tr('MetaTrader Bağlantısı', 'MetaTrader Connection')}
         </h2>
-        <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+        <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {tr(
             `MetaTrader 5'e kuracağın küçük bir eklenti, açtığın pozisyonları "${journalName}" journal'ına anında yazar ve kapandıklarında aynı kayıtları sonuçla tamamlar. Rapor indirip yüklemene gerek kalmaz.`,
             `A small add-on installed in MetaTrader 5 writes your closed trades into "${journalName}" on its own. No more exporting and uploading reports.`
@@ -197,9 +197,9 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
         </div>
 
         {loading ? (
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{tr('Yükleniyor…', 'Loading…')}</p>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{tr('Yükleniyor…', 'Loading…')}</p>
         ) : keys.length === 0 ? (
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {tr('Bu journal için henüz anahtar yok.', 'No key for this journal yet.')}
           </p>
         ) : (
@@ -220,11 +220,11 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                     {tr('Aktif', 'Active')}
                   </span>
                 )}
-                <span className="text-[12px] ms-auto" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <span className="text-[12px] ms-auto" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {tr('son kullanım', 'last used')}: {fmt(k.last_used_at)}
                 </span>
                 <button onClick={() => revoke(k.id)} className="ui-pill ui-pill-danger p-1.5 rounded-lg flex-shrink-0"
-                  style={{ color: 'rgba(255,255,255,0.25)' }}
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
                   title={tr('İptal et', 'Revoke')}>
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -235,7 +235,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
         {/* Anahtarın tamamı sunucuda hiç saklanmıyor, yalnızca özeti — o yüzden
             burada sadece ipucu var. Neden görünmediğini söylemezsek kullanıcı
             bunu bir eksik sanıyor. */}
-        <p className="text-[12.5px] leading-relaxed mt-4 pt-4" style={{ color: 'rgba(255,255,255,0.35)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <p className="text-[12.5px] leading-relaxed mt-4 pt-4" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           {tr('Güvenlik için anahtarın tamamı saklanmaz, yalnızca ilk ve son harfleri görünür. MetaTrader anahtarı zaten hatırlar; kaybettiysen 4. adımdan yenisini oluştur ve eskisini buradan iptal et.',
               'For security the full key is never stored; only its first and last characters are shown. MetaTrader remembers the key anyway; if you lose it, create a new one in step 4 and revoke the old one here.')}
           {' '}
@@ -306,7 +306,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
               </span>
               <div className="min-w-0">
                 <div className="text-[15px] font-medium mb-1.5">{s.t}</div>
-                <p className="text-[14px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{s.d}</p>
+                <p className="text-[14px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.d}</p>
                 {s.code && (
                   <code className="inline-block mt-2.5 font-mono text-[13px] px-3 py-1.5 rounded-lg"
                     style={{ background: 'rgba(0,0,0,0.3)', color: '#a78bfa' }}>
@@ -326,7 +326,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             </li>
           ))}
         </ol>
-        <p className="text-[13px] leading-relaxed mt-6 pt-5" style={{ color: 'rgba(255,255,255,0.3)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <p className="text-[13px] leading-relaxed mt-6 pt-5" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           {tr(
             'Mac kullanıyorsan "Veri Klasörünü Aç" bazı sürümlerde çalışmaz. O zaman Finder\'da Git → Klasöre Git ile şuraya gidebilirsin: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts',
             'On a Mac, "Open Data Folder" does not work in some builds. In Finder use Go → Go to Folder and paste: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts'

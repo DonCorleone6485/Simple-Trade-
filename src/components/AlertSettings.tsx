@@ -44,7 +44,7 @@ function Minutes({ value, onChange }: { value: number; onChange: (v: number) => 
           {m >= 60 ? `${m / 60}${t('hourShort')}` : `${m}${t('minutesShort')}`}
         </button>
       ))}
-      <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('alertsBefore')}</span>
+      <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('alertsBefore')}</span>
     </div>
   );
 }
@@ -78,7 +78,7 @@ export default function AlertSettings({ kind, settings, onChange }: {
 
   return (
     <div className="mb-8 pb-8 space-y-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+      <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.5)' }}>
         {on ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
         {t('alertsTitle')}
       </div>
@@ -95,7 +95,7 @@ export default function AlertSettings({ kind, settings, onChange }: {
           )}
           {/* Bu satır şart. "Bildirim açık" sanıp haberi kaçıran biri için bu
               özellik hiç olmamasından kötüdür. */}
-          <p className="text-[12px] leading-relaxed ps-3.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <p className="text-[12px] leading-relaxed ps-3.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {t('alertsOnlyOpenTab')}
           </p>
         </>
@@ -109,7 +109,7 @@ export default function AlertSettings({ kind, settings, onChange }: {
         </div>
       )}
       {perm === 'unsupported' && (
-        <p className="text-[12.5px] ps-3.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('alertsUnsupported')}</p>
+        <p className="text-[12.5px] ps-3.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('alertsUnsupported')}</p>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { aria } from '../lib/aria';
 import { ChevronLeft, ChevronRight, X, Lock } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -134,7 +135,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
             })(), color: '#34d399' },
           ].map((s, i) => (
             <div key={i}>
-              <div className="text-[11px] mb-2.5 uppercase tracking-[0.12em] truncate" style={{ color: 'rgba(255,255,255,0.3)' }}>{s.label}</div>
+              <div className="text-[11px] mb-2.5 uppercase tracking-[0.12em] truncate" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.label}</div>
               <div className="font-mono text-[26px]" style={{ color: s.color, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>{s.value}</div>
             </div>
           ))}
@@ -147,16 +148,18 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
         <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <button
             onClick={prevMonth}
+            aria-label={aria('prevMonth', language)}
             className="ui-pill p-2 rounded-lg transition-all"
-            style={{ color: 'rgba(255,255,255,0.4)' }}
+            style={{ color: 'rgba(255,255,255,0.5)' }}
           >
             <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
           </button>
           <h2 className="font-display text-[20px] capitalize text-white">{getMonthLabel()}</h2>
           <button
             onClick={nextMonth}
+            aria-label={aria('nextMonth', language)}
             className="ui-pill p-2 rounded-lg transition-all"
-            style={{ color: 'rgba(255,255,255,0.4)' }}
+            style={{ color: 'rgba(255,255,255,0.5)' }}
           >
             <ChevronRight className="w-5 h-5 rtl:rotate-180" />
           </button>
@@ -165,7 +168,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
         {/* Week days */}
         <div className="grid grid-cols-7 px-4 pt-4">
           {weekDays.map(d => (
-            <div key={d} className="text-center text-xs font-semibold pb-3 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <div key={d} className="text-center text-xs font-semibold pb-3 uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {d}
             </div>
           ))}
@@ -238,7 +241,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
                         {signedMoney(stats.netPnL, 0)}
                       </div>
                     )}
-                    <div className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    <div className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
                       {stats.closed > 0 && `${stats.closed} ${t('tradeCount')}`}
                       {stats.closed > 0 && stats.open > 0 && ' · '}
                       {stats.open > 0 && (
@@ -273,7 +276,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
                   { dateStyle: 'long' }
                 ).format(new Date(selectedDay))}
               </h3>
-              <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {selectedTrades.length} {t('tradeCount')}
                 {lockedOn(selectedDay) > 0 && (
                   <button onClick={() => askUpgrade('locked')} className="ms-2 inline-flex items-center gap-1" style={{ color: '#a78bfa' }}>
@@ -284,8 +287,9 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
             </div>
             <button
               onClick={() => setSelectedDay(null)}
+              aria-label={aria('close', language)}
               className="link-gold p-2 rounded-lg transition-all"
-              style={{ color: 'rgba(255,255,255,0.4)' }}
+              style={{ color: 'rgba(255,255,255,0.5)' }}
             >
               <X className="w-5 h-5" />
             </button>
@@ -310,7 +314,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
                         {trade.type}
                       </span>
                       {trade.timeframe && (
-                        <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
+                        <span className="text-xs px-2 py-0.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
                           {trade.timeframe}
                         </span>
                       )}
@@ -320,7 +324,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
                         </span>
                       )}
                     </div>
-                    <div className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    <div className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
                       {formatTime(trade.date)}
                       {trade.rr && <span className="ms-3 font-mono">{trade.rr}R</span>}
                     </div>
@@ -336,8 +340,9 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
                   </div>
                   <button
                     onClick={() => { onDelete(trade.id); if (selectedTrades.length === 1) setSelectedDay(null); }}
+                    aria-label={aria('deleteTrade', language)}
                     className="ui-pill ui-pill-danger p-2 rounded-lg transition-all flex-shrink-0"
-                    style={{ color: 'rgba(255,255,255,0.2)' }}
+                    style={{ color: 'rgba(255,255,255,0.5)' }}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -350,7 +355,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
 
       {trades.length === 0 && (
         <div className="text-center py-20 rounded-2xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <p style={{ color: 'rgba(255,255,255,0.35)' }}>{t('emptyDesc')}</p>
+          <p style={{ color: 'rgba(255,255,255,0.5)' }}>{t('emptyDesc')}</p>
         </div>
       )}
     </div>

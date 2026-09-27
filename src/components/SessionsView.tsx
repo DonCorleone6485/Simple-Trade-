@@ -59,7 +59,7 @@ export default function SessionsView() {
         })}
       </div>
 
-      <p className="text-[11.5px] mt-6" style={{ color: 'rgba(255,255,255,0.25)' }}>
+      <p className="text-[11.5px] mt-6" style={{ color: 'rgba(255,255,255,0.5)' }}>
         {tr('Saatler her seansın kendi şehrine göre. Yaz saati değişimleri kendiliğinden hesaba katılır.',
             'Clocks show each session\'s own city. Daylight saving changes are handled automatically.')}
       </p>

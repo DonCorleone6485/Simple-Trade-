@@ -98,11 +98,11 @@ export default function HeroEquityChart({ data, seriesLabel, tradeWord }: {
           {ticks.map(v => (
             <g key={v}>
               <line x1={padL} x2={w - padR} y1={y(v)} y2={y(v)} stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" />
-              <text x={padL - 8} y={y(v)} dy="0.32em" textAnchor="end" fontSize={11} fill="rgba(255,255,255,0.22)">${v}</text>
+              <text x={padL - 8} y={y(v)} dy="0.32em" textAnchor="end" fontSize={11} fill="rgba(255,255,255,0.5)">${v}</text>
             </g>
           ))}
           {data.map((p, k) => (k % every === 0 || k === data.length - 1) && (
-            <text key={p.i} x={x(k)} y={bottom + 16} textAnchor="middle" fontSize={11} fill="rgba(255,255,255,0.22)">{p.i}</text>
+            <text key={p.i} x={x(k)} y={bottom + 16} textAnchor="middle" fontSize={11} fill="rgba(255,255,255,0.5)">{p.i}</text>
           ))}
           <path d={area} fill="url(#heroGradient)" />
           <path d={line} fill="none" stroke="#10b981" strokeWidth={2} />

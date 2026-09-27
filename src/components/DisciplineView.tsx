@@ -26,7 +26,7 @@ export default function DisciplineView({ trades, journalCount }: DisciplineViewP
 
   const label: React.CSSProperties = {
     fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.14em',
-    color: 'rgba(255,255,255,0.3)', marginBottom: '10px',
+    color: 'rgba(255,255,255,0.5)', marginBottom: '10px',
   };
   const lower = (s: string) => s.toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US');
 
@@ -38,7 +38,7 @@ export default function DisciplineView({ trades, journalCount }: DisciplineViewP
         <p className="text-[15.5px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.72)' }}>
           {t('disciplineIntro1')}
         </p>
-        <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+        <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {t('disciplineIntro2')}
         </p>
       </section>
@@ -49,7 +49,7 @@ export default function DisciplineView({ trades, journalCount }: DisciplineViewP
         <div className="text-[14px] font-medium mb-2" style={{ color: '#a78bfa' }}>
           {t('disciplineAllJournals')}
           {journalCount > 1 && (
-            <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 400 }}>
+            <span style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 400 }}>
               {' · '}{journalCount} journal
             </span>
           )}
@@ -61,7 +61,7 @@ export default function DisciplineView({ trades, journalCount }: DisciplineViewP
 
       {/* ── Sonuç ── */}
       {report.flags.length === 0 ? (
-        <p className="text-[14.5px]" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('disciplineNone')}</p>
+        <p className="text-[14.5px]" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('disciplineNone')}</p>
       ) : (
         <>
           <section>
@@ -76,7 +76,7 @@ export default function DisciplineView({ trades, journalCount }: DisciplineViewP
                     style={{ color: b.pnl >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
                     {signedMoney(b.pnl)}
                   </div>
-                  <div className="text-[11.5px] mt-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                  <div className="text-[11.5px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {b.n} {lower(t('totalTrades'))}
                   </div>
                 </div>
@@ -98,7 +98,7 @@ export default function DisciplineView({ trades, journalCount }: DisciplineViewP
                     </span>
                     <div className="flex-1 min-w-0">
                       <div className="text-[15px] font-medium">{t(titleKey as any)}</div>
-                      <p className="text-[13px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.38)' }}>
+                      <p className="text-[13px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
                         {t(descKey as any)}
                       </p>
                     </div>

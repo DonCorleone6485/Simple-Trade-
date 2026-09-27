@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { aria } from '../lib/aria';
 import { Trade, OrderType } from '../types';
 import { isWinTrade, isLossTrade, isBreakevenTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
 import { money, signedMoney, cur } from '../lib/format';
@@ -52,7 +53,7 @@ const figureLabel: React.CSSProperties = {
   fontSize: '11px',
   textTransform: 'uppercase',
   letterSpacing: '0.14em',
-  color: 'rgba(255,255,255,0.3)',
+  color: 'rgba(255,255,255,0.5)',
   marginBottom: '10px',
 };
 
@@ -79,7 +80,7 @@ function StatGrid({ items }: { items: { label: string; value: string; color?: st
             style={{ color: s.color || 'rgba(255,255,255,0.92)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
             {s.value}
           </div>
-          {s.hint && <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>{s.hint}</div>}
+          {s.hint && <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.hint}</div>}
         </div>
       ))}
     </div>
@@ -168,7 +169,7 @@ export default function TradeHistory({
         <h3 className="font-display text-[18px] text-white">
           {language === 'tr' ? "Başka Journal'a Taşı" : 'Move to Another Journal'}
         </h3>
-        <p className="text-sm mt-1.5 mb-4" style={{ color: 'rgba(255,255,255,0.45)' }}>
+        <p className="text-sm mt-1.5 mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {movingIds.length === 1
             ? (language === 'tr' ? 'Bu işlem seçtiğin journal\'a taşınacak.' : 'This trade will move to the journal you pick.')
             : (language === 'tr'
@@ -186,7 +187,7 @@ export default function TradeHistory({
           ))}
         </div>
         <button onClick={() => setMovingIds(null)} className="w-full mt-4 py-2 text-sm"
-          style={{ color: 'rgba(255,255,255,0.45)' }}>
+          style={{ color: 'rgba(255,255,255,0.5)' }}>
           {t('cancel')}
         </button>
       </div>
@@ -662,7 +663,7 @@ export default function TradeHistory({
       return (
         <div className="text-center py-20 rounded-2xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
           <Target className="w-12 h-12 mx-auto mb-4" style={{ color: 'rgba(255,255,255,0.15)' }} />
-          <p style={{ color: 'rgba(255,255,255,0.35)' }}>{t('emptyDesc')}</p>
+          <p style={{ color: 'rgba(255,255,255,0.5)' }}>{t('emptyDesc')}</p>
         </div>
       );
     }
@@ -711,9 +712,9 @@ export default function TradeHistory({
               <div key={i} style={{ width: `${(seg.n / Math.max(totalClosed, 1)) * 100}%`, background: seg.c }} />
             ))}
           </div>
-          <div className="flex gap-6 mt-3 text-[12px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <div className="flex gap-6 mt-3 text-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
             <span><span style={{ color: '#34d399' }}>●</span> {winningTrades.length} {t('winnersCount')}</span>
-            {breakevenCount > 0 && <span><span style={{ color: 'rgba(255,255,255,0.35)' }}>●</span> {breakevenCount} {t('breakevenCount')}</span>}
+            {breakevenCount > 0 && <span><span style={{ color: 'rgba(255,255,255,0.5)' }}>●</span> {breakevenCount} {t('breakevenCount')}</span>}
             <span><span style={{ color: '#f87171' }}>●</span> {losingTrades.length} {t('losersCount')}</span>
             <span className="ms-auto">{totalClosed} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
           </div>
@@ -754,23 +755,23 @@ export default function TradeHistory({
                       {signedMoney(b.pnl)}
                     </span>
                     {b.rate != null && (
-                      <span className="font-mono text-[15px]" style={{ color: 'rgba(255,255,255,0.45)' }}>%{b.rate}</span>
+                      <span className="font-mono text-[15px]" style={{ color: 'rgba(255,255,255,0.5)' }}>%{b.rate}</span>
                     )}
                   </div>
-                  <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                  <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {b.count} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
                   </div>
                 </div>
               ))}
             </div>
-            <p className="text-[11.5px] mt-6" style={{ color: 'rgba(255,255,255,0.25)' }}>{t('newsNote')}</p>
+            <p className="text-[11.5px] mt-6" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('newsNote')}</p>
           </Section>
         )}
 
         {/* ── Disiplin ── */}
         <Section title={t('discipline')}>
           {disciplineReport.flags.length === 0 ? (
-            <p className="text-[14.5px]" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('disciplineNone')}</p>
+            <p className="text-[14.5px]" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('disciplineNone')}</p>
           ) : (
             <div className="space-y-8">
               {/* Asıl mesaj: kurala uyanla uymayanın parası. */}
@@ -781,7 +782,7 @@ export default function TradeHistory({
                     style={{ color: disciplineReport.cleanPnL >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
                     {signedMoney(disciplineReport.cleanPnL)}
                   </div>
-                  <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                  <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {disciplineReport.cleanCount} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
                   </div>
                 </div>
@@ -791,7 +792,7 @@ export default function TradeHistory({
                     style={{ color: disciplineReport.flaggedPnL >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
                     {signedMoney(disciplineReport.flaggedPnL)}
                   </div>
-                  <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
+                  <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {disciplineReport.flaggedCount} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
                   </div>
                 </div>
@@ -815,7 +816,7 @@ export default function TradeHistory({
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="text-[15px] font-medium">{t(titleKey as any)}</div>
-                        <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.38)' }}>{t(descKey as any)}</p>
+                        <p className="text-[13px] mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{t(descKey as any)}</p>
                       </div>
                       <span className="font-mono text-[15px] flex-shrink-0"
                         style={{ color: f.pnl >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
@@ -842,7 +843,7 @@ export default function TradeHistory({
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div style={{ ...statCard, padding: '20px' }} className="lg:col-span-2">
-            <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('cumulativePnl')}</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('cumulativePnl')}</h4>
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
@@ -853,8 +854,8 @@ export default function TradeHistory({
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `${cur()}${v}`} />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} dy={10} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} dx={-10} tickFormatter={v => `${cur()}${v}`} />
                   <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [money(value), t('cumulativePnl')]} labelFormatter={label => `Trade #${label}`} />
                   <Area type="monotone" dataKey="cumulative" stroke={netProfit >= 0 ? '#10b981' : '#f43f5e'} strokeWidth={2} fillOpacity={1} fill="url(#colorCumulative)" />
                 </AreaChart>
@@ -862,12 +863,12 @@ export default function TradeHistory({
             </div>
           </div>
           <div style={{ ...statCard, padding: '20px' }}>
-            <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('tradePnl')}</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('tradePnl')}</h4>
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} dy={10} />
                   <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [money(value), 'PnL']} labelFormatter={label => `Trade #${label}`} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                   <Bar dataKey="pnl" radius={[4, 4, 4, 4]}>
                     {chartData.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.isWin ? '#10b981' : '#f43f5e'} />))}
@@ -879,7 +880,7 @@ export default function TradeHistory({
         </div>
         <div style={{ ...statCard, padding: '20px' }}>
           <div className="flex items-center justify-between mb-6">
-            <h4 className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('drawdownChart')}</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('drawdownChart')}</h4>
             <div className="text-sm font-mono" style={{ color: '#f87171' }}>{t('maxDrawdown')}: {money(maxDrawdown)}</div>
           </div>
           <div className="h-48 w-full">
@@ -892,8 +893,8 @@ export default function TradeHistory({
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `${cur()}${v}`} />
+                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} dy={10} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} dx={-10} tickFormatter={v => `${cur()}${v}`} />
                 <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }} formatter={(value: number) => [money(value), 'Drawdown']} labelFormatter={label => `Trade #${label}`} />
                 <Area type="monotone" dataKey="drawdown" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#colorDrawdown)" />
               </AreaChart>
@@ -903,13 +904,13 @@ export default function TradeHistory({
         {/* ── Aylık performans ── */}
         {monthlyStats.length > 1 && (
           <div style={{ ...statCard, padding: '20px' }}>
-            <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('monthlyPerformance')}</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('monthlyPerformance')}</h4>
             <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyStats} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dy={10} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 12 }} dx={-10} tickFormatter={v => `${cur()}${v}`} />
+                  <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} dy={10} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} dx={-10} tickFormatter={v => `${cur()}${v}`} />
                   <RechartsTooltip contentStyle={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', color: '#fff' }}
                     formatter={(value: number) => [signedMoney(value), t('netProfit')]} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                   <Bar dataKey="pnl" radius={[6, 6, 0, 0]}>
@@ -923,7 +924,7 @@ export default function TradeHistory({
 
         {/* ── Yöne göre: alış mı satış mı ── */}
         <div style={{ ...statCard, padding: '20px' }}>
-          <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('directionStats')}</h4>
+          <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('directionStats')}</h4>
           <div className="grid grid-cols-2 gap-8">
             {directionStats.map(({ dir, total, rate, pnl }) => (
               <div key={dir}>
@@ -931,7 +932,7 @@ export default function TradeHistory({
                   <span className="text-sm font-medium" style={{ color: dir === 'Buy' ? '#34d399' : '#f87171' }}>
                     {dir === 'Buy' ? t('buy') : t('sell')}
                   </span>
-                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {total} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
                   </span>
                 </div>
@@ -948,13 +949,13 @@ export default function TradeHistory({
         </div>
 
         <div style={{ ...statCard, padding: '20px' }}>
-          <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('heatMap')}</h4>
+          <h4 className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('heatMap')}</h4>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr>
-                  <th className="text-left pb-3 pe-4 font-medium" style={{ color: 'rgba(255,255,255,0.3)' }}></th>
-                  {['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'].map(h => (<th key={h} className="pb-3 px-1 font-medium text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>{h}</th>))}
+                  <th className="text-left pb-3 pe-4 font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}></th>
+                  {['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'].map(h => (<th key={h} className="pb-3 px-1 font-medium text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>{h}</th>))}
                 </tr>
               </thead>
               <tbody>
@@ -975,11 +976,11 @@ export default function TradeHistory({
               </tbody>
             </table>
             <div className="flex items-center gap-4 mt-4 justify-end">
-              <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 <div className="w-3 h-3 rounded" style={{ background: 'rgba(52,211,153,0.4)' }} />
                 {t('profitable')}
               </div>
-              <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 <div className="w-3 h-3 rounded" style={{ background: 'rgba(248,113,113,0.4)' }} />
                 {t('losing')}
               </div>
@@ -989,15 +990,15 @@ export default function TradeHistory({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {setupStats.length > 0 && (
             <div style={{ ...statCard, padding: '20px' }}>
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('setupPerformance')}</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('setupPerformance')}</h4>
               <div className="space-y-3">
                 {setupStats.map(({ setup, total, winRate, pnl }) => (
                   <div key={setup} className="flex items-center gap-3">
                     <span className="text-sm font-medium truncate" style={{ color: '#818cf8', minWidth: '80px', maxWidth: '120px' }}>{setup}</span>
                     <div className="flex-1"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${winRate}%`, background: '#818cf8' }} /></div></div>
-                    <span className="text-xs font-mono w-8 text-end" style={{ color: 'rgba(255,255,255,0.4)' }}>%{winRate}</span>
+                    <span className="text-xs font-mono w-8 text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>%{winRate}</span>
                     <span className="text-xs font-mono w-16 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
-                    <span className="text-xs w-8 text-end" style={{ color: 'rgba(255,255,255,0.3)' }}>{total}</span>
+                    <span className="text-xs w-8 text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>{total}</span>
                   </div>
                 ))}
               </div>
@@ -1005,15 +1006,15 @@ export default function TradeHistory({
           )}
           {symbolStats.length > 0 && (
             <div style={{ ...statCard, padding: '20px' }}>
-              <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('symbolPerformance')}</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('symbolPerformance')}</h4>
               <div className="space-y-3">
                 {symbolStats.map(({ symbol, total, winRate, pnl }) => (
                   <div key={symbol} className="flex items-center gap-3">
                     <span className="text-sm font-medium font-mono" style={{ color: '#fff', minWidth: '80px' }}>{symbol}</span>
                     <div className="flex-1"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${winRate}%`, background: '#2dd4bf' }} /></div></div>
-                    <span className="text-xs font-mono w-8 text-end" style={{ color: 'rgba(255,255,255,0.4)' }}>%{winRate}</span>
+                    <span className="text-xs font-mono w-8 text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>%{winRate}</span>
                     <span className="text-xs font-mono w-16 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
-                    <span className="text-xs w-8 text-end" style={{ color: 'rgba(255,255,255,0.3)' }}>{total}</span>
+                    <span className="text-xs w-8 text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>{total}</span>
                   </div>
                 ))}
               </div>
@@ -1022,11 +1023,11 @@ export default function TradeHistory({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div style={{ ...statCard, padding: '20px' }}>
-            <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('sessionStats')}</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('sessionStats')}</h4>
             <div className="space-y-4">
               {sessionStats.map(({ session, rate, total, pnl }) => (
                 <div key={session} className="flex items-center justify-between">
-                  <span className="text-sm font-medium w-24 text-white">{t(session as any)} <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>({total})</span></span>
+                  <span className="text-sm font-medium w-24 text-white">{t(session as any)} <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>({total})</span></span>
                   <div className="flex-1 mx-4"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${rate}%`, background: '#818cf8' }} /></div></div>
                   <span className="text-xs font-mono w-12 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
                   <span className="text-sm font-semibold font-mono w-10 text-end text-white ms-2">%{rate}</span>
@@ -1035,16 +1036,16 @@ export default function TradeHistory({
             </div>
           </div>
           <div style={{ ...statCard, padding: '20px' }}>
-            <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('dayStats')}</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('dayStats')}</h4>
             <div className="space-y-4">
               {dayStats.length > 0 ? dayStats.map(({ day, rate, total, pnl }) => (
                 <div key={day} className="flex items-center justify-between">
-                  <span className="text-sm font-medium w-24 text-white">{t(day as any)} <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>({total})</span></span>
+                  <span className="text-sm font-medium w-24 text-white">{t(day as any)} <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>({total})</span></span>
                   <div className="flex-1 mx-4"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${rate}%`, background: '#2dd4bf' }} /></div></div>
                   <span className="text-xs font-mono w-12 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
                   <span className="text-sm font-semibold font-mono w-10 text-end text-white ms-2">%{rate}</span>
                 </div>
-              )) : <p className="text-sm italic" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('emptyDesc')}</p>}
+              )) : <p className="text-sm italic" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('emptyDesc')}</p>}
             </div>
           </div>
         </div>
@@ -1052,7 +1053,7 @@ export default function TradeHistory({
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" style={{ color: '#a78bfa' }} />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.3)' }}>AI Analiz</span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.5)' }}>AI Analiz</span>
             </div>
             <button onClick={runAiAnalysis} disabled={aiLoading}
               className="cta px-4 py-2 rounded-full text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1061,11 +1062,11 @@ export default function TradeHistory({
               {aiLoading ? t('aiAnalyzeLoading') : t('aiAnalyzeBtn')}
             </button>
           </div>
-          {!showAi && !aiLoading && <p className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('aiAnalyzeDesc')}</p>}
+          {!showAi && !aiLoading && <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('aiAnalyzeDesc')}</p>}
           {aiLoading && (
             <div className="flex items-center gap-3 py-4">
               <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
-              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('aiAnalyzing')}</span>
+              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('aiAnalyzing')}</span>
             </div>
           )}
           {aiError && <p className="text-sm mt-2" style={{ color: '#f87171' }}>{aiError}</p>}
@@ -1264,7 +1265,7 @@ export default function TradeHistory({
                 <div>
                   <label style={lbl}>
                     {kind === 'pre' ? t('preTrade') : t('postTrade')} {t('photos')}
-                    {!isOwner && <span style={{ color: 'rgba(255,255,255,0.25)', marginLeft: 6 }}>({photos.length}/3)</span>}
+                    {!isOwner && <span style={{ color: 'rgba(255,255,255,0.5)', marginLeft: 6 }}>({photos.length}/3)</span>}
                   </label>
                   <div className="space-y-3">
                     {canUpload && (
@@ -1280,7 +1281,7 @@ export default function TradeHistory({
                       >
                         {uploadingEditPhoto
                           ? <><Loader className="w-4 h-4 mb-1 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{language === 'tr' ? 'Yükleniyor...' : 'Uploading...'}</span></>
-                          : <><Upload className="w-4 h-4 mb-1" style={{ color: 'rgba(255,255,255,0.25)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('photoUpload')}</span></>
+                          : <><Upload className="w-4 h-4 mb-1" style={{ color: 'rgba(255,255,255,0.5)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('photoUpload')}</span></>
                         }
                         <input type="file" ref={fileRef} onChange={e => handleEditPhotoUpload(e, kind)} accept="image/*" multiple className="hidden" disabled={uploadingEditPhoto} />
                       </div>
@@ -1291,7 +1292,7 @@ export default function TradeHistory({
                         {photos.map((photo, i) => (
                           <div key={i} className="relative aspect-square rounded-xl overflow-hidden group" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
                             <img src={photo} alt={`photo-${i}`} className="w-full h-full object-cover" />
-                            <button type="button" onClick={() => removeEditPhoto(i, kind)}
+                            <button type="button" onClick={() => removeEditPhoto(i, kind)} aria-label={aria('removePhoto', language)}
                               className="absolute top-1 end-1 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
                               style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}>
                               <X className="w-3.5 h-3.5" />
@@ -1340,6 +1341,7 @@ export default function TradeHistory({
           >
             <button
               onClick={() => setLightboxPhoto(null)}
+              aria-label={aria('close', language)}
               className="absolute top-4 end-4 p-2 rounded-full"
               style={{ background: 'rgba(255,255,255,0.15)', color: '#fff' }}
             >
@@ -1421,12 +1423,12 @@ export default function TradeHistory({
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-sm mt-1 flex-wrap" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  <div className="flex items-center gap-2 text-sm mt-1 flex-wrap" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     <Calendar className="w-4 h-4" />
                     <span>{getFullDateTime(selectedTrade.date)}</span>
                     {selectedTrade.exitDate && (
                       <>
-                        <span style={{ color: 'rgba(255,255,255,0.2)' }}>→</span>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>→</span>
                         <span>{getFullDateTime(selectedTrade.exitDate)}</span>
                       </>
                     )}
@@ -1444,18 +1446,18 @@ export default function TradeHistory({
               </div>
               <div className="flex items-center gap-6 flex-wrap">
                 <div className="text-end">
-                  <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('riskRewardLabel')}</div>
-                  <div className="font-semibold text-white">{money(selectedTrade.risk || 0)} <span className="mx-1" style={{ color: 'rgba(255,255,255,0.2)' }}>/</span> {money(isLossTrade(selectedTrade) ? lossAmount(selectedTrade) : winAmount(selectedTrade))}</div>
+                  <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('riskRewardLabel')}</div>
+                  <div className="font-semibold text-white">{money(selectedTrade.risk || 0)} <span className="mx-1" style={{ color: 'rgba(255,255,255,0.5)' }}>/</span> {money(isLossTrade(selectedTrade) ? lossAmount(selectedTrade) : winAmount(selectedTrade))}</div>
                 </div>
                 <div className="text-end">
-                  <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('plannedRR')}</div>
+                  <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('plannedRR')}</div>
                   <div className="font-mono font-semibold text-white">{selectedTrade.rr ? `${selectedTrade.rr}R` : '-'}</div>
                 </div>
                 {([['entryPrice', selectedTrade.entryPrice], ['stopLossPrice', selectedTrade.stopLoss], ['exitPrice', selectedTrade.exitPrice]] as const)
                   .filter(([, v]) => v != null)
                   .map(([key, v]) => (
                     <div key={key} className="text-end">
-                      <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t(key)}</div>
+                      <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{t(key)}</div>
                       <div className="font-mono font-semibold" style={{ color: key === 'stopLossPrice' ? '#f87171' : '#fff' }}>{v}</div>
                     </div>
                   ))}
@@ -1465,7 +1467,7 @@ export default function TradeHistory({
                   if (hits.length === 0) return null;
                   return (
                     <div className="text-end">
-                      <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                      <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
                         {t('newsAtEntry')}
                       </div>
                       <div className="text-[13px]" style={{ color: '#fbbf24' }}>
@@ -1479,7 +1481,7 @@ export default function TradeHistory({
                 {/* Planlanan hedefin yanında gerçekten olan. */}
                 {realizedR(selectedTrade) != null && (
                   <div className="text-end">
-                    <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('realizedR')}</div>
+                    <div className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('realizedR')}</div>
                     <div className="font-mono font-semibold" style={{ color: (realizedR(selectedTrade) as number) >= 0 ? '#34d399' : '#f87171' }}>
                       {formatR(realizedR(selectedTrade))}
                     </div>
@@ -1503,7 +1505,7 @@ export default function TradeHistory({
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {(selectedTrade.mtfAnalysis?.length ?? 0) > 0 && (
                     <div className="space-y-4">
-                      <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                      <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
                         {language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}
                       </h4>
                       <MTFAnalysisView entries={selectedTrade.mtfAnalysis!} />
@@ -1511,9 +1513,9 @@ export default function TradeHistory({
                   )}
                   {(selectedTrade.checklist?.length ?? 0) > 0 && (
                     <div className="space-y-4">
-                      <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                      <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
                         Checklist
-                        <span className="ms-2 font-mono" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                        <span className="ms-2 font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}>
                           {selectedTrade.checklist!.filter(i => i.checked).length}/{selectedTrade.checklist!.length}
                         </span>
                       </h4>
@@ -1525,10 +1527,10 @@ export default function TradeHistory({
 
               {/* İşlem Öncesi */}
               <div className="space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('preTrade')}</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('preTrade')}</h4>
                 <p className="text-sm whitespace-pre-wrap leading-relaxed p-4 rounded-xl"
                   style={{ color: 'rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  {selectedTrade.preTradeNotes || <span style={{ color: 'rgba(255,255,255,0.25)' }}>{t('noNotes')}</span>}
+                  {selectedTrade.preTradeNotes || <span style={{ color: 'rgba(255,255,255,0.5)' }}>{t('noNotes')}</span>}
                 </p>
                 {selectedTrade.preTradePhotos?.length > 0 && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1536,6 +1538,7 @@ export default function TradeHistory({
                       <button
                         key={i}
                         onClick={() => setLightboxPhoto(photo)}
+                        aria-label={aria('enlargePhoto', language)}
                         className="rounded-xl overflow-hidden hover:opacity-90 transition-opacity w-full"
                         style={{ border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}
                       >
@@ -1548,10 +1551,10 @@ export default function TradeHistory({
 
               {/* İşlem Sonrası */}
               <div className="space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.3)' }}>{t('postTrade')}</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('postTrade')}</h4>
                 <p className="text-sm whitespace-pre-wrap leading-relaxed p-4 rounded-xl"
                   style={{ color: 'rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  {selectedTrade.postTradeNotes || <span style={{ color: 'rgba(255,255,255,0.25)' }}>{t('noNotes')}</span>}
+                  {selectedTrade.postTradeNotes || <span style={{ color: 'rgba(255,255,255,0.5)' }}>{t('noNotes')}</span>}
                 </p>
                 {selectedTrade.postTradePhotos?.length > 0 && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1559,6 +1562,7 @@ export default function TradeHistory({
                       <button
                         key={i}
                         onClick={() => setLightboxPhoto(photo)}
+                        aria-label={aria('enlargePhoto', language)}
                         className="rounded-xl overflow-hidden hover:opacity-90 transition-opacity w-full"
                         style={{ border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}
                       >
@@ -1582,7 +1586,7 @@ export default function TradeHistory({
       <div className="text-center py-20 rounded-2xl" style={card}>
         <Target className="w-12 h-12 mx-auto mb-4" style={{ color: 'rgba(255,255,255,0.15)' }} />
         <h3 className="text-lg font-medium text-white">{t('emptyTitle')}</h3>
-        <p className="mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{t('emptyDesc')}</p>
+        <p className="mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('emptyDesc')}</p>
       </div>
     );
   }
@@ -1685,11 +1689,11 @@ export default function TradeHistory({
                         className="ui-icon-btn flex-shrink-0 -m-1.5 p-1.5 rounded-md">
                         {isSelected
                           ? <CheckSquare className="w-4 h-4" style={{ color: '#8b5cf6' }} />
-                          : <Square className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.22)' }} />}
+                          : <Square className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.5)' }} />}
                       </div>
                       {/* Saat: gün başlığı hangi gün olduğunu söylüyor, bu da
                           günün neresinde olduğunu. Satırdaki boşluğu da doldurur. */}
-                      <span className="hidden sm:inline w-12 font-mono text-[13px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                      <span className="hidden sm:inline w-12 font-mono text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
                         {new Date(trade.date).toLocaleTimeString(language === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       <span className="hover-title w-20 sm:w-24 font-medium flex items-center gap-1.5">
@@ -1718,7 +1722,7 @@ export default function TradeHistory({
                       {(() => {
                         const r = realizedR(trade);
                         return (
-                          <span className="w-16 sm:w-20 font-mono text-sm text-end" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                          <span className="w-16 sm:w-20 font-mono text-sm text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>
                             {r == null ? '' : formatR(r)}
                           </span>
                         );
@@ -1726,7 +1730,7 @@ export default function TradeHistory({
                       <span className="ms-auto text-end font-mono font-medium" style={{ color: isW ? '#34d399' : isL ? '#f87171' : 'rgba(255,255,255,0.4)' }}>
                         {isW ? signedMoney(winAmount(trade))
                           : isL ? signedMoney(-lossAmount(trade))
-                          : trade.result === 'Başa Baş' ? <span style={{ color: 'rgba(255,255,255,0.45)' }}>$0.00</span>
+                          : trade.result === 'Başa Baş' ? <span style={{ color: 'rgba(255,255,255,0.5)' }}>$0.00</span>
                           : <span className="text-[11px] px-2 py-0.5 rounded-full whitespace-nowrap"
                               style={{ background: 'rgba(251,191,36,0.12)', color: '#fbbf24' }}>
                               {t('incompleteTrade')}

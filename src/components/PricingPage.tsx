@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { aria } from '../lib/aria';
 import { useLanguage } from '../context/LanguageContext';
 import { copy } from '../lib/landingCopy';
 import PricingCards from './PricingCards';
@@ -51,7 +52,7 @@ export default function PricingPage({
             ? t('Pro süren bitti', 'Your Pro time has ended', 'زمان Pro تو تمام شد')
             : t('Sade ve Şeffaf Fiyatlandırma', 'Simple & Transparent Pricing', 'قیمت‌گذاری ساده و شفاف')}
         </h1>
-        <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+        <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {expiredMode
             ? t('Ücretsiz planla devam edebilir ya da Pro\'ya geçebilirsin. Kayıtların hiçbiri silinmedi.',
                 'You can carry on with the Free plan or upgrade to Pro. None of your records were deleted.',
@@ -67,6 +68,7 @@ export default function PricingPage({
         </span>
         <button
           onClick={() => setBilling(billing === 'monthly' ? 'yearly' : 'monthly')}
+          role="switch" aria-checked={billing === 'yearly'} aria-label={aria('yearlyBilling', language)}
           className="relative w-14 h-7 rounded-full transition-all"
           style={{ background: billing === 'yearly' ? '#8b5cf6' : 'rgba(255,255,255,0.1)' }}
         >
@@ -101,7 +103,7 @@ export default function PricingPage({
           : { amount: prices.fmt(prices.yearlyMonthly), note: t('/ ay (yıllık {p})', '/ mo (billed {p}/yr)', '/ ماه (سالانه {p})').replace('{p}', prices.fmt(prices.yearly)) }}
       />
 
-      <p className="text-center text-[13px] mt-8" style={{ color: 'rgba(255,255,255,0.35)' }}>
+      <p className="text-center text-[13px] mt-8" style={{ color: 'rgba(255,255,255,0.5)' }}>
         {t('Deneme için kart istemiyoruz · Deneme bitince kendiliğinden Ücretsiz plana dönersin',
           'No card for the trial · When it ends you drop back to Free on your own',
           'برای آزمایش کارت نمی‌خواهیم · بعد از پایان، خودکار به پلن رایگان برمی‌گردی')}

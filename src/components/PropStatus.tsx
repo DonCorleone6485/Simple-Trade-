@@ -30,7 +30,7 @@ function Cell({ label, value, color, ratio, note }: {
 }) {
   return (
     <div className="flex-1 min-w-[150px]">
-      <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+      <div className="text-[11px] uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
         {label}
       </div>
       <div className="font-mono text-2xl sm:text-3xl mb-3"
@@ -44,7 +44,7 @@ function Cell({ label, value, color, ratio, note }: {
           style={{ width: `${Math.round(ratio * 100)}%`, background: color, transition: 'width 0.3s ease' }} />
       </div>
       {note && (
-        <div className="text-[11.5px] mt-2 font-mono" style={{ color: 'rgba(255,255,255,0.28)' }}>{note}</div>
+        <div className="text-[11.5px] mt-2 font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}>{note}</div>
       )}
     </div>
   );
@@ -102,7 +102,7 @@ export default function PropStatus({ account, trades }: { account: Account; trad
       {/* Bu satır süs değil. Şirketin ekranı açık pozisyonun anlık zararını da
           sayar, bizimki sayamaz; bunu yazmazsak kullanıcı kendini olduğundan
           güvende sanıp hesabı patlatabilir. */}
-      <p className="text-[11.5px] mt-6 leading-relaxed" style={{ color: 'rgba(255,255,255,0.28)' }}>
+      <p className="text-[11.5px] mt-6 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
         {t('propClosedOnly')}
       </p>
     </div>

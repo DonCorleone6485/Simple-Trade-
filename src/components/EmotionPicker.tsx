@@ -119,7 +119,7 @@ export default function EmotionPicker({ value, onChange }: { value: string[]; on
         <span className="truncate" style={{ color: summary ? '#fff' : 'rgba(255,255,255,0.4)' }}>
           {summary || tr('— Seçin —', '— Select —')}
         </span>
-        <ChevronDown className={`w-4 h-4 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.4)' }} />
+        <ChevronDown className={`w-4 h-4 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.5)' }} />
       </button>
 
       {open && (
@@ -129,7 +129,7 @@ export default function EmotionPicker({ value, onChange }: { value: string[]; on
             {DEFAULT_EMOTIONS.map(e => row(e.key, false))}
             {custom.length > 0 && (
               <div className="px-4 pt-2 pb-1 mt-1 text-xs font-semibold uppercase tracking-wider"
-                style={{ color: 'rgba(255,255,255,0.25)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                 {tr('Kendi Eklediklerin', 'Your Own')}
               </div>
             )}

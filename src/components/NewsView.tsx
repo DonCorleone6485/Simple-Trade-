@@ -14,7 +14,7 @@ import { loadAlerts, AlertSettings as Settings } from '../lib/alerts';
 const IMPACT: Record<string, { color: string; bg: string; tr: string; en: string }> = {
   High:    { color: '#f87171', bg: 'rgba(248,113,113,0.14)', tr: 'Yüksek', en: 'High' },
   Medium:  { color: '#fbbf24', bg: 'rgba(251,191,36,0.13)',  tr: 'Orta',   en: 'Medium' },
-  Low:     { color: 'rgba(255,255,255,0.45)', bg: 'rgba(255,255,255,0.06)', tr: 'Düşük', en: 'Low' },
+  Low:     { color: 'rgba(255,255,255,0.5)', bg: 'rgba(255,255,255,0.06)', tr: 'Düşük', en: 'Low' },
   Holiday: { color: '#818cf8', bg: 'rgba(129,140,248,0.14)', tr: 'Tatil',  en: 'Holiday' },
 };
 
@@ -83,12 +83,12 @@ export default function NewsView() {
       {!events && !error && (
         <div className="flex items-center gap-3 py-6">
           <Loader className="w-4 h-4 animate-spin" style={{ color: '#8b5cf6' }} />
-          <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{tr('Yükleniyor…', 'Loading…')}</span>
+          <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{tr('Yükleniyor…', 'Loading…')}</span>
         </div>
       )}
 
       {events && upcoming.length === 0 && (
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {tr('Bu haftanın kalanında olay yok.', 'Nothing left on the calendar this week.')}
         </p>
       )}
@@ -114,7 +114,7 @@ export default function NewsView() {
                     borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.04)',
                     opacity: past ? 0.4 : 1,
                   }}>
-                  <span className="w-12 font-mono text-[13.5px] flex-shrink-0" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  <span className="w-12 font-mono text-[13.5px] flex-shrink-0" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     {new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', hour12: false }).format(e.when)}
                   </span>
 
@@ -132,7 +132,7 @@ export default function NewsView() {
 
                   {(e.forecast || e.previous) && (
                     <span className="hidden sm:flex items-center gap-5 font-mono text-[12.5px] flex-shrink-0"
-                      style={{ color: 'rgba(255,255,255,0.35)' }}>
+                      style={{ color: 'rgba(255,255,255,0.5)' }}>
                       {e.forecast && <span>{tr('bek', 'fc')} {e.forecast}</span>}
                       {e.previous && <span>{tr('önc', 'prev')} {e.previous}</span>}
                     </span>
@@ -144,7 +144,7 @@ export default function NewsView() {
         </div>
       ))}
 
-      <p className="text-[11.5px] pt-2" style={{ color: 'rgba(255,255,255,0.25)' }}>
+      <p className="text-[11.5px] pt-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
         {tr('Saatler kendi saat dilimine göre gösteriliyor. Kaynak: ForexFactory.',
             'Times are shown in your own timezone. Source: ForexFactory.')}
       </p>

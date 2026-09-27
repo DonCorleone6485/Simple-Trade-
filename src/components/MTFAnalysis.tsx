@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { aria } from '../lib/aria';
 import { Plus, X, Pencil, Check, Layers, TrendingUp, TrendingDown, Minus, RotateCcw } from 'lucide-react';
 import { MTFEntry, MTFBias } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -70,7 +71,7 @@ export function MTFAnalysisView({ entries }: { entries: MTFEntry[] }) {
                 style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa' }}>
                 {entry.timeframe}
               </span>
-              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {tfLabel(entry.timeframe, language)}
               </span>
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-semibold"
@@ -210,7 +211,7 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
     <div className="space-y-3">
       {/* Otomatik yüklenen analiz bilgisi */}
       {loadingPrefill && (
-        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {tr('Son analiz aranıyor...', 'Looking up last analysis...')}
         </p>
       )}
@@ -225,7 +226,7 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
           </span>
           <button type="button" onClick={clearAll}
             className="link-gold flex items-center gap-1 text-xs font-medium ms-auto"
-            style={{ color: 'rgba(255,255,255,0.45)' }}>
+            style={{ color: 'rgba(255,255,255,0.5)' }}>
             <RotateCcw className="w-3 h-3" />
             {tr('Temizle', 'Clear')}
           </button>
@@ -245,7 +246,7 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
                 style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa' }}>
                 {entry.timeframe}
               </span>
-              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {tfLabel(entry.timeframe, language)}
               </span>
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-semibold"
@@ -255,11 +256,11 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
               </span>
               <div className="flex items-center gap-1 ms-auto">
                 <button type="button" onClick={() => startEdit(entry)} title={tr('Düzenle', 'Edit')}
-                  className="ui-pill p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  className="ui-pill p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
                 <button type="button" onClick={() => removeEntry(entry.timeframe)} title={tr('Sil', 'Delete')}
-                  className="ui-pill ui-pill-danger p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  className="ui-pill ui-pill-danger p-1.5 rounded-lg transition-all" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -295,7 +296,7 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                     style={active
                       ? { background: meta.bg, color: meta.color, border: `1px solid ${meta.color}55` }
-                      : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}>
                     {BIAS_ICON[bias]}
                     {language === 'tr' ? meta.tr : meta.en}
                   </button>
@@ -324,7 +325,7 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
             </button>
             <button type="button" onClick={() => { setDraft(null); setEditingTf(null); }}
               className="link-gold px-4 py-2 rounded-xl text-sm transition-all"
-              style={{ color: 'rgba(255,255,255,0.45)' }}>
+              style={{ color: 'rgba(255,255,255,0.5)' }}>
               {tr('Vazgeç', 'Cancel')}
             </button>
           </div>
@@ -337,11 +338,11 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
           <div className="rounded-xl p-3.5"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {tr('Timeframe seç', 'Pick a timeframe')}
               </span>
-              <button type="button" onClick={() => setPickerOpen(false)}
-                className="p-1 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <button type="button" onClick={() => setPickerOpen(false)} aria-label={aria('close', language)}
+                className="p-1 rounded-lg" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>

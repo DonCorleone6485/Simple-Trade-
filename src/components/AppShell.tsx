@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { aria } from '../lib/aria';
 import {
   TrendingUp, BookOpen, List, CalendarDays, BarChart2, Target,
   Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Clock, Newspaper, ShieldCheck, ClipboardList, Gauge, LifeBuoy,
@@ -77,7 +78,7 @@ export default function AppShell({
   };
 
   const SectionLabel = ({ children }: { children: React.ReactNode }) => (
-    <div className="px-3 pt-6 pb-2 text-[10px] uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.22)' }}>
+    <div className="px-3 pt-6 pb-2 text-[10px] uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.5)' }}>
       {children}
     </div>
   );
@@ -192,14 +193,14 @@ export default function AppShell({
           style={{ background: 'rgba(13,14,26,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           {/* Başlık ve içerik aynı kaba oturur — ikisinin sol kenarı çakışsın. */}
           <div className={`${CONTENT} h-full flex items-center gap-4`}>
-            <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 -ms-2 rounded-lg"
+            <button onClick={() => setMobileOpen(true)} aria-label={aria('openMenu', language)} className="lg:hidden p-2 -ms-2 rounded-lg"
               style={{ color: 'rgba(255,255,255,0.6)' }}>
               <Menu className="w-5 h-5" />
             </button>
 
             <div className="min-w-0 flex-shrink">
               <h1 className="font-display text-[19px] leading-tight truncate" style={{ letterSpacing: '-0.01em' }}>{title}</h1>
-              {subtitle && <p className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>{subtitle}</p>}
+              {subtitle && <p className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.5)' }}>{subtitle}</p>}
             </div>
 
             {/* Başlıkla düğmeler arasındaki boşluk boş duruyordu. Sürekli
@@ -221,7 +222,7 @@ export default function AppShell({
       </div>
 
       {mobileOpen && (
-        <button onClick={() => setMobileOpen(false)}
+        <button onClick={() => setMobileOpen(false)} aria-label={aria('close', language)}
           className="lg:hidden fixed top-4 end-4 z-[60] p-2 rounded-lg"
           style={{ background: 'rgba(255,255,255,0.08)', color: '#fff' }}>
           <X className="w-5 h-5" />
