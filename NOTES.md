@@ -113,7 +113,9 @@ Okunabilirlik (kontrast, aria etiketleri). Uygulamanın 9 dile çevirisi
 (src/lib/appCopy*.ts) ve dile göre tarih/yüzde biçimi.
 E-posta: Google Workspace (admin@simpletradejournal.io; takma adlar info@,
 support@, billing@, privacy@ aynı kutuya düşer). Namecheap'te MX (Gmail), SPF,
-DMARC ve Google doğrulama kaydı var.
+DMARC ve Google doğrulama kaydı var. Paket: Business Starter, Esnek (aylık) plan;
+ücretli dönem 2026-10-11'de başlıyor — o tarihe kadar ödeme yöntemi ekli olmalı.
+Abonelik hatırlatması 2026-10-25'e kuruldu.
 
 ### MetaTrader kurulum videosu (bekliyor: kullanıcının ekran kaydı)
 Yapay zekâ videosu değil — gerçek ekran kaydı + Remotion kurgusu (yakınlaşma,
