@@ -90,10 +90,15 @@ hesap ya da karar bekliyor.
    yönlendirme kendiliğinden. Kalan: rakip karşılaştırmaları — rakiplerin güncel fiyat/özellikleri
    doğrulanmadan yazılmamalı; daha fazla yazı.
 5. **Yardım merkezi** — 13 soru + rehber bağlantıları. Kalan: yol haritası sayfası.
-6. **PWA** — manifest YAPILDI (ana ekrana ekle → /journal). Service worker bilerek
-   yok. Kalan: sekme kapalıyken bildirim (web push, service worker ister).
+6. **PWA + bildirim** — manifest YAPILDI; sekme kapalıyken bildirim YAPILDI (2026-09-28):
+   public/sw.js (yalnız push, önbellek yok), src/lib/push.ts (abonelik),
+   supabase/functions/push-alerts (dakikada bir, pg_cron + pg_net, sır vault'ta),
+   tablo push_subscriptions. VAPID/CRON sırları Supabase secrets'ta. sessions.ts
+   fonksiyona KOPYALANDI — seans saatleri değişirse ikisini de güncelle.
 7. **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate.
-8. **Sentry** (hata izleme), otomatik testler, durum sayfası.
+8. **Hata izleme** — YAPILDI (2026-09-28): Sentry yerine kendi hafif sistemimiz:
+   src/lib/errorLog.ts → client_errors tablosu (yalnız ekleme), ErrorBoundary,
+   günlük özet support@'a (api/emails.ts). Kalan: otomatik testler, durum sayfası.
 9. **Paket boyutu** — YAPILDI (2026-09-28): 7 dilin çeviri tablosu ayrı dosyada,
    yalnız o dillerde ve çizimden önce yükleniyor; ana paket 124 → 86 KB (gzip).
 
