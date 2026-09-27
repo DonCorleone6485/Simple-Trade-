@@ -7,7 +7,7 @@ import {
   Upload, Check, Shield, Home, Printer, Plug
 } from 'lucide-react';
 import {
-  SignIn, SignUp, useUser, useClerk, useAuth, SignedIn, SignedOut
+  SignIn, SignUp, useUser, useClerk, useAuth
 } from '@clerk/clerk-react';
 import TradeForm from './components/TradeForm';
 import TradeHistory from './components/TradeHistory';
@@ -32,6 +32,7 @@ import { Trade, Account, JournalGoals, JournalKind, DrawdownType } from './types
 import PropStatus from './components/PropStatus';
 import { useLanguage } from './context/LanguageContext';
 import { PlanProvider, UpgradeReason, FREE_DAILY_TRADES } from './context/PlanContext';
+import { demoData } from './lib/demo';
 import { supabase } from './lib/supabase';
 import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, isOpenTrade } from './lib/tradeMath';
@@ -177,6 +178,17 @@ export default function App() {
   const [startingTrial, setStartingTrial] = useState(false);
   /** Tek kullanımlık e-postayla açılmış hesap: uygulama açılmıyor. */
   const [emailBlocked, setEmailBlocked] = useState(false);
+  /**
+   * Kayıt olmadan gezinti. "Ücretsiz Başla" önce örnek verilerle dolu
+   * uygulamayı açıyor; hesap ancak kayıt gerektiren bir şeye basınca
+   * isteniyor. Sekme yenilense de sürsün diye oturum boyunca hatırlanıyor.
+   */
+  const [guest, setGuest] = useState(() => {
+    try { return sessionStorage.getItem('stjGuest') === '1'; } catch { return false; }
+  });
+  /** "Kendi journal'ın için ücretsiz hesap aç" penceresi. */
+  const [showJoin, setShowJoin] = useState(false);
+  const isGuest = guest && isLoaded && !isSignedIn;
 
   const isRTL = language === 'fa' || language === 'ar';
 
@@ -479,16 +491,51 @@ export default function App() {
   useEffect(() => {
     if (!isLoaded) return;
     if (isSignedIn) {
+      // Gezintiden hesaba geçti: örnek veri gitsin, gerçek veri yüklenecek.
+      if (guest) {
+        setGuest(false);
+        try { sessionStorage.removeItem('stjGuest'); } catch { /* yok */ }
+        setAccounts([]);
+        setTrades([]);
+        setActiveJournal(null);
+        setView('dashboard');
+      }
       // Giriş/kayıt tamamlandı: kullanıcıyı doğrudan journal'a al.
       if (authStage === 'auth') {
         setAuthStage('landing');
         navigate('journal', true);
       }
-    } else if (page === 'journal') {
+    } else if (page === 'journal' && !guest) {
       // Girişi olmayan biri /journal'a geldi — ana sayfaya döndür.
       navigate('home', true);
     }
-  }, [isLoaded, isSignedIn, authStage, page]);
+  }, [isLoaded, isSignedIn, authStage, page, guest]);
+
+  // Gezintinin örnek verisi — seçili dilde, tarayıcıda üretiliyor.
+  useEffect(() => {
+    if (!isGuest) return;
+    const demo = demoData(language);
+    setAccounts(demo.journals);
+    setTrades(demo.trades);
+    setActiveJournal(j => (j ? demo.journals.find(x => x.id === j.id) || null : j));
+  }, [isGuest, language]);
+
+  /** "Ücretsiz Başla": kayıt istemeden örnek verilerle uygulamaya gir. */
+  const startGuest = () => {
+    try { sessionStorage.setItem('stjGuest', '1'); } catch { /* yok */ }
+    setGuest(true);
+    setActiveJournal(null);
+    setView('dashboard');
+    navigate('journal');
+    window.scrollTo(0, 0);
+  };
+
+  /** Gezinen biri kayıt gerektiren bir şeye bastı: pencereyi aç, işlemi durdur. */
+  const needAccount = (): boolean => {
+    if (!isGuest) return false;
+    setShowJoin(true);
+    return true;
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -537,6 +584,7 @@ export default function App() {
 
   // ── JOURNAL LİMİT KONTROLÜ ──
   const handleNewJournalClick = () => {
+    if (needAccount()) return;
     if (!isPro && accounts.length >= 1) {
       setUpgradeReason('journal');
       setShowUpgradeModal(true);
@@ -590,6 +638,7 @@ export default function App() {
 
   // ── TRADE LİMİT KONTROLÜ ──
   const handleNewTradeClick = async () => {
+    if (needAccount()) return;
     if (!isPro && todayOpenCount >= FREE_DAILY_TRADES) {
       askUpgrade('daily');
       return;
@@ -619,6 +668,7 @@ export default function App() {
   };
 
   const handleUpdateTrade = async (trade: Trade) => {
+    if (needAccount()) return;
     const { error } = await supabase.from('trades').update({
       date: trade.date,
       exit_date: trade.exitDate || null,
@@ -719,6 +769,7 @@ export default function App() {
   };
 
   const handleDeleteTrade = async (id: string) => {
+    if (needAccount()) return;
     const trade = trades.find(tr => tr.id === id);
     if (trade) {
       await deletePhotosFromStorage([
@@ -732,6 +783,7 @@ export default function App() {
 
   /** İşlemleri başka bir journal'a taşır; not, fotoğraf, checklist hepsi gider. */
   const handleMoveTrades = async (ids: string[], targetJournalId: string) => {
+    if (needAccount()) return;
     if (!user || ids.length === 0) return;
     const { error } = await supabase
       .from('trades')
@@ -758,6 +810,7 @@ export default function App() {
   };
 
   const handleDeleteMultiple = async (ids: string[]) => {
+    if (needAccount()) return;
     const toDelete = trades.filter(tr => ids.includes(tr.id));
     for (const trade of toDelete) {
       await deletePhotosFromStorage([
@@ -830,6 +883,7 @@ export default function App() {
   };
 
   const handleUpdateGoals = async (goals: JournalGoals) => {
+    if (needAccount()) return;
     if (!activeJournal) return;
     await supabase.from('journals').update({ goals }).eq('id', activeJournal.id);
     setAccounts(prev => prev.map(a => a.id === activeJournal.id ? { ...a, goals } : a));
@@ -905,12 +959,12 @@ export default function App() {
 
   const handleNav = (key: NavKey) => {
     if (key === 'home') { navigate('home'); return; }
-    if (key === 'referral') { setShowReferral(true); return; }
+    if (key === 'referral') { if (!needAccount()) setShowReferral(true); return; }
     if (key === 'pricing') { goTo({ view: 'pricing' }); return; }
     if (key === 'sessions') { goTo({ view: 'sessions', journal: null }); return; }
     if (key === 'news') { goTo({ view: 'news', journal: null }); return; }
     if (key === 'discipline') { goTo({ view: 'discipline', journal: null }); return; }
-    if (key === 'checklists') { goTo({ view: 'checklists', journal: null }); return; }
+    if (key === 'checklists') { if (!needAccount()) goTo({ view: 'checklists', journal: null }); return; }
     if (key === 'propReview') { goTo({ view: 'propReview', journal: null }); return; }
     if (key === 'journals') { goTo({ view: 'dashboard', journal: null }); return; }
     // Yeni işlem, plan limitlerinden geçmeli.
@@ -947,7 +1001,7 @@ export default function App() {
   const shellActions =
     view === 'dashboard' ? (
       <>
-      <button onClick={() => setShowCSVImport(true)} title={importLabel}
+      <button onClick={() => { if (!needAccount()) setShowCSVImport(true); }} title={importLabel}
         className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
         style={pillBtn}
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
@@ -956,7 +1010,7 @@ export default function App() {
         <span className="hidden xl:inline">{importLabel}</span>
       </button>
       {/* Telefonda da görünür (simge olarak): sol menüde artık MetaTrader yok. */}
-      <button onClick={() => setShowMTPicker(true)} title={t('mtConnectTab')}
+      <button onClick={() => { if (!needAccount()) setShowMTPicker(true); }} title={t('mtConnectTab')}
         className="flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
         style={pillBtn}
         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
@@ -985,7 +1039,7 @@ export default function App() {
           <Printer className="w-4 h-4" />
           <span className="hidden xl:inline">{t('printPdf')}</span>
         </button>
-        <button onClick={() => setShowCSVImport(true)} title={importLabel}
+        <button onClick={() => { if (!needAccount()) setShowCSVImport(true); }} title={importLabel}
           className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
           style={pillBtn}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
@@ -993,7 +1047,7 @@ export default function App() {
           <Upload className="w-4 h-4" />
           <span className="hidden xl:inline">{importLabel}</span>
         </button>
-        <button onClick={() => goTo({ view: 'expanded', tab: 'mtConnect' })} title={t('mtConnectTab')}
+        <button onClick={() => { if (!needAccount()) goTo({ view: 'expanded', tab: 'mtConnect' }); }} title={t('mtConnectTab')}
           className="flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-medium"
           style={journalTab === 'mtConnect' ? { ...pillBtn, background: 'rgba(139,92,246,0.15)', color: '#fff', border: '1px solid rgba(139,92,246,0.35)' } : pillBtn}
           onMouseEnter={e => { if (journalTab !== 'mtConnect') (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
@@ -1009,7 +1063,7 @@ export default function App() {
           <PlusCircle className="w-4 h-4" />
           <span className="hidden sm:inline">{t('newTradeTab')}</span>
           {/* Google Flow'daki kredi gibi: ücretsiz planda bugünkü hak görünsün. */}
-          {!isPro && (
+          {!isPro && !isGuest && (
             <span className="text-[11.5px] font-mono px-1.5 py-0.5 rounded-full"
               title={t('todayQuotaTitle')}
               style={{ background: 'rgba(255,255,255,0.18)' }}>
@@ -1221,7 +1275,7 @@ export default function App() {
       )}
 
       {/* AUTH */}
-      <SignedOut>
+      {isLoaded && !isSignedIn && !(isGuest && page === 'journal' && authStage !== 'auth') && (<>
         {(() => {
           const urlParams = new URLSearchParams(window.location.search);
           const refCode = urlParams.get('ref');
@@ -1231,7 +1285,7 @@ export default function App() {
 
         {authStage === 'landing' ? (
           <LandingPage
-            onGetStarted={() => goToAuth('signup')}
+            onGetStarted={startGuest}
             onSignIn={() => goToAuth('signin')}
           />
         ) : (
@@ -1262,7 +1316,7 @@ export default function App() {
             {authView === 'signin' ? <SignIn routing="hash" /> : <SignUp routing="hash" />}
           </div>
         )}
-      </SignedOut>
+      </>)}
 
       {printJob && activeJournal && (
         <PrintableReport
@@ -1273,8 +1327,31 @@ export default function App() {
         />
       )}
 
-      <SignedIn>
-        <PlanProvider value={{ isPro, askUpgrade }}>
+      {(isSignedIn || (isGuest && page === 'journal' && authStage !== 'auth')) && (
+        <PlanProvider value={isGuest
+          ? { isPro: true, askUpgrade: () => setShowJoin(true), isGuest: true, requireAccount: () => setShowJoin(true) }
+          : { isPro, askUpgrade, isGuest: false, requireAccount: () => {} }}>
+        {/* Gezinen biri kayıt gerektiren bir şeye bastı. */}
+        {showJoin && isGuest && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-4">
+            <div className="w-full max-w-md rounded-2xl p-7 space-y-4" style={{ background: '#1a1b2e', border: '1px solid rgba(139,92,246,0.25)' }}>
+              <h2 className="font-display text-[21px] font-medium text-white">{t('joinTitle')}</h2>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>{t('joinBody')}</p>
+              <button onClick={() => { setShowJoin(false); goToAuth('signup'); }}
+                className="cta w-full py-3 rounded-full text-sm font-semibold" style={{ background: '#8b5cf6', color: '#fff' }}>
+                {t('guestSignUp')}
+              </button>
+              <div className="flex items-center justify-between text-[13px] pt-1">
+                <button onClick={() => { setShowJoin(false); goToAuth('signin'); }} style={{ color: '#a78bfa' }}>
+                  {t('guestSignIn')}
+                </button>
+                <button onClick={() => setShowJoin(false)} style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  {t('joinContinue')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Tek kullanımlık e-postayla açılmış hesap: ne deneme ne ücretsiz plan.
             İleride e-postayla ulaşabileceğimiz gerçek bir adres istiyoruz. */}
         {emailBlocked && (
@@ -1570,8 +1647,19 @@ export default function App() {
           userLabel={user?.firstName || user?.emailAddresses[0]?.emailAddress}
           userImage={user?.imageUrl}
           onSignOut={() => signOut()}
+          guest={isGuest ? { onSignUp: () => goToAuth('signup'), onSignIn: () => goToAuth('signin') } : undefined}
           languageMenu={languageMenu}
         >
+          {isGuest && (
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-xl"
+              style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.22)' }}>
+              <p className="text-[13.5px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{t('guestBanner')}</p>
+              <button onClick={() => goToAuth('signup')}
+                className="cta px-4 py-1.5 rounded-full text-[13px] font-semibold flex-shrink-0" style={{ background: '#8b5cf6', color: '#fff' }}>
+                {t('guestSignUp')}
+              </button>
+            </div>
+          )}
           {loading && (
             <div className="flex items-center justify-center py-24">
               <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
@@ -1605,8 +1693,8 @@ export default function App() {
               formatDate={formatDate}
               onNewJournal={handleNewJournalClick}
               onOpen={openJournal}
-              onDelete={setAccountToDelete}
-              onEdit={openEditJournal}
+              onDelete={id => { if (!needAccount()) setAccountToDelete(id); }}
+              onEdit={acc => { if (!needAccount()) openEditJournal(acc); }}
             />
           )}
 
@@ -1665,7 +1753,7 @@ export default function App() {
         </>
         )}
         </PlanProvider>
-      </SignedIn>
+      )}
     </div>
   );
 }

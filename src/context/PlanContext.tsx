@@ -15,9 +15,15 @@ export type UpgradeReason = 'daily' | 'journal' | 'locked' | 'importLocked' | 'v
 interface Plan {
   isPro: boolean;
   askUpgrade: (reason: UpgradeReason) => void;
+  /**
+   * Kayıt olmadan örnek verilerle geziyor. Kayıt gerektiren her şey
+   * (düzenleme, silme, yapay zekâ) "ücretsiz hesap aç" penceresini açar.
+   */
+  isGuest: boolean;
+  requireAccount: () => void;
 }
 
-const PlanContext = createContext<Plan>({ isPro: true, askUpgrade: () => {} });
+const PlanContext = createContext<Plan>({ isPro: true, askUpgrade: () => {}, isGuest: false, requireAccount: () => {} });
 
 export const PlanProvider = PlanContext.Provider;
 export const usePlan = () => useContext(PlanContext);

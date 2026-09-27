@@ -26,6 +26,8 @@ interface AppShellProps {
   userLabel?: string;
   userImage?: string;
   onSignOut: () => void;
+  /** Kayıt olmadan geziyor: kullanıcı bloğunun yerinde kayıt ve giriş. */
+  guest?: { onSignUp: () => void; onSignIn: () => void };
   languageMenu?: React.ReactNode;
   children: React.ReactNode;
 }
@@ -44,7 +46,7 @@ const CONTENT = 'w-full max-w-[1140px] mx-auto px-5 sm:px-8';
 
 export default function AppShell({
   active, onNavigate, activeJournalName, title, subtitle, actions,
-  isPro, trialDaysLeft, userLabel, userImage, onSignOut, languageMenu, children,
+  isPro, trialDaysLeft, userLabel, userImage, onSignOut, guest, languageMenu, children,
 }: AppShellProps) {
   const { t, language } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -123,6 +125,18 @@ export default function AppShell({
 
       {/* Kullanıcı */}
       <div className="p-3 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        {guest ? (
+          <div className="space-y-2 px-1 py-1">
+            <button onClick={() => { setMobileOpen(false); guest.onSignUp(); }}
+              className="cta w-full py-2 rounded-lg text-[13px] font-semibold" style={{ background: '#8b5cf6', color: '#fff' }}>
+              {t('guestSignUp')}
+            </button>
+            <button onClick={() => { setMobileOpen(false); guest.onSignIn(); }}
+              className="w-full py-1.5 text-[12.5px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              {t('guestSignIn')}
+            </button>
+          </div>
+        ) : (
         <div className="flex items-center gap-2.5 px-2 py-2">
           <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0" style={{ background: 'rgba(139,92,246,0.18)' }}>
             {userImage
@@ -144,6 +158,7 @@ export default function AppShell({
             <LogOut className="w-4 h-4" />
           </button>
         </div>
+        )}
       </div>
     </div>
   );

@@ -94,7 +94,7 @@ export default function TradeHistory({
   onPrintTrade,
 }: TradeHistoryProps) {
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
-  const { isPro, askUpgrade } = usePlan();
+  const { isPro, askUpgrade, isGuest, requireAccount } = usePlan();
   const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
   const [editForm, setEditForm] = useState<Partial<Trade>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -212,6 +212,7 @@ export default function TradeHistory({
 
 
   const runAiAnalysis = async () => {
+    if (isGuest) { requireAccount(); return; }
     if (!isPro) { askUpgrade('ai'); return; }
     setAiLoading(true);
     setAiError('');
@@ -515,6 +516,7 @@ export default function TradeHistory({
   // ── EDIT ──────────────────────────────────────────────────────────────────
   const startEdit = (trade: Trade, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isGuest) { requireAccount(); return; }
     // Detaydan geliyorsa geçmişte zaten bir kaydımız var; ikinciyi eklemeyiz,
     // yoksa geri tuşu bir kez boşa basılmış olur.
     openOverlay(() => {
