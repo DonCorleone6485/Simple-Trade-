@@ -6,6 +6,7 @@ import {
   Newspaper, Wallet, Gauge, Lock, LogOut,
 } from 'lucide-react';
 import { openContact } from '../lib/contact';
+import { langPath } from '../lib/langPath';
 import { useLanguage } from '../context/LanguageContext';
 import { SESSIONS, sessionState } from '../lib/sessions';
 import { copy } from '../lib/landingCopy';
@@ -456,7 +457,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             <button onClick={() => scrollTo('pricing')} className="nav-link text-sm font-medium">
               {t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری')}
             </button>
-            <a href="/blog" className="nav-link text-sm font-medium">{t('Blog', 'Blog', 'بلاگ')}</a>
+            <a href={langPath('/blog', language)} className="nav-link text-sm font-medium">{t('Blog', 'Blog', 'بلاگ')}</a>
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -931,10 +932,10 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 { label: t('Özellikler', 'Features', 'ویژگی‌ها'), href: '#features' },
                 { label: t('Nasıl Çalışır', 'How It Works', 'چگونه کار می‌کند'), href: '#how-it-works' },
                 { label: t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری'), href: '#pricing' },
-                { label: t('Yardım', 'Help', 'راهنما'), href: '/help' },
-                { label: t('Blog', 'Blog', 'بلاگ'), href: '/blog' },
+                { label: t('Yardım', 'Help', 'راهنما'), href: langPath('/help', language) },
+                { label: t('Blog', 'Blog', 'بلاگ'), href: langPath('/blog', language) },
                 { label: t('İletişim', 'Contact', 'تماس با ما'), href: 'mailto:support@simpletradejournal.io' },
-                { label: t('Değişiklikler', 'Changelog', 'تغییرات'), href: '/changelog' },
+                { label: t('Değişiklikler', 'Changelog', 'تغییرات'), href: langPath('/changelog', language) },
               ].map(l => (
                 /* Renk satır içi stille verilmiyordu diye değil — veriliyordu
                    diye sorun çıkıyordu: onMouseEnter beyazı doğrudan elemana

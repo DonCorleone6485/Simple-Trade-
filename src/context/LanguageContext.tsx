@@ -2,7 +2,7 @@ import { cur } from '../lib/format';
 import { loadAppCopy, needsAppCopy } from '../lib/appCopy';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type Language = 'tr' | 'en' | 'fa' | 'ar' | 'ru' | 'es' | 'pt' | 'de' | 'fr';
+export type Language = 'tr' | 'en' | 'fa' | 'ar' | 'ru' | 'es' | 'pt' | 'de' | 'fr';
 
 interface Translations {
   [key: string]: { tr: string; en: string; fa: string; ar: string; ru: string; es: string; pt: string; de: string; fr: string; };
@@ -391,6 +391,15 @@ const COUNTRY_LANGUAGE: Record<string, Language> = {
 };
 
 export function detectLanguage(): Language {
+  // Adresteki dil (/tr/…, /fa/…) her şeyin önünde: o adrese gelen o dili
+  // istiyor. Seçim olarak da saklanıyor (bkz. lib/langPath.ts).
+  if (typeof window !== 'undefined') {
+    const seg = window.location.pathname.split('/')[1] || '';
+    if (seg !== 'en' && (LANGUAGES as string[]).includes(seg)) {
+      try { localStorage.setItem(STORAGE_KEY, seg); } catch { /* önemsiz */ }
+      return seg as Language;
+    }
+  }
   try {
     const saved = localStorage.getItem(STORAGE_KEY) as Language | null;
     if (saved && LANGUAGES.includes(saved)) return saved;
@@ -412,8 +421,12 @@ function savedLanguage(): Language | null {
   } catch { return null; }
 }
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(detectLanguage);
+export function LanguageProvider({ children, initial }: {
+  children: ReactNode;
+  /** Ön çizimde (sunucuda) sayfanın dili; tarayıcıda boş bırakılır. */
+  initial?: Language;
+}) {
+  const [language, setLanguageState] = useState<Language>(() => initial || detectLanguage());
 
   /** Seçim kalıcı olsun: yenilemede ya da ertesi gün sıfırlanmasın. */
   const setLanguage = (lang: Language) => {

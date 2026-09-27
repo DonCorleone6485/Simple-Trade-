@@ -3,6 +3,7 @@ import { ArrowLeft, Clock } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { Lock as LogoLock } from './Logo';
 import { ARTICLES, ARTICLE_LANGS, articlePath, articleText, findArticle, type Article, type ArticleLang, type Block } from '../content/articles';
+import { langPath } from '../lib/langPath';
 
 /**
  * Blog dizini (/blog) ve tek tek yazılar (/guides/…, /blog/…).
@@ -50,11 +51,6 @@ const LOCALES: Record<ArticleLang, string> = {
 const isRtl = (l: string) => l === 'fa' || l === 'ar';
 const SITE = 'https://www.simpletradejournal.io';
 
-export const BLOG_META = {
-  title: 'Blog & guides — Simple Trading Journal',
-  description: 'Guides for connecting MetaTrader 5 and importing trade history, and articles on keeping a trading journal, R-multiples and prop firm rules.',
-};
-
 const BlockView: React.FC<{ b: Block }> = ({ b }) => {
   if ('h2' in b) return <h2 className="text-[21px] font-medium text-white mt-10 mb-3">{b.h2}</h2>;
   if ('p' in b) return <p className="text-[16px] leading-[1.75] mb-4" style={{ color: 'rgba(255,255,255,0.72)' }}>{b.p}</p>;
@@ -76,7 +72,7 @@ const BlockView: React.FC<{ b: Block }> = ({ b }) => {
 const ArticleCard: React.FC<{ a: Article; lang: ArticleLang; onOpen: (path: string) => void; minRead: string }> = ({ a, lang, onOpen, minRead }) => {
   const path = articlePath(a);
   return (
-    <a href={path} onClick={e => { e.preventDefault(); onOpen(path); }}
+    <a href={langPath(path, lang)} onClick={e => { e.preventDefault(); onOpen(path); }}
       className="block rounded-2xl p-6 transition-colors hover:bg-white/[0.05]"
       style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
       dir={isRtl(lang) ? 'rtl' : 'ltr'}>
@@ -120,15 +116,15 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
     description: articleText(article, 'en').description,
     datePublished: article.date,
     dateModified: article.date,
-    inLanguage: ARTICLE_LANGS,
-    url: SITE + articlePath(article),
+    inLanguage: lang,
+    url: SITE + langPath(articlePath(article), lang),
     publisher: { '@type': 'Organization', name: 'Simple Trading Journal', url: SITE + '/' },
   } : null;
 
   return (
     <div className="min-h-screen" style={{ background: '#0d0e1a' }}>
       <header className="max-w-3xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-        <a href="/" onClick={e => { e.preventDefault(); onHome(); }} aria-label="Simple Trading Journal">
+        <a href={langPath('/', lang)} onClick={e => { e.preventDefault(); onHome(); }} aria-label="Simple Trading Journal">
           <LogoLock className="h-[26px] w-auto text-white" />
         </a>
         <button onClick={cta.onClick} className="cta px-4 py-2 rounded-full text-sm font-medium" style={{ background: '#8b5cf6', color: '#fff' }}>
@@ -157,7 +153,7 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
           </>
         ) : (
           <>
-            <a href="/blog" onClick={e => { e.preventDefault(); onOpen('/blog'); }}
+            <a href={langPath('/blog', lang)} onClick={e => { e.preventDefault(); onOpen('/blog'); }}
               className="link-gold inline-flex items-center gap-1.5 text-[13px] mb-8" style={{ color: 'rgba(255,255,255,0.55)' }}>
               <ArrowLeft className={`w-4 h-4 ${rtl ? 'rotate-180' : ''}`} />
               {ui('back')}

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { openContact } from '../lib/contact';
+import { langPath } from '../lib/langPath';
 import { useLanguage } from '../context/LanguageContext';
 import { Lock as LogoLock } from './Logo';
 
@@ -327,17 +328,6 @@ const CHANGELOG: { date: string; items: L9[] }[] = [
   },
 ];
 
-export const INFO_META: Record<InfoKind, { title: string; description: string }> = {
-  help: {
-    title: 'Help — Simple Trading Journal',
-    description: 'How to connect MetaTrader, import broker reports, use the Free plan and the Pro trial, read the discipline analysis, track a prop account, export to Excel and delete your data.',
-  },
-  changelog: {
-    title: 'Changelog — Simple Trading Journal',
-    description: 'What is new in Simple Trading Journal: MetaTrader auto-sync, report import, discipline analysis, prop tracking and more, newest first.',
-  },
-};
-
 const LOCALES: Record<Lang, string> = {
   tr: 'tr-TR', en: 'en-US', fa: 'fa-IR', ar: 'ar', ru: 'ru-RU', es: 'es-ES', pt: 'pt-PT', de: 'de-DE', fr: 'fr-FR',
 };
@@ -362,7 +352,7 @@ export default function InfoPage({ kind, onHome, onOther, cta }: {
   return (
     <div className="min-h-screen" style={{ background: '#0d0e1a' }}>
       <header className="max-w-3xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-        <a href="/" onClick={e => { e.preventDefault(); onHome(); }} aria-label="Simple Trading Journal">
+        <a href={langPath('/', lang)} onClick={e => { e.preventDefault(); onHome(); }} aria-label="Simple Trading Journal">
           <LogoLock className="h-[26px] w-auto text-white" />
         </a>
         <button onClick={cta.onClick} className="cta px-4 py-2 rounded-full text-sm font-medium" style={{ background: '#8b5cf6', color: '#fff' }}>
@@ -391,8 +381,8 @@ export default function InfoPage({ kind, onHome, onOther, cta }: {
             <section className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <h2 className="text-[17px] font-medium text-white mb-3">{s('guidesTitle')}</h2>
               <div className="flex flex-col gap-2">
-                <a href="/guides/metatrader-5-auto-sync" className="text-[15px]" style={{ color: '#a78bfa' }}>{s('guideMt5')} →</a>
-                <a href="/guides/import-trade-history" className="text-[15px]" style={{ color: '#a78bfa' }}>{s('guideImport')} →</a>
+                <a href={langPath('/guides/metatrader-5-auto-sync', lang)} className="text-[15px]" style={{ color: '#a78bfa' }}>{s('guideMt5')} →</a>
+                <a href={langPath('/guides/import-trade-history', lang)} className="text-[15px]" style={{ color: '#a78bfa' }}>{s('guideImport')} →</a>
               </div>
             </section>
             {/* Soruların altında: yardım sayfası, cevabı bulamayanın

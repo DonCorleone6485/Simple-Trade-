@@ -21,6 +21,30 @@
       "destination": "/guides/:slug.html"
     },
     {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)",
+      "destination": "/:lang/index.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/help",
+      "destination": "/:lang/help.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/changelog",
+      "destination": "/:lang/changelog.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/blog",
+      "destination": "/:lang/blog.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/blog/:slug",
+      "destination": "/:lang/blog/:slug.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/guides/:slug",
+      "destination": "/:lang/guides/:slug.html"
+    },
+    {
       "source": "/journal",
       "destination": "/index.html"
     },

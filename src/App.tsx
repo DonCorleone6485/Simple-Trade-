@@ -18,6 +18,7 @@ import AppShell, { NavKey } from './components/AppShell';
 import { Trade, Account, JournalGoals, JournalKind, DrawdownType } from './types';
 import { useLanguage } from './context/LanguageContext';
 import { CONTACT_EVENT } from './lib/contact';
+import { splitLangPath, langPath } from './lib/langPath';
 import { PlanProvider, UpgradeReason, FREE_DAILY_TRADES } from './context/PlanContext';
 import { demoData } from './lib/demo';
 import { matchOpenTrade } from './lib/matchOpen';
@@ -67,7 +68,8 @@ const JOURNAL_TABS: JournalTab[] = ['newTrade', 'trades', 'calendar', 'stats', '
 
 /** Adres satırındaki yolun parçaları: ['journal', '<id>', 'trades'] gibi. */
 function pathParts(): string[] {
-  return window.location.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+  // Dil öneki (/tr, /fa…) sayfayı değiştirmiyor; yalnızca dili (bkz. lib/langPath.ts).
+  return splitLangPath(window.location.pathname).path.split('/').filter(Boolean);
 }
 
 function getInitialPage(): Page {
@@ -230,8 +232,20 @@ export default function App() {
   const isGuest = guest && isLoaded && !isSignedIn;
   const isInfoPage = page === 'help' || page === 'changelog';
   const isContentPage = isInfoPage || page === 'blog';
+
+  // Herkese açık sayfada adresin dili, seçili dille aynı olsun: dil
+  // değiştirilince /blog → /tr/blog; ilk açılışta tarayıcı Türkçeyse de.
+  // Böylece paylaşılan bağlantı ve Google aynı dili görüyor.
+  useEffect(() => {
+    if (page === 'journal') return;
+    const { path } = splitLangPath(window.location.pathname);
+    const want = langPath(path, language);
+    if ((window.location.pathname.replace(/\/+$/, '') || '/') !== want) {
+      window.history.replaceState(window.history.state, '', want + window.location.search + window.location.hash);
+    }
+  }, [language, page]);
   // Blogda hangi yazı açık: adres satırının kendisi (/blog, /guides/…).
-  const [contentPath, setContentPath] = useState(() => window.location.pathname.replace(/\/+$/, '') || '/blog');
+  const [contentPath, setContentPath] = useState(() => splitLangPath(window.location.pathname).path || '/blog');
 
   const isRTL = language === 'fa' || language === 'ar';
 
@@ -471,8 +485,11 @@ export default function App() {
   };
 
   // ── SAYFA YÖNLENDİRME (ana sayfa ↔ journal) ──
+  /** Herkese açık sayfalar dilli adreste (/tr/blog); uygulama dilsiz (/journal). */
+  const localized = (path: string) => (path.startsWith(JOURNAL_PATH) ? path : langPath(path, language));
   const navigate = (target: Page, replace = false) => {
-    const path = pathForPage(target);
+    const bare = pathForPage(target);
+    const path = localized(bare);
     // Landing page anchor'ları (#features) ve Clerk'in hash routing'i geride
     // kalmasın — sayfa değişince hash'i temizle.
     if (window.location.pathname !== path || window.location.hash) {
@@ -480,13 +497,14 @@ export default function App() {
       window.history[method]({}, '', path + window.location.search);
     }
     setPage(target);
-    if (target === 'blog') setContentPath(path);
+    if (target === 'blog') setContentPath(bare);
     window.scrollTo(0, 0);
   };
 
   /** Blog/rehber içinde bir yazıya geç (sayfa yenilenmeden). */
   const openContent = (path: string) => {
-    if (window.location.pathname !== path) window.history.pushState({}, '', path);
+    const url = localized(path);
+    if (window.location.pathname !== url) window.history.pushState({}, '', url);
     setContentPath(path);
     setPage('blog');
   };
@@ -520,7 +538,7 @@ export default function App() {
     const onPopState = () => {
       const target = getInitialPage();
       setPage(target);
-      if (target === 'blog') setContentPath(window.location.pathname.replace(/\/+$/, ''));
+      if (target === 'blog') setContentPath(splitLangPath(window.location.pathname).path);
       if (target !== 'journal') return;
       const r = parseView();
       if (r.view === 'expanded') {
