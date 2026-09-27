@@ -26,6 +26,7 @@ const UI: Record<string, L9> = {
     fr: 'Tenir un journal, mesurer le risque et configurer Simple Trading Journal.',
   },
   guides: { tr: 'Rehberler', en: 'Guides', fa: 'راهنماها', ar: 'الأدلة', ru: 'Руководства', es: 'Guías', pt: 'Guias', de: 'Anleitungen', fr: 'Guides' },
+  compare: { tr: 'Karşılaştırmalar', en: 'Comparisons', fa: 'مقایسه‌ها', ar: 'مقارنات', ru: 'Сравнения', es: 'Comparativas', pt: 'Comparações', de: 'Vergleiche', fr: 'Comparatifs' },
   articles: { tr: 'Yazılar', en: 'Articles', fa: 'مقاله‌ها', ar: 'المقالات', ru: 'Статьи', es: 'Artículos', pt: 'Artigos', de: 'Artikel', fr: 'Articles' },
   minRead: { tr: '{0} dk okuma', en: '{0} min read', fa: '{0} دقیقه مطالعه', ar: 'قراءة {0} دقائق', ru: '{0} мин чтения', es: '{0} min de lectura', pt: '{0} min de leitura', de: '{0} Min. Lesezeit', fr: '{0} min de lecture' },
   back: { tr: 'Tüm yazılar', en: 'All articles', fa: 'همه مقاله‌ها', ar: 'كل المقالات', ru: 'Все статьи', es: 'Todos los artículos', pt: 'Todos os artigos', de: 'Alle Artikel', fr: 'Tous les articles' },
@@ -57,6 +58,29 @@ const BlockView: React.FC<{ b: Block }> = ({ b }) => {
   if ('code' in b) return (
     <pre dir="auto" className="font-mono text-[14px] px-4 py-3 rounded-xl mb-4 overflow-x-auto" style={{ background: 'rgba(0,0,0,0.35)', color: '#c4b5fd' }}>{b.code}</pre>
   );
+  if ('table' in b) {
+    const [head, ...rows] = b.table;
+    return (
+      <div className="overflow-x-auto mb-6 rounded-xl" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+        <table className="w-full text-[14px]" style={{ borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>{head.map((h, i) => (
+              <th key={i} className="text-start font-medium px-3.5 py-2.5" style={{ color: i === 1 ? '#c4b5fd' : '#fff', background: 'rgba(255,255,255,0.04)' }}>{h}</th>
+            ))}</tr>
+          </thead>
+          <tbody>
+            {rows.map((r, i) => (
+              <tr key={i} style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                {r.map((c, j) => (
+                  <td key={j} className="px-3.5 py-2.5 align-top" style={{ color: j === 0 ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.8)' }}>{c}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
   if ('note' in b) return (
     <p className="text-[14.5px] leading-relaxed rounded-xl px-4 py-3 mb-4" style={{ background: 'rgba(240,180,41,0.08)', border: '1px solid rgba(240,180,41,0.2)', color: 'rgba(255,255,255,0.7)' }}>{b.note}</p>
   );
@@ -106,7 +130,9 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
   }, [path, lang]);
 
   const guides = ARTICLES.filter(a => a.section === 'guides');
-  const posts = ARTICLES.filter(a => a.section === 'blog');
+  const isComparison = (a: Article) => a.slug.endsWith('-alternative');
+  const posts = ARTICLES.filter(a => a.section === 'blog' && !isComparison(a));
+  const comparisons = ARTICLES.filter(isComparison);
   const related = article ? ARTICLES.filter(a => a !== article).slice(0, 3) : [];
 
   const jsonLd = article ? {
@@ -147,8 +173,12 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
               {guides.map(a => <ArticleCard key={a.slug} a={a} lang={lang} onOpen={onOpen} minRead={ui('minRead')} />)}
             </div>
             <h2 className="text-[12px] uppercase tracking-[0.14em] mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{ui('articles')}</h2>
-            <div className="grid gap-4">
+            <div className="grid gap-4 mb-12">
               {posts.map(a => <ArticleCard key={a.slug} a={a} lang={lang} onOpen={onOpen} minRead={ui('minRead')} />)}
+            </div>
+            <h2 className="text-[12px] uppercase tracking-[0.14em] mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{ui('compare')}</h2>
+            <div className="grid gap-4">
+              {comparisons.map(a => <ArticleCard key={a.slug} a={a} lang={lang} onOpen={onOpen} minRead={ui('minRead')} />)}
             </div>
           </>
         ) : (
@@ -160,7 +190,7 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
             </a>
             <article dir={rtl ? 'rtl' : 'ltr'} lang={lang}>
               <div className="text-[12px] uppercase tracking-[0.14em] mb-3" style={{ color: '#f0b429' }}>
-                {article.section === 'guides' ? ui('guides') : ui('articles')}
+                {article.section === 'guides' ? ui('guides') : isComparison(article) ? ui('compare') : ui('articles')}
               </div>
               <h1 className="poster text-[2rem] sm:text-[2.6rem] leading-tight mb-4">{articleText(article, lang).title}</h1>
               <div className="flex items-center gap-3 text-[13px] mb-10" style={{ color: 'rgba(255,255,255,0.45)' }}>

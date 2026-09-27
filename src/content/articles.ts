@@ -33,7 +33,9 @@ export type Block =
   | { ol: string[] }
   | { ul: string[] }
   | { code: string }
-  | { note: string };
+  | { note: string }
+  /** Karşılaştırma tablosu: ilk satır başlık; ilk sütun satır adı. */
+  | { table: string[][] };
 
 /** Bir yazının tek bir dildeki metni. */
 export interface ArticleText {
@@ -59,6 +61,11 @@ export const ARTICLES: Article[] = [
   { slug: 'how-to-keep-a-trading-journal', section: 'blog', date: '2026-09-27', minutes: 6 },
   { slug: 'r-multiple-explained', section: 'blog', date: '2026-09-27', minutes: 5 },
   { slug: 'prop-firm-daily-loss-and-drawdown', section: 'blog', date: '2026-09-27', minutes: 5 },
+  // Karşılaştırmalar: rakip bilgileri kendi fiyat/yardım sayfalarından
+  // (Eylül 2026). Fiyatlar değişir — güncellerken tarihi de değiştir.
+  { slug: 'tradezella-alternative', section: 'blog', date: '2026-09-28', minutes: 4 },
+  { slug: 'tradersync-alternative', section: 'blog', date: '2026-09-28', minutes: 4 },
+  { slug: 'edgewonk-alternative', section: 'blog', date: '2026-09-28', minutes: 4 },
 ];
 
 export const articlePath = (a: Pick<Article, 'section' | 'slug'>) => `/${a.section}/${a.slug}`;

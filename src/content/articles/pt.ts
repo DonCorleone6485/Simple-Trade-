@@ -173,6 +173,254 @@ const TEXT: Record<string, ArticleText> = {
       { p: 'Marca um diário como conta prop, introduz o objetivo de lucro, o limite de perda diária e a perda máxima da empresa, e o diário mostra a que distância estás de cada um enquanto operas. Os limites de perda ficam âmbar e depois vermelhos à medida que te aproximas; o objetivo de lucro fica verde quando te aproximas dele. A análise de disciplina assinala operações de vingança e o aumento de risco depois de perdas — os hábitos que acabam com a maioria dos challenges.' },
     ],
   },
+  // --- karşılaştırmalar (scripts: compare_gen) ---
+  'tradezella-alternative': {
+    "title": "Simple Trading Journal vs Tradezella: uma comparação honesta",
+    "description": "Procuras uma alternativa ao Tradezella? Preços, plano gratuito, teste e sincronização com o MetaTrader lado a lado, e onde cada um é mais forte.",
+    "body": [
+      {
+        "p": "O Tradezella é um dos diários de trading mais conhecidos. Se procuras uma alternativa mais barata, na tua língua ou com plano gratuito, é assim que o Simple Trading Journal se compara."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "Tradezella"
+          ],
+          [
+            "Preço mensal",
+            "$14.99",
+            "$35 – $99"
+          ],
+          [
+            "Preço anual",
+            "$119",
+            "$315 – $891"
+          ],
+          [
+            "Plano gratuito",
+            "Sim — 2 operações por dia, sem limite de tempo",
+            "Não"
+          ],
+          [
+            "Teste gratuito",
+            "3 dias de Pro, sem cartão",
+            "Não indicado na página de preços"
+          ],
+          [
+            "Sincronização automática com o MetaTrader",
+            "MetaTrader 5 (MT4: importar relatório)",
+            "MT4 e MT5"
+          ],
+          [
+            "Como o MetaTrader se liga",
+            "Complemento no MT5 + chave, sem partilhar palavra-passe",
+            "Número de conta + palavra-passe de investidor"
+          ],
+          [
+            "Importação",
+            "Relatório MT4/MT5, cTrader, TradeLocker, DXtrade, Match-Trader, qualquer CSV",
+            "Mais de 500 corretoras e prop firms"
+          ]
+        ]
+      },
+      {
+        "note": "Os preços e funcionalidades do Tradezella foram retirados das suas próprias páginas de preços e ajuda em setembro de 2026 e podem ter mudado. Confirma no site antes de decidir."
+      },
+      {
+        "h2": "Onde o Tradezella é mais forte"
+      },
+      {
+        "ul": [
+          "Muitas mais integrações com corretoras e prop firms — mais de 500, segundo o Tradezella.",
+          "Mais historial e mais funcionalidades nos planos superiores.",
+          "As contas MT4 e MT5 sincronizam sem instalar nada no MetaTrader."
+        ]
+      },
+      {
+        "h2": "Onde o Simple Trading Journal é mais forte"
+      },
+      {
+        "ul": [
+          "Um plano gratuito sem limite de tempo (2 operações por dia) e 3 dias de Pro sem cartão.",
+          "O Pro custa $14.99 por mês ou $119 por ano — a opção mais barata do Tradezella é $35 por mês.",
+          "A aplicação inteira em 9 línguas, incluindo português, turco, persa e árabe.",
+          "O MetaTrader 5 liga-se com um pequeno complemento e uma chave; nunca partilhas a palavra-passe de investidor.",
+          "Análise de disciplina integrada (operações de vingança, mais risco depois de perdas, excesso de operações, operar fora de horas) e acompanhamento dos limites das prop firms."
+        ]
+      },
+      {
+        "h2": "Qual escolher?"
+      },
+      {
+        "p": "Se precisas de uma gama muito grande de integrações com corretoras ou das ferramentas mais avançadas, o Tradezella pode servir-te melhor. Se operas no MetaTrader, queres um diário na tua língua e preferes começar grátis, experimenta o Simple Trading Journal — o plano gratuito não pede cartão."
+      }
+    ]
+  },
+  'tradersync-alternative': {
+    "title": "Simple Trading Journal vs TraderSync: uma comparação honesta",
+    "description": "Procuras uma alternativa ao TraderSync? Preços, plano gratuito, teste e sincronização com o MetaTrader lado a lado, e onde cada um é mais forte.",
+    "body": [
+      {
+        "p": "O TraderSync é um dos diários de trading mais conhecidos. Se procuras uma alternativa mais barata, na tua língua ou com plano gratuito, é assim que o Simple Trading Journal se compara."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "TraderSync"
+          ],
+          [
+            "Preço mensal",
+            "$14.99",
+            "$29.95 – $79.95"
+          ],
+          [
+            "Preço anual",
+            "$119",
+            "$269.52 – $719.52"
+          ],
+          [
+            "Plano gratuito",
+            "Sim — 2 operações por dia, sem limite de tempo",
+            "Não"
+          ],
+          [
+            "Teste gratuito",
+            "3 dias de Pro, sem cartão",
+            "7 dias, sem cartão"
+          ],
+          [
+            "Sincronização automática com o MetaTrader",
+            "MetaTrader 5 (MT4: importar relatório)",
+            "MT4 e MT5"
+          ],
+          [
+            "Importação",
+            "Relatório MT4/MT5, cTrader, TradeLocker, DXtrade, Match-Trader, qualquer CSV",
+            "Mais de 200 corretoras e plataformas"
+          ]
+        ]
+      },
+      {
+        "note": "Os preços e funcionalidades do TraderSync foram retirados das suas próprias páginas de preços e ajuda em setembro de 2026 e podem ter mudado. Confirma no site antes de decidir."
+      },
+      {
+        "h2": "Onde o TraderSync é mais forte"
+      },
+      {
+        "ul": [
+          "Mais de 200 corretoras e plataformas suportadas.",
+          "Um assistente de IA (Cypher) e repetição de operações nos planos superiores.",
+          "Um teste de 7 dias com todas as funcionalidades, sem cartão."
+        ]
+      },
+      {
+        "h2": "Onde o Simple Trading Journal é mais forte"
+      },
+      {
+        "ul": [
+          "Um plano gratuito sem limite de tempo (2 operações por dia) e 3 dias de Pro sem cartão.",
+          "O Pro custa $14.99 por mês ou $119 por ano — a opção mais barata do TraderSync é $29.95 por mês.",
+          "A aplicação inteira em 9 línguas, incluindo português, turco, persa e árabe.",
+          "O MetaTrader 5 liga-se com um pequeno complemento e uma chave; nunca partilhas a palavra-passe de investidor.",
+          "Análise de disciplina integrada (operações de vingança, mais risco depois de perdas, excesso de operações, operar fora de horas) e acompanhamento dos limites das prop firms."
+        ]
+      },
+      {
+        "h2": "Qual escolher?"
+      },
+      {
+        "p": "Se precisas de uma gama muito grande de integrações com corretoras ou das ferramentas mais avançadas, o TraderSync pode servir-te melhor. Se operas no MetaTrader, queres um diário na tua língua e preferes começar grátis, experimenta o Simple Trading Journal — o plano gratuito não pede cartão."
+      }
+    ]
+  },
+  'edgewonk-alternative': {
+    "title": "Simple Trading Journal vs Edgewonk: uma comparação honesta",
+    "description": "Procuras uma alternativa ao Edgewonk? Preços, plano gratuito, teste e sincronização com o MetaTrader lado a lado, e onde cada um é mais forte.",
+    "body": [
+      {
+        "p": "O Edgewonk é um dos diários de trading mais conhecidos. Se procuras uma alternativa mais barata, na tua língua ou com plano gratuito, é assim que o Simple Trading Journal se compara."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "Edgewonk"
+          ],
+          [
+            "Preço mensal",
+            "$14.99",
+            "— (só anual)"
+          ],
+          [
+            "Preço anual",
+            "$119",
+            "$197"
+          ],
+          [
+            "Plano gratuito",
+            "Sim — 2 operações por dia, sem limite de tempo",
+            "Não"
+          ],
+          [
+            "Teste gratuito",
+            "3 dias de Pro, sem cartão",
+            "Não — garantia de reembolso de 14 dias"
+          ],
+          [
+            "Sincronização automática com o MetaTrader",
+            "MetaTrader 5 (MT4: importar relatório)",
+            "MT4 e MT5"
+          ],
+          [
+            "Como o MetaTrader se liga",
+            "Complemento no MT5 + chave, sem partilhar palavra-passe",
+            "Publicação de relatórios por FTP do MetaTrader"
+          ],
+          [
+            "Importação",
+            "Relatório MT4/MT5, cTrader, TradeLocker, DXtrade, Match-Trader, qualquer CSV",
+            "Muitas plataformas (ver a página de importação)"
+          ]
+        ]
+      },
+      {
+        "note": "Os preços e funcionalidades do Edgewonk foram retirados das suas próprias páginas de preços e ajuda em setembro de 2026 e podem ter mudado. Confirma no site antes de decidir."
+      },
+      {
+        "h2": "Onde o Edgewonk é mais forte"
+      },
+      {
+        "ul": [
+          "Um diário veterano com um único plano que inclui todas as funcionalidades.",
+          "Garantia de reembolso de 14 dias.",
+          "Sincronização automática de MT4 e MT5 com a publicação de relatórios do próprio MetaTrader."
+        ]
+      },
+      {
+        "h2": "Onde o Simple Trading Journal é mais forte"
+      },
+      {
+        "ul": [
+          "Um plano gratuito sem limite de tempo (2 operações por dia) e 3 dias de Pro sem cartão.",
+          "O Pro custa $14.99 por mês ou $119 por ano — a opção mais barata do Edgewonk é $197 por ano.",
+          "A aplicação inteira em 9 línguas, incluindo português, turco, persa e árabe.",
+          "O MetaTrader 5 liga-se com um pequeno complemento e uma chave; nunca partilhas a palavra-passe de investidor.",
+          "Análise de disciplina integrada (operações de vingança, mais risco depois de perdas, excesso de operações, operar fora de horas) e acompanhamento dos limites das prop firms."
+        ]
+      },
+      {
+        "h2": "Qual escolher?"
+      },
+      {
+        "p": "Se precisas de uma gama muito grande de integrações com corretoras ou das ferramentas mais avançadas, o Edgewonk pode servir-te melhor. Se operas no MetaTrader, queres um diário na tua língua e preferes começar grátis, experimenta o Simple Trading Journal — o plano gratuito não pede cartão."
+      }
+    ]
+  },
 };
 
 export default TEXT;

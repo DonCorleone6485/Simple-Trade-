@@ -173,6 +173,254 @@ const TEXT: Record<string, ArticleText> = {
       { p: 'Marquez un journal comme compte prop, saisissez l\'objectif de profit, la limite de perte journalière et la perte maximale de la société : le journal vous montre en temps réel votre distance à chacun. Les limites de perte passent à l\'ambre puis au rouge à mesure que vous vous en approchez ; l\'objectif de profit vire au vert quand vous vous en rapprochez. L\'analyse de discipline signale les trades de revanche et la hausse du risque après des pertes — les habitudes qui mettent fin à la plupart des challenges.' },
     ],
   },
+  // --- karşılaştırmalar (scripts: compare_gen) ---
+  'tradezella-alternative': {
+    "title": "Simple Trading Journal ou Tradezella : une comparaison honnête",
+    "description": "Vous cherchez une alternative à Tradezella ? Prix, plan gratuit, essai et synchronisation MetaTrader côte à côte, et les points forts de chacun.",
+    "body": [
+      {
+        "p": "Tradezella est l'un des journaux de trading les plus connus. Si vous cherchez une alternative moins chère, dans votre langue ou avec un plan gratuit, voici comment Simple Trading Journal se compare."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "Tradezella"
+          ],
+          [
+            "Prix mensuel",
+            "$14.99",
+            "$35 – $99"
+          ],
+          [
+            "Prix annuel",
+            "$119",
+            "$315 – $891"
+          ],
+          [
+            "Plan gratuit",
+            "Oui — 2 trades par jour, sans limite de durée",
+            "Non"
+          ],
+          [
+            "Essai gratuit",
+            "3 jours de Pro, sans carte",
+            "Non indiqué sur sa page de tarifs"
+          ],
+          [
+            "Synchro automatique MetaTrader",
+            "MetaTrader 5 (MT4 : import de relevé)",
+            "MT4 et MT5"
+          ],
+          [
+            "Connexion à MetaTrader",
+            "Module dans MT5 + clé, sans partager de mot de passe",
+            "Numéro de compte + mot de passe investisseur"
+          ],
+          [
+            "Import",
+            "Relevé MT4/MT5, cTrader, TradeLocker, DXtrade, Match-Trader, tout CSV",
+            "Plus de 500 courtiers et prop firms"
+          ]
+        ]
+      },
+      {
+        "note": "Les prix et fonctionnalités de Tradezella proviennent de ses propres pages de tarifs et d'aide en septembre 2026 et ont pu changer. Vérifiez sur son site avant de décider."
+      },
+      {
+        "h2": "Là où Tradezella est plus fort"
+      },
+      {
+        "ul": [
+          "Beaucoup plus d'intégrations de courtiers et de prop firms — plus de 500 selon Tradezella.",
+          "Plus d'ancienneté et davantage de fonctionnalités dans ses offres supérieures.",
+          "Les comptes MT4 et MT5 se synchronisent sans rien installer dans MetaTrader."
+        ]
+      },
+      {
+        "h2": "Là où Simple Trading Journal est plus fort"
+      },
+      {
+        "ul": [
+          "Un plan gratuit sans limite de durée (2 trades par jour) et 3 jours de Pro sans carte.",
+          "Pro coûte $14.99 par mois ou $119 par an — l'option la moins chère de Tradezella est à $35 par mois.",
+          "Toute l'application en 9 langues, dont le français, le turc, le persan et l'arabe.",
+          "MetaTrader 5 se connecte par un petit module et une clé ; vous ne partagez jamais votre mot de passe investisseur.",
+          "Analyse de discipline intégrée (trades de revanche, risque en hausse après des pertes, surtrading, trading hors horaires) et suivi des limites de prop firm."
+        ]
+      },
+      {
+        "h2": "Lequel choisir ?"
+      },
+      {
+        "p": "Si vous avez besoin d'un très large choix d'intégrations de courtiers ou de ses outils plus avancés, Tradezella vous conviendra peut-être mieux. Si vous tradez sur MetaTrader, voulez un journal dans votre langue et préférez commencer gratuitement, essayez Simple Trading Journal — le plan gratuit ne demande pas de carte."
+      }
+    ]
+  },
+  'tradersync-alternative': {
+    "title": "Simple Trading Journal ou TraderSync : une comparaison honnête",
+    "description": "Vous cherchez une alternative à TraderSync ? Prix, plan gratuit, essai et synchronisation MetaTrader côte à côte, et les points forts de chacun.",
+    "body": [
+      {
+        "p": "TraderSync est l'un des journaux de trading les plus connus. Si vous cherchez une alternative moins chère, dans votre langue ou avec un plan gratuit, voici comment Simple Trading Journal se compare."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "TraderSync"
+          ],
+          [
+            "Prix mensuel",
+            "$14.99",
+            "$29.95 – $79.95"
+          ],
+          [
+            "Prix annuel",
+            "$119",
+            "$269.52 – $719.52"
+          ],
+          [
+            "Plan gratuit",
+            "Oui — 2 trades par jour, sans limite de durée",
+            "Non"
+          ],
+          [
+            "Essai gratuit",
+            "3 jours de Pro, sans carte",
+            "7 jours, sans carte"
+          ],
+          [
+            "Synchro automatique MetaTrader",
+            "MetaTrader 5 (MT4 : import de relevé)",
+            "MT4 et MT5"
+          ],
+          [
+            "Import",
+            "Relevé MT4/MT5, cTrader, TradeLocker, DXtrade, Match-Trader, tout CSV",
+            "Plus de 200 courtiers et plateformes"
+          ]
+        ]
+      },
+      {
+        "note": "Les prix et fonctionnalités de TraderSync proviennent de ses propres pages de tarifs et d'aide en septembre 2026 et ont pu changer. Vérifiez sur son site avant de décider."
+      },
+      {
+        "h2": "Là où TraderSync est plus fort"
+      },
+      {
+        "ul": [
+          "Plus de 200 courtiers et plateformes pris en charge.",
+          "Un assistant IA (Cypher) et le replay des trades dans ses offres supérieures.",
+          "Un essai de 7 jours avec toutes les fonctionnalités, sans carte."
+        ]
+      },
+      {
+        "h2": "Là où Simple Trading Journal est plus fort"
+      },
+      {
+        "ul": [
+          "Un plan gratuit sans limite de durée (2 trades par jour) et 3 jours de Pro sans carte.",
+          "Pro coûte $14.99 par mois ou $119 par an — l'option la moins chère de TraderSync est à $29.95 par mois.",
+          "Toute l'application en 9 langues, dont le français, le turc, le persan et l'arabe.",
+          "MetaTrader 5 se connecte par un petit module et une clé ; vous ne partagez jamais votre mot de passe investisseur.",
+          "Analyse de discipline intégrée (trades de revanche, risque en hausse après des pertes, surtrading, trading hors horaires) et suivi des limites de prop firm."
+        ]
+      },
+      {
+        "h2": "Lequel choisir ?"
+      },
+      {
+        "p": "Si vous avez besoin d'un très large choix d'intégrations de courtiers ou de ses outils plus avancés, TraderSync vous conviendra peut-être mieux. Si vous tradez sur MetaTrader, voulez un journal dans votre langue et préférez commencer gratuitement, essayez Simple Trading Journal — le plan gratuit ne demande pas de carte."
+      }
+    ]
+  },
+  'edgewonk-alternative': {
+    "title": "Simple Trading Journal ou Edgewonk : une comparaison honnête",
+    "description": "Vous cherchez une alternative à Edgewonk ? Prix, plan gratuit, essai et synchronisation MetaTrader côte à côte, et les points forts de chacun.",
+    "body": [
+      {
+        "p": "Edgewonk est l'un des journaux de trading les plus connus. Si vous cherchez une alternative moins chère, dans votre langue ou avec un plan gratuit, voici comment Simple Trading Journal se compare."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "Edgewonk"
+          ],
+          [
+            "Prix mensuel",
+            "$14.99",
+            "— (annuel uniquement)"
+          ],
+          [
+            "Prix annuel",
+            "$119",
+            "$197"
+          ],
+          [
+            "Plan gratuit",
+            "Oui — 2 trades par jour, sans limite de durée",
+            "Non"
+          ],
+          [
+            "Essai gratuit",
+            "3 jours de Pro, sans carte",
+            "Non — satisfait ou remboursé 14 jours"
+          ],
+          [
+            "Synchro automatique MetaTrader",
+            "MetaTrader 5 (MT4 : import de relevé)",
+            "MT4 et MT5"
+          ],
+          [
+            "Connexion à MetaTrader",
+            "Module dans MT5 + clé, sans partager de mot de passe",
+            "Publication des rapports MetaTrader par FTP"
+          ],
+          [
+            "Import",
+            "Relevé MT4/MT5, cTrader, TradeLocker, DXtrade, Match-Trader, tout CSV",
+            "Nombreuses plateformes (voir sa page d'import)"
+          ]
+        ]
+      },
+      {
+        "note": "Les prix et fonctionnalités de Edgewonk proviennent de ses propres pages de tarifs et d'aide en septembre 2026 et ont pu changer. Vérifiez sur son site avant de décider."
+      },
+      {
+        "h2": "Là où Edgewonk est plus fort"
+      },
+      {
+        "ul": [
+          "Un journal de longue date avec une seule offre qui inclut toutes les fonctionnalités.",
+          "Une garantie satisfait ou remboursé de 14 jours.",
+          "Synchro automatique MT4 et MT5 via la publication de rapports propre à MetaTrader."
+        ]
+      },
+      {
+        "h2": "Là où Simple Trading Journal est plus fort"
+      },
+      {
+        "ul": [
+          "Un plan gratuit sans limite de durée (2 trades par jour) et 3 jours de Pro sans carte.",
+          "Pro coûte $14.99 par mois ou $119 par an — l'option la moins chère de Edgewonk est à $197 par an.",
+          "Toute l'application en 9 langues, dont le français, le turc, le persan et l'arabe.",
+          "MetaTrader 5 se connecte par un petit module et une clé ; vous ne partagez jamais votre mot de passe investisseur.",
+          "Analyse de discipline intégrée (trades de revanche, risque en hausse après des pertes, surtrading, trading hors horaires) et suivi des limites de prop firm."
+        ]
+      },
+      {
+        "h2": "Lequel choisir ?"
+      },
+      {
+        "p": "Si vous avez besoin d'un très large choix d'intégrations de courtiers ou de ses outils plus avancés, Edgewonk vous conviendra peut-être mieux. Si vous tradez sur MetaTrader, voulez un journal dans votre langue et préférez commencer gratuitement, essayez Simple Trading Journal — le plan gratuit ne demande pas de carte."
+      }
+    ]
+  },
 };
 
 export default TEXT;

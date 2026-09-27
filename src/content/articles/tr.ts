@@ -333,7 +333,255 @@ const TEXT: Record<string, ArticleText> = {
         "p": "Bir journal'ı prop hesabı olarak işaretle, firmanın kâr hedefini, günlük kayıp sınırını ve maksimum kaybını gir; journal işlem yaptıkça her birine ne kadar uzak olduğunu gösterir. Kayıp sınırlarına yaklaştıkça çubuk sarıya sonra kırmızıya döner; kâr hedefine yaklaştıkça yeşile. Disiplin analizi de çoğu challenge'ı bitiren alışkanlıkları — intikam işlemlerini ve kayıptan sonra artan riski — işaretler."
       }
     ]
-  }
+  },
+  // --- karşılaştırmalar (scripts: compare_gen) ---
+  'tradezella-alternative': {
+    "title": "Simple Trading Journal ve Tradezella: dürüst bir karşılaştırma",
+    "description": "Tradezella alternatifi mi arıyorsun? Fiyat, ücretsiz plan, deneme ve MetaTrader bağlantısı yan yana; hangisinin nerede güçlü olduğu da.",
+    "body": [
+      {
+        "p": "Tradezella en bilinen trading journal'lardan biri. Daha ucuz, kendi dilinde ya da ücretsiz planı olan bir alternatif arıyorsan, Simple Trading Journal'ın nasıl karşılaştırıldığı aşağıda."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "Tradezella"
+          ],
+          [
+            "Aylık fiyat",
+            "$14.99",
+            "$35 – $99"
+          ],
+          [
+            "Yıllık fiyat",
+            "$119",
+            "$315 – $891"
+          ],
+          [
+            "Ücretsiz plan",
+            "Var — günde 2 işlem, süre sınırı yok",
+            "Yok"
+          ],
+          [
+            "Ücretsiz deneme",
+            "3 gün Pro, kart gerekmez",
+            "Fiyat sayfasında belirtilmemiş"
+          ],
+          [
+            "MetaTrader otomatik kayıt",
+            "MetaTrader 5 (MT4: rapor aktarma)",
+            "MT4 ve MT5"
+          ],
+          [
+            "MetaTrader nasıl bağlanıyor",
+            "MT5'e eklenti + anahtar, şifre paylaşılmaz",
+            "Hesap numarası + yatırımcı şifresi"
+          ],
+          [
+            "İçe aktarma",
+            "MT4/MT5 raporu, cTrader, TradeLocker, DXtrade, Match-Trader, her CSV",
+            "500'den fazla broker ve prop firma"
+          ]
+        ]
+      },
+      {
+        "note": "Tradezella'nın fiyat ve özellikleri Eylül 2026'da kendi fiyat ve yardım sayfalarından alındı; o tarihten beri değişmiş olabilir. Karar vermeden önce sitesine bak."
+      },
+      {
+        "h2": "Tradezella nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "Çok daha fazla broker ve prop firma bağlantısı — Tradezella'ya göre 500'den fazla.",
+          "Daha uzun geçmiş ve üst planlarında daha geniş özellik seti.",
+          "MT4 ve MT5 hesapları MetaTrader'a bir şey kurmadan bağlanıyor."
+        ]
+      },
+      {
+        "h2": "Simple Trading Journal nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "Süre sınırı olmayan ücretsiz plan (günde 2 işlem) ve kartsız 3 günlük Pro denemesi.",
+          "Pro aylık $14.99 ya da yıllık $119 — Tradezella'nın en ucuz seçeneği aylık $35.",
+          "Uygulamanın tamamı 9 dilde; Türkçe, Farsça ve Arapça dahil.",
+          "MetaTrader 5 küçük bir eklenti ve anahtarla bağlanıyor; yatırımcı şifreni hiç paylaşmıyorsun.",
+          "Hazır disiplin analizi (intikam işlemi, kayıptan sonra artan risk, aşırı işlem, alışılmadık saatler) ve prop firma sınır takibi."
+        ]
+      },
+      {
+        "h2": "Hangisini seçmeli?"
+      },
+      {
+        "p": "Çok geniş bir broker bağlantısı yelpazesine ya da daha gelişmiş araçlarına ihtiyacın varsa Tradezella sana daha uygun olabilir. MetaTrader'da işlem yapıyor, kendi dilinde bir journal istiyor ve ücretsiz başlamayı tercih ediyorsan Simple Trading Journal'ı dene — ücretsiz plan kart istemiyor."
+      }
+    ]
+  },
+  'tradersync-alternative': {
+    "title": "Simple Trading Journal ve TraderSync: dürüst bir karşılaştırma",
+    "description": "TraderSync alternatifi mi arıyorsun? Fiyat, ücretsiz plan, deneme ve MetaTrader bağlantısı yan yana; hangisinin nerede güçlü olduğu da.",
+    "body": [
+      {
+        "p": "TraderSync en bilinen trading journal'lardan biri. Daha ucuz, kendi dilinde ya da ücretsiz planı olan bir alternatif arıyorsan, Simple Trading Journal'ın nasıl karşılaştırıldığı aşağıda."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "TraderSync"
+          ],
+          [
+            "Aylık fiyat",
+            "$14.99",
+            "$29.95 – $79.95"
+          ],
+          [
+            "Yıllık fiyat",
+            "$119",
+            "$269.52 – $719.52"
+          ],
+          [
+            "Ücretsiz plan",
+            "Var — günde 2 işlem, süre sınırı yok",
+            "Yok"
+          ],
+          [
+            "Ücretsiz deneme",
+            "3 gün Pro, kart gerekmez",
+            "7 gün, kart gerekmez"
+          ],
+          [
+            "MetaTrader otomatik kayıt",
+            "MetaTrader 5 (MT4: rapor aktarma)",
+            "MT4 ve MT5"
+          ],
+          [
+            "İçe aktarma",
+            "MT4/MT5 raporu, cTrader, TradeLocker, DXtrade, Match-Trader, her CSV",
+            "200'den fazla broker ve platform"
+          ]
+        ]
+      },
+      {
+        "note": "TraderSync'in fiyat ve özellikleri Eylül 2026'da kendi fiyat ve yardım sayfalarından alındı; o tarihten beri değişmiş olabilir. Karar vermeden önce sitesine bak."
+      },
+      {
+        "h2": "TraderSync nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "200'den fazla desteklenen broker ve platform.",
+          "Üst planlarında yapay zekâ asistanı (Cypher) ve işlem tekrarı.",
+          "Bütün özellikleriyle, kartsız 7 günlük deneme."
+        ]
+      },
+      {
+        "h2": "Simple Trading Journal nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "Süre sınırı olmayan ücretsiz plan (günde 2 işlem) ve kartsız 3 günlük Pro denemesi.",
+          "Pro aylık $14.99 ya da yıllık $119 — TraderSync'in en ucuz seçeneği aylık $29.95.",
+          "Uygulamanın tamamı 9 dilde; Türkçe, Farsça ve Arapça dahil.",
+          "MetaTrader 5 küçük bir eklenti ve anahtarla bağlanıyor; yatırımcı şifreni hiç paylaşmıyorsun.",
+          "Hazır disiplin analizi (intikam işlemi, kayıptan sonra artan risk, aşırı işlem, alışılmadık saatler) ve prop firma sınır takibi."
+        ]
+      },
+      {
+        "h2": "Hangisini seçmeli?"
+      },
+      {
+        "p": "Çok geniş bir broker bağlantısı yelpazesine ya da daha gelişmiş araçlarına ihtiyacın varsa TraderSync sana daha uygun olabilir. MetaTrader'da işlem yapıyor, kendi dilinde bir journal istiyor ve ücretsiz başlamayı tercih ediyorsan Simple Trading Journal'ı dene — ücretsiz plan kart istemiyor."
+      }
+    ]
+  },
+  'edgewonk-alternative': {
+    "title": "Simple Trading Journal ve Edgewonk: dürüst bir karşılaştırma",
+    "description": "Edgewonk alternatifi mi arıyorsun? Fiyat, ücretsiz plan, deneme ve MetaTrader bağlantısı yan yana; hangisinin nerede güçlü olduğu da.",
+    "body": [
+      {
+        "p": "Edgewonk en bilinen trading journal'lardan biri. Daha ucuz, kendi dilinde ya da ücretsiz planı olan bir alternatif arıyorsan, Simple Trading Journal'ın nasıl karşılaştırıldığı aşağıda."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "Edgewonk"
+          ],
+          [
+            "Aylık fiyat",
+            "$14.99",
+            "— (yalnızca yıllık)"
+          ],
+          [
+            "Yıllık fiyat",
+            "$119",
+            "$197"
+          ],
+          [
+            "Ücretsiz plan",
+            "Var — günde 2 işlem, süre sınırı yok",
+            "Yok"
+          ],
+          [
+            "Ücretsiz deneme",
+            "3 gün Pro, kart gerekmez",
+            "Yok — 14 gün para iadesi"
+          ],
+          [
+            "MetaTrader otomatik kayıt",
+            "MetaTrader 5 (MT4: rapor aktarma)",
+            "MT4 ve MT5"
+          ],
+          [
+            "MetaTrader nasıl bağlanıyor",
+            "MT5'e eklenti + anahtar, şifre paylaşılmaz",
+            "MetaTrader'ın FTP ile rapor yayını"
+          ],
+          [
+            "İçe aktarma",
+            "MT4/MT5 raporu, cTrader, TradeLocker, DXtrade, Match-Trader, her CSV",
+            "Birçok platform (içe aktarma sayfasına bak)"
+          ]
+        ]
+      },
+      {
+        "note": "Edgewonk'un fiyat ve özellikleri Eylül 2026'da kendi fiyat ve yardım sayfalarından alındı; o tarihten beri değişmiş olabilir. Karar vermeden önce sitesine bak."
+      },
+      {
+        "h2": "Edgewonk nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "Her özelliği tek bir planda sunan, köklü bir journal.",
+          "14 gün para iade garantisi.",
+          "MetaTrader'ın kendi rapor yayınıyla MT4 ve MT5 otomatik kayıt."
+        ]
+      },
+      {
+        "h2": "Simple Trading Journal nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "Süre sınırı olmayan ücretsiz plan (günde 2 işlem) ve kartsız 3 günlük Pro denemesi.",
+          "Pro aylık $14.99 ya da yıllık $119 — Edgewonk'un en ucuz seçeneği yıllık $197.",
+          "Uygulamanın tamamı 9 dilde; Türkçe, Farsça ve Arapça dahil.",
+          "MetaTrader 5 küçük bir eklenti ve anahtarla bağlanıyor; yatırımcı şifreni hiç paylaşmıyorsun.",
+          "Hazır disiplin analizi (intikam işlemi, kayıptan sonra artan risk, aşırı işlem, alışılmadık saatler) ve prop firma sınır takibi."
+        ]
+      },
+      {
+        "h2": "Hangisini seçmeli?"
+      },
+      {
+        "p": "Çok geniş bir broker bağlantısı yelpazesine ya da daha gelişmiş araçlarına ihtiyacın varsa Edgewonk sana daha uygun olabilir. MetaTrader'da işlem yapıyor, kendi dilinde bir journal istiyor ve ücretsiz başlamayı tercih ediyorsan Simple Trading Journal'ı dene — ücretsiz plan kart istemiyor."
+      }
+    ]
+  },
 };
 
 export default TEXT;
