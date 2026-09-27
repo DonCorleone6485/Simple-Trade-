@@ -72,8 +72,8 @@ hesap ya da karar bekliyor.
   fiyat; karşılığında yorum. Yapılsın mı? (Ödeme sistemi gelince.)
 
 ### C. Bilgi gerektirmeyen, sonra yapılacaklar
-1. **Vercel Analytics** — çerezsiz ziyaretçi sayımı. Kullanıcının Vercel panelinde
-   Analytics → Enable demesi gerekiyor (tek tık); sonra `@vercel/analytics` eklenir.
+1. **Vercel Analytics** — YAPILDI (2026-09-28, ücretsiz plan): src/main.tsx;
+   /journal/<id> adresleri /journal olarak sayılıyor.
 2. **Dil başına adresler** (/tr, /de, /fa…) + hreflang + her dilde ön çizim —
    SEO'nun sonraki adımı (şu an ön çizim yalnız İngilizce).
 3. **Tam içerik güvenlik politikası** (script-src CSP) — Clerk, Supabase, Google
