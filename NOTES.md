@@ -120,6 +120,10 @@ Açık: fiyat, kurucu kampanyası, günlük sınırın sayısı (2?).
 Güvenlik: users tablosunda Pro/deneme alanlarını tarayıcı yazamıyor
 (protect_user_privileges tetikleyicisi, silme yetkisi yok), referrals RLS açık,
 /api/referral kimliği Clerk oturumundan alıyor — YAPILDI.
-AÇIK KALAN (ACİL): trades ve journals politikaları `true` — herkese açık anon
-anahtarla bütün kullanıcıların işlemleri okunup silinebiliyor. Çözüm: Clerk ↔
-Supabase third-party auth + user_id = auth.jwt()->>'sub' politikaları.
+Satır bazlı erişim — YAPILDI (2026-09-27): Clerk, Supabase'e üçüncü taraf kimlik
+sağlayıcı olarak eklendi (Clerk panelinde Supabase entegrasyonu Production'da
+açık; Supabase third-party auth: https://clerk.simpletradejournal.io). İstemci
+her isteğe Clerk oturum anahtarını koyuyor (src/lib/supabase.ts accessToken).
+trades/journals/users politikaları: yalnız authenticated, user_id =
+auth.jwt()->>'sub'. trade-photos: yalnız kendi klasörü (user_id/...); kova
+herkese açık, bağlantılar çalışıyor. anon anahtarla hiçbir tablo okunamıyor.
