@@ -273,6 +273,13 @@ export default function App() {
     }
   }, [user]);
 
+  // Otomatik e-postalar (deneme bitiyor vb.) seçili dilde gitsin; dil
+  // değiştirilince de. Satır yoksa oluşturulmuyor — ilk kontrol onu açıyor.
+  useEffect(() => {
+    if (!user || isGuest) return;
+    supabase.from('users').update({ language }).eq('user_id', user.id).then(() => {}, () => {});
+  }, [user?.id, language, isGuest]);
+
   const checkProStatus = async () => {
     if (!user) return;
     const cols = 'is_pro, has_paid, pro_until, trial_started_at, trial_ends_at, trial_denied, email_checked_at, email_disposable, timezone, currency';
@@ -286,7 +293,7 @@ export default function App() {
         const r = await fetch('/api/trial', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ action: 'check' }),
+          body: JSON.stringify({ action: 'check', language }),
         });
         if (r.ok) ({ data } = await supabase.from('users').select(cols).eq('user_id', user.id).maybeSingle());
       } catch { /* kontrol olmadan devam */ }

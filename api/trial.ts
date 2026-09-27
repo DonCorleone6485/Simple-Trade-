@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createClerkClient, verifyToken } from '@clerk/backend';
 import { isDisposableEmailDomain } from 'disposable-email-domains-js';
 import { createHash } from 'crypto';
+import { sendEmail, toLang } from './_email.js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -61,6 +62,8 @@ export default async function handler(req: any, res: any) {
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   const action = body.action === 'start' ? 'start' : 'check';
+  // Otomatik e-postalar bu dilde gidiyor; tarayıcı her açılışta da günceller.
+  const language = body.language ? toLang(body.language) : null;
 
   const { data: row } = await supabase
     .from('users')
@@ -82,9 +85,15 @@ export default async function handler(req: any, res: any) {
     }
     disposable = !!email && isDisposable(email);
     await supabase.from('users').upsert(
-      { user_id: userId, email_checked_at: new Date().toISOString(), email_disposable: disposable },
+      { user_id: userId, email_checked_at: new Date().toISOString(), email_disposable: disposable, ...(language ? { language } : {}) },
       { onConflict: 'user_id' },
     );
+    // Hesabı ilk kez görüyoruz: hoş geldin postası. Gitmezse (Resend'e
+    // ulaşılamadı, anahtar yok) günlük görev (api/cron-emails.ts) yeniden dener.
+    if (email && !disposable) {
+      const sent = await sendEmail('welcome', email, { userId, lang: language || 'en' });
+      if (sent) await supabase.from('users').update({ welcome_sent_at: new Date().toISOString() }).eq('user_id', userId);
+    }
   }
 
   if (action === 'check') return res.status(200).json({ blocked: disposable });
