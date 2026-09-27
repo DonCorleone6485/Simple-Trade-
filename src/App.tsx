@@ -45,6 +45,7 @@ const DisciplineView = lazy(() => import('./components/DisciplineView'));
 const ChecklistLibrary = lazy(() => import('./components/ChecklistLibrary'));
 const PropEvaluation = lazy(() => import('./components/PropEvaluation'));
 const LandingPage = lazy(() => import('./components/LandingPage'));
+const InfoPage = lazy(() => import('./components/InfoPage'));
 const JournalDashboard = lazy(() => import('./components/JournalDashboard'));
 const PrintableReport = lazy(() => import('./components/PrintableReport'));
 const PropStatus = lazy(() => import('./components/PropStatus'));
@@ -53,7 +54,7 @@ type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news' | 'discip
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect';
 type AuthView = 'signin' | 'signup';
 type AuthStage = 'landing' | 'auth';
-type Page = 'home' | 'journal';
+type Page = 'home' | 'journal' | 'help' | 'changelog';
 
 const JOURNAL_PATH = '/journal';
 const JOURNAL_TABS: JournalTab[] = ['newTrade', 'trades', 'calendar', 'stats', 'goals', 'mtConnect'];
@@ -64,11 +65,12 @@ function pathParts(): string[] {
 }
 
 function getInitialPage(): Page {
-  return pathParts()[0] === 'journal' ? 'journal' : 'home';
+  const first = pathParts()[0];
+  return first === 'journal' ? 'journal' : first === 'help' ? 'help' : first === 'changelog' ? 'changelog' : 'home';
 }
 
 function pathForPage(page: Page): string {
-  return page === 'journal' ? JOURNAL_PATH : '/';
+  return page === 'journal' ? JOURNAL_PATH : page === 'help' ? '/help' : page === 'changelog' ? '/changelog' : '/';
 }
 
 /**
@@ -208,6 +210,7 @@ export default function App() {
   /** "Kendi journal'ın için ücretsiz hesap aç" penceresi. */
   const [showJoin, setShowJoin] = useState(false);
   const isGuest = guest && isLoaded && !isSignedIn;
+  const isInfoPage = page === 'help' || page === 'changelog';
 
   const isRTL = language === 'fa' || language === 'ar';
 
@@ -1014,8 +1017,17 @@ export default function App() {
     : view === 'expanded' ? (journalTab as NavKey)
     : 'journals';
 
+  // Tarayıcı sekmesinin başlığı hangi ekranda olunduğunu söylesin (ana sayfa
+  // ve Yardım/Değişiklikler kendi başlıklarını kendileri koyuyor).
+  useEffect(() => {
+    if (page !== 'journal') return;
+    const label = typeof shellTitle === 'string' ? shellTitle : '';
+    document.title = label ? `${label} · Simple Trading Journal` : 'Simple Trading Journal';
+  });
+
   const handleNav = (key: NavKey) => {
     if (key === 'home') { navigate('home'); return; }
+    if (key === 'help') { navigate('help'); return; }
     if (key === 'referral') { if (!needAccount()) setShowReferral(true); return; }
     if (key === 'pricing') { goTo({ view: 'pricing' }); return; }
     if (key === 'sessions') { goTo({ view: 'sessions', journal: null }); return; }
@@ -1338,7 +1350,21 @@ export default function App() {
       )}
 
       {/* AUTH */}
-      {isLoaded && !isSignedIn && !(isGuest && page === 'journal' && authStage !== 'auth') && (<>
+      {/* Yardım ve Değişiklikler: giriş gerekmeyen, herkese aynı iki sayfa. */}
+      {isInfoPage && (
+        <Suspense fallback={<div className="min-h-screen" style={{ background: '#0d0e1a' }} />}>
+          <InfoPage
+            kind={page as 'help' | 'changelog'}
+            onHome={() => navigate('home')}
+            onOther={() => navigate(page === 'help' ? 'changelog' : 'help')}
+            cta={isSignedIn
+              ? { label: t('guestGoJournal'), onClick: () => navigate('journal') }
+              : { label: t('guestStartFree'), onClick: startGuest }}
+          />
+        </Suspense>
+      )}
+
+      {!isInfoPage && isLoaded && !isSignedIn && !(isGuest && page === 'journal' && authStage !== 'auth') && (<>
         {(() => {
           const urlParams = new URLSearchParams(window.location.search);
           const refCode = urlParams.get('ref');
@@ -1394,7 +1420,7 @@ export default function App() {
         </Suspense>
       )}
 
-      {(isSignedIn || (isGuest && page === 'journal' && authStage !== 'auth')) && (
+      {!isInfoPage && (isSignedIn || (isGuest && page === 'journal' && authStage !== 'auth')) && (
         <PlanProvider value={isGuest
           ? { isPro: true, askUpgrade: () => setShowJoin(true), isGuest: true, requireAccount: () => setShowJoin(true) }
           : { isPro, askUpgrade, isGuest: false, requireAccount: () => {} }}>

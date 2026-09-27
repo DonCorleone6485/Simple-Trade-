@@ -3,8 +3,57 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simple Trading Journal</title>
-    <meta name="description" content="Log every trade, see your real statistics, and build the discipline that turns a strategy into consistent results." />
+    <title>Simple Trading Journal — Trading Journal with MetaTrader Auto-Sync</title>
+    <meta name="description" content="A trading journal whose trades arrive from MetaTrader on their own. See which setup pays, what your mistakes cost and how close you are to your prop limits. Free to start, in 9 languages." />
+    <link rel="canonical" href="https://www.simpletradejournal.io/" />
+
+    <!-- Paylaşım önizlemesi (WhatsApp, X, LinkedIn, Telegram…). Bu botlar
+         JavaScript çalıştırmaz; burada yazan her şey statik olmalı. Resim:
+         promo/src/OgImage.tsx'ten çizildi (public/og-image.png). -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Simple Trading Journal" />
+    <meta property="og:url" content="https://www.simpletradejournal.io/" />
+    <meta property="og:title" content="Simple Trading Journal — whatever works is repeatable" />
+    <meta property="og:description" content="Trades arrive from MetaTrader on their own, discipline analysis shows what your mistakes cost, and your prop limits stay in view. Free to start." />
+    <meta property="og:image" content="https://www.simpletradejournal.io/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Simple Trading Journal — Whatever works is repeatable. We make it visible." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Simple Trading Journal — whatever works is repeatable" />
+    <meta name="twitter:description" content="Trades arrive from MetaTrader on their own, discipline analysis shows what your mistakes cost, and your prop limits stay in view." />
+    <meta name="twitter:image" content="https://www.simpletradejournal.io/og-image.png" />
+
+    <!-- Arama motorlarının ürünü tanıması için yapılandırılmış veri. Fiyatlar
+         src/lib/pricing.ts ile aynı olmalı. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "Simple Trading Journal",
+          "url": "https://www.simpletradejournal.io/",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "Web",
+          "description": "Trading journal with MetaTrader 5 auto-sync, file import from MT4/MT5, cTrader, TradeLocker, DXtrade and Match-Trader, discipline analysis, prop firm limit tracking and AI analysis.",
+          "inLanguage": ["en", "tr", "fa", "ar", "ru", "es", "pt", "de", "fr"],
+          "image": "https://www.simpletradejournal.io/og-image.png",
+          "offers": [
+            { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD" },
+            { "@type": "Offer", "name": "Pro (monthly)", "price": "14.99", "priceCurrency": "USD" },
+            { "@type": "Offer", "name": "Pro (yearly)", "price": "119", "priceCurrency": "USD" }
+          ]
+        },
+        {
+          "@type": "Organization",
+          "name": "Simple Trading Journal",
+          "url": "https://www.simpletradejournal.io/",
+          "logo": "https://www.simpletradejournal.io/apple-touch-icon.png"
+        }
+      ]
+    }
+    </script>
 
     <!-- Sekmede ve ana ekranda görünen simgeler.
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   TrendingUp, BookOpen, List, CalendarDays, BarChart2, Target,
-  Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Clock, Newspaper, ShieldCheck, ClipboardList, Gauge,
+  Home, Gift, Sparkles, LogOut, Menu, X, ChevronRight, PlusCircle, Clock, Newspaper, ShieldCheck, ClipboardList, Gauge, LifeBuoy,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import HeaderStrip from './HeaderStrip';
@@ -10,7 +10,7 @@ import { Lock } from './Logo';
 
 export type NavKey =
   | 'journals' | 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect'
-  | 'pricing' | 'referral' | 'home' | 'sessions' | 'news' | 'discipline' | 'checklists' | 'propReview';
+  | 'pricing' | 'referral' | 'home' | 'help' | 'sessions' | 'news' | 'discipline' | 'checklists' | 'propReview';
 
 interface AppShellProps {
   active: NavKey;
@@ -122,6 +122,7 @@ export default function AppShell({
           <NavItem icon={<Sparkles className="w-4 h-4" />} label={tr('Pro\'ya Geç', 'Upgrade to Pro')} itemKey="pricing" />
         )}
         <NavItem icon={<Gift className="w-4 h-4" />} label={tr('Referans Kodu', 'Referral Code')} itemKey="referral" />
+        <NavItem icon={<LifeBuoy className="w-4 h-4" />} label={t('helpNav')} itemKey="help" />
         <NavItem icon={<Home className="w-4 h-4" />} label={tr('Ana Sayfa', 'Home')} itemKey="home" />
       </nav>
 

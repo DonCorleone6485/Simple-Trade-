@@ -1,5 +1,6 @@
 import React from 'react';
-import { Composition } from 'remotion';
+import { Composition, Still } from 'remotion';
+import { OgImage } from './OgImage';
 import { Ayna } from './Ayna';
 import { Fis } from './Fis';
 import { Hic } from './Hic';
@@ -36,6 +37,7 @@ export const Root: React.FC = () => (
     <Composition id="Reel" component={Reel} width={1920} height={1080} fps={FPS} durationInFrames={REEL.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="ReelFa" component={ReelFa} width={1920} height={1080} fps={FPS} durationInFrames={REEL.duration * FPS} defaultProps={{ music: true }} />
     <Composition id="MacDikey" component={MacDikey} width={1080} height={1920} fps={FPS} durationInFrames={MAC.duration * FPS} defaultProps={{ music: true }} />
+    <Still id="OgImage" component={OgImage} width={1200} height={630} />
     <Composition id="Reklam" component={Reklam} width={1080} height={1920} fps={FPS} durationInFrames={REKLAM.duration * FPS} defaultProps={{ music: true }} />
   </>
 );

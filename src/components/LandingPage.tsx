@@ -168,6 +168,17 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
     document.getElementById(id)?.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
 
+  // Sekme başlığı ve açıklama seçili dilde (index.html'deki İngilizce; dil
+  // değişince güncelleniyor — Google sayfayı çizdikten sonraki hâlini okuyor).
+  useEffect(() => {
+    document.title = `Simple Trading Journal — ${t('MetaTrader ile otomatik kayıt yapan işlem günlüğü', 'Trading Journal with MetaTrader Auto-Sync', 'ژورنال معاملاتی با ثبت خودکار متاتریدر')}`;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', t(
+      'İşlemleri MetaTrader\'dan kendiliğinden gelen işlem günlüğü. Hangi kurulumun kazandırdığını, hatalarının sana kaça mal olduğunu ve prop sınırlarına ne kadar kaldığını gör. Ücretsiz başla.',
+      'A trading journal whose trades arrive from MetaTrader on their own. See which setup pays, what your mistakes cost and how close you are to your prop limits. Free to start, in 9 languages.',
+      'ژورنال معاملاتی که معاملات خودکار از متاتریدر وارد آن می‌شوند. ببین کدام ستاپ سود می‌دهد، اشتباهاتت چقدر هزینه دارد و تا حدود پراپ چقدر فاصله داری. رایگان شروع کن.',
+    ));
+  }, [language]);
+
   // Paylaşılan bir bağlantı (/#pricing) doğrudan o bölüme açılsın. Tarayıcı
   // kendisi kaydıramıyor: sayfa yüklendiğinde bölüm henüz çizilmemiş oluyor.
   useEffect(() => {
@@ -915,6 +926,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 { label: t('Özellikler', 'Features', 'ویژگی‌ها'), href: '#features' },
                 { label: t('Nasıl Çalışır', 'How It Works', 'چگونه کار می‌کند'), href: '#how-it-works' },
                 { label: t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری'), href: '#pricing' },
+                { label: t('Yardım', 'Help', 'راهنما'), href: '/help' },
+                { label: t('Değişiklikler', 'Changelog', 'تغییرات'), href: '/changelog' },
               ].map(l => (
                 /* Renk satır içi stille verilmiyordu diye değil — veriliyordu
                    diye sorun çıkıyordu: onMouseEnter beyazı doğrudan elemana
