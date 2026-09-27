@@ -1,17 +1,28 @@
 import React, { useState } from 'react';
-import { Check, Zap, TrendingUp, Shield } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { copy } from '../lib/landingCopy';
-import { Lock } from './Logo';
+import PricingCards from './PricingCards';
 
 interface PricingPageProps {
+  /** Tam ekran: deneme ya da Pro süresi bittiğinde bir kez açılıyor. */
   onboardingMode?: boolean;
   expiredMode?: boolean;
   onFreeStart?: () => void;
   onProStart?: () => void;
+  /** Düğme yazıları duruma göre App'ten gelir ("Mevcut planın" gibi). */
+  freeLabel?: string;
+  proLabel?: string;
+  freeDisabled?: boolean;
+  proDisabled?: boolean;
 }
 
-export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, onProStart }: PricingPageProps) {
+/**
+ * Uygulamadaki fiyat sayfası. Kartlar ana sayfadakiyle aynı bileşen
+ * (PricingCards); burada ek olarak aylık/yıllık seçimi var.
+ */
+export default function PricingPage({
+  onboardingMode, expiredMode, onFreeStart, onProStart, freeLabel, proLabel, freeDisabled, proDisabled,
+}: PricingPageProps) {
   const { language } = useLanguage();
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly');
 
@@ -27,59 +38,31 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
     return copy(en, language);
   };
 
-  const freeFeatures = [
-    t('1 Journal', '1 Journal', '۱ ژورنال'),
-    t('Günde 2 işlem (fazlası kilitli saklanır)', '2 trades a day (extras kept locked)', '۲ معامله در روز (بقیه قفل نگه داشته می‌شوند)'),
-    t('MetaTrader otomatik kayıt ve içe aktarma', 'MetaTrader auto-sync & file import', 'ثبت خودکار متاتریدر و وارد کردن فایل'),
-    t('Tüm istatistikler, takvim ve disiplin analizi', 'All statistics, calendar & discipline analysis', 'همه آمارها، تقویم و تحلیل انضباط'),
-    t('İşlem Öncesi ve Sonrası 1\'er Fotoğraf', '1 Photo Before and 1 After Each Trade', '۱ عکس قبل و ۱ عکس بعد از هر معامله'),
-  ];
-
-  const proFeatures = [
-    t('Her gün sınırsız işlem ve journal', 'Unlimited trades & journals, every day', 'معامله و ژورنال نامحدود، هر روز'),
-    t('Sesli not ve yapay zekâ analizi', 'Voice notes & AI analysis', 'یادداشت صوتی و تحلیل هوش مصنوعی'),
-    t('İşlem Öncesi ve Sonrası 3\'er Fotoğraf', '3 Photos Before and 3 After Each Trade', '۳ عکس قبل و ۳ عکس بعد از هر معامله'),
-  ];
-
   const monthlyPrice = 12.99;
   const yearlyPrice = 99;
   const yearlyMonthly = (yearlyPrice / 12).toFixed(2);
   const savings = Math.round(((monthlyPrice * 12 - yearlyPrice) / (monthlyPrice * 12)) * 100);
 
   const content = (
-    <div className="min-h-screen py-16 px-4" style={{ background: '#0d0e1a' }}>
-      <div className="text-center mb-12">
-        {onboardingMode ? (
-          <>
-            <div className="flex items-center justify-center mb-4">
-              <Lock className="h-[34px] w-auto text-white" />
-            </div>
-            <h1 className="font-display text-[38px] font-medium text-white mb-4">
-              {t('Hoş Geldiniz! 👋', 'Welcome! 👋', '!خوش آمدید 👋')}
-            </h1>
-            <p className="text-lg" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {t('Nasıl başlamak istersiniz?', 'How would you like to get started?', 'چطور می‌خواهید شروع کنید؟')}
-            </p>
-          </>
-        ) : (
-          <>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6"
-              style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', color: '#a78bfa' }}>
-              <Zap className="w-4 h-4" />
-              {t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری')}
-            </div>
-            <h1 className="font-display text-[38px] font-medium text-white mb-4">
-              {t('Sade ve Şeffaf Fiyatlar', 'Simple & Transparent Pricing', 'قیمت‌های ساده و شفاف')}
-            </h1>
-            <p className="text-lg" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {t('Ücretsiz başlayın, büyüdükçe yükseltin.', 'Start free, upgrade as you grow.', 'رایگان شروع کنید، با رشد ارتقا دهید.')}
-            </p>
-          </>
-        )}
+    <div className={onboardingMode ? 'min-h-screen py-16 px-4' : 'py-4'} style={onboardingMode ? { background: '#0d0e1a' } : undefined}>
+      <div className="max-w-4xl mx-auto mb-10">
+        <span className="channel mb-5 block">{t('Fiyat', 'Pricing', 'قیمت')}</span>
+        <h1 className="poster text-[2.1rem] sm:text-[2.6rem] mb-3">
+          {expiredMode
+            ? t('Pro süren bitti', 'Your Pro time has ended', 'زمان Pro تو تمام شد')
+            : t('Sade ve Şeffaf Fiyatlandırma', 'Simple & Transparent Pricing', 'قیمت‌گذاری ساده و شفاف')}
+        </h1>
+        <p className="text-[16px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+          {expiredMode
+            ? t('Ücretsiz planla devam edebilir ya da Pro\'ya geçebilirsin. Kayıtların hiçbiri silinmedi.',
+                'You can carry on with the Free plan or upgrade to Pro. None of your records were deleted.',
+                'می‌توانی با پلن رایگان ادامه دهی یا به Pro ارتقا دهی. هیچ‌کدام از سوابقت حذف نشد.')
+            : t('Ücretsiz başla, büyüdükçe yükselt.', 'Start free, upgrade as you grow.', 'رایگان شروع کنید، با رشد ارتقا دهید.')}
+        </p>
       </div>
 
-      {/* Billing toggle */}
-      <div className="flex items-center justify-center gap-4 mb-12">
+      {/* Aylık / yıllık */}
+      <div className="flex items-center justify-center gap-4 mb-8">
         <span className="text-sm font-medium" style={{ color: billing === 'monthly' ? '#fff' : 'rgba(255,255,255,0.4)' }}>
           {t('Aylık', 'Monthly', 'ماهانه')}
         </span>
@@ -100,117 +83,30 @@ export default function PricingPage({ onboardingMode, expiredMode, onFreeStart, 
         </span>
       </div>
 
-      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+      <PricingCards
+        t={t}
+        free={{
+          label: freeLabel || (expiredMode
+            ? t('Ücretsiz devam et', 'Continue free', 'ادامه رایگان')
+            : t('Ücretsiz Başla', 'Get Started Free', 'شروع رایگان')),
+          onClick: () => onFreeStart?.(),
+          disabled: freeDisabled,
+        }}
+        pro={{
+          label: proLabel || t("Pro'ya Geç", 'Upgrade to Pro', 'ارتقا به Pro'),
+          onClick: () => onProStart?.(),
+          disabled: proDisabled,
+        }}
+        proPrice={billing === 'monthly'
+          ? { amount: `$${monthlyPrice}`, note: t('/ ay', '/ month', '/ ماه') }
+          : { amount: `$${yearlyMonthly}`, note: t('/ ay (yıllık $99)', '/ mo (billed $99/yr)', '/ ماه (سالانه ۹۹$)') }}
+      />
 
-        {/* FREE */}
-        <div className="rounded-2xl p-8" style={{ background: 'rgba(255,255,255,0.025)' }}>
-          <div className="mb-6">
-            <h2 className="font-display text-[22px] font-medium text-white mb-1">{t('Ücretsiz', 'Free', 'رایگان')}</h2>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {t('Başlamak için ideal', 'Perfect to get started', 'ایده‌آل برای شروع')}
-            </p>
-          </div>
-          <div className="mb-8">
-            <span className="text-5xl font-bold text-white">$0</span>
-            <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {t('/ sonsuza kadar', '/ forever', '/ برای همیشه')}
-            </span>
-          </div>
-          <button
-            onClick={onFreeStart}
-            className="ui-pill w-full py-3 rounded-full text-sm font-medium mb-8 transition-all"
-            style={{ background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
-          >
-            {t('Ücretsiz Başla', 'Get Started Free', 'شروع رایگان')}
-          </button>
-          <div className="space-y-3">
-            {freeFeatures.map((feature, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(52,211,153,0.1)' }}>
-                  <Check className="w-3 h-3" style={{ color: '#34d399' }} />
-                </div>
-                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* PRO */}
-        <div className="rounded-2xl p-8 relative"
-          style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-            <span className="px-4 py-1 rounded-full text-xs font-semibold" style={{ background: '#8b5cf6', color: '#fff' }}>
-              {t('En Popüler', 'Most Popular', 'محبوب‌ترین')}
-            </span>
-          </div>
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="w-5 h-5" style={{ color: '#a78bfa' }} />
-              <h2 className="font-display text-[22px] font-medium text-white">Pro</h2>
-            </div>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {t('Ciddi traderlar için', 'For serious traders', 'برای معامله‌گران جدی')}
-            </p>
-          </div>
-          <div className="mb-2">
-            <span className="text-5xl font-bold text-white">
-              ${billing === 'monthly' ? monthlyPrice : yearlyMonthly}
-            </span>
-            <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {t('/ ay', '/ month', '/ ماه')}
-            </span>
-            {billing === 'yearly' && (
-              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                {t('Yıllık ${n} faturalandırılır', 'Billed ${n}/year', '{n}$ سالانه فاکتور می‌شود').replace('{n}', String(yearlyPrice))}
-              </p>
-            )}
-          </div>
-
-          {/* 3 Gün Trial */}
-          <div className="flex items-center gap-2 mb-6 px-3 py-2 rounded-xl"
-            style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.15)' }}>
-            <Shield className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
-            <span className="text-xs font-medium" style={{ color: '#34d399' }}>
-              {t(
-                '3 Gün Ücretsiz Dene — 3. günün sonunda ödeme alınır, istediğin zaman iptal et',
-                '3-Day Free Trial — charged on day 3, cancel anytime',
-                '۳ روز رایگان — در روز سوم پرداخت می‌شود، هر زمان لغو کن'
-              )}
-            </span>
-          </div>
-
-          <button
-            onClick={onProStart}
-            className="cta w-full py-3 rounded-full text-sm font-medium mb-8 transition-all"
-            style={{ background: '#8b5cf6', color: '#fff' }}
-          >
-            {t("Pro'ya Geç", 'Upgrade to Pro', 'ارتقا به Pro')}
-          </button>
-
-          <div className="space-y-3">
-            {proFeatures.map((feature, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(139,92,246,0.2)' }}>
-                  <Check className="w-3 h-3" style={{ color: '#a78bfa' }} />
-                </div>
-                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="text-center mt-12">
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          {t(
-            'Kart bilgisi gereklidir • 3 gün ücretsiz • 3. günün sonunda ödeme alınır • İstediğiniz zaman iptal edin',
-            'Card required • 3-day free trial • Charged on day 3 • Cancel anytime',
-            'کارت لازم است • ۳ روز رایگان • در روز سوم پرداخت • هر زمان لغو کنید'
-          )}
-        </p>
-      </div>
+      <p className="text-center text-[13px] mt-8" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        {t('Deneme için kart istemiyoruz · Deneme bitince kendiliğinden Ücretsiz plana dönersin',
+          'No card for the trial · When it ends you drop back to Free on your own',
+          'برای آزمایش کارت نمی‌خواهیم · بعد از پایان، خودکار به پلن رایگان برمی‌گردی')}
+      </p>
     </div>
   );
 

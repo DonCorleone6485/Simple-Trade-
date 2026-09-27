@@ -200,6 +200,7 @@ export default function App() {
     importLocked: t('upgradeImportLocked').replace('{n}', String(importLockedCount)),
     voice: t('upgradeVoice'),
     ai: t('upgradeAi'),
+    delete: t('upgradeDelete'),
   };
 
   /** Kilitli bir şeye dokunulduğunda: o kısıtlamayı anlatan pencere. */
@@ -771,6 +772,9 @@ export default function App() {
 
   const handleDeleteTrade = async (id: string) => {
     if (needAccount()) return;
+    // Ücretsiz planda silme yok (veritabanı da izin vermiyor): silip yeniden
+    // girerek günlük hakkı sıfırlamak olmasın.
+    if (!isPro) { askUpgrade('delete'); return; }
     const trade = trades.find(tr => tr.id === id);
     if (trade) {
       await deletePhotosFromStorage([
@@ -812,6 +816,7 @@ export default function App() {
 
   const handleDeleteMultiple = async (ids: string[]) => {
     if (needAccount()) return;
+    if (!isPro) { askUpgrade('delete'); return; }
     const toDelete = trades.filter(tr => ids.includes(tr.id));
     for (const trade of toDelete) {
       await deletePhotosFromStorage([
@@ -1669,8 +1674,20 @@ export default function App() {
 
           {!loading && view === 'pricing' && (
             <PricingPage
+              freeLabel={isPro ? t('pricingBackToJournals') : t('pricingCurrentPlan')}
+              freeDisabled={!isPro && !isGuest}
               onFreeStart={() => goTo({ view: 'dashboard', journal: null })}
-              onProStart={() => setShowPaymentModal(true)}
+              proLabel={isGuest ? t('trialStartCta')
+                : trialEndsAt ? t('pricingTrialActive')
+                : isPro ? t('pricingCurrentPlan')
+                : trialAvailable ? t('trialStartCta')
+                : t('trialEndedUpgrade')}
+              proDisabled={!isGuest && isPro}
+              onProStart={() => {
+                if (needAccount()) return;
+                if (trialAvailable) startTrial();
+                else setShowPaymentModal(true);
+              }}
             />
           )}
 
@@ -1694,7 +1711,11 @@ export default function App() {
               formatDate={formatDate}
               onNewJournal={handleNewJournalClick}
               onOpen={openJournal}
-              onDelete={id => { if (!needAccount()) setAccountToDelete(id); }}
+              onDelete={id => {
+                if (needAccount()) return;
+                if (!isPro) { askUpgrade('delete'); return; }
+                setAccountToDelete(id);
+              }}
               onEdit={acc => { if (!needAccount()) openEditJournal(acc); }}
             />
           )}

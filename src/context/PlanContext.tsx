@@ -10,7 +10,7 @@ import { createContext, useContext } from 'react';
  * Varsayılan Pro: sağlayıcının dışında kalan bir yerde (ana sayfa gibi)
  * kilit simgesi yanlışlıkla görünmesin.
  */
-export type UpgradeReason = 'daily' | 'journal' | 'locked' | 'importLocked' | 'voice' | 'ai';
+export type UpgradeReason = 'daily' | 'journal' | 'locked' | 'importLocked' | 'voice' | 'ai' | 'delete';
 
 interface Plan {
   isPro: boolean;
