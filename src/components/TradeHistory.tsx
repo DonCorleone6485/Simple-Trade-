@@ -536,7 +536,8 @@ export default function TradeHistory({
       tr.orderType ? orderLabel[tr.orderType] || tr.orderType : '',
       tr.setup || '',
       tr.entryPrice ?? null, tr.stopLoss ?? null, tr.exitPrice ?? null,
-      tr.risk || 0, tradePnL(tr), realizedR(tr), tr.rr || '',
+      // R:R metin olarak saklanıyor ("2.0"); Excel'de sayı olsun, tarih sanılmasın.
+      tr.risk || 0, tradePnL(tr), realizedR(tr), isFinite(parseFloat(tr.rr)) ? parseFloat(tr.rr) : (tr.rr || ''),
       resultLabel[tr.result] ?? tr.result,
       (tr.emotions || []).map(e => emotionLabel(e, language)).join(', '),
       tr.preTradeNotes || '', tr.postTradeNotes || '',
