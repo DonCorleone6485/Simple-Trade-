@@ -80,9 +80,9 @@ hesap ya da karar bekliyor.
    Fonts, Cloudflare Turnstile ve fotoğraf bağlantıları için izin listesiyle; önce
    Report-Only olarak denenmeli (bozulursa giriş çalışmaz).
 4. **Blog / eğitim içeriği** — YAPILDI (2026-09-28): /blog, 2 rehber + 3 yazı, EN+TR,
-   ön çizimli (src/content/articles.ts'e yazı eklemek yeterli; PAGES, sitemap
-   elle). Kalan: rakip karşılaştırmaları — rakiplerin güncel fiyat/özellikleri
-   doğrulanmadan yazılmamalı; daha fazla yazı; sitemap'i otomatik üretmek.
+   ön çizimli (src/content/articles.ts'e yazı eklemek yeterli; sayfa, sitemap ve
+   yönlendirme kendiliğinden). Kalan: rakip karşılaştırmaları — rakiplerin güncel fiyat/özellikleri
+   doğrulanmadan yazılmamalı; daha fazla yazı.
 5. **Yardım merkezi** — 13 soru + rehber bağlantıları. Kalan: yol haritası sayfası.
 6. **PWA** — manifest YAPILDI (ana ekrana ekle → /journal). Service worker bilerek
    yok. Kalan: sekme kapalıyken bildirim (web push, service worker ister).

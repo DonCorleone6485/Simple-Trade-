@@ -57,6 +57,13 @@ try {
     writeFileSync(out, withBody(withHead(template, page), html));
     console.log(`prerender: ${page.path} ${Math.round(html.length / 1024)} KB`);
   }
+  // Site haritası aynı listeden: yeni yazı eklenince elle güncellemek
+  // gerekmesin. public/sitemap.xml yalnızca ön çizim çökerse kalan yedek.
+  const today = new Date().toISOString().slice(0, 10);
+  const urls = [{ path: '/', priority: '1.0' }, ...pages.map(p => ({ path: p.path, priority: p.path.startsWith('/guides') ? '0.7' : '0.6' }))];
+  writeFileSync(resolve('dist/sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
+    .map(u => `  <url><loc>${SITE}${u.path}</loc><lastmod>${today}</lastmod><priority>${u.priority}</priority></url>`).join('\n')}\n</urlset>\n`);
+  console.log(`prerender: sitemap ${urls.length} urls`);
 } catch (err) {
   console.warn('prerender skipped:', err && err.message ? err.message : err);
   // Adresler yine çalışsın: ön çizimsiz uygulama kabuğu.
