@@ -105,11 +105,10 @@ hesap ya da karar bekliyor.
    yalnız o dillerde ve çizimden önce yükleniyor; ana paket 124 → 86 KB (gzip).
 
 ### D. Kullanıcının kontrol etmesi gerekenler
-- MT4 eklentisi (public/SimpleTradingJournal.mq4, "Beta"): gerçek bir MT4'te dene —
-  dosya Experts'e, MT4'ü yeniden başlat (kendisi derler), anahtar, bir işlem aç/kapat.
-  Çalışırsa: Beta etiketini kaldır (MTConnect.tsx), rehberi ve karşılaştırma
-  tablolarını (scripts/compare_gen.py: mt_us) "MT4 ve MT5" olarak güncelle.
-  Derlenmiş .ex4 yok: MetaQuotes MT4'ü/derleyicisini artık dağıtmıyor.
+- MT4 eklentisi DENENDİ (2026-09-28, MT4 build 1481, MetaQuotes-Demo): MT4 kendisi
+  derledi, işlem doğru saatle geldi; Beta kaldırıldı, karşılaştırmalar "MT4 ve MT5".
+  .mq4 kaynak olarak veriliyor (MetaQuotes MT4 derleyicisini dağıtmıyor; kullanıcının
+  Mac'indeki MT4 ile derlenebilir: ~/Library/Application Support/net.metaquotes.wine.metatrader4).
 - Hesabım penceresi: para birimi seçimi, saat dilimi, "ad/e-posta/şifre" düğmesi.
 - MetaTrader sayfası: anahtarın bağlı olduğu hesap ("•••1234 · Sunucu").
 - EA'yı 1.06'ya güncellemek (grafikte "başka hesaba bağlı" uyarısı için).

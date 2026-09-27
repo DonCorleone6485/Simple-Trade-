@@ -22,7 +22,8 @@ interface ApiKey {
  * MT4 eklentisi kaynak dosya olarak (.mq4): MetaTrader 4 Experts klasöründeki
  * kaynak dosyaları yeniden başlarken kendisi derliyor. Derlenmiş .ex4
  * veremiyoruz — MetaQuotes MT4'ü (ve derleyicisini) artık dağıtmıyor. Gerçek
- * bir MT4'te denenene kadar seçenek "Beta" etiketli.
+ * 2026-09-28'de gerçek bir MT4'te (build 1481, MetaQuotes-Demo) denendi: MT4 kendisi
+ * derledi, açılan/kapanan emir journal'a doğru saatle düştü.
  */
 const MT4_FILE = '/SimpleTradingJournal.mq4';
 
@@ -278,7 +279,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
               <button key={p} type="button" role="radio" aria-checked={platform === p} onClick={() => setPlatform(p)}
                 className="px-4 py-1.5 rounded-full text-[13.5px] font-medium transition-colors"
                 style={platform === p ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.6)' }}>
-                {p === 'mt5' ? 'MetaTrader 5' : <>MetaTrader 4 <span className="ms-1 text-[10px] font-semibold uppercase tracking-wider opacity-80">Beta</span></>}
+                {p === 'mt5' ? 'MetaTrader 5' : 'MetaTrader 4'}
               </button>
             ))}
           </div>

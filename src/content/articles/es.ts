@@ -7,6 +7,7 @@ const TEXT: Record<string, ArticleText> = {
     description: 'Paso a paso: instala el complemento de Simple Trading Journal en MT5 para que cada operación cerrada llegue sola a tu diario, con stop loss, riesgo y comisiones incluidos.',
     body: [
       { p: 'Escribir cada operación a mano es la principal razón por la que la gente deja de llevar un diario. Con el complemento de MetaTrader 5, cada operación se registra en el momento en que se abre y se completa al cerrarse: entrada, salida, stop loss, lotes, comisión y swap. Tú solo añades lo que MetaTrader no puede saber: tu setup, tu razonamiento y cómo te sentías.' },
+      { note: "¿Usas MetaTrader 4? Los pasos son los mismos: en la pantalla de MetaTrader elige MetaTrader 4, descarga SimpleTradingJournal.mq4 y ponlo en MQL4 → Experts. MetaTrader 4 lo compila solo al reiniciarse." },
       { h2: 'Qué necesitas' },
       { ul: [
         'MetaTrader 5 en Windows o Mac (la terminal de escritorio; la app móvil no ejecuta complementos).',
@@ -210,12 +211,12 @@ const TEXT: Record<string, ArticleText> = {
           ],
           [
             "Sincronización automática con MetaTrader",
-            "MetaTrader 5 (MT4: importar informe)",
+            "MT4 y MT5",
             "MT4 y MT5"
           ],
           [
             "Cómo se conecta MetaTrader",
-            "Complemento en MT5 + clave, sin compartir contraseña",
+            "Complemento en MetaTrader + clave, sin compartir contraseña",
             "Número de cuenta + contraseña de inversor"
           ],
           [
@@ -246,7 +247,7 @@ const TEXT: Record<string, ArticleText> = {
           "Un plan gratuito sin límite de tiempo (2 operaciones al día) y 3 días de Pro sin tarjeta.",
           "Pro cuesta $14.99 al mes o $119 al año; la opción más barata de Tradezella es $35 al mes.",
           "Toda la aplicación en 9 idiomas, incluidos español, turco, persa y árabe.",
-          "MetaTrader 5 se conecta con un pequeño complemento y una clave; nunca compartes tu contraseña de inversor.",
+          "MetaTrader 4 y 5 se conectan con un pequeño complemento y una clave; nunca compartes tu contraseña de inversor.",
           "Análisis de disciplina integrado (operaciones de venganza, más riesgo tras pérdidas, sobreoperar, operar fuera de horario) y seguimiento de límites de prop firms."
         ]
       },
@@ -294,7 +295,7 @@ const TEXT: Record<string, ArticleText> = {
           ],
           [
             "Sincronización automática con MetaTrader",
-            "MetaTrader 5 (MT4: importar informe)",
+            "MT4 y MT5",
             "MT4 y MT5"
           ],
           [
@@ -325,7 +326,7 @@ const TEXT: Record<string, ArticleText> = {
           "Un plan gratuito sin límite de tiempo (2 operaciones al día) y 3 días de Pro sin tarjeta.",
           "Pro cuesta $14.99 al mes o $119 al año; la opción más barata de TraderSync es $29.95 al mes.",
           "Toda la aplicación en 9 idiomas, incluidos español, turco, persa y árabe.",
-          "MetaTrader 5 se conecta con un pequeño complemento y una clave; nunca compartes tu contraseña de inversor.",
+          "MetaTrader 4 y 5 se conectan con un pequeño complemento y una clave; nunca compartes tu contraseña de inversor.",
           "Análisis de disciplina integrado (operaciones de venganza, más riesgo tras pérdidas, sobreoperar, operar fuera de horario) y seguimiento de límites de prop firms."
         ]
       },
@@ -373,12 +374,12 @@ const TEXT: Record<string, ArticleText> = {
           ],
           [
             "Sincronización automática con MetaTrader",
-            "MetaTrader 5 (MT4: importar informe)",
+            "MT4 y MT5",
             "MT4 y MT5"
           ],
           [
             "Cómo se conecta MetaTrader",
-            "Complemento en MT5 + clave, sin compartir contraseña",
+            "Complemento en MetaTrader + clave, sin compartir contraseña",
             "Publicación de informes por FTP de MetaTrader"
           ],
           [
@@ -409,7 +410,7 @@ const TEXT: Record<string, ArticleText> = {
           "Un plan gratuito sin límite de tiempo (2 operaciones al día) y 3 días de Pro sin tarjeta.",
           "Pro cuesta $14.99 al mes o $119 al año; la opción más barata de Edgewonk es $197 al año.",
           "Toda la aplicación en 9 idiomas, incluidos español, turco, persa y árabe.",
-          "MetaTrader 5 se conecta con un pequeño complemento y una clave; nunca compartes tu contraseña de inversor.",
+          "MetaTrader 4 y 5 se conectan con un pequeño complemento y una clave; nunca compartes tu contraseña de inversor.",
           "Análisis de disciplina integrado (operaciones de venganza, más riesgo tras pérdidas, sobreoperar, operar fuera de horario) y seguimiento de límites de prop firms."
         ]
       },

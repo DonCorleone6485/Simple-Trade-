@@ -10,6 +10,9 @@ const TEXT: Record<string, ArticleText> = {
         "p": "Her işlemi journal'a elle yazmak, insanların journal tutmayı bırakmasının bir numaralı sebebi. MetaTrader 5 eklentisiyle her işlem açıldığı anda kaydediliyor, kapandığında tamamlanıyor: giriş, çıkış, stop, lot, komisyon ve swap dahil. Sen yalnızca MetaTrader'ın bilemeyeceğini eklersin: setup'ın, gerekçen ve o anki hislerin."
       },
       {
+        "note": "MetaTrader 4 mü kullanıyorsun? Adımlar aynı: MetaTrader ekranında MetaTrader 4'ü seç, SimpleTradingJournal.mq4 dosyasını indir ve MQL4 → Experts klasörüne koy. MetaTrader 4 yeniden başlarken dosyayı kendisi derler."
+      },
+      {
         "h2": "Ne gerekiyor"
       },
       {
@@ -371,12 +374,12 @@ const TEXT: Record<string, ArticleText> = {
           ],
           [
             "MetaTrader otomatik kayıt",
-            "MetaTrader 5 (MT4: rapor aktarma)",
+            "MT4 ve MT5",
             "MT4 ve MT5"
           ],
           [
             "MetaTrader nasıl bağlanıyor",
-            "MT5'e eklenti + anahtar, şifre paylaşılmaz",
+            "MetaTrader'a eklenti + anahtar, şifre paylaşılmaz",
             "Hesap numarası + yatırımcı şifresi"
           ],
           [
@@ -407,7 +410,7 @@ const TEXT: Record<string, ArticleText> = {
           "Süre sınırı olmayan ücretsiz plan (günde 2 işlem) ve kartsız 3 günlük Pro denemesi.",
           "Pro aylık $14.99 ya da yıllık $119 — Tradezella'nın en ucuz seçeneği aylık $35.",
           "Uygulamanın tamamı 9 dilde; Türkçe, Farsça ve Arapça dahil.",
-          "MetaTrader 5 küçük bir eklenti ve anahtarla bağlanıyor; yatırımcı şifreni hiç paylaşmıyorsun.",
+          "MetaTrader 4 ve 5 küçük bir eklenti ve anahtarla bağlanıyor; yatırımcı şifreni hiç paylaşmıyorsun.",
           "Hazır disiplin analizi (intikam işlemi, kayıptan sonra artan risk, aşırı işlem, alışılmadık saatler) ve prop firma sınır takibi."
         ]
       },
@@ -455,7 +458,7 @@ const TEXT: Record<string, ArticleText> = {
           ],
           [
             "MetaTrader otomatik kayıt",
-            "MetaTrader 5 (MT4: rapor aktarma)",
+            "MT4 ve MT5",
             "MT4 ve MT5"
           ],
           [
@@ -486,7 +489,7 @@ const TEXT: Record<string, ArticleText> = {
           "Süre sınırı olmayan ücretsiz plan (günde 2 işlem) ve kartsız 3 günlük Pro denemesi.",
           "Pro aylık $14.99 ya da yıllık $119 — TraderSync'in en ucuz seçeneği aylık $29.95.",
           "Uygulamanın tamamı 9 dilde; Türkçe, Farsça ve Arapça dahil.",
-          "MetaTrader 5 küçük bir eklenti ve anahtarla bağlanıyor; yatırımcı şifreni hiç paylaşmıyorsun.",
+          "MetaTrader 4 ve 5 küçük bir eklenti ve anahtarla bağlanıyor; yatırımcı şifreni hiç paylaşmıyorsun.",
           "Hazır disiplin analizi (intikam işlemi, kayıptan sonra artan risk, aşırı işlem, alışılmadık saatler) ve prop firma sınır takibi."
         ]
       },
@@ -534,12 +537,12 @@ const TEXT: Record<string, ArticleText> = {
           ],
           [
             "MetaTrader otomatik kayıt",
-            "MetaTrader 5 (MT4: rapor aktarma)",
+            "MT4 ve MT5",
             "MT4 ve MT5"
           ],
           [
             "MetaTrader nasıl bağlanıyor",
-            "MT5'e eklenti + anahtar, şifre paylaşılmaz",
+            "MetaTrader'a eklenti + anahtar, şifre paylaşılmaz",
             "MetaTrader'ın FTP ile rapor yayını"
           ],
           [
@@ -570,7 +573,7 @@ const TEXT: Record<string, ArticleText> = {
           "Süre sınırı olmayan ücretsiz plan (günde 2 işlem) ve kartsız 3 günlük Pro denemesi.",
           "Pro aylık $14.99 ya da yıllık $119 — Edgewonk'un en ucuz seçeneği yıllık $197.",
           "Uygulamanın tamamı 9 dilde; Türkçe, Farsça ve Arapça dahil.",
-          "MetaTrader 5 küçük bir eklenti ve anahtarla bağlanıyor; yatırımcı şifreni hiç paylaşmıyorsun.",
+          "MetaTrader 4 ve 5 küçük bir eklenti ve anahtarla bağlanıyor; yatırımcı şifreni hiç paylaşmıyorsun.",
           "Hazır disiplin analizi (intikam işlemi, kayıptan sonra artan risk, aşırı işlem, alışılmadık saatler) ve prop firma sınır takibi."
         ]
       },
