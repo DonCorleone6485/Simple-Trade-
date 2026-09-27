@@ -1,4 +1,5 @@
 import React from 'react';
+import { pick, localeOf } from '../lib/appCopy';
 import { BarChart2 } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -21,14 +22,14 @@ const RULE_KEYS: Record<RuleKey, [string, string]> = {
 /** Bütün journal'lar birlikte: disiplin hesabın değil, kişinin özelliği. */
 export default function DisciplineView({ trades, journalCount }: DisciplineViewProps) {
   const { t, language } = useLanguage();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
   const report = analyseDiscipline(trades);
 
   const label: React.CSSProperties = {
     fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.14em',
     color: 'rgba(255,255,255,0.5)', marginBottom: '10px',
   };
-  const lower = (s: string) => s.toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US');
+  const lower = (s: string) => s.toLocaleLowerCase(localeOf(language));
 
   return (
     <div className="max-w-3xl space-y-10">

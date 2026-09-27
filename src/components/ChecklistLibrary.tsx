@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { pick } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { Plus, X, Pencil, Check, ClipboardList, Loader } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
@@ -17,7 +18,7 @@ const newItemId = () => `c-${Date.now()}-${Math.random().toString(36).slice(2, 6
 export default function ChecklistLibrary() {
   const { user } = useUser();
   const { language } = useLanguage();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
 
   const [lists, setLists] = useState<NamedChecklist[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +67,7 @@ export default function ChecklistLibrary() {
 
   const removeList = async (id: string) => {
     const list = lists.find(l => l.id === id);
-    if (!confirm(tr(`"${list?.name}" listesi silinsin mi?`, `Delete the list "${list?.name}"?`))) return;
+    if (!confirm(tr('"{0}" listesi silinsin mi?', 'Delete the list "{0}"?', list?.name))) return;
     const next = lists.filter(l => l.id !== id);
     if (activeId === id) setActiveId(next[0]?.id ?? null);
     await persist(next);
@@ -115,8 +116,7 @@ export default function ChecklistLibrary() {
   return (
     <div className="max-w-3xl space-y-8">
       <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-        {tr('Farklı stratejiler için ayrı listeler tut. Yeni işlem açarken hangisini kullanacağını seçersin; seçtiğin liste o journal\'da kalır.',
-            'Keep a separate list for each strategy. You pick one when logging a trade, and it stays chosen for that journal.')}
+        {tr('Farklı stratejiler için ayrı listeler tut. Yeni işlem açarken hangisini kullanacağını seçersin; seçtiğin liste o journal\'da kalır.', 'Keep a separate list for each strategy. You pick one when logging a trade, and it stays chosen for that journal.')}
       </p>
 
       {/* ── Listeler ── */}

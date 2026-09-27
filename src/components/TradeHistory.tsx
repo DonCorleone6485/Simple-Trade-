@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { pick, localeOf } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { Trade, OrderType } from '../types';
 import { isWinTrade, isLossTrade, isBreakevenTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
@@ -167,14 +168,12 @@ export default function TradeHistory({
       <div className="w-full max-w-sm rounded-2xl p-5" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.08)' }}
         onClick={e => e.stopPropagation()}>
         <h3 className="font-display text-[18px] text-white">
-          {language === 'tr' ? "Başka Journal'a Taşı" : 'Move to Another Journal'}
+          {pick(language, 'Başka Journal\'a Taşı', 'Move to Another Journal')}
         </h3>
         <p className="text-sm mt-1.5 mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
           {movingIds.length === 1
-            ? (language === 'tr' ? 'Bu işlem seçtiğin journal\'a taşınacak.' : 'This trade will move to the journal you pick.')
-            : (language === 'tr'
-                ? `${movingIds.length} işlem seçtiğin journal'a taşınacak.`
-                : `${movingIds.length} trades will move to the journal you pick.`)}
+            ? (pick(language, 'Bu işlem seçtiğin journal\'a taşınacak.', 'This trade will move to the journal you pick.'))
+            : (pick(language, '{0} işlem seçtiğin journal\'a taşınacak.', '{0} trades will move to the journal you pick.', movingIds.length))}
         </p>
         <div className="space-y-2">
           {otherJournals.map(j => (
@@ -235,7 +234,7 @@ export default function TradeHistory({
       if (data.error) throw new Error(data.error);
       setAiAnalysis(data.analysis);
     } catch (e) {
-      setAiError((language === 'tr' ? 'Analiz yapılamadı. Lütfen tekrar deneyin.' : 'The analysis could not be completed. Please try again.'));
+      setAiError((pick(language, 'Analiz yapılamadı. Lütfen tekrar deneyin.', 'The analysis could not be completed. Please try again.')));
     } finally {
       setAiLoading(false);
     }
@@ -364,7 +363,7 @@ export default function TradeHistory({
     sortedByDate.forEach(t => {
       const d = new Date(t.date);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      const label = new Intl.DateTimeFormat(language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US',
+      const label = new Intl.DateTimeFormat(localeOf(language),
         { month: 'short', year: '2-digit' }).format(d);
       const cur = map.get(key) || { label, pnl: 0, total: 0 };
       cur.pnl += tradePnL(t);
@@ -524,12 +523,12 @@ export default function TradeHistory({
     const orderLabel: Record<string, string> = { Market: t('orderMarket'), Limit: t('orderLimit'), Stop: t('orderStop') };
     const header = [
       t('dateTime'), t('exitDateTime'), t('symbol'), t('type'), t('orderType'), t('setup'),
-      language === 'tr' ? 'Giriş fiyatı' : 'Entry price',
-      language === 'tr' ? 'Stop' : 'Stop loss',
-      language === 'tr' ? 'Çıkış fiyatı' : 'Exit price',
-      t('risk'), language === 'tr' ? 'Kâr/Zarar' : 'P&L', t('realizedR'), t('plannedRR'), t('result'),
+      pick(language, 'Giriş fiyatı', 'Entry price'),
+      pick(language, 'Stop', 'Stop loss'),
+      pick(language, 'Çıkış fiyatı', 'Exit price'),
+      t('risk'), pick(language, 'Kâr/Zarar', 'P&L'), t('realizedR'), t('plannedRR'), t('result'),
       t('emotion'), t('preTrade'), t('postTrade'), t('photos'),
-      language === 'tr' ? 'Pozisyon no' : 'Position ID',
+      pick(language, 'Pozisyon no', 'Position ID'),
     ];
     const rows = chosen.map(tr => [
       csvDate(tr.date), csvDate(tr.exitDate), tr.symbol,
@@ -593,9 +592,7 @@ export default function TradeHistory({
     const hadChecklist = !!(editingTrade.checklist && editingTrade.checklist.length > 0);
     if (!hadChecklist && !(merged.checklist || []).some(i => i.checked)) merged.checklist = undefined;
     if (merged.exitDate && new Date(merged.exitDate).getTime() < new Date(merged.date).getTime()) {
-      alert(language === 'tr'
-        ? 'Çıkış tarihi, giriş tarihinden önce olamaz.'
-        : 'Exit time cannot be earlier than entry time.');
+      alert(pick(language, 'Çıkış tarihi, giriş tarihinden önce olamaz.', 'Exit time cannot be earlier than entry time.'));
       return;
     }
     onUpdate(merged);
@@ -619,7 +616,7 @@ export default function TradeHistory({
   const addEditPhotoFromLink = async (url: string, kind: 'pre' | 'post'): Promise<string | null> => {
     const current = kind === 'pre' ? (editForm.preTradePhotos || []) : (editForm.postTradePhotos || []);
     if (!isOwner && current.length >= 3) {
-      return language === 'tr' ? 'En fazla 3 fotoğraf.' : 'At most 3 photos.';
+      return pick(language, 'En fazla 3 fotoğraf.', 'At most 3 photos.');
     }
     const { file, error } = await fetchPhotoFromLink(url, getToken, language);
     if (!file) return error || null;
@@ -630,7 +627,7 @@ export default function TradeHistory({
     const files = Array.from(e.target.files || []) as File[];
     const current = kind === 'pre' ? (editForm.preTradePhotos || []) : (editForm.postTradePhotos || []);
     if (!isOwner && current.length + files.length > 3) {
-      alert((language === 'tr' ? 'En fazla 3 fotoğraf yükleyebilirsiniz.' : 'You can upload at most 3 photos.'));
+      alert((pick(language, 'En fazla 3 fotoğraf yükleyebilirsiniz.', 'You can upload at most 3 photos.')));
       return;
     }
     setUploadingEditPhoto(true);
@@ -642,7 +639,7 @@ export default function TradeHistory({
     setUploadingEditPhoto(false);
     e.target.value = '';
     if (failure) {
-      alert(language === 'tr' ? `Fotoğraf yüklenemedi: ${failure}` : `Photo upload failed: ${failure}`);
+      alert(pick(language, 'Fotoğraf yüklenemedi: {0}', 'Photo upload failed: {0}', failure));
     }
   };
 
@@ -716,7 +713,7 @@ export default function TradeHistory({
             <span><span style={{ color: '#34d399' }}>●</span> {winningTrades.length} {t('winnersCount')}</span>
             {breakevenCount > 0 && <span><span style={{ color: 'rgba(255,255,255,0.5)' }}>●</span> {breakevenCount} {t('breakevenCount')}</span>}
             <span><span style={{ color: '#f87171' }}>●</span> {losingTrades.length} {t('losersCount')}</span>
-            <span className="ms-auto">{totalClosed} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
+            <span className="ms-auto">{totalClosed} {t('totalTrades').toLocaleLowerCase(localeOf(language))}</span>
           </div>
         </div>
 
@@ -724,7 +721,7 @@ export default function TradeHistory({
         <Section title={t('riskMetrics')}>
           <StatGrid items={[
             { label: t('expectancy'), value: signedMoney(expectancy), color: expectancy >= 0 ? '#34d399' : '#f87171',
-              hint: language === 'tr' ? 'İşlem başına uzun vadeli ortalama' : 'Long-run average per trade' },
+              hint: pick(language, 'İşlem başına uzun vadeli ortalama', 'Long-run average per trade') },
             { label: t('profitFactor'), value: profitFactor },
             { label: t('avgRealizedR'), value: formatR(avgR), color: avgR == null ? undefined : avgR >= 0 ? '#34d399' : '#f87171' },
             { label: t('payoffRatio'), value: payoff != null ? `${payoff.toFixed(2)}x` : '-' },
@@ -759,7 +756,7 @@ export default function TradeHistory({
                     )}
                   </div>
                   <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    {b.count} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
+                    {b.count} {t('totalTrades').toLocaleLowerCase(localeOf(language))}
                   </div>
                 </div>
               ))}
@@ -783,7 +780,7 @@ export default function TradeHistory({
                     {signedMoney(disciplineReport.cleanPnL)}
                   </div>
                   <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    {disciplineReport.cleanCount} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
+                    {disciplineReport.cleanCount} {t('totalTrades').toLocaleLowerCase(localeOf(language))}
                   </div>
                 </div>
                 <div>
@@ -793,7 +790,7 @@ export default function TradeHistory({
                     {signedMoney(disciplineReport.flaggedPnL)}
                   </div>
                   <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    {disciplineReport.flaggedCount} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
+                    {disciplineReport.flaggedCount} {t('totalTrades').toLocaleLowerCase(localeOf(language))}
                   </div>
                 </div>
               </div>
@@ -933,7 +930,7 @@ export default function TradeHistory({
                     {dir === 'Buy' ? t('buy') : t('sell')}
                   </span>
                   <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    {total} {t('totalTrades').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
+                    {total} {t('totalTrades').toLocaleLowerCase(localeOf(language))}
                   </span>
                 </div>
                 <div className="w-full h-1.5 rounded-full mb-3" style={{ background: 'rgba(255,255,255,0.06)' }}>
@@ -1102,7 +1099,7 @@ export default function TradeHistory({
             className="link-gold flex items-center gap-2 text-sm font-medium"
             style={{ color: 'rgba(255,255,255,0.5)' }}>
             <ChevronLeft className="w-4 h-4" />
-            {language === 'tr' ? 'Geri' : 'Back'}
+            {pick(language, 'Geri', 'Back')}
           </button>
           <div className="flex items-center gap-3">
             <button onClick={closeOverlay} className="px-4 py-2 text-sm rounded-xl"
@@ -1118,7 +1115,7 @@ export default function TradeHistory({
         </div>
 
         <div className="rounded-2xl p-6 space-y-6" style={card}>
-          <h2 className="text-lg font-semibold text-white">{language === 'tr' ? 'İşlemi Düzenle' : language === 'fa' ? 'ویرایش معامله' : 'Edit Trade'}</h2>
+          <h2 className="text-lg font-semibold text-white">{pick(language, 'İşlemi Düzenle', 'Edit Trade')}</h2>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
@@ -1235,7 +1232,7 @@ export default function TradeHistory({
           </div>
 
           <div>
-            <label style={lbl}>{language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}</label>
+            <label style={lbl}>{pick(language, 'Multi Timeframe Analiz', 'Multi-Timeframe Analysis')}</label>
             <MTFAnalysis
               value={editForm.mtfAnalysis || []}
               onChange={entries => setEditForm(f => ({ ...f, mtfAnalysis: entries }))}
@@ -1280,7 +1277,7 @@ export default function TradeHistory({
                         }}
                       >
                         {uploadingEditPhoto
-                          ? <><Loader className="w-4 h-4 mb-1 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{language === 'tr' ? 'Yükleniyor...' : 'Uploading...'}</span></>
+                          ? <><Loader className="w-4 h-4 mb-1 animate-spin" style={{ color: '#8b5cf6' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{pick(language, 'Yükleniyor...', 'Uploading...')}</span></>
                           : <><Upload className="w-4 h-4 mb-1" style={{ color: 'rgba(255,255,255,0.5)' }} /><span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('photoUpload')}</span></>
                         }
                         <input type="file" ref={fileRef} onChange={e => handleEditPhotoUpload(e, kind)} accept="image/*" multiple className="hidden" disabled={uploadingEditPhoto} />
@@ -1376,18 +1373,18 @@ export default function TradeHistory({
               )}
               {canMove && (
                 <button onClick={() => setMovingIds([selectedTrade.id])}
-                  title={language === 'tr' ? "Başka journal'a taşı" : 'Move to another journal'}
+                  title={pick(language, 'Başka journal\'a taşı', 'Move to another journal')}
                   className="ui-pill flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
                   style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}>
                   <FolderInput className="w-4 h-4" />
-                  {language === 'tr' ? 'Taşı' : 'Move'}
+                  {pick(language, 'Taşı', 'Move')}
                 </button>
               )}
               <button onClick={e => startEdit(selectedTrade, e)}
                 className="ui-pill flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
                 style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}>
                 <Edit2 className="w-4 h-4" />
-                {language === 'tr' ? 'Düzenle' : 'Edit'}
+                {pick(language, 'Düzenle', 'Edit')}
               </button>
               <button onClick={() => { onDelete(selectedTrade.id); closeOverlay(); }}
                 className="ui-pill ui-pill-danger flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-all"
@@ -1506,7 +1503,7 @@ export default function TradeHistory({
                   {(selectedTrade.mtfAnalysis?.length ?? 0) > 0 && (
                     <div className="space-y-4">
                       <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                        {language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}
+                        {pick(language, 'Multi Timeframe Analiz', 'Multi-Timeframe Analysis')}
                       </h4>
                       <MTFAnalysisView entries={selectedTrade.mtfAnalysis!} />
                     </div>
@@ -1612,12 +1609,12 @@ export default function TradeHistory({
             ? <CheckSquare className="w-4 h-4" style={{ color: '#8b5cf6' }} />
             : <Square className="w-4 h-4" />}
           <span>{selectedIds.size === trades.length && trades.length > 0
-            ? (language === 'tr' ? 'Tümünü Kaldır' : 'Deselect All')
-            : (language === 'tr' ? 'Tümünü Seç' : 'Select All')}</span>
+            ? (pick(language, 'Tümünü Kaldır', 'Deselect All'))
+            : (pick(language, 'Tümünü Seç', 'Select All'))}</span>
           {/* Kısmi seçimde kaç tane olduğunu söyle. */}
           {selectedIds.size > 0 && selectedIds.size < trades.length && (
             <span className="text-[13px]" style={{ color: '#a78bfa' }}>
-              · {selectedIds.size} {language === 'tr' ? 'seçili' : 'selected'}
+              · {selectedIds.size} {pick(language, 'seçili', 'selected')}
             </span>
           )}
         </button>
@@ -1627,18 +1624,18 @@ export default function TradeHistory({
             className="ui-pill flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all ms-auto me-3"
             style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.25)' }}>
             <FolderInput className="w-4 h-4" />
-            {selectedIds.size} {language === 'tr' ? 'işlemi taşı' : 'trades — move'}
+            {selectedIds.size} {pick(language, 'işlemi taşı', 'trades — move')}
           </button>
         )}
 
         <button onClick={exportTrades} disabled={trades.length === 0}
           className="ui-pill flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all disabled:opacity-40 order-last ms-3"
           style={{ color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
-          title={language === 'tr' ? "Excel'de açılan CSV dosyası olarak indir" : 'Download as a CSV file that opens in Excel'}>
+          title={pick(language, 'Excel\'de açılan CSV dosyası olarak indir', 'Download as a CSV file that opens in Excel')}>
           <Download className="w-4 h-4" />
           {selectedIds.size > 0
-            ? (language === 'tr' ? `${selectedIds.size} işlemi dışa aktar` : `Export ${selectedIds.size}`)
-            : (language === 'tr' ? 'Excel’e aktar' : 'Export to Excel')}
+            ? (pick(language, '{0} işlemi dışa aktar', 'Export {0}', selectedIds.size))
+            : (pick(language, 'Excel’e aktar', 'Export to Excel'))}
         </button>
 
         {selectedIds.size > 0 && (
@@ -1646,7 +1643,7 @@ export default function TradeHistory({
             className="ui-pill ui-pill-danger flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-all"
             style={{ background: 'rgba(248,113,113,0.1)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}>
             <Trash2 className="w-4 h-4" />
-            {selectedIds.size} {language === 'tr' ? 'işlemi sil' : 'trades delete'}
+            {selectedIds.size} {pick(language, 'işlemi sil', 'trades delete')}
           </button>
         )}
       </div>
@@ -1694,7 +1691,7 @@ export default function TradeHistory({
                       {/* Saat: gün başlığı hangi gün olduğunu söylüyor, bu da
                           günün neresinde olduğunu. Satırdaki boşluğu da doldurur. */}
                       <span className="hidden sm:inline w-12 font-mono text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                        {new Date(trade.date).toLocaleTimeString(language === 'tr' ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(trade.date).toLocaleTimeString(localeOf(language), { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       <span className="hover-title w-20 sm:w-24 font-medium flex items-center gap-1.5">
                         {isLocked && <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#a78bfa' }} />}
@@ -1745,20 +1742,20 @@ export default function TradeHistory({
                         <button onClick={e => startEdit(trade, e)}
                           className="ui-pill p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                           style={{ color: '#a78bfa' }}
-                          title={language === 'tr' ? 'Düzenle' : 'Edit'}>
+                          title={pick(language, 'Düzenle', 'Edit')}>
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button onClick={e => { e.stopPropagation(); openOverlay(() => setSelectedTrade(trade)); }}
                           className="ui-pill p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                           style={{ color: 'rgba(255,255,255,0.5)' }}
-                          title={language === 'tr' ? 'Detaylar' : 'Details'}>
+                          title={pick(language, 'Detaylar', 'Details')}>
                           <Eye className="w-3.5 h-3.5" />
                         </button>
                         {canMove && (
                           <button onClick={e => { e.stopPropagation(); setMovingIds([trade.id]); }}
                             className="ui-pill p-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1"
                             style={{ color: 'rgba(255,255,255,0.5)' }}
-                            title={language === 'tr' ? "Başka journal'a taşı" : 'Move to another journal'}>
+                            title={pick(language, 'Başka journal\'a taşı', 'Move to another journal')}>
                             <FolderInput className="w-3.5 h-3.5" />
                           </button>
                         )}

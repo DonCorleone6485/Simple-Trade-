@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { pick } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import {
   TrendingUp, BookOpen, List, CalendarDays, BarChart2, Target,
@@ -54,7 +55,7 @@ export default function AppShell({
   const { t, language } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
   const isRTL = language === 'fa' || language === 'ar';
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
 
   const go = (key: NavKey) => { onNavigate(key); setMobileOpen(false); };
 

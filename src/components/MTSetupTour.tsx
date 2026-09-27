@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { pick } from '../lib/appCopy';
 import { Play, Pause } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -39,7 +40,7 @@ interface Step {
 
 export default function MTSetupTour() {
   const { language } = useLanguage();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -58,62 +59,47 @@ export default function MTSetupTour() {
   const steps: Step[] = useMemo(() => [
     /* 01 — Dosyayı Experts klasörüne koy */
     { sc: 0, beat: 0, dur: 2300, cursor: [300, 250],
-      cap: tr('İndirdiğin `SimpleTradingJournal.ex5` dosyası MetaTrader\'ın kendi klasörüne girmeli. Yolu terminalin kendisi açıyor.',
-              'The `SimpleTradingJournal.ex5` file you downloaded has to go into MetaTrader\'s own folder. The terminal opens that folder for you.') },
+      cap: tr('İndirdiğin `SimpleTradingJournal.ex5` dosyası MetaTrader\'ın kendi klasörüne girmeli. Yolu terminalin kendisi açıyor.', 'The `SimpleTradingJournal.ex5` file you downloaded has to go into MetaTrader\'s own folder. The terminal opens that folder for you.') },
     { sc: 0, beat: 1, dur: 2400, cursor: [70, 80], click: true, ring: 's0-file',
-      cap: tr('**Dosya** menüsünü aç, **Veri Klasörünü Aç**\'a tıkla.',
-              'Open the **File** menu and click **Open Data Folder**.') },
+      cap: tr('**Dosya** menüsünü aç, **Veri Klasörünü Aç**\'a tıkla.', 'Open the **File** menu and click **Open Data Folder**.') },
     { sc: 0, beat: 2, dur: 2600, cursor: [300, 210], click: true, ring: 's0-experts',
-      cap: tr('Açılan pencerede **MQL5** klasörünün içindesin. **Experts**\'e çift tıkla.',
-              'The window opens inside **MQL5**. Double-click **Experts**.') },
+      cap: tr('Açılan pencerede **MQL5** klasörünün içindesin. **Experts**\'e çift tıkla.', 'The window opens inside **MQL5**. Double-click **Experts**.') },
     { sc: 0, beat: 3, dur: 1600, cursor: [420, 300],
-      cap: tr('Klasör boş ya da içinde başka eklentiler var — ikisi de olur.',
-              'The folder may be empty or already hold other add-ons — either is fine.') },
+      cap: tr('Klasör boş ya da içinde başka eklentiler var — ikisi de olur.', 'The folder may be empty or already hold other add-ons — either is fine.') },
     { sc: 0, beat: 4, dur: 2800, cursor: [330, 290],
-      cap: tr('İndirdiğin dosyayı buraya sürükle. Adım tamam.',
-              'Drag the downloaded file in here. That step is done.') },
+      cap: tr('İndirdiğin dosyayı buraya sürükle. Adım tamam.', 'Drag the downloaded file in here. That step is done.') },
 
     /* 02 — WebRequest izni */
     { sc: 1, beat: 0, dur: 2600, cursor: [280, 80], click: true, ring: 's1-tools',
-      cap: tr('Eklenti işlemleri siteye gönderecek. MetaTrader bu izni sormadan vermez: **Araçlar › Seçenekler**.',
-              'The add-on will send your trades to the site. MetaTrader will not allow that until you say so: **Tools › Options**.') },
+      cap: tr('Eklenti işlemleri siteye gönderecek. MetaTrader bu izni sormadan vermez: **Araçlar › Seçenekler**.', 'The add-on will send your trades to the site. MetaTrader will not allow that until you say so: **Tools › Options**.') },
     { sc: 1, beat: 1, dur: 2200, cursor: [470, 140], click: true, ring: 's1-tab',
       cap: tr('**Uzman Danışmanlar** sekmesine geç.', 'Go to the **Expert Advisors** tab.') },
     { sc: 1, beat: 2, dur: 2200, cursor: [250, 232], click: true, ring: 's1-check',
-      cap: tr('“Listelenen URL\'ler için WebRequest\'e izin ver” kutusunu işaretle.',
-              'Tick “Allow WebRequest for listed URL”.') },
+      cap: tr('“Listelenen URL\'ler için WebRequest\'e izin ver” kutusunu işaretle.', 'Tick “Allow WebRequest for listed URL”.') },
     { sc: 1, beat: 3, dur: 3200, cursor: [400, 268], typing: { el: 's1-list', text: URL_TEXT },
-      cap: tr('Alttaki listeye adresi ekle: `https://www.simpletradejournal.io`',
-              'Add this address to the list below: `https://www.simpletradejournal.io`') },
+      cap: tr('Alttaki listeye adresi ekle: `https://www.simpletradejournal.io`', 'Add this address to the list below: `https://www.simpletradejournal.io`') },
     { sc: 1, beat: 4, dur: 1800, cursor: [600, 368], click: true, press: 's1-ok',
       cap: tr('**Tamam**. İzin verildi.', '**OK**. Permission granted.') },
 
     /* 03 — Yeniden başlat */
     { sc: 2, beat: 0, dur: 2000, cursor: [760, 60], click: true, ring: 's2-x',
-      cap: tr('MetaTrader yeni dosyayı ancak yeniden açılınca görür. Kapat.',
-              'MetaTrader only notices the new file after a restart. Close it.') },
+      cap: tr('MetaTrader yeni dosyayı ancak yeniden açılınca görür. Kapat.', 'MetaTrader only notices the new file after a restart. Close it.') },
     { sc: 2, beat: 1, dur: 1500, cursor: [480, 270], hide: 's2-win',
       cap: tr('Kapat ve tekrar aç.', 'Close it and open it again.') },
     { sc: 2, beat: 2, dur: 3000, cursor: [190, 250], ring: 's2-ea',
-      cap: tr('Soldaki **Kılavuz** panelinde, **Uzman Danışmanlar** altında **SimpleTradingJournal** göründü. Panel kapalıysa **Ctrl+N** ile aç.',
-              '**SimpleTradingJournal** now sits under **Expert Advisors** in the **Navigator** panel on the left. If the panel is hidden, **Ctrl+N** brings it back.') },
+      cap: tr('Soldaki **Kılavuz** panelinde, **Uzman Danışmanlar** altında **SimpleTradingJournal** göründü. Panel kapalıysa **Ctrl+N** ile aç.', '**SimpleTradingJournal** now sits under **Expert Advisors** in the **Navigator** panel on the left. If the panel is hidden, **Ctrl+N** brings it back.') },
 
     /* 04 — Grafiğe sürükle, anahtarı yapıştır */
     { sc: 3, beat: 0, dur: 4600, cursor: [600, 300], drag: [[150, 205], [600, 300]],
-      cap: tr('Eklentiyi bir grafiğin üstüne sürükle. Başka bir uzman danışman kullanıyorsan **boş bir grafik** aç ve oraya koy — böylece sürekli çalışır.',
-              'Drag the add-on onto a chart. If you already use another expert advisor, open an **empty chart** and put it there — that way it stays on.') },
+      cap: tr('Eklentiyi bir grafiğin üstüne sürükle. Başka bir uzman danışman kullanıyorsan **boş bir grafik** aç ve oraya koy — böylece sürekli çalışır.', 'Drag the add-on onto a chart. If you already use another expert advisor, open an **empty chart** and put it there — that way it stays on.') },
     { sc: 3, beat: 1, dur: 2400, cursor: [420, 150], click: true, ring: 's3-tab',
-      cap: tr('Açılan pencerede **Girdiler** sekmesine geç.',
-              'In the window that opens, go to the **Inputs** tab.') },
+      cap: tr('Açılan pencerede **Girdiler** sekmesine geç.', 'In the window that opens, go to the **Inputs** tab.') },
     { sc: 3, beat: 2, dur: 4200, cursor: [500, 205], typing: { el: 's3-key', text: KEY_TEXT },
-      cap: tr('**ApiKey** satırına, yukarıda ürettiğin anahtarı yapıştır. Boş bırakırsan eklenti çalışmaz. Öteki satırlara dokunma.',
-              'Paste the key you created above into the **ApiKey** row. Left empty, the add-on does not run. Leave the other rows alone.') },
+      cap: tr('**ApiKey** satırına, yukarıda ürettiğin anahtarı yapıştır. Boş bırakırsan eklenti çalışmaz. Öteki satırlara dokunma.', 'Paste the key you created above into the **ApiKey** row. Left empty, the add-on does not run. Leave the other rows alone.') },
     { sc: 3, beat: 3, dur: 2600, cursor: [590, 326], click: true, press: 's3-ok',
-      cap: tr('**Tamam** dedikten sonra grafiğin sol üstünde eklentinin durumu yazar.',
-              'After **OK**, the add-on writes its status at the top-left of the chart.') },
+      cap: tr('**Tamam** dedikten sonra grafiğin sol üstünde eklentinin durumu yazar.', 'After **OK**, the add-on writes its status at the top-left of the chart.') },
     { sc: 3, beat: 4, dur: 3000, cursor: [590, 326],
-      cap: tr('Geçmiş tarandı, kapanan işlemler journal\'a gitti. Sağ üstteki gülen yüz “çalışıyor” demek.',
-              'History scanned, closed trades sent to the journal. The smiley at the top-right means it is running.') },
+      cap: tr('Geçmiş tarandı, kapanan işlemler journal\'a gitti. Sağ üstteki gülen yüz “çalışıyor” demek.', 'History scanned, closed trades sent to the journal. The smiley at the top-right means it is running.') },
 
     /* Kapanış */
     { sc: 4, beat: 0, dur: 4000,
@@ -554,8 +540,7 @@ export default function MTSetupTour() {
               <div className="tick">✓</div>
               <h3>{tr('Kurulum bitti', 'Setup complete')}</h3>
               <p>
-                {tr('Bundan sonra açtığın her pozisyon, sen hiçbir şey yapmadan journal\'ına düşer — açık işlem olarak. Notunu ve fotoğrafını pozisyon hayattayken yazarsın; kapandığında eklenti aynı kaydı sonuçla tamamlar, ikinci bir satır açmaz. MetaTrader açık olduğu sürece otuz saniyede bir bakar.',
-                    'From now on every position you open lands in your journal by itself, as an open trade. You write the notes and attach the screenshot while it is still live; when it closes the add-on completes that same record instead of adding a second row. It checks every thirty seconds while MetaTrader is open.')}
+                {tr('Bundan sonra açtığın her pozisyon, sen hiçbir şey yapmadan journal\'ına düşer — açık işlem olarak. Notunu ve fotoğrafını pozisyon hayattayken yazarsın; kapandığında eklenti aynı kaydı sonuçla tamamlar, ikinci bir satır açmaz. MetaTrader açık olduğu sürece otuz saniyede bir bakar.', 'From now on every position you open lands in your journal by itself, as an open trade. You write the notes and attach the screenshot while it is still live; when it closes the add-on completes that same record instead of adding a second row. It checks every thirty seconds while MetaTrader is open.')}
               </p>
             </div>
           </section>
@@ -614,7 +599,7 @@ function renderCaption(text: string) {
 
 function Titlebar({ closeEl }: { closeEl?: string }) {
   const { language } = useLanguage();
-  const demo = language === 'tr' ? 'Demo Hesap' : 'Demo Account';
+  const demo = pick(language, 'Demo Hesap', 'Demo Account');
   return (
     <div className="titlebar">
       <span className="dot" />

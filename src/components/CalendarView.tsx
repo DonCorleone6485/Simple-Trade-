@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { localeOf } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { ChevronLeft, ChevronRight, X, Lock } from 'lucide-react';
 import { Trade } from '../types';
@@ -92,7 +93,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
 
   const formatTime = (dateStr: string) => {
     const d = new Date(dateStr);
-    return d.toLocaleTimeString(language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleTimeString(localeOf(language), { hour: '2-digit', minute: '2-digit' });
   };
 
   const today = new Date();
@@ -272,7 +273,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
             <div>
               <h3 className="font-semibold text-white">
                 {new Intl.DateTimeFormat(
-                  language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US',
+                  localeOf(language),
                   { dateStyle: 'long' }
                 ).format(new Date(selectedDay))}
               </h3>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { pick } from '../lib/appCopy';
 import { Mic, Square, Wand2, Undo2, Loader, Lock } from 'lucide-react';
 import { useAuth } from '@clerk/clerk-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -102,7 +103,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
   const { language } = useLanguage();
   // Sesli not ve yazım düzeltme yapay zekâ kullanıyor: Pro'ya ait.
   const { isPro, askUpgrade } = usePlan();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
 
   const [listening, setListening] = useState(false);
   const [tidying, setTidying] = useState(false);
@@ -133,9 +134,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
     try { mediaRef.current?.stream?.getTracks().forEach((t: MediaStreamTrack) => t.stop()); } catch { /* yok */ }
   }, []);
 
-  const micDenied = () => setError(tr(
-    'Mikrofon izni verilmedi. Adres çubuğundaki kilit simgesinden açabilirsin.',
-    'Microphone permission was denied. You can allow it from the padlock in the address bar.'));
+  const micDenied = () => setError(tr('Mikrofon izni verilmedi. Adres çubuğundaki kilit simgesinden açabilirsin.', 'Microphone permission was denied. You can allow it from the padlock in the address bar.'));
 
   const startRecording = async () => {
     setError(null);
@@ -383,8 +382,7 @@ export default function NoteField({ value, onChange, placeholder, height = '190p
       )}
       {!Recognition && !CanRecord && (
         <p className="text-[11.5px] mt-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          {tr('Konuşarak yazma bu tarayıcıda çalışmıyor — güncel bir tarayıcı kullan.',
-              'Dictation is not available in this browser — use an up-to-date browser.')}
+          {tr('Konuşarak yazma bu tarayıcıda çalışmıyor — güncel bir tarayıcı kullan.', 'Dictation is not available in this browser — use an up-to-date browser.')}
         </p>
       )}
     </div>

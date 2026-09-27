@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { pick, localeOf } from './lib/appCopy';
 import { aria } from './lib/aria';
 import {
   PlusCircle, Globe, ChevronDown, ChevronLeft,
@@ -712,9 +713,7 @@ export default function App() {
 
     if (error) {
       alert(language === 'tr'
-        ? (language === 'tr'
-        ? 'Kayıt başarısız. Fotoğraflar çok büyük olabilir, daha küçük fotoğraflar deneyin.'
-        : 'Could not save. The photos may be too large — try smaller ones.')
+        ? (pick(language, 'Kayıt başarısız. Fotoğraflar çok büyük olabilir, daha küçük fotoğraflar deneyin.', 'Could not save. The photos may be too large — try smaller ones.'))
         : 'Save failed. Photos may be too large, try smaller images.');
       return;
     }
@@ -745,7 +744,7 @@ export default function App() {
         starting_capital: 10000,
       }).select().single();
       if (error || !data) {
-        alert(language === 'tr' ? 'Journal oluşturulamadı.' : 'Could not create the journal.');
+        alert(pick(language, 'Journal oluşturulamadı.', 'Could not create the journal.'));
         return;
       }
       targetJournal = accountFromRow(data);
@@ -855,7 +854,7 @@ export default function App() {
       .in('id', ids)
       .eq('user_id', user.id);
     if (error) {
-      alert(language === 'tr' ? 'İşlemler taşınamadı.' : 'The trades could not be moved.');
+      alert(pick(language, 'İşlemler taşınamadı.', 'The trades could not be moved.'));
       return;
     }
     setTrades(prev => prev.map(tr =>
@@ -928,7 +927,7 @@ export default function App() {
       starting_capital: 10000,
     }).select().single();
     if (error || !data) {
-      alert(language === 'tr' ? 'Journal oluşturulamadı.' : 'Could not create the journal.');
+      alert(pick(language, 'Journal oluşturulamadı.', 'Could not create the journal.'));
       return;
     }
     const acc = accountFromRow(data);
@@ -1005,12 +1004,12 @@ export default function App() {
 
   const activeStats = activeJournal ? getJournalStats(activeJournal.id) : null;
 
-  const signInLabel = language === 'tr' ? 'Giriş Yap' : language === 'fa' ? 'ورود' : 'Sign In';
-  const signUpLabel = language === 'tr' ? 'Kayıt Ol' : language === 'fa' ? 'ثبت نام' : 'Sign Up';
-  const pricingLabel = language === 'tr' ? 'Fiyatlar' : language === 'fa' ? 'قیمت‌ها' : 'Pricing';
-  const homeLabel = language === 'tr' ? 'Ana Sayfa' : language === 'fa' ? 'صفحه اصلی' : 'Home';
+  const signInLabel = pick(language, 'Giriş Yap', 'Sign In');
+  const signUpLabel = pick(language, 'Kayıt Ol', 'Sign Up');
+  const pricingLabel = pick(language, 'Fiyatlar', 'Pricing');
+  const homeLabel = pick(language, 'Ana Sayfa', 'Home');
   // Dosya biçimi butonun işi değil: CSV de HTML de kabul ediliyor.
-  const importLabel = language === 'tr' ? 'İçe Aktar' : 'Import';
+  const importLabel = pick(language, 'İçe Aktar', 'Import');
 
   // ── PORTAL KABUĞU ──
   const navKey: NavKey =
@@ -1065,7 +1064,7 @@ export default function App() {
       ? [formatDate(activeJournal.startDate), activeJournal.startingCapital ? `${cur()}${int(activeJournal.startingCapital)}` : null]
           .filter(Boolean).join('  ·  ')
       : view === 'dashboard'
-      ? `${accounts.length} journal  ·  ${trades.length} ${language === 'tr' ? 'işlem' : 'trades'}`
+      ? `${accounts.length} journal  ·  ${trades.length} ${pick(language, 'işlem', 'trades')}`
       : undefined;
 
   const pillBtn: React.CSSProperties = {
@@ -1230,7 +1229,7 @@ export default function App() {
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="w-5 h-5" style={{ color: '#a78bfa' }} />
               <h2 className="font-display text-[22px] text-white" style={{ letterSpacing: '-0.01em' }}>
-                {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
+                {pick(language, 'Pro\'ya Geç', 'Upgrade to Pro')}
               </h2>
             </div>
             <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -1240,7 +1239,7 @@ export default function App() {
             {/* Billing Toggle */}
             <div className="flex items-center gap-3 mb-3">
               <span className="text-sm" style={{ color: modalBilling === 'monthly' ? '#fff' : 'rgba(255,255,255,0.4)' }}>
-                {language === 'tr' ? 'Aylık' : 'Monthly'}
+                {pick(language, 'Aylık', 'Monthly')}
               </span>
               <button
                 onClick={() => setModalBilling(modalBilling === 'monthly' ? 'yearly' : 'monthly')}
@@ -1251,7 +1250,7 @@ export default function App() {
                   style={{ left: modalBilling === 'yearly' ? '26px' : '2px' }} />
               </button>
               <span className="text-sm" style={{ color: modalBilling === 'yearly' ? '#fff' : 'rgba(255,255,255,0.4)' }}>
-                {language === 'tr' ? 'Yıllık' : 'Yearly'}
+                {pick(language, 'Yıllık', 'Yearly')}
                 <span className="ms-1 px-1.5 py-0.5 rounded-full text-xs font-semibold"
                   style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
                   %{prices.savings}
@@ -1264,11 +1263,11 @@ export default function App() {
                 {prices.fmt(modalBilling === 'monthly' ? prices.monthly : prices.yearlyMonthly)}
               </span>
               <span className="text-sm ms-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                {language === 'tr' ? '/ ay' : '/ month'}
+                {pick(language, '/ ay', '/ month')}
               </span>
               {modalBilling === 'yearly' && (
                 <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {(language === 'tr' ? 'Yıllık {p} faturalandırılır' : 'Billed {p}/year').replace('{p}', prices.fmt(prices.yearly))}
+                  {(pick(language, 'Yıllık {p} faturalandırılır', 'Billed {p}/year')).replace('{p}', prices.fmt(prices.yearly))}
                 </p>
               )}
             </div>
@@ -1299,7 +1298,7 @@ export default function App() {
                 style={{ background: '#8b5cf6', color: '#fff' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7c3aed'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#8b5cf6'; }}>
-                {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
+                {pick(language, 'Pro\'ya Geç', 'Upgrade to Pro')}
               </button>
             )}
 
@@ -1320,7 +1319,7 @@ export default function App() {
               style={{ color: 'rgba(255,255,255,0.5)' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}>
-              {language === 'tr' ? 'Şimdilik Devam Et' : 'Continue for Now'}
+              {pick(language, 'Şimdilik Devam Et', 'Continue for Now')}
             </button>
           </div>
         </div>
@@ -1394,7 +1393,7 @@ export default function App() {
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}>
               <ChevronLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-              <span>{language === 'tr' ? 'Geri' : language === 'fa' ? 'بازگشت' : 'Back'}</span>
+              <span>{pick(language, 'Geri', 'Back')}</span>
             </button>
 
             <div className="flex items-center gap-2 mb-8">
@@ -1494,7 +1493,7 @@ export default function App() {
                     className="w-full outline-none text-sm" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(248,113,113,0.3)', color: '#fff', borderRadius: '12px', padding: '10px 14px' }} />
                   {deleteError && <p className="text-[13px]" style={{ color: '#f87171' }}>{deleteError}</p>}
                   <button
-                    disabled={deleting || deleteWord.trim().toLocaleUpperCase(language === 'tr' ? 'tr-TR' : 'en-US') !== t('accountDeleteWord')}
+                    disabled={deleting || deleteWord.trim().toLocaleUpperCase(localeOf(language)) !== t('accountDeleteWord')}
                     onClick={async () => {
                       setDeleting(true);
                       setDeleteError('');
@@ -1584,9 +1583,9 @@ export default function App() {
             <div className="p-7 w-full max-w-md space-y-6" style={modalCard}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-display text-[22px] text-white" style={{ letterSpacing: '-0.01em' }}>{language === 'tr' ? 'Referans Kodu Oluştur' : 'Create Referral Code'}</h3>
+                  <h3 className="font-display text-[22px] text-white" style={{ letterSpacing: '-0.01em' }}>{pick(language, 'Referans Kodu Oluştur', 'Create Referral Code')}</h3>
                   <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    {language === 'tr' ? 'Her tıklamada yeni kod oluşturulur' : 'A new code is generated each time'}
+                    {pick(language, 'Her tıklamada yeni kod oluşturulur', 'A new code is generated each time')}
                   </p>
                 </div>
                 <button onClick={() => { setShowReferral(false); setReferralMsg(''); setReferralInput(''); }} aria-label={aria('close', language)}
@@ -1598,21 +1597,21 @@ export default function App() {
               {/* Ödül paylaşım seçimi */}
               <div className="space-y-2">
                 <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  {language === 'tr' ? 'Ödülü nasıl paylaşmak istersiniz?' : 'How would you like to share the reward?'}
+                  {pick(language, 'Ödülü nasıl paylaşmak istersiniz?', 'How would you like to share the reward?')}
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     {
                       key: '50_50',
-                      title: language === 'tr' ? '%50 / %50' : '50% / 50%',
-                      desc: language === 'tr' ? 'Ödülü paylaş' : 'Share the reward',
-                      detail: language === 'tr' ? '1 ay → sen 7 gün, arkadaşın 7 gün\n1 yıl → sen 45 gün, arkadaşın 45 gün' : '1mo → you 7d, friend 7d\n1yr → you 45d, friend 45d',
+                      title: pick(language, '%50 / %50', '50% / 50%'),
+                      desc: pick(language, 'Ödülü paylaş', 'Share the reward'),
+                      detail: pick(language, '1 ay → sen 7 gün, arkadaşın 7 gün\n1 yıl → sen 45 gün, arkadaşın 45 gün', '1mo → you 7d, friend 7d\n1yr → you 45d, friend 45d'),
                     },
                     {
                       key: '100_friend',
-                      title: language === 'tr' ? '%100 Arkadaşa' : '100% to Friend',
-                      desc: language === 'tr' ? 'Tüm ödülü hediye et' : 'Gift all reward',
-                      detail: language === 'tr' ? '1 ay → arkadaşın 14 gün\n1 yıl → arkadaşın 90 gün' : '1mo → friend 14d\n1yr → friend 90d',
+                      title: pick(language, '%100 Arkadaşa', '100% to Friend'),
+                      desc: pick(language, 'Tüm ödülü hediye et', 'Gift all reward'),
+                      detail: pick(language, '1 ay → arkadaşın 14 gün\n1 yıl → arkadaşın 90 gün', '1mo → friend 14d\n1yr → friend 90d'),
                     },
                   ].map(opt => (
                     <button key={opt.key} type="button"
@@ -1650,14 +1649,14 @@ export default function App() {
                 disabled={!referralInput}
                 className="w-full py-3 rounded-full text-sm font-medium transition-all disabled:opacity-40"
                 style={{ background: '#34d399', color: '#04140d', transition: TRANSITION }}>
-                {language === 'tr' ? '✨ Yeni Kod Oluştur' : '✨ Generate New Code'}
+                {pick(language, '✨ Yeni Kod Oluştur', '✨ Generate New Code')}
               </button>
 
               {/* Oluşturulan kod */}
               {referralCode && (
                 <div className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.15)' }}>
                   <p className="text-xs font-semibold" style={{ color: '#34d399' }}>
-                    {language === 'tr' ? '✅ Kodunuz hazır! Arkadaşınızla paylaşın:' : '✅ Your code is ready! Share with your friend:'}
+                    {pick(language, '✅ Kodunuz hazır! Arkadaşınızla paylaşın:', '✅ Your code is ready! Share with your friend:')}
                   </p>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 px-3 py-2 rounded-xl font-mono text-sm font-bold text-white"
@@ -1667,20 +1666,18 @@ export default function App() {
                     <button
                       onClick={() => {
                         navigator.clipboard?.writeText(referralCode).then(() => {
-                          setReferralMsg(language === 'tr' ? '✅ Kopyalandı!' : '✅ Copied!');
+                          setReferralMsg(pick(language, '✅ Kopyalandı!', '✅ Copied!'));
                           setTimeout(() => setReferralMsg(''), 2000);
                         });
                       }}
                       className="px-4 py-2 rounded-full text-sm font-medium flex-shrink-0"
                       style={{ background: 'rgba(52,211,153,0.15)', color: '#34d399', transition: TRANSITION }}>
-                      {language === 'tr' ? 'Kopyala' : 'Copy'}
+                      {pick(language, 'Kopyala', 'Copy')}
                     </button>
                   </div>
                   {referralMsg && <p className="text-sm font-medium" style={{ color: '#34d399' }}>{referralMsg}</p>}
                   <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    {language === 'tr'
-                      ? '⚠️ Bu kod bir kez kullanılabilir. Kullanıldıktan sonra yeni kod oluşturun.'
-                      : '⚠️ This code can only be used once. Generate a new code after it\'s used.'}
+                    {pick(language, '⚠️ Bu kod bir kez kullanılabilir. Kullanıldıktan sonra yeni kod oluşturun.', '⚠️ This code can only be used once. Generate a new code after it\'s used.')}
                   </p>
                 </div>
               )}

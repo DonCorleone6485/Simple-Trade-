@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { pick } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { Upload, X, CheckCircle, AlertTriangle, FileText, Columns } from 'lucide-react';
 import { Trade, TradeResult } from '../types';
@@ -591,7 +592,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
     setFileName(file.name);
     if (!newName) {
       const base = file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
-      setNewName(base.slice(0, 40) || (language === 'tr' ? 'İçe Aktarılan Journal' : 'Imported Journal'));
+      setNewName(base.slice(0, 40) || (pick(language, 'İçe Aktarılan Journal', 'Imported Journal')));
     }
     setLoading(true);
     readFileText(file)
@@ -609,7 +610,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
       })
       .catch(() => setParseResult({
         trades: [], platform: 'Unknown', headers: [], rows: [], map: EMPTY_MAP,
-        errors: [language === 'tr' ? 'Dosya okunamadı.' : 'The file could not be read.'],
+        errors: [pick(language, 'Dosya okunamadı.', 'The file could not be read.')],
       }))
       .finally(() => setLoading(false));
   };
@@ -679,12 +680,10 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-display text-[22px] font-medium text-white">
-              {language === 'tr' ? 'İşlem Geçmişi İçe Aktar' : 'Import Trade History'}
+              {pick(language, 'İşlem Geçmişi İçe Aktar', 'Import Trade History')}
             </h2>
             <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {language === 'tr' ? 'Trade geçmişinizi otomatik içe aktarın' :
-               language === 'fa' ? 'تاریخچه معاملات خود را وارد کنید' :
-               'Automatically import your trade history'}
+              {pick(language, 'Trade geçmişinizi otomatik içe aktarın', 'Automatically import your trade history')}
             </p>
           </div>
           <button onClick={onClose} aria-label={aria('close', language)} className="p-2 rounded-lg" style={{ color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.05)' }}>
@@ -753,7 +752,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
               <button onClick={() => targetReady && setStep('file')} disabled={!targetReady}
                 className="cta px-6 py-2 text-sm font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ background: '#8b5cf6', color: '#fff' }}>
-                {language === 'tr' ? 'Devam' : 'Continue'}
+                {pick(language, 'Devam', 'Continue')}
               </button>
             </div>
           </div>
@@ -763,21 +762,21 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
           style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)', color: '#fff' }}>
           <span style={{ color: 'rgba(255,255,255,0.55)' }}>
             {!locked && target === 'new'
-              ? (language === 'tr' ? 'Yeni journal:' : 'New journal:')
-              : (language === 'tr' ? 'Eklenecek journal:' : 'Adding to:')}
+              ? (pick(language, 'Yeni journal:', 'New journal:'))
+              : (pick(language, 'Eklenecek journal:', 'Adding to:'))}
           </span>
           <span className="font-medium">{targetLabel}</span>
           {!locked && (
             <button onClick={() => { setStep('target'); setParseResult(null); setFileName(''); setContent(''); setShowMapping(false); }}
               className="ms-auto text-[13px]" style={{ color: '#a78bfa' }}>
-              {language === 'tr' ? 'Değiştir' : 'Change'}
+              {pick(language, 'Değiştir', 'Change')}
             </button>
           )}
         </div>
 
         <div style={card}>
           <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {language === 'tr' ? 'Desteklenen Platformlar' : 'Supported Platforms'}
+            {pick(language, 'Desteklenen Platformlar', 'Supported Platforms')}
           </p>
           <div className="flex flex-wrap gap-2">
             {supportedPlatforms.map(p => (
@@ -804,14 +803,10 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
           <input ref={fileInputRef} type="file" accept=".csv,.txt,.html,.htm" className="hidden" onChange={handleFileChange} />
           <Upload className="w-10 h-10 mb-4" style={{ color: dragging ? '#8b5cf6' : 'rgba(255,255,255,0.2)' }} />
           <p className="font-medium text-white mb-1">
-            {language === 'tr' ? 'Rapor dosyasını sürükleyin veya tıklayın' :
-             language === 'fa' ? 'فایل گزارش را بکشید یا کلیک کنید' :
-             'Drag & drop your report, or click to browse'}
+            {pick(language, 'Rapor dosyasını sürükleyin veya tıklayın', 'Drag & drop your report, or click to browse')}
           </p>
           <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {language === 'tr'
-              ? 'CSV veya HTML · MetaTrader raporu doğrudan yüklenebilir · Platform otomatik tanınır'
-              : 'CSV or HTML · MetaTrader reports work as-is · Platform auto-detected'}
+            {pick(language, 'CSV veya HTML · MetaTrader raporu doğrudan yüklenebilir · Platform otomatik tanınır', 'CSV or HTML · MetaTrader reports work as-is · Platform auto-detected')}
           </p>
         </div>
 
@@ -819,7 +814,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
           <div style={card} className="flex items-center gap-3">
             <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />
             <span className="text-sm text-white">
-              {language === 'tr' ? 'Dosya analiz ediliyor...' : 'Analyzing file...'}
+              {pick(language, 'Dosya analiz ediliyor...', 'Analyzing file...')}
             </span>
           </div>
         )}
@@ -830,7 +825,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
             {parseResult.platform !== 'Unknown' && (
               <div className="flex items-center gap-3">
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {language === 'tr' ? 'Tanınan Platform:' : 'Detected Platform:'}
+                  {pick(language, 'Tanınan Platform:', 'Detected Platform:')}
                 </span>
                 <span className="px-3 py-1 rounded-full text-sm font-semibold"
                   style={{
@@ -851,13 +846,11 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                   <div className="flex items-center gap-2">
                     <Columns className="w-4 h-4" style={{ color: '#a78bfa' }} />
                     <span className="text-sm font-semibold text-white">
-                      {language === 'tr' ? 'Sütunları Eşleştir' : 'Match the columns'}
+                      {pick(language, 'Sütunları Eşleştir', 'Match the columns')}
                     </span>
                   </div>
                   <p className="text-xs mt-1.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    {language === 'tr'
-                      ? 'Dosyandaki hangi sütunun ne olduğunu seç. Bir kere seçmen yeterli — aynı biçimdeki dosyalarda hatırlanır.'
-                      : 'Tell us which column is which. You only do this once — the same file format is remembered.'}
+                    {pick(language, 'Dosyandaki hangi sütunun ne olduğunu seç. Bir kere seçmen yeterli — aynı biçimdeki dosyalarda hatırlanır.', 'Tell us which column is which. You only do this once — the same file format is remembered.')}
                   </p>
                 </div>
 
@@ -880,7 +873,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                         <option value={-1} style={{ background: '#1a1b2e' }}>—</option>
                         {parseResult.headers.map((h, i) => (
                           <option key={i} value={i} style={{ background: '#1a1b2e' }}>
-                            {h.trim() || `${language === 'tr' ? 'Sütun' : 'Column'} ${i + 1}`}
+                            {h.trim() || `${pick(language, 'Sütun', 'Column')} ${i + 1}`}
                           </option>
                         ))}
                       </select>
@@ -893,7 +886,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                   <div className="rounded-lg p-3 text-[11px] leading-relaxed"
                     style={{ background: 'rgba(0,0,0,0.25)', color: 'rgba(255,255,255,0.5)' }}>
                     <span style={{ color: 'rgba(255,255,255,0.5)' }}>
-                      {language === 'tr' ? 'İlk satır: ' : 'First row: '}
+                      {pick(language, 'İlk satır: ', 'First row: ')}
                     </span>
                     {MAP_FIELDS.filter(f => parseResult.map[f.key] >= 0).map((f, i) => (
                       <span key={f.key}>
@@ -914,22 +907,18 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                 <div className="flex items-center gap-2 mb-1">
                   <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: '#fbbf24' }} />
                   <span className="text-sm font-semibold" style={{ color: '#fbbf24' }}>
-                    {language === 'tr' ? 'Bu dosyada işlem geçmişi yok' : 'This file has no trade history'}
+                    {pick(language, 'Bu dosyada işlem geçmişi yok', 'This file has no trade history')}
                   </span>
                 </div>
                 <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {parseResult.platform.startsWith('MT')
-                    ? (language === 'tr'
-                        ? 'Dosya okundu ama içinde kapanmış işlem yok — büyük ihtimalle "İşlem Hesabı Raporu" indirilmiş; o rapor sadece açık pozisyonları ve bakiyeyi içerir. Doğrusu için MetaTrader\'da Araç Kutusu → Geçmiş sekmesine sağ tıkla → Rapor.'
-                        : 'The file was read but holds no closed trades — this looks like the account report, which only carries open positions and balances. In MetaTrader use Toolbox → History, right-click → Report.')
-                    : (language === 'tr'
-                        ? 'Dosya okundu ama içinde kapanmış işlem bulunamadı. Sütunlar yanlış eşleşmiş olabilir; aşağıdan kendin eşleştirebilirsin.'
-                        : 'The file was read but no closed trades were found. If the columns were matched wrongly you can set them yourself below.')}
+                    ? (pick(language, 'Dosya okundu ama içinde kapanmış işlem yok — büyük ihtimalle "İşlem Hesabı Raporu" indirilmiş; o rapor sadece açık pozisyonları ve bakiyeyi içerir. Doğrusu için MetaTrader\'da Araç Kutusu → Geçmiş sekmesine sağ tıkla → Rapor.', 'The file was read but holds no closed trades — this looks like the account report, which only carries open positions and balances. In MetaTrader use Toolbox → History, right-click → Report.'))
+                    : (pick(language, 'Dosya okundu ama içinde kapanmış işlem bulunamadı. Sütunlar yanlış eşleşmiş olabilir; aşağıdan kendin eşleştirebilirsin.', 'The file was read but no closed trades were found. If the columns were matched wrongly you can set them yourself below.'))}
                 </p>
                 <button onClick={() => setShowMapping(true)}
                   className="mt-3 flex items-center gap-1.5 text-sm" style={{ color: '#a78bfa' }}>
                   <Columns className="w-3.5 h-3.5" />
-                  {language === 'tr' ? 'Yine de sütunları eşleştir' : 'Match the columns anyway'}
+                  {pick(language, 'Yine de sütunları eşleştir', 'Match the columns anyway')}
                 </button>
               </div>
             )}
@@ -939,13 +928,11 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                 <div className="flex items-center gap-2 mb-1">
                   <AlertTriangle className="w-4 h-4" style={{ color: '#fbbf24' }} />
                   <span className="text-sm font-semibold" style={{ color: '#fbbf24' }}>
-                    {language === 'tr' ? 'Bu dosyayı otomatik tanıyamadım' : 'This file was not recognised automatically'}
+                    {pick(language, 'Bu dosyayı otomatik tanıyamadım', 'This file was not recognised automatically')}
                   </span>
                 </div>
                 <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  {language === 'tr'
-                    ? 'Yukarıdan sütunları kendin eşleştirirsen dosya yine de aktarılır.'
-                    : 'Match the columns above and the file will import all the same.'}
+                  {pick(language, 'Yukarıdan sütunları kendin eşleştirirsen dosya yine de aktarılır.', 'Match the columns above and the file will import all the same.')}
                 </p>
               </div>
             )}
@@ -955,7 +942,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                 <div className="flex items-center gap-2 mb-2">
                   <AlertTriangle className="w-4 h-4" style={{ color: '#f87171' }} />
                   <span className="text-sm font-semibold" style={{ color: '#f87171' }}>
-                    {language === 'tr' ? 'Uyarılar' : 'Warnings'}
+                    {pick(language, 'Uyarılar', 'Warnings')}
                   </span>
                 </div>
                 {parseResult.errors.map((err, i) => (
@@ -973,15 +960,13 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                   <span className="text-sm font-semibold" style={{ color: freshTrades.length > 0 ? '#34d399' : 'rgba(255,255,255,0.6)' }}>
                     {freshTrades.length > 0
                       ? `${freshTrades.length} ${language === 'tr' ? 'yeni işlem' : freshTrades.length === 1 ? 'new trade' : 'new trades'}`
-                      : (language === 'tr' ? 'Yeni işlem yok' : 'Nothing new to import')}
+                      : (pick(language, 'Yeni işlem yok', 'Nothing new to import'))}
                   </span>
                 </div>
                 <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {skipped > 0
-                    ? (language === 'tr'
-                        ? `${skipped} işlem bu journal'da zaten var, atlanacak — notların ve fotoğrafların olduğu gibi kalır.`
-                        : `${skipped} already in this journal and will be skipped — your notes and photos stay as they are.`)
-                    : (language === 'tr' ? "Journal'ınıza eklenecek:" : 'Will be added to your journal:')}
+                    ? (pick(language, '{0} işlem bu journal\'da zaten var, atlanacak — notların ve fotoğrafların olduğu gibi kalır.', '{0} already in this journal and will be skipped — your notes and photos stay as they are.', skipped))
+                    : (pick(language, 'Journal\'ınıza eklenecek:', 'Will be added to your journal:'))}
                 </p>
               </div>
             )}
@@ -990,7 +975,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
               <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider grid grid-cols-4 gap-2"
                   style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)' }}>
-                  <span>{language === 'tr' ? 'Tarih' : 'Date'}</span>
+                  <span>{pick(language, 'Tarih', 'Date')}</span>
                   <span>Symbol</span>
                   <span>Type</span>
                   <span>Sonuç</span>
@@ -1013,7 +998,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                   ))}
                   {(freshTrades.length > 0 ? freshTrades : parseResult.trades).length > 50 && (
                     <div className="px-4 py-2 text-sm text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                      +{(freshTrades.length > 0 ? freshTrades : parseResult.trades).length - 50} {language === 'tr' ? 'daha...' : 'more...'}
+                      +{(freshTrades.length > 0 ? freshTrades : parseResult.trades).length - 50} {pick(language, 'daha...', 'more...')}
                     </div>
                   )}
                 </div>
@@ -1027,12 +1012,12 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                   className="me-auto flex items-center gap-1.5 text-sm"
                   style={{ color: 'rgba(255,255,255,0.5)' }}>
                   <Columns className="w-3.5 h-3.5" />
-                  {language === 'tr' ? 'Sütunları kendim eşleştir' : 'Match columns myself'}
+                  {pick(language, 'Sütunları kendim eşleştir', 'Match columns myself')}
                 </button>
               )}
               <button onClick={() => { setParseResult(null); setFileName(''); setContent(''); setShowMapping(false); }}
                 className="px-4 py-2 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                {language === 'tr' ? 'Temizle' : 'Clear'}
+                {pick(language, 'Temizle', 'Clear')}
               </button>
               <button
                 onClick={handleImport}
@@ -1044,8 +1029,8 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                 {freshTrades.length > 0
                   ? `${freshTrades.length} ${language === 'tr' ? 'İşlem İçe Aktar' : freshTrades.length === 1 ? 'Trade — Import' : 'Trades — Import'}`
                   : parseResult.trades.length > 0
-                  ? (language === 'tr' ? 'Hepsi Zaten Ekli' : 'Already Imported')
-                  : (language === 'tr' ? 'İşlem Bulunamadı' : 'No Trades Found')}
+                  ? (pick(language, 'Hepsi Zaten Ekli', 'Already Imported'))
+                  : (pick(language, 'İşlem Bulunamadı', 'No Trades Found'))}
               </button>
             </div>
           </div>

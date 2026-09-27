@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { pick } from '../lib/appCopy';
 import { Plus, X, Pencil, Check, Square, CheckSquare, RotateCcw } from 'lucide-react';
 import { ChecklistItem } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -47,7 +48,7 @@ export function ChecklistView({ items }: { items: ChecklistItem[] }) {
 export default function Checklist({ value, onChange, syncTemplate = false, selectedListId, onSelectList }: ChecklistProps) {
   const { language } = useLanguage();
   const { user } = useUser();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
 
   const items = value || [];
   /**
@@ -350,10 +351,7 @@ export default function Checklist({ value, onChange, syncTemplate = false, selec
 
       {syncTemplate && items.length > 0 && (
         <p className="text-xs pt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          {tr(
-            'Maddeler kaydedilir ve her yeni işlemde işaretsiz olarak karşına gelir.',
-            'Items are saved and appear unchecked on every new trade.'
-          )}
+          {tr('Maddeler kaydedilir ve her yeni işlemde işaretsiz olarak karşına gelir.', 'Items are saved and appear unchecked on every new trade.')}
         </p>
       )}
     </div>

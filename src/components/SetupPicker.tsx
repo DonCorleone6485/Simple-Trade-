@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { pick } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { ChevronDown, X } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
@@ -113,7 +114,7 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
       <button type="button" onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all"
         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}>
-        <span style={{ color: value ? '#fff' : 'rgba(255,255,255,0.4)' }}>{value || (language === 'tr' ? '— Seçin —' : '— Select —')}</span>
+        <span style={{ color: value ? '#fff' : 'rgba(255,255,255,0.4)' }}>{value || (pick(language, '— Seçin —', '— Select —'))}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.5)' }} />
       </button>
 
@@ -126,12 +127,12 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
             <button type="button" onClick={() => handleSelect('')}
               className="ui-pill w-full text-start px-4 py-2.5 text-sm transition-all"
               style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {language === 'tr' ? '— Seçin —' : '— Select —'}
+              {pick(language, '— Seçin —', '— Select —')}
             </button>
 
             {/* Varsayılan setuplar */}
             <div className="px-4 py-1.5 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {language === 'tr' ? 'Standart Setuplar' : 'Standard Setups'}
+              {pick(language, 'Standart Setuplar', 'Standard Setups')}
             </div>
             {DEFAULT_SETUPS.map(s => (
               <button key={s} type="button" onClick={() => handleSelect(s)}
@@ -147,7 +148,7 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
               <>
                 <div className="px-4 py-1.5 text-xs font-semibold uppercase tracking-wider mt-1"
                   style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                  {language === 'tr' ? 'Özel Setuplar' : 'Custom Setups'}
+                  {pick(language, 'Özel Setuplar', 'Custom Setups')}
                 </div>
                 {customSetups.map(s => (
                   <div key={s} className="ui-pill group flex items-center px-4 py-2.5 text-sm transition-all"
@@ -159,7 +160,7 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
                     <button type="button" onClick={e => removeCustom(s, e)}
                       className="ui-pill ui-pill-danger p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                       style={{ color: '#f87171' }}
-                      title={language === 'tr' ? 'Sil' : 'Delete'}>
+                      title={pick(language, 'Sil', 'Delete')}>
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -174,13 +175,13 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
               <div className="flex items-center gap-2 p-3">
                 <input ref={inputRef} type="text" value={inputVal} onChange={e => setInputVal(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustom(); } if (e.key === 'Escape') { setShowInput(false); setInputVal(''); } }}
-                  placeholder={language === 'tr' ? 'Setup adı yaz...' : 'Setup name...'}
+                  placeholder={pick(language, 'Setup adı yaz...', 'Setup name...')}
                   className="flex-1 bg-transparent outline-none text-sm"
                   style={{ color: '#fff', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '4px' }} />
                 <button type="button" onClick={addCustom}
                   className="px-3 py-1 rounded-lg text-xs font-semibold flex-shrink-0"
                   style={{ background: '#8b5cf6', color: '#fff' }}>
-                  {language === 'tr' ? 'Ekle' : 'Add'}
+                  {pick(language, 'Ekle', 'Add')}
                 </button>
                 <button type="button" onClick={() => { setShowInput(false); setInputVal(''); }} aria-label={aria('close', language)}
                   className="p-1 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -193,7 +194,7 @@ export default function SetupPicker({ value, onChange }: { value: string; onChan
                 style={{ color: '#a78bfa' }}>
                 <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                   style={{ background: 'rgba(139,92,246,0.2)' }}>+</span>
-                <span>{language === 'tr' ? 'Özel Setup Ekle' : 'Add Custom Setup'}</span>
+                <span>{pick(language, 'Özel Setup Ekle', 'Add Custom Setup')}</span>
               </button>
             )}
           </div>

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { pick } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { cur } from '../lib/format';
 import { Upload, X, Search, ChevronDown, Loader } from 'lucide-react';
@@ -131,7 +132,7 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
       <button type="button" onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-mono font-medium transition-all"
         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}>
-        <span>{value || (language === 'tr' ? 'Sembol seç...' : 'Pick a symbol...')}</span>
+        <span>{value || (pick(language, 'Sembol seç...', 'Pick a symbol...'))}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.5)' }} />
       </button>
       {open && (
@@ -141,7 +142,7 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <Search className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.5)' }} />
               <input ref={searchRef} type="text" value={search} onChange={e => setSearch(e.target.value)} onKeyDown={handleKeyDown}
-                placeholder={language === 'tr' ? 'Sembol ara veya yaz... (Enter ile ekle)' : 'Search or type a symbol... (Enter to add)'}
+                placeholder={pick(language, 'Sembol ara veya yaz... (Enter ile ekle)', 'Search or type a symbol... (Enter to add)')}
                 className="flex-1 bg-transparent outline-none text-sm text-white placeholder-gray-500" style={{ color: '#fff' }} />
               {search && <button type="button" onClick={() => setSearch('')} aria-label={aria('clearSearch', language)}><X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.5)' }} /></button>}
             </div>
@@ -160,7 +161,7 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
           <div className="overflow-y-auto" style={{ maxHeight: '280px' }}>
             {!search && recentlyUsed.length > 0 && (
               <div>
-                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{language === 'tr' ? 'Son Kullanılanlar' : 'Recently Used'}</div>
+                <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{pick(language, 'Son Kullanılanlar', 'Recently Used')}</div>
                 {recentlyUsed.map(symbol => (
                   <button key={`recent-${symbol}`} type="button" onClick={() => handleSelect(symbol)}
                     className="ui-pill w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all" style={{ color: '#fff' }}>
@@ -174,8 +175,8 @@ function SymbolPicker({ value, onChange }: { value: string; onChange: (v: string
               </div>
             )}
             {search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{filteredSymbols.length > 0
-                ? (language === 'tr' ? 'Sonuçlar' : 'Results')
-                : (language === 'tr' ? 'Bulunamadı — Enter ile ekle' : 'No match — press Enter to add')}</div>}
+                ? (pick(language, 'Sonuçlar', 'Results'))
+                : (pick(language, 'Bulunamadı — Enter ile ekle', 'No match — press Enter to add'))}</div>}
             {!search && <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>{category}</div>}
             {filteredSymbols.map(symbol => (
               <button key={symbol} type="button" onClick={() => handleSelect(symbol)}
@@ -333,12 +334,12 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
   const addPhotoFromLink = async (url: string, kind: 'pre' | 'post'): Promise<string | null> => {
     const current = kind === 'pre' ? prePhotos : postPhotos;
     if (!isOwner && current.length >= photoLimit) {
-      return language === 'tr' ? `En fazla ${photoLimit} fotoğraf.` : `At most ${photoLimit} photos.`;
+      return pick(language, 'En fazla {0} fotoğraf.', 'At most {0} photos.', photoLimit);
     }
     const { file, error } = await fetchPhotoFromLink(url, getToken, language);
     if (!file) return error || null;
     const { url: stored, error: upErr } = await uploadPhotoToStorage(file, kind);
-    if (!stored) return upErr || (language === 'tr' ? 'Yüklenemedi.' : 'Upload failed.');
+    if (!stored) return upErr || (pick(language, 'Yüklenemedi.', 'Upload failed.'));
     if (kind === 'pre') setPrePhotos(p => [...p, stored]);
     else setPostPhotos(p => [...p, stored]);
     return null;
@@ -365,9 +366,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
     if (kind === 'pre') setUploadingPre(false); else setUploadingPost(false);
     e.target.value = '';
     if (failure) {
-      alert(language === 'tr'
-        ? `Fotoğraf yüklenemedi: ${failure}`
-        : `Photo upload failed: ${failure}`);
+      alert(pick(language, 'Fotoğraf yüklenemedi: {0}', 'Photo upload failed: {0}', failure));
     }
   };
 
@@ -386,15 +385,11 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
     e.preventDefault();
     if (!date) { alert(t('pleaseSelectDate')); return; }
     if (isClosed && !exitDate) {
-      alert(language === 'tr'
-        ? 'Sonuç girdiğin işlem için çıkış tarihi de gerekli.'
-        : 'A trade with a result needs an exit time as well.');
+      alert(pick(language, 'Sonuç girdiğin işlem için çıkış tarihi de gerekli.', 'A trade with a result needs an exit time as well.'));
       return;
     }
     if (exitDate && new Date(exitDate).getTime() < new Date(date).getTime()) {
-      alert(language === 'tr'
-        ? 'Çıkış tarihi, giriş tarihinden önce olamaz.'
-        : 'Exit time cannot be earlier than entry time.');
+      alert(pick(language, 'Çıkış tarihi, giriş tarihinden önce olamaz.', 'Exit time cannot be earlier than entry time.'));
       return;
     }
     const newTrade: Trade = {
@@ -440,9 +435,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
             Checklist <span style={{ ...optHint, fontSize: '13px' }}>({t('optionalLabel')})</span>
           </h2>
           <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {language === 'tr'
-              ? 'İşleme girmeden önce kendi kurallarını kontrol et.'
-              : 'Run through your own rules before taking the trade.'}
+            {pick(language, 'İşleme girmeden önce kendi kurallarını kontrol et.', 'Run through your own rules before taking the trade.')}
           </p>
         </div>
         <div className="p-6">
@@ -583,7 +576,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
 
         <div style={divider}>
           <p style={sectionTitle}>
-            {language === 'tr' ? 'Multi Timeframe Analiz' : 'Multi-Timeframe Analysis'}
+            {pick(language, 'Multi Timeframe Analiz', 'Multi-Timeframe Analysis')}
             <span style={optHint}> ({t('optionalLabel')})</span>
           </p>
           <MTFAnalysis value={mtf} onChange={setMtf} symbol={symbol} autoFill />
@@ -628,7 +621,7 @@ export default function TradeForm({ onSave, isPro = false, hideTitle = false, ch
           className="cta px-6 py-2.5 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           style={primaryBtn}>
           {uploadingPre || uploadingPost
-            ? (language === 'tr' ? 'Fotoğraflar yükleniyor...' : 'Uploading photos...')
+            ? (pick(language, 'Fotoğraflar yükleniyor...', 'Uploading photos...'))
             : t('saveButton')}
         </button>
       </div>

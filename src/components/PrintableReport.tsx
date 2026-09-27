@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { pick, localeOf } from '../lib/appCopy';
 import { createPortal } from 'react-dom';
 import { Trade, Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -31,17 +32,17 @@ const ink = {
  */
 export default function PrintableReport({ journal, trades, single = false, onDone }: PrintableReportProps) {
   const { t, language } = useLanguage();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
 
   const fmtDate = (d?: string) => {
     if (!d) return '-';
     const date = new Date(d);
-    return new Intl.DateTimeFormat(language === 'tr' ? 'tr-TR' : 'en-US', { dateStyle: 'medium' }).format(date);
+    return new Intl.DateTimeFormat(localeOf(language), { dateStyle: 'medium' }).format(date);
   };
   const fmtDateTime = (d?: string) => {
     if (!d) return '-';
     const date = new Date(d);
-    return new Intl.DateTimeFormat(language === 'tr' ? 'tr-TR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+    return new Intl.DateTimeFormat(localeOf(language), { dateStyle: 'medium', timeStyle: 'short' }).format(date);
   };
 
   const ordered = [...trades].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());

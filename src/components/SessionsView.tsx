@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { pick } from '../lib/appCopy';
 import { useLanguage } from '../context/LanguageContext';
 import { SESSIONS, sessionState } from '../lib/sessions';
 import AlertSettings from './AlertSettings';
@@ -6,7 +7,7 @@ import { loadAlerts, AlertSettings as Settings } from '../lib/alerts';
 
 export default function SessionsView() {
   const { language } = useLanguage();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
   const [now, setNow] = useState(new Date());
   const [alerts, setAlerts] = useState<Settings>(loadAlerts);
 
@@ -60,8 +61,7 @@ export default function SessionsView() {
       </div>
 
       <p className="text-[11.5px] mt-6" style={{ color: 'rgba(255,255,255,0.5)' }}>
-        {tr('Saatler her seansın kendi şehrine göre. Yaz saati değişimleri kendiliğinden hesaba katılır.',
-            'Clocks show each session\'s own city. Daylight saving changes are handled automatically.')}
+        {tr('Saatler her seansın kendi şehrine göre. Yaz saati değişimleri kendiliğinden hesaba katılır.', 'Clocks show each session\'s own city. Daylight saving changes are handled automatically.')}
       </p>
     </div>
   );

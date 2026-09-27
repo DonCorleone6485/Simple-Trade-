@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { localeOf } from '../lib/appCopy';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Plus, X, Printer, Ban, RotateCcw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -481,7 +482,7 @@ function PrintView({ firms, results, redLines, onDone }: {
             {t('propReviewTitle')}
           </h1>
           <span style={{ fontSize: 11, color: ink.soft }}>
-            {new Date().toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', { dateStyle: 'medium' })}
+            {new Date().toLocaleDateString(localeOf(language), { dateStyle: 'medium' })}
           </span>
         </div>
       </div>

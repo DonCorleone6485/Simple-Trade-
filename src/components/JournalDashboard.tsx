@@ -1,4 +1,5 @@
 import React from 'react';
+import { pick, localeOf } from '../lib/appCopy';
 import { Plus, Trash2, Pencil, ArrowUpRight, Lock } from 'lucide-react';
 import { Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -63,7 +64,7 @@ export default function JournalDashboard({
     { trades: 0, net: 0 }
   );
 
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
 
   return (
     <main className={hideHeader ? '' : 'max-w-5xl mx-auto px-6 sm:px-8 py-14 sm:py-20'}>
@@ -162,7 +163,7 @@ export default function JournalDashboard({
                         {(stats.open ?? 0) > 0 && (
                           <span className="text-[11px] px-2 py-0.5 rounded-full"
                             style={{ background: 'rgba(251,191,36,0.12)', color: '#fbbf24' }}>
-                            {stats.open} {t('incompleteTrade').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
+                            {stats.open} {t('incompleteTrade').toLocaleLowerCase(localeOf(language))}
                           </span>
                         )}
                         {(stats.locked ?? 0) > 0 && (

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { pick, localeOf } from '../lib/appCopy';
 import { AlertTriangle, Loader } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { NewsEvent } from '../lib/news';
@@ -20,8 +21,8 @@ const IMPACT: Record<string, { color: string; bg: string; tr: string; en: string
 
 export default function NewsView() {
   const { language } = useLanguage();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
-  const locale = language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US';
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
+  const locale = localeOf(language);
 
   const [now, setNow] = useState(new Date());
   const [events, setEvents] = useState<NewsEvent[] | null>(null);
@@ -145,8 +146,7 @@ export default function NewsView() {
       ))}
 
       <p className="text-[11.5px] pt-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
-        {tr('Saatler kendi saat dilimine göre gösteriliyor. Kaynak: ForexFactory.',
-            'Times are shown in your own timezone. Source: ForexFactory.')}
+        {tr('Saatler kendi saat dilimine göre gösteriliyor. Kaynak: ForexFactory.', 'Times are shown in your own timezone. Source: ForexFactory.')}
       </p>
     </div>
   );

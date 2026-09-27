@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { pick } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { X, Check, Shield, Tag } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -24,10 +25,10 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   const totalPrice = prices.fmt(billing === 'monthly' ? prices.monthly : prices.yearly);
 
   const proFeatures = [
-    language === 'tr' ? 'Her gün sınırsız işlem ve journal' : 'Unlimited trades & journals, every day',
-    language === 'tr' ? 'Sesli not ve yapay zekâ analizi' : 'Voice notes & AI analysis',
-    language === 'tr' ? 'MetaTrader otomatik kayıt, sınırsız' : 'Unlimited MetaTrader auto-sync',
-    language === 'tr' ? 'İşlem öncesi ve sonrası 3\'er fotoğraf' : '3 photos before and 3 after each trade',
+    pick(language, 'Her gün sınırsız işlem ve journal', 'Unlimited trades & journals, every day'),
+    pick(language, 'Sesli not ve yapay zekâ analizi', 'Voice notes & AI analysis'),
+    pick(language, 'MetaTrader otomatik kayıt, sınırsız', 'Unlimited MetaTrader auto-sync'),
+    pick(language, 'İşlem öncesi ve sonrası 3\'er fotoğraf', '3 photos before and 3 after each trade'),
   ];
 
   const validateCode = async () => {
@@ -73,10 +74,10 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
           style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div>
             <h2 className="text-lg font-bold text-white">
-              {language === 'tr' ? "Pro'ya Geç" : 'Upgrade to Pro'}
+              {pick(language, 'Pro\'ya Geç', 'Upgrade to Pro')}
             </h2>
             <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {language === 'tr' ? 'Tüm özelliklere sınırsız erişim' : 'Unlimited access to all features'}
+              {pick(language, 'Tüm özelliklere sınırsız erişim', 'Unlimited access to all features')}
             </p>
           </div>
           <button onClick={onClose} aria-label={aria('close', language)} className="p-1.5 rounded-lg"
@@ -94,8 +95,8 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
               style={billing === 'monthly'
                 ? { background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.4)' }
                 : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <div>{language === 'tr' ? 'Aylık' : 'Monthly'}</div>
-              <div className="text-xs mt-0.5 font-normal">{prices.fmt(prices.monthly)} / {language === 'tr' ? 'ay' : 'mo'}</div>
+              <div>{pick(language, 'Aylık', 'Monthly')}</div>
+              <div className="text-xs mt-0.5 font-normal">{prices.fmt(prices.monthly)} / {pick(language, 'ay', 'mo')}</div>
             </button>
             <button onClick={() => handleBillingChange('yearly')}
               className="flex-1 py-3 px-4 rounded-full text-sm font-medium transition-all relative"
@@ -104,8 +105,8 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                 : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-xs font-bold"
                 style={{ background: '#34d399', color: '#000' }}>%{savings}</span>
-              <div>{language === 'tr' ? 'Yıllık' : 'Yearly'}</div>
-              <div className="text-xs mt-0.5 font-normal">{prices.fmt(prices.yearlyMonthly)} / {language === 'tr' ? 'ay' : 'mo'}</div>
+              <div>{pick(language, 'Yıllık', 'Yearly')}</div>
+              <div className="text-xs mt-0.5 font-normal">{prices.fmt(prices.yearlyMonthly)} / {pick(language, 'ay', 'mo')}</div>
             </button>
           </div>
 
@@ -127,9 +128,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
             style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.15)' }}>
             <Shield className="w-4 h-4 flex-shrink-0" style={{ color: '#34d399' }} />
             <span className="text-xs" style={{ color: '#34d399' }}>
-              {language === 'tr'
-                ? '3 Gün Ücretsiz Dene — 3. günün sonunda ödeme alınır'
-                : '3-Day Free Trial — charged on day 3'}
+              {pick(language, 'İstediğin zaman iptal et', 'Cancel anytime')}
             </span>
           </div>
 
@@ -137,7 +136,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
           <div className="space-y-2 pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '16px' }}>
             <label className="flex items-center gap-1.5 text-sm font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>
               <Tag className="w-3.5 h-3.5" />
-              {language === 'tr' ? 'Referans Kodu (opsiyonel)' : 'Referral Code (optional)'}
+              {pick(language, 'Referans Kodu (opsiyonel)', 'Referral Code (optional)')}
             </label>
             <div className="flex gap-2">
               <input
@@ -159,21 +158,19 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
               <button onClick={validateCode} disabled={!referralCode.trim() || validating}
                 className="px-4 py-2 rounded-full text-sm font-medium transition-all disabled:opacity-40 flex-shrink-0"
                 style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
-                {validating ? '...' : (language === 'tr' ? 'Uygula' : 'Apply')}
+                {validating ? '...' : (pick(language, 'Uygula', 'Apply'))}
               </button>
             </div>
 
             {referralStatus === 'valid' && (
               <div className="px-3 py-2.5 rounded-xl text-sm"
                 style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
-                🎁 {language === 'tr'
-                  ? `${rewardDays} gün ücretsiz ödülünüz ödeme onaylandığında hesabınıza eklenecektir.`
-                  : `${rewardDays} free days will be added to your account once payment is confirmed.`}
+                🎁 {pick(language, '{0} gün ücretsiz ödülünüz ödeme onaylandığında hesabınıza eklenecektir.', '{0} free days will be added to your account once payment is confirmed.', rewardDays)}
               </div>
             )}
             {referralStatus === 'invalid' && (
               <p className="text-xs" style={{ color: '#f87171' }}>
-                {language === 'tr' ? 'Geçersiz veya daha önce kullanılmış kod.' : 'Invalid or already used code.'}
+                {pick(language, 'Geçersiz veya daha önce kullanılmış kod.', 'Invalid or already used code.')}
               </p>
             )}
           </div>
@@ -182,14 +179,14 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
           <div className="space-y-3 pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '16px' }}>
             <div className="flex items-center justify-between">
               <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                {language === 'tr' ? 'Toplam' : 'Total'}
+                {pick(language, 'Toplam', 'Total')}
               </span>
               <div className="text-end">
                 <span className="font-display text-[26px] font-medium text-white">{totalPrice}</span>
                 <span className="text-sm ms-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
                   {billing === 'yearly'
-                    ? (language === 'tr' ? '/ yıl' : '/ year')
-                    : (language === 'tr' ? '/ ay' : '/ month')}
+                    ? (pick(language, '/ yıl', '/ year'))
+                    : (pick(language, '/ ay', '/ month'))}
                 </span>
               </div>
             </div>
@@ -197,12 +194,10 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
             <button disabled
               className="w-full py-3 rounded-full text-sm font-medium cursor-not-allowed"
               style={{ background: 'rgba(139,92,246,0.15)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(139,92,246,0.15)' }}>
-              💳 {language === 'tr' ? 'Ödeme Yap — Yakında' : 'Pay Now — Coming Soon'}
+              💳 {pick(language, 'Ödeme Yap — Yakında', 'Pay Now — Coming Soon')}
             </button>
             <p className="text-center text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {language === 'tr'
-                ? 'Ödeme sistemi çok yakında aktif olacak'
-                : 'Payment system coming very soon'}
+              {pick(language, 'Ödeme sistemi çok yakında aktif olacak', 'Payment system coming very soon')}
             </p>
           </div>
 

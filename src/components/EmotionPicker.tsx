@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { pick } from '../lib/appCopy';
 import { ChevronDown, X } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -19,7 +20,7 @@ export default function EmotionPicker({ value, onChange }: { value: string[]; on
   const [custom, setCustom] = useState<string[]>([]);
   const { user } = useUser();
   const { language } = useLanguage();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   /** Kullanıcı listeye dokunduysa geç gelen hesap verisi onu ezmesin. */

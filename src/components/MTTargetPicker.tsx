@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { pick } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { X, Plug } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -18,7 +19,7 @@ export default function MTTargetPicker({ journals, onChoose, onClose }: {
   onClose: () => void;
 }) {
   const { language, t } = useLanguage();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
   const [target, setTarget] = useState<'new' | 'existing'>(journals.length > 0 ? 'existing' : 'new');
   const [name, setName] = useState('');
   const [picked, setPicked] = useState(journals[0]?.id || '');

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { pick } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { Plus, X, Pencil, Check, Layers, TrendingUp, TrendingDown, Minus, RotateCcw } from 'lucide-react';
 import { MTFEntry, MTFBias } from '../types';
@@ -93,7 +94,7 @@ export function MTFAnalysisView({ entries }: { entries: MTFEntry[] }) {
 export default function MTFAnalysis({ value, onChange, symbol, autoFill = false }: MTFAnalysisProps) {
   const { language } = useLanguage();
   const { user } = useUser();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
 
   const entries = value || [];
   const [open, setOpen] = useState(entries.length > 0);
@@ -219,10 +220,7 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
         <div className="flex items-center gap-3 flex-wrap px-3 py-2 rounded-xl"
           style={{ background: 'rgba(52,211,153,0.07)', border: '1px solid rgba(52,211,153,0.15)' }}>
           <span className="text-xs" style={{ color: '#34d399' }}>
-            {tr(
-              `${prefilledFrom} için son analizin yüklendi — düzenleyebilirsin.`,
-              `Loaded your last analysis for ${prefilledFrom} — edit as needed.`
-            )}
+            {tr('{0} için son analizin yüklendi — düzenleyebilirsin.', 'Loaded your last analysis for {0} — edit as needed.', prefilledFrom)}
           </span>
           <button type="button" onClick={clearAll}
             className="link-gold flex items-center gap-1 text-xs font-medium ms-auto"
@@ -306,10 +304,7 @@ export default function MTFAnalysis({ value, onChange, symbol, autoFill = false 
           </div>
 
           <textarea value={draft.notes} onChange={e => setDraft({ ...draft, notes: e.target.value })} autoFocus
-            placeholder={tr(
-              `${draft.timeframe} analizini yaz — yapı, likidite, kilit seviyeler...`,
-              `Write your ${draft.timeframe} analysis — structure, liquidity, key levels...`
-            )}
+            placeholder={tr('{0} analizini yaz — yapı, likidite, kilit seviyeler...', 'Write your {0} analysis — structure, liquidity, key levels...', draft.timeframe)}
             className="w-full outline-none text-sm"
             style={{
               background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',

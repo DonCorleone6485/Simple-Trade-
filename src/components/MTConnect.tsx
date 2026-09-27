@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { pick, localeOf } from '../lib/appCopy';
 import { Plug, Copy, Check, Trash2, KeyRound, AlertTriangle, Loader, Download } from 'lucide-react';
 import { useAuth } from '@clerk/clerk-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -32,7 +33,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
   const { getToken } = useAuth();
   const { language, t } = useLanguage();
   const { isPro } = usePlan();
-  const tr = (a: string, b: string) => (language === 'tr' ? a : b);
+  const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
 
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,8 +83,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
   };
 
   const revoke = async (keyId: string) => {
-    if (!confirm(tr('Bu anahtar iptal edilsin mi? Onu kullanan EA işlem gönderemez.',
-                    'Revoke this key? Any EA using it will stop sending trades.'))) return;
+    if (!confirm(tr('Bu anahtar iptal edilsin mi? Onu kullanan EA işlem gönderemez.', 'Revoke this key? Any EA using it will stop sending trades.'))) return;
     try {
       await call('POST', { action: 'revoke', keyId });
       load();
@@ -113,7 +113,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
 
   const fmt = (iso: string | null) => {
     if (!iso) return tr('hiç', 'never');
-    return new Intl.DateTimeFormat(language === 'tr' ? 'tr-TR' : 'en-US',
+    return new Intl.DateTimeFormat(localeOf(language),
       { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso));
   };
 
@@ -140,8 +140,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             </span>
           </div>
           <p className="text-[13px] mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            {tr('Bu anahtarı bir daha gösteremeyiz; sunucuda yalnızca özeti duruyor. Kaybedersen yenisini üretirsin.',
-                'We cannot show this again — only its hash is stored. If you lose it, create a new one.')}
+            {tr('Bu anahtarı bir daha gösteremeyiz; sunucuda yalnızca özeti duruyor. Kaybedersen yenisini üretirsin.', 'We cannot show this again — only its hash is stored. If you lose it, create a new one.')}
           </p>
           <div className="flex items-center gap-2">
             <code className="flex-1 font-mono text-[13px] px-3 py-2.5 rounded-lg overflow-x-auto whitespace-nowrap"
@@ -167,10 +166,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
           {tr('MetaTrader Bağlantısı', 'MetaTrader Connection')}
         </h2>
         <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          {tr(
-            `MetaTrader 5'e kuracağın küçük bir eklenti, açtığın pozisyonları "${journalName}" journal'ına anında yazar ve kapandıklarında aynı kayıtları sonuçla tamamlar. Rapor indirip yüklemene gerek kalmaz.`,
-            `A small add-on installed in MetaTrader 5 writes your closed trades into "${journalName}" on its own. No more exporting and uploading reports.`
-          )}
+          {tr('MetaTrader 5\'e kuracağın küçük bir eklenti, açtığın pozisyonları "{0}" journal\'ına anında yazar ve kapandıklarında aynı kayıtları sonuçla tamamlar. Rapor indirip yüklemene gerek kalmaz.', 'A small add-on installed in MetaTrader 5 writes the positions you open into "{0}" right away and completes them with the result when they close. No more exporting and uploading reports.', journalName)}
         </p>
         {!isPro && (
           <p className="text-[13px] leading-relaxed mt-3 px-3.5 py-2.5 rounded-xl"
@@ -236,11 +232,9 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             burada sadece ipucu var. Neden görünmediğini söylemezsek kullanıcı
             bunu bir eksik sanıyor. */}
         <p className="text-[12.5px] leading-relaxed mt-4 pt-4" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          {tr('Güvenlik için anahtarın tamamı saklanmaz, yalnızca ilk ve son harfleri görünür. MetaTrader anahtarı zaten hatırlar; kaybettiysen 4. adımdan yenisini oluştur ve eskisini buradan iptal et.',
-              'For security the full key is never stored; only its first and last characters are shown. MetaTrader remembers the key anyway; if you lose it, create a new one in step 4 and revoke the old one here.')}
+          {tr('Güvenlik için anahtarın tamamı saklanmaz, yalnızca ilk ve son harfleri görünür. MetaTrader anahtarı zaten hatırlar; kaybettiysen 4. adımdan yenisini oluştur ve eskisini buradan iptal et.', 'For security the full key is never stored; only its first and last characters are shown. MetaTrader remembers the key anyway; if you lose it, create a new one in step 4 and revoke the old one here.')}
           {' '}
-          {tr('Her anahtar ilk bağlandığı MetaTrader hesabına kilitlenir; başka bir hesabın grafiğine yapıştırılırsa işlem göndermez. Her hesap için ayrı anahtar oluştur.',
-              'Each key locks to the first MetaTrader account it connects from; pasted into another account\'s chart it sends nothing. Create a separate key for each account.')}
+          {tr('Her anahtar ilk bağlandığı MetaTrader hesabına kilitlenir; başka bir hesabın grafiğine yapıştırılırsa işlem göndermez. Her hesap için ayrı anahtar oluştur.', 'Each key locks to the first MetaTrader account it connects from; pasted into another account\'s chart it sends nothing. Create a separate key for each account.')}
         </p>
       </div>
 
@@ -255,25 +249,21 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
           {[
             {
               t: tr('Dosyayı indir', 'Download the file'),
-              d: tr('MetaTrader\'da Dosya → Veri Klasörünü Aç. Açılan pencerede MQL5 → Experts klasörüne gir ve indirdiğin dosyayı içine at.',
-                    'In MetaTrader open File → Open Data Folder, go into MQL5 → Experts, and drop the downloaded file in.'),
+              d: tr('MetaTrader\'da Dosya → Veri Klasörünü Aç. Açılan pencerede MQL5 → Experts klasörüne gir ve indirdiğin dosyayı içine at.', 'In MetaTrader open File → Open Data Folder, go into MQL5 → Experts, and drop the downloaded file in.'),
               download: '/SimpleTradingJournal.ex5',
             },
             {
               t: tr('İzin ver', 'Allow the connection'),
-              d: tr('Araçlar → Seçenekler → Uzman Danışmanlar sekmesi. "Listelenen URL\'ler için WebRequest\'e izin ver" kutusunu işaretle, alttaki listeye şu adresi ekle:',
-                    'Tools → Options → Expert Advisors. Tick "Allow WebRequest for listed URL" and add this address to the list:'),
+              d: tr('Araçlar → Seçenekler → Uzman Danışmanlar sekmesi. "Listelenen URL\'ler için WebRequest\'e izin ver" kutusunu işaretle, alttaki listeye şu adresi ekle:', 'Tools → Options → Expert Advisors. Tick "Allow WebRequest for listed URL" and add this address to the list:'),
               code: 'https://www.simpletradejournal.io',
             },
             {
               t: tr('MetaTrader\'ı yeniden başlat', 'Restart MetaTrader'),
-              d: tr('Kapat, tekrar aç. Soldaki Kılavuz panelinde Uzman Danışmanlar altında SimpleTradingJournal görünecek.',
-                    'Close it and open it again. SimpleTradingJournal will appear under Expert Advisors in the Navigator panel on the left.'),
+              d: tr('Kapat, tekrar aç. Soldaki Kılavuz panelinde Uzman Danışmanlar altında SimpleTradingJournal görünecek.', 'Close it and open it again. SimpleTradingJournal will appear under Expert Advisors in the Navigator panel on the left.'),
             },
             {
               t: tr('Grafiğe sürükle ve anahtarı yapıştır', 'Drag it onto a chart and paste the key'),
-              d: tr('SimpleTradingJournal\'ı bir grafiğin üstüne sürükle. Açılan pencerede Girdiler sekmesine geç, ApiKey satırına aşağıdaki düğmeyle oluşturduğun anahtarı yapıştır, Tamam. Grafiğin sol üstünde "Baglanti tamam" yazısı belirir.',
-                    'Drag SimpleTradingJournal onto a chart. In the window that opens, go to the Inputs tab, paste the key you create with the button below into ApiKey, and click OK. "Connected" appears at the top-left of the chart.'),
+              d: tr('SimpleTradingJournal\'ı bir grafiğin üstüne sürükle. Açılan pencerede Girdiler sekmesine geç, ApiKey satırına aşağıdaki düğmeyle oluşturduğun anahtarı yapıştır, Tamam. Grafiğin sol üstünde "Baglanti tamam" yazısı belirir.', 'Drag SimpleTradingJournal onto a chart. In the window that opens, go to the Inputs tab, paste the key you create with the button below into ApiKey, and click OK. "Connected" appears at the top-left of the chart.'),
               extra: (<>
                 {keyBlock}
                 <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.18)' }}>
@@ -281,19 +271,16 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                     {tr('Hangi grafiğe koymalıyım?', 'Which chart should it go on?')}
                   </div>
                   <p className="text-[13.5px] leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                    {tr('MetaTrader bir grafikte aynı anda yalnızca bir uzman danışman (EA) çalıştırır. Başka bir EA kullanıyorsan (örneğin Position Sizer) iki yolun var:',
-                        'MetaTrader runs only one expert advisor (EA) per chart. If you already use another EA (Position Sizer, for example), you have two options:')}
+                    {tr('MetaTrader bir grafikte aynı anda yalnızca bir uzman danışman (EA) çalıştırır. Başka bir EA kullanıyorsan (örneğin Position Sizer) iki yolun var:', 'MetaTrader runs only one expert advisor (EA) per chart. If you already use another EA (Position Sizer, for example), you have two options:')}
                   </p>
                   <div className="space-y-3 text-[13.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
                     <div>
                       <span className="font-medium" style={{ color: '#fff' }}>{tr('Sürekli çalışsın — önerilen. ', 'Always on — recommended. ')}</span>
-                      {tr('Yeni, boş bir grafik aç ve eklentiyi oraya koy. O grafik açık kaldıkça kapanan her işlem kendiliğinden journal\'a gelir. İşlemlerini diğer grafiklerde her zamanki gibi yapmaya devam edersin.',
-                          'Open a new, empty chart and put the add-on there. As long as that chart stays open, every closed trade reaches your journal by itself. Keep trading on your other charts as usual.')}
+                      {tr('Yeni, boş bir grafik aç ve eklentiyi oraya koy. O grafik açık kaldıkça kapanan her işlem kendiliğinden journal\'a gelir. İşlemlerini diğer grafiklerde her zamanki gibi yapmaya devam edersin.', 'Open a new, empty chart and put the add-on there. As long as that chart stays open, every closed trade reaches your journal by itself. Keep trading on your other charts as usual.')}
                     </div>
                     <div>
                       <span className="font-medium" style={{ color: '#fff' }}>{tr('Sadece istediğimde güncellensin. ', 'Only when I want. ')}</span>
-                      {tr('Eklentiyi, diğer EA\'nı kullandığın grafiğe at. Journal o anda güncellenir — arada kapanmış işlemler dahil — ama o grafikteki diğer EA kaldırılır. Onu geri koyduğunda bizimki kalkar ve bir dahaki sefere kadar güncelleme olmaz. Anahtarı her seferinde yeniden sormaz. Bazı EA\'lar grafikten kaldırılınca kendi ayarlarını sıfırlar; bunu göz önünde bulundur.',
-                          'Drop the add-on onto the chart where your other EA runs. Your journal updates right then — including trades closed in between — but the other EA is removed. Put that one back and ours is removed, with no updates until next time. It will not ask for the key again. Some EAs reset their own settings when removed from a chart, so keep that in mind.')}
+                      {tr('Eklentiyi, diğer EA\'nı kullandığın grafiğe at. Journal o anda güncellenir — arada kapanmış işlemler dahil — ama o grafikteki diğer EA kaldırılır. Onu geri koyduğunda bizimki kalkar ve bir dahaki sefere kadar güncelleme olmaz. Anahtarı her seferinde yeniden sormaz. Bazı EA\'lar grafikten kaldırılınca kendi ayarlarını sıfırlar; bunu göz önünde bulundur.', 'Drop the add-on onto the chart where your other EA runs. Your journal updates right then — including trades closed in between — but the other EA is removed. Put that one back and ours is removed, with no updates until next time. It will not ask for the key again. Some EAs reset their own settings when removed from a chart, so keep that in mind.')}
                     </div>
                   </div>
                 </div>
@@ -327,10 +314,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
           ))}
         </ol>
         <p className="text-[13px] leading-relaxed mt-6 pt-5" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          {tr(
-            'Mac kullanıyorsan "Veri Klasörünü Aç" bazı sürümlerde çalışmaz. O zaman Finder\'da Git → Klasöre Git ile şuraya gidebilirsin: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts',
-            'On a Mac, "Open Data Folder" does not work in some builds. In Finder use Go → Go to Folder and paste: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts'
-          )}
+          {tr('Mac kullanıyorsan "Veri Klasörünü Aç" bazı sürümlerde çalışmaz. O zaman Finder\'da Git → Klasöre Git ile şuraya gidebilirsin: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts', 'On a Mac, "Open Data Folder" does not work in some builds. In Finder use Go → Go to Folder and paste: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts')}
         </p>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { localeOf } from '../lib/appCopy';
 import { SESSIONS, sessionState } from '../lib/sessions';
 import { NewsEvent } from '../lib/news';
 import { Bell } from 'lucide-react';
@@ -205,7 +206,7 @@ export default function HeaderStrip({ onOpenSessions, onOpenNews }: {
     }
   }
 
-  const locale = language === 'tr' ? 'tr-TR' : language === 'fa' ? 'fa-IR' : 'en-US';
+  const locale = localeOf(language);
 
   // ── Sıradaki önemli haberler ──
   //
