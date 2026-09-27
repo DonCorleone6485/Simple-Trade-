@@ -3,4 +3,10 @@
   <url><loc>https://www.simpletradejournal.io/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://www.simpletradejournal.io/help</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.simpletradejournal.io/changelog</loc><changefreq>weekly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.simpletradejournal.io/blog</loc><lastmod>2026-09-27</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.simpletradejournal.io/guides/metatrader-5-auto-sync</loc><lastmod>2026-09-27</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.simpletradejournal.io/guides/import-trade-history</loc><lastmod>2026-09-27</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.simpletradejournal.io/blog/how-to-keep-a-trading-journal</loc><lastmod>2026-09-27</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.simpletradejournal.io/blog/r-multiple-explained</loc><lastmod>2026-09-27</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.simpletradejournal.io/blog/prop-firm-daily-loss-and-drawdown</loc><lastmod>2026-09-27</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>

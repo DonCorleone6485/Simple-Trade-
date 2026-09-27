@@ -48,6 +48,7 @@ const ChecklistLibrary = lazy(() => import('./components/ChecklistLibrary'));
 const PropEvaluation = lazy(() => import('./components/PropEvaluation'));
 const LandingPage = lazy(() => import('./components/LandingPage'));
 const InfoPage = lazy(() => import('./components/InfoPage'));
+const ArticlePage = lazy(() => import('./components/ArticlePage'));
 const JournalDashboard = lazy(() => import('./components/JournalDashboard'));
 const PrintableReport = lazy(() => import('./components/PrintableReport'));
 const PropStatus = lazy(() => import('./components/PropStatus'));
@@ -56,7 +57,8 @@ type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news' | 'discip
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect';
 type AuthView = 'signin' | 'signup';
 type AuthStage = 'landing' | 'auth';
-type Page = 'home' | 'journal' | 'help' | 'changelog';
+/** 'blog': /blog dizini ve /blog/…, /guides/… yazıları (ArticlePage). */
+type Page = 'home' | 'journal' | 'help' | 'changelog' | 'blog';
 
 const JOURNAL_PATH = '/journal';
 const JOURNAL_TABS: JournalTab[] = ['newTrade', 'trades', 'calendar', 'stats', 'goals', 'mtConnect'];
@@ -68,11 +70,12 @@ function pathParts(): string[] {
 
 function getInitialPage(): Page {
   const first = pathParts()[0];
-  return first === 'journal' ? 'journal' : first === 'help' ? 'help' : first === 'changelog' ? 'changelog' : 'home';
+  return first === 'journal' ? 'journal' : first === 'help' ? 'help' : first === 'changelog' ? 'changelog'
+    : first === 'blog' || first === 'guides' ? 'blog' : 'home';
 }
 
 function pathForPage(page: Page): string {
-  return page === 'journal' ? JOURNAL_PATH : page === 'help' ? '/help' : page === 'changelog' ? '/changelog' : '/';
+  return page === 'journal' ? JOURNAL_PATH : page === 'help' ? '/help' : page === 'changelog' ? '/changelog' : page === 'blog' ? '/blog' : '/';
 }
 
 /**
@@ -217,6 +220,9 @@ export default function App() {
   const [showJoin, setShowJoin] = useState(false);
   const isGuest = guest && isLoaded && !isSignedIn;
   const isInfoPage = page === 'help' || page === 'changelog';
+  const isContentPage = isInfoPage || page === 'blog';
+  // Blogda hangi yazı açık: adres satırının kendisi (/blog, /guides/…).
+  const [contentPath, setContentPath] = useState(() => window.location.pathname.replace(/\/+$/, '') || '/blog');
 
   const isRTL = language === 'fa' || language === 'ar';
 
@@ -465,7 +471,15 @@ export default function App() {
       window.history[method]({}, '', path + window.location.search);
     }
     setPage(target);
+    if (target === 'blog') setContentPath(path);
     window.scrollTo(0, 0);
+  };
+
+  /** Blog/rehber içinde bir yazıya geç (sayfa yenilenmeden). */
+  const openContent = (path: string) => {
+    if (window.location.pathname !== path) window.history.pushState({}, '', path);
+    setContentPath(path);
+    setPage('blog');
   };
 
   /**
@@ -497,6 +511,7 @@ export default function App() {
     const onPopState = () => {
       const target = getInitialPage();
       setPage(target);
+      if (target === 'blog') setContentPath(window.location.pathname.replace(/\/+$/, ''));
       if (target !== 'journal') return;
       const r = parseView();
       if (r.view === 'expanded') {
@@ -1377,7 +1392,20 @@ export default function App() {
         </Suspense>
       )}
 
-      {!isInfoPage && isLoaded && !isSignedIn && !(isGuest && page === 'journal' && authStage !== 'auth') && (<>
+      {page === 'blog' && (
+        <Suspense fallback={<div className="min-h-screen" style={{ background: '#0d0e1a' }} />}>
+          <ArticlePage
+            path={contentPath}
+            onHome={() => navigate('home')}
+            onOpen={openContent}
+            cta={isSignedIn
+              ? { label: t('guestGoJournal'), onClick: () => navigate('journal') }
+              : { label: t('guestStartFree'), onClick: startGuest }}
+          />
+        </Suspense>
+      )}
+
+      {!isContentPage && isLoaded && !isSignedIn && !(isGuest && page === 'journal' && authStage !== 'auth') && (<>
         {(() => {
           const urlParams = new URLSearchParams(window.location.search);
           const refCode = urlParams.get('ref');
@@ -1433,7 +1461,7 @@ export default function App() {
         </Suspense>
       )}
 
-      {!isInfoPage && (isSignedIn || (isGuest && page === 'journal' && authStage !== 'auth')) && (
+      {!isContentPage && (isSignedIn || (isGuest && page === 'journal' && authStage !== 'auth')) && (
         <PlanProvider value={isGuest
           ? { isPro: true, askUpgrade: () => setShowJoin(true), isGuest: true, requireAccount: () => setShowJoin(true) }
           : { isPro, askUpgrade, isGuest: false, requireAccount: () => {} }}>

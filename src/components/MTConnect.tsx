@@ -316,6 +316,9 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
         <p className="text-[13px] leading-relaxed mt-6 pt-5" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           {tr('Mac kullanıyorsan "Veri Klasörünü Aç" bazı sürümlerde çalışmaz. O zaman Finder\'da Git → Klasöre Git ile şuraya gidebilirsin: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts', 'On a Mac, "Open Data Folder" does not work in some builds. In Finder use Go → Go to Folder and paste: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts')}
         </p>
+        <a href="/guides/metatrader-5-auto-sync" target="_blank" rel="noopener" className="inline-block text-[13px] mt-3" style={{ color: '#a78bfa' }}>
+          {tr('Ayrıntılı kurulum rehberi ve sorun giderme →', 'Full setup guide and troubleshooting →')}
+        </a>
       </div>
     </div>
   );

@@ -67,6 +67,9 @@ const UI: Record<string, L9> = {
     de: 'Für Anfragen zu Daten und Datenschutz:',
     fr: 'Pour les demandes relatives aux données et à la confidentialité :',
   },
+  guidesTitle: { tr: 'Adım adım rehberler', en: 'Step-by-step guides', fa: 'راهنماهای گام‌به‌گام', ar: 'أدلة خطوة بخطوة', ru: 'Пошаговые руководства', es: 'Guías paso a paso', pt: 'Guias passo a passo', de: 'Schritt-für-Schritt-Anleitungen', fr: 'Guides pas à pas' },
+  guideMt5: { tr: 'MetaTrader 5\'i bağlamak', en: 'Connecting MetaTrader 5', fa: 'وصل کردن متاتریدر ۵', ar: 'ربط ميتاتريدر 5', ru: 'Подключение MetaTrader 5', es: 'Conectar MetaTrader 5', pt: 'Ligar o MetaTrader 5', de: 'MetaTrader 5 verbinden', fr: 'Connecter MetaTrader 5' },
+  guideImport: { tr: 'İşlem geçmişini içe aktarmak', en: 'Importing your trade history', fa: 'وارد کردن تاریخچه معاملات', ar: 'استيراد سجل الصفقات', ru: 'Импорт истории сделок', es: 'Importar tu historial', pt: 'Importar o teu histórico', de: 'Handelshistorie importieren', fr: 'Importer votre historique' },
   home: { tr: 'Ana sayfa', en: 'Home', fa: 'صفحه اصلی', ar: 'الرئيسية', ru: 'Главная', es: 'Inicio', pt: 'Início', de: 'Startseite', fr: 'Accueil' },
   seeChangelog: { tr: 'Değişikliklere bak', en: 'See the changelog', fa: 'دیدن تغییرات', ar: 'عرض سجل التغييرات', ru: 'Что нового', es: 'Ver novedades', pt: 'Ver novidades', de: 'Änderungen ansehen', fr: 'Voir les nouveautés' },
   seeHelp: { tr: 'Yardıma dön', en: 'Back to help', fa: 'بازگشت به راهنما', ar: 'العودة إلى المساعدة', ru: 'К помощи', es: 'Volver a la ayuda', pt: 'Voltar à ajuda', de: 'Zur Hilfe', fr: 'Retour à l\'aide' },
@@ -333,6 +336,13 @@ export default function InfoPage({ kind, onHome, onOther, cta }: {
                 <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>{h.a[lang]}</p>
               </section>
             ))}
+            <section className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <h2 className="text-[17px] font-medium text-white mb-3">{s('guidesTitle')}</h2>
+              <div className="flex flex-col gap-2">
+                <a href="/guides/metatrader-5-auto-sync" className="text-[15px]" style={{ color: '#a78bfa' }}>{s('guideMt5')} →</a>
+                <a href="/guides/import-trade-history" className="text-[15px]" style={{ color: '#a78bfa' }}>{s('guideImport')} →</a>
+              </div>
+            </section>
             {/* Soruların altında: yardım sayfası, cevabı bulamayanın
                 bakacağı son yer; uygulamadaki "Yardım" da buraya geliyor. */}
             <section className="rounded-2xl p-6" style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}>

@@ -1,6 +1,7 @@
 /**
- * Derlemenin son adımı: ana sayfayı, Yardım'ı ve Değişiklikler'i önceden
- * çizip dist/ altına yazar (index.html, help.html, changelog.html).
+ * Derlemenin son adımı: ana sayfayı ve src/prerender.tsx'teki PAGES
+ * listesini (Yardım, Değişiklikler, blog, rehberler) önceden çizip dist/
+ * altına yazar (index.html, help.html, blog/….html …).
  * Neden: src/prerender.tsx'teki açıklamaya bak. vercel.json /help ve
  * /changelog adreslerini bu dosyalara yönlendiriyor.
  *
@@ -12,9 +13,9 @@
  * Bir şey ters giderse derleme durmaz: ön çizim olmadan da site çalışıyor
  * (yalnızca /help ve /changelog için index.html kopyalanır).
  */
-import { readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
 
 const SITE = 'https://www.simpletradejournal.io';
 const indexPath = resolve('dist/index.html');
@@ -42,20 +43,29 @@ function withHead(page, { title, description, path }) {
     .replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${esc(description)}$2`);
 }
 
+let pages = [];
 try {
-  const { render, META } = await import(pathToFileURL(resolve('dist-ssr/prerender.js')).href);
-  const home = render('home');
+  const mod = await import(pathToFileURL(resolve('dist-ssr/prerender.js')).href);
+  pages = mod.PAGES;
+  const home = mod.render('home');
   writeFileSync(indexPath, withBody(template, home));
   console.log(`prerender: home ${Math.round(home.length / 1024)} KB`);
-  for (const page of ['help', 'changelog']) {
-    const html = render(page);
-    writeFileSync(resolve(`dist/${page}.html`), withBody(withHead(template, META[page]), html));
-    console.log(`prerender: ${page} ${Math.round(html.length / 1024)} KB`);
+  for (const page of pages) {
+    const html = mod.render(page.path);
+    const out = resolve('dist', page.file);
+    mkdirSync(dirname(out), { recursive: true });
+    writeFileSync(out, withBody(withHead(template, page), html));
+    console.log(`prerender: ${page.path} ${Math.round(html.length / 1024)} KB`);
   }
 } catch (err) {
   console.warn('prerender skipped:', err && err.message ? err.message : err);
   // Adresler yine çalışsın: ön çizimsiz uygulama kabuğu.
-  for (const page of ['help', 'changelog']) writeFileSync(resolve(`dist/${page}.html`), template);
+  const files = pages.length ? pages.map(p => p.file) : ['help.html', 'changelog.html', 'blog.html'];
+  for (const file of files) {
+    const out = resolve('dist', file);
+    mkdirSync(dirname(out), { recursive: true });
+    writeFileSync(out, template);
+  }
 } finally {
   rmSync(resolve('dist-ssr'), { recursive: true, force: true });
 }

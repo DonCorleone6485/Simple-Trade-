@@ -2,6 +2,8 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import LandingPage from './components/LandingPage';
 import InfoPage, { INFO_META } from './components/InfoPage';
+import ArticlePage, { BLOG_META } from './components/ArticlePage';
+import { ARTICLES, articlePath } from './content/articles';
 import { LanguageProvider } from './context/LanguageContext';
 
 /**
@@ -23,13 +25,30 @@ export const META: Record<Exclude<PrerenderPage, 'home'>, { title: string; descr
   changelog: { ...INFO_META.changelog, path: '/changelog' },
 };
 
-export function render(page: PrerenderPage = 'home'): string {
+/**
+ * Ana sayfa dışında önceden çizilen her sayfa: adres, dist/ altındaki dosya
+ * ve <head> bilgileri. scripts/prerender.mjs bu listeyi dolaşıyor; vercel.json
+ * adresleri bu dosyalara yönlendiriyor.
+ */
+export const PAGES: { path: string; file: string; title: string; description: string }[] = [
+  { ...META.help, file: 'help.html' },
+  { ...META.changelog, file: 'changelog.html' },
+  { ...BLOG_META, path: '/blog', file: 'blog.html' },
+  ...ARTICLES.map(a => ({
+    path: articlePath(a),
+    file: `${a.section}/${a.slug}.html`,
+    title: `${a.title.en} — Simple Trading Journal`,
+    description: a.description.en,
+  })),
+];
+
+export function render(page: string = 'home'): string {
   const noop = () => {};
-  return renderToString(
-    <LanguageProvider>
-      {page === 'home'
-        ? <LandingPage onGetStarted={noop} onSignIn={noop} />
-        : <InfoPage kind={page} onHome={noop} onOther={noop} cta={{ label: 'Get Started Free', onClick: noop }} />}
-    </LanguageProvider>
-  );
+  const cta = { label: 'Get Started Free', onClick: noop };
+  let body: React.ReactNode;
+  if (page === 'home') body = <LandingPage onGetStarted={noop} onSignIn={noop} />;
+  else if (page === 'help' || page === 'changelog' || page === '/help' || page === '/changelog') {
+    body = <InfoPage kind={page.replace('/', '') as 'help' | 'changelog'} onHome={noop} onOther={noop} cta={cta} />;
+  } else body = <ArticlePage path={page} onHome={noop} onOpen={noop} cta={cta} />;
+  return renderToString(<LanguageProvider>{body}</LanguageProvider>);
 }
