@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { createClerkClient, verifyToken } from '@clerk/backend';
 import { isDisposableEmailDomain } from 'disposable-email-domains-js';
+import { createHash } from 'crypto';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -93,6 +94,23 @@ export default async function handler(req: any, res: any) {
   if (row?.trial_started_at) return res.status(409).json({ error: 'already_used' });
   const proActive = row?.is_pro && (!row.pro_until || utc(row.pro_until) > new Date());
   if (row?.has_paid || proActive) return res.status(409).json({ error: 'already_pro' });
+
+  // Aynı e-posta daha önce deneme kullandıysa (hesap silinip yeniden
+  // açılmış) ikinci kez verilmez. Açık e-posta değil, özeti tutuluyor.
+  let emailHash = '';
+  try {
+    const user = await createClerkClient({ secretKey: secret }).users.getUser(userId);
+    const email = user.emailAddresses.find(e => e.id === user.primaryEmailAddressId)?.emailAddress
+      || user.emailAddresses[0]?.emailAddress || '';
+    emailHash = email ? createHash('sha256').update(email.trim().toLowerCase()).digest('hex') : '';
+  } catch {
+    return res.status(502).json({ error: 'Could not read the account' });
+  }
+  if (emailHash) {
+    const { data: used } = await supabase.from('used_trials').select('email_hash').eq('email_hash', emailHash).maybeSingle();
+    if (used) return res.status(409).json({ error: 'already_used' });
+    await supabase.from('used_trials').insert({ email_hash: emailHash });
+  }
 
   const now = new Date();
   const endsAt = new Date(now.getTime() + TRIAL_DAYS * 86_400_000);

@@ -28,6 +28,8 @@ interface AppShellProps {
   onSignOut: () => void;
   /** Kayıt olmadan geziyor: kullanıcı bloğunun yerinde kayıt ve giriş. */
   guest?: { onSignUp: () => void; onSignIn: () => void };
+  /** İsme tıklayınca hesap penceresi (plan, hesabı silme). */
+  onOpenAccount?: () => void;
   languageMenu?: React.ReactNode;
   children: React.ReactNode;
 }
@@ -46,7 +48,7 @@ const CONTENT = 'w-full max-w-[1140px] mx-auto px-5 sm:px-8';
 
 export default function AppShell({
   active, onNavigate, activeJournalName, title, subtitle, actions,
-  isPro, trialDaysLeft, userLabel, userImage, onSignOut, guest, languageMenu, children,
+  isPro, trialDaysLeft, userLabel, userImage, onSignOut, guest, onOpenAccount, languageMenu, children,
 }: AppShellProps) {
   const { t, language } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -145,14 +147,15 @@ export default function AppShell({
                   {(userLabel || '?').charAt(0).toUpperCase()}
                 </div>}
           </div>
-          <div className="flex-1 min-w-0">
+          <button type="button" onClick={() => { setMobileOpen(false); onOpenAccount?.(); }}
+            className="flex-1 min-w-0 text-start" title={t('accountTitle')}>
             <div className="text-[12px] truncate" style={{ color: 'rgba(255,255,255,0.6)' }}>{userLabel}</div>
             {isPro && (
               <div className="text-[10px] tracking-wider" style={{ color: '#a78bfa' }}>
                 {trialDaysLeft ? t('trialBadge').replace('{n}', String(trialDaysLeft)) : 'PRO'}
               </div>
             )}
-          </div>
+          </button>
           <button onClick={onSignOut} className="ui-icon-btn ui-icon-btn-danger p-1.5 rounded-lg flex-shrink-0"
             title={tr('Çıkış Yap', 'Sign Out')}>
             <LogOut className="w-4 h-4" />

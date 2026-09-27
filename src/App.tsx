@@ -189,6 +189,12 @@ export default function App() {
   const [guest, setGuest] = useState(() => {
     try { return sessionStorage.getItem('stjGuest') === '1'; } catch { return false; }
   });
+  /** Hesap penceresi ve hesabı silme adımları. */
+  const [showAccount, setShowAccount] = useState(false);
+  const [deleteStep, setDeleteStep] = useState(false);
+  const [deleteWord, setDeleteWord] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   /** "Kendi journal'ın için ücretsiz hesap aç" penceresi. */
   const [showJoin, setShowJoin] = useState(false);
   const isGuest = guest && isLoaded && !isSignedIn;
@@ -1340,6 +1346,67 @@ export default function App() {
         <PlanProvider value={isGuest
           ? { isPro: true, askUpgrade: () => setShowJoin(true), isGuest: true, requireAccount: () => setShowJoin(true) }
           : { isPro, askUpgrade, isGuest: false, requireAccount: () => {} }}>
+        {/* Hesap: plan bilgisi ve hesabı tamamen silme (KVKK / GDPR). */}
+        {showAccount && !isGuest && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-4">
+            <div className="w-full max-w-md rounded-2xl p-7 space-y-5" style={{ background: '#1a1b2e', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <h2 className="font-display text-[21px] font-medium text-white">{t('accountTitle')}</h2>
+                  <p className="text-sm mt-1 truncate" style={{ color: 'rgba(255,255,255,0.5)' }}>{user?.primaryEmailAddress?.emailAddress}</p>
+                </div>
+                <button onClick={() => setShowAccount(false)} className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)' }}>
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="text-sm px-4 py-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.7)' }}>
+                {trialEndsAt ? t('accountPlanTrial') : isPro ? t('accountPlanPro') : t('accountPlanFree')}
+              </div>
+
+              {!deleteStep ? (
+                <button onClick={() => setDeleteStep(true)} className="text-[13px] underline underline-offset-2" style={{ color: '#f87171' }}>
+                  {t('accountDelete')}
+                </button>
+              ) : (
+                <div className="space-y-3 pt-1" style={{ borderTop: '1px solid rgba(248,113,113,0.2)' }}>
+                  <p className="text-[13px] leading-relaxed pt-3" style={{ color: 'rgba(255,255,255,0.65)' }}>{t('accountDeleteWarn')}</p>
+                  <p className="text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    {t('accountDeleteType').replace('{w}', t('accountDeleteWord'))}
+                  </p>
+                  <input value={deleteWord} onChange={e => setDeleteWord(e.target.value)} autoFocus
+                    className="w-full outline-none text-sm" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(248,113,113,0.3)', color: '#fff', borderRadius: '12px', padding: '10px 14px' }} />
+                  {deleteError && <p className="text-[13px]" style={{ color: '#f87171' }}>{deleteError}</p>}
+                  <button
+                    disabled={deleting || deleteWord.trim().toLocaleUpperCase(language === 'tr' ? 'tr-TR' : 'en-US') !== t('accountDeleteWord')}
+                    onClick={async () => {
+                      setDeleting(true);
+                      setDeleteError('');
+                      try {
+                        const token = await getToken();
+                        const r = await fetch('/api/account', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                          body: JSON.stringify({ action: 'delete', confirm: true }),
+                        });
+                        if (!r.ok) throw new Error();
+                        setShowAccount(false);
+                        await signOut();
+                        navigate('home', true);
+                      } catch {
+                        setDeleteError(t('accountDeleteFailed'));
+                      } finally {
+                        setDeleting(false);
+                      }
+                    }}
+                    className="w-full py-3 rounded-full text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{ background: '#dc2626', color: '#fff' }}>
+                    {deleting ? t('accountDeleting') : t('accountDeleteConfirm')}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         {/* Gezinen biri kayıt gerektiren bir şeye bastı. */}
         {showJoin && isGuest && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-4">
@@ -1657,6 +1724,7 @@ export default function App() {
           userImage={user?.imageUrl}
           onSignOut={() => signOut()}
           guest={isGuest ? { onSignUp: () => goToAuth('signup'), onSignIn: () => goToAuth('signin') } : undefined}
+          onOpenAccount={() => { setShowAccount(true); setDeleteStep(false); setDeleteWord(''); setDeleteError(''); }}
           languageMenu={languageMenu}
         >
           {isGuest && (
