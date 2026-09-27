@@ -33,6 +33,7 @@ import PropStatus from './components/PropStatus';
 import { useLanguage } from './context/LanguageContext';
 import { PlanProvider, UpgradeReason, FREE_DAILY_TRADES } from './context/PlanContext';
 import { demoData } from './lib/demo';
+import { matchOpenTrade } from './lib/matchOpen';
 import { usePrices } from './lib/pricing';
 import { supabase } from './lib/supabase';
 import { modalCard, input as uiInput, label as uiLabel, primaryBtn, quietBtn, hairline, TRANSITION } from './lib/ui';
@@ -740,8 +741,40 @@ export default function App() {
     );
     importedTrades = importedTrades.filter(tr => !known.has(tradeKey(tr)));
 
+    // Bekleyen kayıtlar: işleme girerken yazılıp sonucu henüz girilmemiş olanlar.
+    // Rapordaki kapanmış işlem bunlardan biriyle eşleşirse yeni satır açılmıyor,
+    // o kayıt tamamlanıyor — notlar ve fotoğraflar yerinde kalıyor. MetaTrader
+    // bağlantısı da aynı kuralla çalışıyor (api/ingest.ts).
+    const pending = trades.filter(tr => tr.journal_id === targetJournal!.id && isOpenTrade(tr));
+    const completedTrades: Trade[] = [];
     const inserted: Trade[] = [];
     for (const trade of importedTrades) {
+      if (trade.result) {
+        const sameId = trade.externalId
+          ? pending.find(p => p.externalId === trade.externalId && p.symbol.toUpperCase() === trade.symbol.toUpperCase())
+          : undefined;
+        const hit = sameId || matchOpenTrade(
+          { symbol: trade.symbol, type: trade.type, openPrice: trade.entryPrice || 0, openTime: trade.date },
+          pending.filter(p => !p.externalId),
+        );
+        if (hit) {
+          // Kapanış bilgisi yazılıyor; kullanıcının girdiği risk, R:R, stop ve
+          // giriş fiyatı duruyorsa dokunulmuyor, yalnız boşsa dolduruluyor.
+          const patch: any = { date: trade.date, exit_date: trade.exitDate || null, reward: trade.reward || 0, result: trade.result };
+          if (trade.externalId) patch.external_id = trade.externalId;
+          if (trade.exitPrice) patch.exit_price = trade.exitPrice;
+          if (!(Number(hit.risk) > 0) && trade.risk) patch.risk = trade.risk;
+          if (!hit.rr && trade.rr) patch.rr = trade.rr;
+          if (hit.stopLoss == null && trade.stopLoss) patch.stop_loss = trade.stopLoss;
+          if (hit.entryPrice == null && trade.entryPrice) patch.entry_price = trade.entryPrice;
+          const { data } = await supabase.from('trades').update(patch).eq('id', hit.id).select().single();
+          if (data) {
+            completedTrades.push(tradeFromRow(data));
+            pending.splice(pending.indexOf(hit), 1);
+            continue;
+          }
+        }
+      }
       const { data } = await supabase.from('trades').insert({
         user_id: user.id, journal_id: targetJournal.id, date: trade.date, exit_date: trade.exitDate || null,
         symbol: trade.symbol, type: trade.type, timeframe: trade.timeframe || '',
@@ -754,7 +787,7 @@ export default function App() {
       }).select().single();
       if (data) inserted.push(tradeFromRow(data));
     }
-    setTrades(prev => [...inserted, ...prev]);
+    setTrades(prev => [...inserted, ...prev.map(tr => completedTrades.find(c => c.id === tr.id) || tr)]);
     // Yeni journal açıldıysa doğrudan içine gir.
     if (target.kind === 'new') {
       goTo({ view: 'expanded', journal: targetJournal, tab: 'trades' });
