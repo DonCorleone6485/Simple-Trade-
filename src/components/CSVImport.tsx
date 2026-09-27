@@ -541,7 +541,9 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
   const locked = !!journalId;
   const [target, setTarget] = useState<'existing' | 'new'>(journalId ? 'existing' : 'new');
   const [newName, setNewName] = useState('');
-  const [picked, setPicked] = useState<string>(journalId || journals[0]?.id || '');
+  // Journal'ın dışından açılınca hiçbiri önceden seçili değil: ilk journal
+  // seçili geliyordu, dosya fark edilmeden yanlış journal'a gidiyordu.
+  const [picked, setPicked] = useState<string>(journalId || '');
   const targetId = locked ? journalId! : picked;
   const targetKeys = locked ? existingKeys : (keysByJournal[picked] || []);
   /**
@@ -741,7 +743,8 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
                       <select value={picked} onChange={e => setPicked(e.target.value)}
                         className="w-full outline-none text-sm"
                         style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-                          color: '#fff', borderRadius: '12px', padding: '10px 14px' }}>
+                          color: picked ? '#fff' : 'rgba(255,255,255,0.45)', borderRadius: '12px', padding: '10px 14px' }}>
+                        <option value="" disabled style={{ background: '#1a1b2e', color: 'rgba(255,255,255,0.45)' }}>{pick(language, 'Bir journal seç…', 'Choose a journal…')}</option>
                         {journals.map(j => (
                           <option key={j.id} value={j.id} style={{ background: '#1a1b2e', color: '#fff' }}>{j.name}</option>
                         ))}

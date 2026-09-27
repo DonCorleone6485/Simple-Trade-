@@ -10,6 +10,10 @@ import { useLanguage } from '../context/LanguageContext';
  * İçe aktarmadaki akışın aynısı — yeni bir journal ya da mevcutlardan biri.
  * Bir journal'ın içinden basıldığında bu pencere hiç açılmıyor; hedef zaten
  * o journal ve doğrudan bağlantı sayfasına gidiliyor.
+ *
+ * Varsayılan "yeni journal" ve listede hiçbir journal önceden seçili değil:
+ * önce ilk journal seçili geliyordu, kullanıcı fark etmeden Devam'a basıp
+ * MetaTrader'ı yanlış journal'a bağlıyordu.
  */
 export type MTTarget = { kind: 'new'; name: string } | { kind: 'existing'; journalId: string };
 
@@ -20,9 +24,9 @@ export default function MTTargetPicker({ journals, onChoose, onClose }: {
 }) {
   const { language, t } = useLanguage();
   const tr = (a: string, b: string, ...args: (string | number | null | undefined)[]) => pick(language, a, b, ...args);
-  const [target, setTarget] = useState<'new' | 'existing'>(journals.length > 0 ? 'existing' : 'new');
+  const [target, setTarget] = useState<'new' | 'existing'>('new');
   const [name, setName] = useState('');
-  const [picked, setPicked] = useState(journals[0]?.id || '');
+  const [picked, setPicked] = useState('');
   const ready = target === 'new' ? name.trim().length > 0 : !!picked;
 
   const option = (on: boolean): React.CSSProperties => on
@@ -78,7 +82,8 @@ export default function MTTargetPicker({ journals, onChoose, onClose }: {
             </button>
           )}
           {target === 'existing' && journals.length > 0 && (
-            <select value={picked} onChange={e => setPicked(e.target.value)} className="w-full outline-none text-sm" style={field}>
+            <select value={picked} onChange={e => setPicked(e.target.value)} className="w-full outline-none text-sm" style={{ ...field, color: picked ? '#fff' : 'rgba(255,255,255,0.45)' }}>
+              <option value="" disabled style={{ background: '#1a1b2e', color: 'rgba(255,255,255,0.45)' }}>{tr('Bir journal seç…', 'Choose a journal…')}</option>
               {journals.map(j => <option key={j.id} value={j.id} style={{ background: '#1a1b2e', color: '#fff' }}>{j.name}</option>)}
             </select>
           )}
