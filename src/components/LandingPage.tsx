@@ -455,7 +455,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             <button onClick={() => scrollTo('pricing')} className="nav-link text-sm font-medium">
               {t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری')}
             </button>
-            <a href="/blog" className="nav-link text-sm font-medium">Blog</a>
+            <a href="/blog" className="nav-link text-sm font-medium">{t('Blog', 'Blog', 'بلاگ')}</a>
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -931,7 +931,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 { label: t('Nasıl Çalışır', 'How It Works', 'چگونه کار می‌کند'), href: '#how-it-works' },
                 { label: t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری'), href: '#pricing' },
                 { label: t('Yardım', 'Help', 'راهنما'), href: '/help' },
-                { label: 'Blog', href: '/blog' },
+                { label: t('Blog', 'Blog', 'بلاگ'), href: '/blog' },
                 { label: t('Değişiklikler', 'Changelog', 'تغییرات'), href: '/changelog' },
               ].map(l => (
                 /* Renk satır içi stille verilmiyordu diye değil — veriliyordu

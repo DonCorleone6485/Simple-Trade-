@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server';
 import LandingPage from './components/LandingPage';
 import InfoPage, { INFO_META } from './components/InfoPage';
 import ArticlePage, { BLOG_META } from './components/ArticlePage';
-import { ARTICLES, articlePath } from './content/articles';
+import { ARTICLES, articlePath, articleText } from './content/articles';
 import { LanguageProvider } from './context/LanguageContext';
 
 /**
@@ -37,8 +37,8 @@ export const PAGES: { path: string; file: string; title: string; description: st
   ...ARTICLES.map(a => ({
     path: articlePath(a),
     file: `${a.section}/${a.slug}.html`,
-    title: `${a.title.en} — Simple Trading Journal`,
-    description: a.description.en,
+    title: `${articleText(a, 'en').title} — Simple Trading Journal`,
+    description: articleText(a, 'en').description,
   })),
 ];
 

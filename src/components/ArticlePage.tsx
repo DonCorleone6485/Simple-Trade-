@@ -2,14 +2,13 @@ import React, { useEffect } from 'react';
 import { ArrowLeft, Clock } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { Lock as LogoLock } from './Logo';
-import { ARTICLES, articlePath, findArticle, type Article, type ArticleLang, type Block } from '../content/articles';
+import { ARTICLES, ARTICLE_LANGS, articlePath, articleText, findArticle, type Article, type ArticleLang, type Block } from '../content/articles';
 
 /**
  * Blog dizini (/blog) ve tek tek yazılar (/guides/…, /blog/…).
  *
- * Görünüş Yardım sayfasıyla aynı aile (InfoPage). Yazılar İngilizce ve
- * Türkçe; öbür dillerde İngilizce gösteriliyor, çevresindeki düğmeler ise
- * seçili dilde (bkz. src/content/articles.ts).
+ * Görünüş Yardım sayfasıyla aynı aile (InfoPage). Yazılar ve çevresindeki
+ * düğmeler dokuz dilde, seçili dilde (bkz. src/content/articles.ts).
  */
 type L9 = Record<'tr' | 'en' | 'fa' | 'ar' | 'ru' | 'es' | 'pt' | 'de' | 'fr', string>;
 const UI: Record<string, L9> = {
@@ -45,7 +44,10 @@ const UI: Record<string, L9> = {
   },
 };
 
-const LOCALES: Record<string, string> = { tr: 'tr-TR', en: 'en-US' };
+const LOCALES: Record<ArticleLang, string> = {
+  tr: 'tr-TR', en: 'en-US', fa: 'fa-IR', ar: 'ar-u-nu-latn', ru: 'ru-RU', es: 'es-ES', pt: 'pt-PT', de: 'de-DE', fr: 'fr-FR',
+};
+const isRtl = (l: string) => l === 'fa' || l === 'ar';
 const SITE = 'https://www.simpletradejournal.io';
 
 export const BLOG_META = {
@@ -57,7 +59,7 @@ const BlockView: React.FC<{ b: Block }> = ({ b }) => {
   if ('h2' in b) return <h2 className="text-[21px] font-medium text-white mt-10 mb-3">{b.h2}</h2>;
   if ('p' in b) return <p className="text-[16px] leading-[1.75] mb-4" style={{ color: 'rgba(255,255,255,0.72)' }}>{b.p}</p>;
   if ('code' in b) return (
-    <pre className="font-mono text-[14px] px-4 py-3 rounded-xl mb-4 overflow-x-auto" style={{ background: 'rgba(0,0,0,0.35)', color: '#c4b5fd' }}>{b.code}</pre>
+    <pre dir="auto" className="font-mono text-[14px] px-4 py-3 rounded-xl mb-4 overflow-x-auto" style={{ background: 'rgba(0,0,0,0.35)', color: '#c4b5fd' }}>{b.code}</pre>
   );
   if ('note' in b) return (
     <p className="text-[14.5px] leading-relaxed rounded-xl px-4 py-3 mb-4" style={{ background: 'rgba(240,180,41,0.08)', border: '1px solid rgba(240,180,41,0.2)', color: 'rgba(255,255,255,0.7)' }}>{b.note}</p>
@@ -77,9 +79,9 @@ const ArticleCard: React.FC<{ a: Article; lang: ArticleLang; onOpen: (path: stri
     <a href={path} onClick={e => { e.preventDefault(); onOpen(path); }}
       className="block rounded-2xl p-6 transition-colors hover:bg-white/[0.05]"
       style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-      dir={lang === 'tr' ? 'ltr' : undefined}>
-      <h3 className="text-[17px] font-medium text-white mb-2">{a.title[lang]}</h3>
-      <p className="text-[14.5px] leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.6)' }}>{a.description[lang]}</p>
+      dir={isRtl(lang) ? 'rtl' : 'ltr'}>
+      <h3 className="text-[17px] font-medium text-white mb-2">{articleText(a, lang).title}</h3>
+      <p className="text-[14.5px] leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.6)' }}>{articleText(a, lang).description}</p>
       <span className="text-[12.5px]" style={{ color: 'rgba(255,255,255,0.45)' }}>{minRead.replace('{0}', String(a.minutes))}</span>
     </a>
   );
@@ -95,7 +97,7 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
 }) {
   const { language } = useLanguage();
   const ui = (k: keyof typeof UI) => (UI[k] as Record<string, string>)[language] || UI[k].en;
-  const lang: ArticleLang = language === 'tr' ? 'tr' : 'en';
+  const lang: ArticleLang = (ARTICLE_LANGS as string[]).includes(language) ? (language as ArticleLang) : 'en';
   const rtl = language === 'fa' || language === 'ar';
 
   const [, section, slug] = path.split('/');
@@ -103,7 +105,7 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
   const isIndex = !article;
 
   useEffect(() => {
-    document.title = article ? `${article.title[lang]} — Simple Trading Journal` : `${ui('blog')} — Simple Trading Journal`;
+    document.title = article ? `${articleText(article, lang).title} — Simple Trading Journal` : `${ui('blog')} — Simple Trading Journal`;
     window.scrollTo(0, 0);
   }, [path, lang]);
 
@@ -114,11 +116,11 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
   const jsonLd = article ? {
     '@context': 'https://schema.org',
     '@type': article.section === 'guides' ? 'HowTo' : 'BlogPosting',
-    ...(article.section === 'guides' ? { name: article.title.en } : { headline: article.title.en }),
-    description: article.description.en,
+    ...(article.section === 'guides' ? { name: articleText(article, 'en').title } : { headline: articleText(article, 'en').title }),
+    description: articleText(article, 'en').description,
     datePublished: article.date,
     dateModified: article.date,
-    inLanguage: ['en', 'tr'],
+    inLanguage: ARTICLE_LANGS,
     url: SITE + articlePath(article),
     publisher: { '@type': 'Organization', name: 'Simple Trading Journal', url: SITE + '/' },
   } : null;
@@ -160,13 +162,11 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
               <ArrowLeft className={`w-4 h-4 ${rtl ? 'rotate-180' : ''}`} />
               {ui('back')}
             </a>
-            {/* Yazının kendisi yalnızca İngilizce/Türkçe; Farsça/Arapça
-                arayüzde de soldan sağa okunmalı. */}
-            <article dir="ltr" lang={lang}>
+            <article dir={rtl ? 'rtl' : 'ltr'} lang={lang}>
               <div className="text-[12px] uppercase tracking-[0.14em] mb-3" style={{ color: '#f0b429' }}>
                 {article.section === 'guides' ? ui('guides') : ui('articles')}
               </div>
-              <h1 className="poster text-[2rem] sm:text-[2.6rem] leading-tight mb-4">{article.title[lang]}</h1>
+              <h1 className="poster text-[2rem] sm:text-[2.6rem] leading-tight mb-4">{articleText(article, lang).title}</h1>
               <div className="flex items-center gap-3 text-[13px] mb-10" style={{ color: 'rgba(255,255,255,0.45)' }}>
                 <time dateTime={article.date}>
                   {new Intl.DateTimeFormat(LOCALES[lang], { dateStyle: 'long' }).format(new Date(`${article.date}T12:00:00Z`))}
@@ -174,7 +174,7 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
                 <span aria-hidden>·</span>
                 <span className="inline-flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{ui('minRead').replace('{0}', String(article.minutes))}</span>
               </div>
-              {article.body[lang].map((b, i) => <BlockView key={i} b={b} />)}
+              {articleText(article, lang).body.map((b, i) => <BlockView key={i} b={b} />)}
             </article>
 
             <section className="rounded-2xl p-7 mt-14" style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}>
