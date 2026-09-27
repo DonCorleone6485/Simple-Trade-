@@ -35,6 +35,8 @@ interface Spec {
   /** Gerçekleşen R: pozitif kazanç, -1 zarar, 0 başa baş, null hâlâ açık. */
   r: number | null;
   emo: string[];
+  /** İşlemin süresi (dakika). Verilmezse sıraya göre değişen bir süre. */
+  dur?: number;
   pre?: Two;
   post?: Two;
 }
@@ -53,7 +55,7 @@ const REAL: Spec[] = [
   { w: 19, h: 13, m: 40, sym: 'XAUUSD', type: 'Sell', setup: 'OB', risk: 100, r: -1, emo: ['focused'] },
   { w: 18, h: 9, m: 5, sym: 'GBPUSD', type: 'Buy', setup: 'Liquidity Sweep', risk: 100, r: 2.5, emo: ['confident'],
     post: ['Asya dibinin altı süpürüldü, plan tuttu. Kısmi almadım, iyi ki.', 'Asian low swept, plan worked. Didn\'t take partials — glad I didn\'t.'] },
-  { w: 17, h: 13, m: 30, sym: 'NAS100', type: 'Buy', setup: 'Trend Pullback', risk: 100, r: -1, emo: ['fomo'],
+  { w: 17, h: 13, m: 30, sym: 'NAS100', type: 'Buy', setup: 'Trend Pullback', risk: 100, r: -1, emo: ['fomo'], dur: 10,
     post: ['Girişi kovaladım, geri çekilmeyi beklemedim.', 'Chased the entry, didn\'t wait for the pullback.'] },
   { w: 17, h: 13, m: 48, sym: 'NAS100', type: 'Buy', setup: 'Trend Pullback', risk: 200, r: -1, emo: ['revenge', 'angry'],
     post: ['Zararı hemen geri almak istedim, riski iki katına çıkardım. Yapmamalıydım.', 'Wanted the loss back right away and doubled the risk. Shouldn\'t have.'] },
@@ -64,10 +66,11 @@ const REAL: Spec[] = [
   { w: 13, h: 1, m: 30, sym: 'XAUUSD', type: 'Sell', setup: 'FVG', risk: 100, r: -1, emo: ['tired'],
     post: ['Gece yarısı, uykusuz. Kuralım dışında.', 'Past midnight, no sleep. Outside my rules.'] },
   { w: 12, h: 8, m: 5, sym: 'GBPUSD', type: 'Sell', setup: 'Liquidity Sweep', risk: 100, r: 2, emo: ['focused'] },
-  { w: 12, h: 10, m: 30, sym: 'EURUSD', type: 'Buy', setup: 'FVG', risk: 100, r: -1, emo: ['impatient'] },
-  { w: 12, h: 11, m: 10, sym: 'EURUSD', type: 'Buy', setup: 'FVG', risk: 100, r: -1, emo: ['angry'] },
-  { w: 12, h: 11, m: 40, sym: 'GBPUSD', type: 'Buy', setup: 'OB', risk: 150, r: -1, emo: ['revenge'],
+  { w: 12, h: 10, m: 30, sym: 'EURUSD', type: 'Buy', setup: 'FVG', risk: 100, r: -1, emo: ['impatient'], dur: 25 },
+  { w: 12, h: 11, m: 10, sym: 'EURUSD', type: 'Buy', setup: 'FVG', risk: 100, r: -1, emo: ['angry'], dur: 20 },
+  { w: 12, h: 11, m: 40, sym: 'GBPUSD', type: 'Buy', setup: 'OB', risk: 150, r: -1, emo: ['revenge'], dur: 20,
     post: ['Günün kârını ve fazlasını geri verdim. 2 zarardan sonra durmalıydım.', 'Gave back the day\'s profit and more. Should have stopped after 2 losses.'] },
+  { w: 12, h: 12, m: 15, sym: 'XAUUSD', type: 'Sell', setup: 'FVG', risk: 100, r: 1, emo: ['impatient'] },
   { w: 11, h: 14, m: 5, sym: 'NAS100', type: 'Sell', setup: 'BOS / ChoCH', risk: 100, r: 2.2, emo: ['calm'] },
   { w: 10, h: 8, m: 40, sym: 'XAUUSD', type: 'Buy', setup: 'Trend Pullback', risk: 100, r: 1.5, emo: ['confident'] },
   { w: 9, h: 13, m: 30, sym: 'EURUSD', type: 'Sell', setup: 'Breaker Block', risk: 100, r: -1, emo: ['fearful'] },
@@ -123,7 +126,7 @@ function build(specs: Spec[], journalId: string, tr: boolean, days: Date[]): Tra
     const stop = +(entry - dir * mk.dist).toFixed(mk.digits);
     const closed = s.r !== null;
     const exit = closed ? +(entry + dir * mk.dist * (s.r as number)).toFixed(mk.digits) : undefined;
-    const minutes = 20 + ((i * 53) % 160);
+    const minutes = s.dur ?? 20 + ((i * 53) % 160);
     const result: TradeResult | '' = !closed ? '' : s.r! > 0 ? 'Başarılı' : s.r! < 0 ? 'Başarısız' : 'Başa Baş';
     const reward = !closed ? 0 : s.r! > 0 ? Math.round(s.risk * s.r!) : s.r! < 0 ? -s.risk : 0;
     const pick = (t?: Two) => (t ? (tr ? t[0] : t[1]) : '');
