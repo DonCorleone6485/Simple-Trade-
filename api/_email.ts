@@ -353,3 +353,17 @@ export async function sendContactMessage(m: { email: string; message: string; na
     return false;
   }
 }
+
+/** Bize (support@) giden iç bildirim — örneğin günlük hata özeti. */
+export async function sendInternal(subject: string, text: string): Promise<boolean> {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return false;
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: 'Simple Trading Journal <alerts@updates.simpletradejournal.io>', to: [REPLY_TO], subject, text, tags: [{ name: 'kind', value: 'internal' }] }),
+    });
+    return r.ok;
+  } catch { return false; }
+}

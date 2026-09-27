@@ -5,7 +5,11 @@ import { Analytics } from '@vercel/analytics/react';
 import App from './App';
 import { LanguageProvider, useLanguage, detectLanguage } from './context/LanguageContext';
 import { loadAppCopy, needsAppCopy } from './lib/appCopy';
+import ErrorBoundary from './components/ErrorBoundary';
+import { installErrorLogging } from './lib/errorLog';
 import './index.css';
+
+installErrorLogging();
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -79,6 +83,7 @@ const initial = detectLanguage();
 Promise.all([needsAppCopy(initial) ? loadAppCopy() : null, loadClerkLocale(initial)]).then(() => {
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
+      <ErrorBoundary>
       <LanguageProvider>
         <ClerkWithLanguage>
           <App />
@@ -87,6 +92,7 @@ Promise.all([needsAppCopy(initial) ? loadAppCopy() : null, loadClerkLocale(initi
             kimlik taşıyor (/journal/<id>/…); istatistiğe yalnızca /journal gitsin. */}
         <Analytics beforeSend={e => ({ ...e, url: e.url.replace(/\/journal\/.*$/, '/journal') })} />
       </LanguageProvider>
+      </ErrorBoundary>
     </React.StrictMode>
   );
 });

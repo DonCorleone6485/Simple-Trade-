@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { createClerkClient, verifyToken } from '@clerk/backend';
 import { timingSafeEqual } from 'crypto';
-import { emailEnabled, sendContactMessage, sendEmail, toLang, unsubscribeToken } from './_email.js';
+import { emailEnabled, sendContactMessage, sendEmail, sendInternal, toLang, unsubscribeToken } from './_email.js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -177,5 +177,30 @@ export default async function handler(req: any, res: any) {
       }
     }
   }
-  return res.status(200).json({ sent: counts });
+  // Günlük hata özeti: son 24 saatte tarayıcılarda hata çıktıysa bize tek
+  // posta (bkz. src/lib/errorLog.ts). Hata yoksa hiçbir şey gitmez.
+  const errors = await errorDigest(now);
+  return res.status(200).json({ sent: counts, errors });
+}
+
+async function errorDigest(now: number): Promise<number> {
+  const { data } = await supabase.from('client_errors')
+    .select('message, kind, url, user_id, created_at')
+    .gte('created_at', new Date(now - DAY).toISOString())
+    .order('created_at', { ascending: false }).limit(500);
+  if (!data?.length) return 0;
+  const groups = new Map<string, { n: number; users: Set<string>; url: string; kind: string }>();
+  for (const e of data) {
+    const g = groups.get(e.message) || { n: 0, users: new Set<string>(), url: e.url || '', kind: e.kind || '' };
+    g.n++;
+    g.users.add(e.user_id || 'anon');
+    groups.set(e.message, g);
+  }
+  const lines = [...groups.entries()].sort((a, b) => b[1].n - a[1].n).slice(0, 15)
+    .map(([msg, g]) => `• ${g.n}× (${g.users.size} kişi, ${g.kind}) ${msg}\n  ${g.url}`);
+  await sendInternal(
+    `[Hata özeti] Son 24 saatte ${data.length} hata`,
+    `Son 24 saatte kullanıcı tarayıcılarında ${data.length} hata kaydedildi (${groups.size} farklı).\n\n${lines.join('\n\n')}\n\nAyrıntı: Supabase → client_errors tablosu.`,
+  );
+  return data.length;
 }
