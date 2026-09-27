@@ -95,10 +95,11 @@ function parseView(): { view: View; journalId?: string; tab: JournalTab } {
 
 function getInitialAuthStage(): AuthStage {
   // Clerk's routing="hash" drives multi-step auth (email verification,
-  // OAuth/SSO return) via window.location.hash. A non-trivial hash on
-  // first load means we're mid-flow — resume auth, don't show the
-  // marketing page.
-  return window.location.hash && window.location.hash.length > 1 ? 'auth' : 'landing';
+  // OAuth/SSO return) via window.location.hash, always as "#/step". A hash
+  // like that on first load means we're mid-flow — resume auth. Landing
+  // anchors (#pricing, #features) are not: a shared link to the pricing
+  // section used to open the sign-in form instead.
+  return window.location.hash.startsWith('#/') ? 'auth' : 'landing';
 }
 
 /** Veritabanı satırını işleme çevirir. */

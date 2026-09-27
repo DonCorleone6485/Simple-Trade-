@@ -169,6 +169,15 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
     document.getElementById(id)?.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
 
+  // Paylaşılan bir bağlantı (/#pricing) doğrudan o bölüme açılsın. Tarayıcı
+  // kendisi kaydıramıyor: sayfa yüklendiğinde bölüm henüz çizilmemiş oluyor.
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (!id || id.startsWith('/')) return;
+    const timer = setTimeout(() => document.getElementById(id)?.scrollIntoView({ block: 'start' }), 150);
+    return () => clearTimeout(timer);
+  }, []);
+
   /**
    * İmlecin kutu içindeki yerini iki CSS değişkenine yazar; ışık huzmesi
    * (index.css'teki .hover-quiet::before) oradan besleniyor. Konumu CSS'e
@@ -893,7 +902,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               </div>
               <button onClick={onGetStarted}
                 className="cta mt-auto w-full py-3 rounded-full text-sm font-medium"
-                style={{ background: '#8b5cf6', color: '#fff' }}>
+                // Görünmez çerçeve: yandaki düğmenin 1px çizgisiyle aynı boyda kalsın.
+                style={{ background: '#8b5cf6', color: '#fff', border: '1px solid transparent' }}>
                 {signedIn ? ctaLabel : t('3 Gün Ücretsiz Dene', 'Try Free for 3 Days', '۳ روز رایگان امتحان کن')}
               </button>
             </motion.div>
