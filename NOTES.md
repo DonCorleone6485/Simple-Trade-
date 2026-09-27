@@ -113,12 +113,17 @@ Kararlar (kullanıcı):
   saat/sembol/yön görünür, sonuç bulanık; istatistiğe girmez; Pro'da açılır.
   Sesli not, not düzeltme, yapay zekâ analizi Pro (sunucuda da kontrol).
   "Yeni İşlem" düğmesinde 1/2 sayacı; her kısıtlamada kendi mesajıyla pencere.
-- Ana sayfa fiyat kartları + SSS yeni modele göre; Pro'nun yanında
-  "(3 gün kartsız deneme)". Fiyatlar hâlâ eski ($12.99/ay, $99/yıl).
+- Ana sayfa ve uygulama içi fiyat kartları aynı bileşen (PricingCards).
+- Fiyatlar — YAPILDI: Pro $14.99/ay, $119/yıl; Türkiye'den 349 TL / 2.790 TL
+  (src/lib/pricing.ts tek kaynak, ülke /api/geo'dan). TL 6 ayda bir gözden geçir.
+  Diğer ülke grupları (%30/%50 indirim) henüz yok.
+- Ücretsizde journal/işlem silme yok (RLS delete politikası Pro ister).
+- Hesap silme — YAPILDI: kenar menüsünde isme tıkla → Hesabım → sil (/api/account).
+  Sonrasında yalnız özetler kalır (mt_accounts, used_trials: deneme tekrarı engeli).
 - Kayıtsız gezinti — YAPILDI: "Ücretsiz Başla" örnek verili uygulamayı açar
   (src/lib/demo.ts, iki journal, dört disiplin alışkanlığı bilerek içeride);
   kayıt gerektiren her şey "ücretsiz hesap aç" penceresini açar.
-- Eksik: takvimde ve journal kartında "+N kilitli" göstergesi yok.
+- Takvim ve journal kartında "N kilitli" göstergesi — YAPILDI.
 - Pro $14.99/ay, $119/yıl; TR 349 TL/ay, 2.790 TL/yıl. Yıllıkta 14 gün iade.
 - Kurucu üye: ilk 500 kişi yıllık $79 (1.990 TL), ömür boyu.
 - Altyapı: Paddle veya Lemon Squeezy (MoR). Kilitlerden ÖNCE ödeme kurulmalı —
