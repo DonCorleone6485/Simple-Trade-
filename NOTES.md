@@ -43,9 +43,9 @@ hesap ya da karar bekliyor.
    Metni, Çerez Politikası, İade Politikası, risk uyarısı ("yatırım tavsiyesi
    değildir"). Gerekli: sitede görünecek isim/unvan ve iletişim adresi. Taslağı
    ben yazarım; son hâli avukata gösterilmeli. Ödeme hesabı onayı için şart.
-3. **İletişim + Hakkımızda** — destek e-postası (ör. destek@simpletradejournal.io;
-   alan adında e-posta kurulumu gerekebilir), sosyal medya hesapları, varsa
-   Discord/Telegram topluluğu. Sitede hiçbir yerde iletişim yolu yok.
+3. **İletişim + Hakkımızda** — e-posta hazır (aşağıda); gerekli olan sosyal
+   medya hesapları, varsa Discord/Telegram topluluğu. Sitede hiçbir yerde
+   iletişim yolu yok.
 4. **Meta Pixel** — Meta Business'ta Pixel oluşturup kimliği vermek. Instagram
    reklamından ÖNCE. Çerez onay bandı da gerekecek (KVKK/GDPR).
 5. **Google Search Console** — siteyi Google hesabıyla eklemek; doğrulama için
@@ -60,6 +60,12 @@ hesap ya da karar bekliyor.
 8. **Sosyal kanıt** — gerçek kullanıcı yorumları (uydurulmayacak). Kurucu üye
    kampanyası kaynak olabilir.
 9. **MetaTrader kurulum videosu** — kullanıcının ekran kayıtları (aşağıdaki bölüm).
+
+10. **E-posta DKIM imzası** — Google, Gmail açıldıktan 24–72 saat sonra izin
+   veriyor (en erken 2026-09-28). Admin → Uygulamalar → Google Workspace →
+   Gmail → E-posta kimlik doğrulaması → 2048 bit anahtar oluştur → Namecheap'e
+   TXT `google._domainkey` → "Kimlik doğrulamasını başlat". Sonra DMARC
+   `p=none` → `p=quarantine`.
 
 ### B. Karar bekleyen
 - **Kurucu üye kampanyası**: ilk 500 kişiye yıllık $79 (1.990 TL), ömür boyu bu
@@ -105,6 +111,9 @@ kötüye kullanım önlemleri; ücretsizde silme yok; hesap silme. Kayıtsız ge
 Değişiklikler sayfaları. Hesap ayarları (para birimi, saat dilimi, profil).
 Okunabilirlik (kontrast, aria etiketleri). Uygulamanın 9 dile çevirisi
 (src/lib/appCopy*.ts) ve dile göre tarih/yüzde biçimi.
+E-posta: Google Workspace (admin@simpletradejournal.io; takma adlar info@,
+support@, billing@, privacy@ aynı kutuya düşer). Namecheap'te MX (Gmail), SPF,
+DMARC ve Google doğrulama kaydı var.
 
 ### MetaTrader kurulum videosu (bekliyor: kullanıcının ekran kaydı)
 Yapay zekâ videosu değil — gerçek ekran kaydı + Remotion kurgusu (yakınlaşma,
