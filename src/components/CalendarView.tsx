@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Lock } from 'lucide-react';
 import { Trade } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { usePlan } from '../context/PlanContext';
 import { signedMoney } from '../lib/format';
 import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, dayKey, isOpenTrade } from '../lib/tradeMath';
 
@@ -9,10 +10,17 @@ import { isWinTrade, isLossTrade, lossAmount, winAmount, tradePnL, dayKey, isOpe
 interface CalendarViewProps {
   trades: Trade[];
   onDelete: (id: string) => void;
+  /**
+   * Ücretsiz planın günlük hakkını aşıp kilitli kaydedilenler. Günün
+   * rakamlarına girmiyorlar (sonuç gizli), ama o günde oldukları görünüyor.
+   */
+  lockedTrades?: Trade[];
 }
 
-export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
+export default function CalendarView({ trades, onDelete, lockedTrades = [] }: CalendarViewProps) {
   const { language, t } = useLanguage();
+  const { askUpgrade } = usePlan();
+  const lockedOn = (key: string) => lockedTrades.filter(tr => dayKey(tr.date) === key).length;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
@@ -174,6 +182,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
             const key = getDayKey(day);
             const isSelected = selectedDay === key;
             const isTodayDay = isToday(day);
+            const locked = lockedOn(key);
 
             let bg = 'transparent';
             let border = '1px solid transparent';
@@ -206,7 +215,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
             return (
               <div
                 key={day}
-                onClick={() => stats ? setSelectedDay(isSelected ? null : key) : null}
+                onClick={() => stats ? setSelectedDay(isSelected ? null : key) : locked > 0 ? askUpgrade('locked') : null}
                 /* Günün rengi kâr/zararı anlatıyor; onu altına boyamak
                    bilgiyi siler. Dokunulabilirliği renk yerine ince bir
                    altın halka söylüyor. */
@@ -214,7 +223,7 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
                 style={{
                   background: bg,
                   border,
-                  cursor: stats ? 'pointer' : 'default',
+                  cursor: stats || locked > 0 ? 'pointer' : 'default',
                   minHeight: '72px',
                   padding: '8px',
                 }}
@@ -236,6 +245,12 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
                         <span style={{ color: '#fbbf24' }}>{stats.open} {t('openShort')}</span>
                       )}
                     </div>
+                  </div>
+                )}
+                {locked > 0 && (
+                  <div className={`${stats ? 'mt-0.5' : 'mt-auto'} flex items-center gap-1 text-[11px]`} style={{ color: '#a78bfa' }}>
+                    <Lock className="w-3 h-3" />
+                    {t('lockedCountShort').replace('{n}', String(locked))}
                   </div>
                 )}
                 {isTodayDay && !stats && (
@@ -260,6 +275,11 @@ export default function CalendarView({ trades, onDelete }: CalendarViewProps) {
               </h3>
               <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 {selectedTrades.length} {t('tradeCount')}
+                {lockedOn(selectedDay) > 0 && (
+                  <button onClick={() => askUpgrade('locked')} className="ms-2 inline-flex items-center gap-1" style={{ color: '#a78bfa' }}>
+                    · <Lock className="w-3 h-3" /> {t('lockedCountShort').replace('{n}', String(lockedOn(selectedDay)))}
+                  </button>
+                )}
               </p>
             </div>
             <button

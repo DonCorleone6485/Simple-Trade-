@@ -1,7 +1,8 @@
 import React from 'react';
-import { Plus, Trash2, Pencil, ArrowUpRight } from 'lucide-react';
+import { Plus, Trash2, Pencil, ArrowUpRight, Lock } from 'lucide-react';
 import { Account } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { usePlan } from '../context/PlanContext';
 import { signedMoney, int } from '../lib/format';
 
 export interface JournalStats {
@@ -11,6 +12,8 @@ export interface JournalStats {
   profitFactor: string;
   /** Sonucu henüz girilmemiş işlem sayısı. */
   open?: number;
+  /** Ücretsiz planda günlük hakkı aşıp kilitli kaydedilen işlem sayısı. */
+  locked?: number;
 }
 
 interface JournalDashboardProps {
@@ -49,6 +52,7 @@ export default function JournalDashboard({
   accounts, getStats, formatDate, onNewJournal, onOpen, onDelete, onEdit, userLabel, hideHeader = false,
 }: JournalDashboardProps) {
   const { t, language } = useLanguage();
+  const { askUpgrade } = usePlan();
 
   const ordered = [...accounts].reverse();
   const totals = accounts.reduce(
@@ -160,6 +164,14 @@ export default function JournalDashboard({
                             style={{ background: 'rgba(251,191,36,0.12)', color: '#fbbf24' }}>
                             {stats.open} {t('incompleteTrade').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US')}
                           </span>
+                        )}
+                        {(stats.locked ?? 0) > 0 && (
+                          <button onClick={e => { e.stopPropagation(); askUpgrade('locked'); }}
+                            className="text-[11px] px-2 py-0.5 rounded-full inline-flex items-center gap-1"
+                            style={{ background: 'rgba(139,92,246,0.14)', color: '#a78bfa' }}>
+                            <Lock className="w-3 h-3" />
+                            {t('lockedCountShort').replace('{n}', String(stats.locked))}
+                          </button>
                         )}
                       </div>
                     </div>

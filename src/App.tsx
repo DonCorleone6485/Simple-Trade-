@@ -922,7 +922,8 @@ export default function App() {
     const grossLoss = losses.reduce((s, tr) => s + lossAmount(tr), 0);
     const netPnL = grossProfit - grossLoss;
     const profitFactor = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : grossProfit > 0 ? '∞' : '0.00';
-    return { total: jt.length, winRate, netPnL, profitFactor, open: jt.filter(isOpenTrade).length };
+    const locked = isPro ? 0 : trades.filter(tr => tr.accountId === accountId && tr.locked).length;
+    return { total: jt.length, winRate, netPnL, profitFactor, open: jt.filter(isOpenTrade).length, locked };
   };
 
   const languages = [
@@ -1766,7 +1767,8 @@ export default function App() {
               {journalTab === 'trades' && <TradeHistory trades={filteredTrades} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} onPrintTrade={trade => setPrintJob({ trades: [trade], single: true })}
                 otherJournals={accounts.filter(a => a.id !== activeJournal.id).map(a => ({ id: a.id, name: a.name }))}
                 onMoveTrades={handleMoveTrades} account={activeJournal} />}
-              {journalTab === 'calendar' && <CalendarView trades={filteredOpen} onDelete={handleDeleteTrade} />}
+              {journalTab === 'calendar' && <CalendarView trades={filteredOpen} onDelete={handleDeleteTrade}
+                lockedTrades={isPro ? [] : filteredTrades.filter(tr => tr.locked)} />}
               {journalTab === 'stats' && <TradeHistory trades={filteredOpen} onDelete={handleDeleteTrade} onDeleteMultiple={handleDeleteMultiple} onUpdate={handleUpdateTrade} account={activeJournal} statsOnly />}
               {journalTab === 'goals' && <GoalsView trades={filteredOpen} account={activeJournal} onUpdateGoals={handleUpdateGoals} />}
               {journalTab === 'mtConnect' && <MTConnect journalId={activeJournal.id} journalName={activeJournal.name} />}
