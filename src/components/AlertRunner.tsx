@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { NewsEvent } from '../lib/news';
 import { useLanguage } from '../context/LanguageContext';
+import { syncPush } from '../lib/push';
 import { dueAlerts, loadAlerts, loadFired, rememberFired, showAlert, permissionState } from '../lib/alerts';
 
 /**
@@ -28,6 +29,14 @@ export default function AlertRunner({ onNavigate }: {
   nav.current = onNavigate;
   const tr = useRef(t);
   tr.current = t;
+
+  // Açılışta sunucu aboneliğini tazele: dil değişmiş, tarayıcı aboneliği
+  // yenilemiş olabilir (lib/push.ts). Kapalıysa hiçbir şey yapmaz.
+  const { language } = useLanguage();
+  useEffect(() => {
+    const s = loadAlerts();
+    if (s.news || s.session) void syncPush(s, language);
+  }, [language]);
 
   useEffect(() => {
     let dead = false;

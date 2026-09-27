@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Bell, BellOff, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import {
   AlertSettings as Settings, MINUTE_CHOICES,
   permissionState, requestPermission, saveAlerts,
 } from '../lib/alerts';
+import { syncPush } from '../lib/push';
 
 /**
  * Bildirim ayarları — Seanslar ve Günün Haberleri sayfalarının başında.
@@ -54,13 +55,17 @@ export default function AlertSettings({ kind, settings, onChange }: {
   settings: Settings;
   onChange: (s: Settings) => void;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [perm, setPerm] = useState(permissionState());
+  // Sunucudan (sekme kapalıyken) bildirim gidebiliyor mu — lib/push.ts.
+  const [pushOn, setPushOn] = useState(false);
+  useEffect(() => { syncPush(settings, language).then(setPushOn); }, []);
 
   const set = (patch: Partial<Settings>) => {
     const next = { ...settings, ...patch };
     onChange(next);
     saveAlerts(next);
+    syncPush(next, language).then(setPushOn);
   };
 
   /** Anahtar açılırken izin sorulur; reddedilirse anahtar açılmaz. */
@@ -96,7 +101,7 @@ export default function AlertSettings({ kind, settings, onChange }: {
           {/* Bu satır şart. "Bildirim açık" sanıp haberi kaçıran biri için bu
               özellik hiç olmamasından kötüdür. */}
           <p className="text-[12px] leading-relaxed ps-3.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {t('alertsOnlyOpenTab')}
+            {pushOn ? t('alertsPushOn') : t('alertsOnlyOpenTab')}
           </p>
         </>
       )}

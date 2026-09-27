@@ -8,9 +8,11 @@ import { SESSIONS, sessionState } from './sessions';
  * tarayıcının kendisi gösteriyor. Zamanlayıcı da burada — takvimi zaten
  * çekiyoruz, ne zaman ateşleneceğini hesaplamak için başka bir şey gerekmiyor.
  *
- * SINIRI AÇIKÇA SÖYLEMEK GEREKİR: sekme kapalıysa bildirim gelmez. Ekranda da
- * yazıyor, çünkü "haber bildirimi açık" sanıp haberi kaçıran biri için bu
- * özellik hiç olmamasından kötüdür.
+ * Sekme kapalıyken: giriş yapmış kullanıcıda aynı kurallar sunucuda da
+ * çalışıyor (supabase/functions/push-alerts, abonelik: lib/push.ts). Misafirde
+ * ya da push desteklemeyen tarayıcıda bildirim yalnızca sekme açıkken gelir;
+ * ekranda da hangisinin geçerli olduğu yazıyor, çünkü "haber bildirimi açık"
+ * sanıp haberi kaçıran biri için bu özellik hiç olmamasından kötüdür.
  *
  * Ayarlar tarayıcıda duruyor, veritabanında değil: bildirim izni zaten
  * tarayıcıya özel. Telefonda izin verip bilgisayarda vermemiş olabilirsin.
