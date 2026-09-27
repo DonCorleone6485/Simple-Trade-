@@ -24,6 +24,7 @@ const NOISE = [
   /Failed to fetch$/i,         // aynısı, Chrome
   /NetworkError when attempting to fetch/i,
   /AbortError/i,
+  /JSON-RPC error/i,          // kripto cüzdan eklentileri (MetaMask vb.)
 ];
 
 export function logError(kind: 'error' | 'rejection' | 'render', err: unknown, extraStack?: string) {
