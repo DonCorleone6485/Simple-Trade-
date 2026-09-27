@@ -88,9 +88,8 @@ hesap ya da karar bekliyor.
    yok. Kalan: sekme kapalıyken bildirim (web push, service worker ister).
 7. **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate.
 8. **Sentry** (hata izleme), otomatik testler, durum sayfası.
-9. **Paket boyutu** — çeviri tablosu (src/lib/appCopyData.ts, ~89 KB) ana pakette;
-   yalnız tr/en dışındaki diller için ayrı yüklenebilir (ön yüklemeyle, yoksa
-   Farsça/Arapçada bir an İngilizce görünür).
+9. **Paket boyutu** — YAPILDI (2026-09-28): 7 dilin çeviri tablosu ayrı dosyada,
+   yalnız o dillerde ve çizimden önce yükleniyor; ana paket 124 → 86 KB (gzip).
 
 ### D. Kullanıcının kontrol etmesi gerekenler
 - Hesabım penceresi: para birimi seçimi, saat dilimi, "ad/e-posta/şifre" düğmesi.
