@@ -33,7 +33,7 @@ export function unsubscribeToken(userId: string): string {
   return createHmac('sha256', process.env.SUPABASE_SERVICE_KEY || '').update(`unsub:${userId}`).digest('hex').slice(0, 32);
 }
 const unsubscribeUrl = (userId: string) =>
-  `${SITE}/api/unsubscribe?u=${encodeURIComponent(userId)}&t=${unsubscribeToken(userId)}`;
+  `${SITE}/api/emails?u=${encodeURIComponent(userId)}&t=${unsubscribeToken(userId)}`;
 
 type Mail = { subject: string; lead: string; body: string[]; cta: string; foot: string };
 type Kind = 'welcome' | 'trialEnding' | 'trialEnded';

@@ -89,7 +89,7 @@ export default async function handler(req: any, res: any) {
       { onConflict: 'user_id' },
     );
     // Hesabı ilk kez görüyoruz: hoş geldin postası. Gitmezse (Resend'e
-    // ulaşılamadı, anahtar yok) günlük görev (api/cron-emails.ts) yeniden dener.
+    // ulaşılamadı, anahtar yok) günlük görev (api/emails.ts) yeniden dener.
     if (email && !disposable) {
       const sent = await sendEmail('welcome', email, { userId, lang: language || 'en' });
       if (sent) await supabase.from('users').update({ welcome_sent_at: new Date().toISOString() }).eq('user_id', userId);
