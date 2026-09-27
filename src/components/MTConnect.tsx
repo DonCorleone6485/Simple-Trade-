@@ -18,6 +18,14 @@ interface ApiKey {
   mt_hint?: string | null;
 }
 
+/**
+ * MT4 eklentisi kaynak dosya olarak (.mq4): MetaTrader 4 Experts klasöründeki
+ * kaynak dosyaları yeniden başlarken kendisi derliyor. Derlenmiş .ex4
+ * veremiyoruz — MetaQuotes MT4'ü (ve derleyicisini) artık dağıtmıyor. Gerçek
+ * bir MT4'te denenene kadar seçenek "Beta" etiketli.
+ */
+const MT4_FILE = '/SimpleTradingJournal.mq4';
+
 interface MTConnectProps {
   journalId: string;
   journalName: string;
@@ -42,6 +50,22 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
   const [fresh, setFresh] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  /**
+   * MetaTrader 4 mü 5 mi. Kurulum adımları aynı; değişen indirilen dosya ve
+   * klasör adı (MQL4 / MQL5). Seçim hatırlanıyor: çoğu kişi tek sürüm kullanır.
+   */
+  const [platform, setPlatformState] = useState<'mt5' | 'mt4'>(() => {
+    try { return localStorage.getItem('stj-mt-platform') === 'mt4' ? 'mt4' : 'mt5'; } catch { return 'mt5'; }
+  });
+  const setPlatform = (p: 'mt5' | 'mt4') => {
+    setPlatformState(p);
+    try { localStorage.setItem('stj-mt-platform', p); } catch { /* önemsiz */ }
+  };
+  const mt4 = platform === 'mt4';
+  // Adım metinleri dokuz dilde "MQL5" diye yazılı; MT4'te klasörün adı MQL4.
+  const forPlatform = (text: string) => (mt4 ? text.replace(/MQL5/g, 'MQL4') : text);
+  const eaFile = mt4 ? MT4_FILE : '/SimpleTradingJournal.ex5';
 
   const call = async (method: 'GET' | 'POST', body?: unknown) => {
     const token = await getToken();
@@ -246,12 +270,25 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
           <MTSetupTour />
         </div>
         <div style={label}>{tr('Kurulum', 'Setup')}</div>
+        {/* Önce hangi MetaTrader: dosya ve klasör buna göre değişiyor. */}
+        <div className="mb-6">
+          <div className="text-[14px] font-medium mb-2.5">{tr('Hangi MetaTrader\'ı kullanıyorsun?', 'Which MetaTrader do you use?')}</div>
+          <div className="inline-flex rounded-full p-1" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }} role="radiogroup">
+            {(['mt5', 'mt4'] as const).map(p => (
+              <button key={p} type="button" role="radio" aria-checked={platform === p} onClick={() => setPlatform(p)}
+                className="px-4 py-1.5 rounded-full text-[13.5px] font-medium transition-colors"
+                style={platform === p ? { background: '#8b5cf6', color: '#fff' } : { color: 'rgba(255,255,255,0.6)' }}>
+                {p === 'mt5' ? 'MetaTrader 5' : <>MetaTrader 4 <span className="ms-1 text-[10px] font-semibold uppercase tracking-wider opacity-80">Beta</span></>}
+              </button>
+            ))}
+          </div>
+        </div>
         <ol className="space-y-5">
           {[
             {
               t: tr('Dosyayı indir', 'Download the file'),
-              d: tr('MetaTrader\'da Dosya → Veri Klasörünü Aç. Açılan pencerede MQL5 → Experts klasörüne gir ve indirdiğin dosyayı içine at.', 'In MetaTrader open File → Open Data Folder, go into MQL5 → Experts, and drop the downloaded file in.'),
-              download: '/SimpleTradingJournal.ex5',
+              d: forPlatform(tr('MetaTrader\'da Dosya → Veri Klasörünü Aç. Açılan pencerede MQL5 → Experts klasörüne gir ve indirdiğin dosyayı içine at.', 'In MetaTrader open File → Open Data Folder, go into MQL5 → Experts, and drop the downloaded file in.')),
+              download: eaFile,
             },
             {
               t: tr('İzin ver', 'Allow the connection'),
@@ -306,7 +343,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                     className="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full text-sm font-medium"
                     style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}>
                     <Download className="w-4 h-4" />
-                    SimpleTradingJournal.ex5
+                    {eaFile.slice(1)}
                   </a>
                 )}
                 {s.extra}
@@ -314,9 +351,14 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             </li>
           ))}
         </ol>
-        <p className="text-[13px] leading-relaxed mt-6 pt-5" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        {mt4 && (
+          <p className="text-[13px] leading-relaxed mt-6 pt-5" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+            {tr('MetaTrader 4\'te kısmen kapattığın bir emrin kalan kısmı MetaTrader tarafından yeni numarayla açılır; journal\'da iki ayrı işlem olarak görünür.', 'In MetaTrader 4, when you close part of an order MetaTrader gives the rest a new ticket, so it shows as two separate trades in your journal.')}
+          </p>
+        )}
+        {!mt4 && <p className="text-[13px] leading-relaxed mt-6 pt-5" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           {tr('Mac kullanıyorsan "Veri Klasörünü Aç" bazı sürümlerde çalışmaz. O zaman Finder\'da Git → Klasöre Git ile şuraya gidebilirsin: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts', 'On a Mac, "Open Data Folder" does not work in some builds. In Finder use Go → Go to Folder and paste: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts')}
-        </p>
+        </p>}
         <a href={langPath('/guides/metatrader-5-auto-sync', language)} target="_blank" rel="noopener" className="inline-block text-[13px] mt-3" style={{ color: '#a78bfa' }}>
           {tr('Ayrıntılı kurulum rehberi ve sorun giderme →', 'Full setup guide and troubleshooting →')}
         </a>
