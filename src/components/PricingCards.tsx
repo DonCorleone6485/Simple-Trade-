@@ -71,7 +71,7 @@ export default function PricingCards({ t, free, pro, proPrice }: {
           {t('Başlamak için ideal', 'Perfect to get started', 'ایده‌آل برای شروع')}
         </p>
         <div className="mt-7 mb-8 flex items-baseline gap-2">
-          <span className="font-display" style={{ fontSize: '52px', letterSpacing: '-0.04em', lineHeight: 1 }}>$0</span>
+          <span className="font-display" style={{ fontSize: '52px', letterSpacing: '-0.04em', lineHeight: 1 }}>{prices.fmt(0)}</span>
           <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('/ sonsuza kadar', '/ forever', '/ برای همیشه')}</span>
         </div>
         <div className="space-y-3 mb-9">

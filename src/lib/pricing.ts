@@ -30,16 +30,17 @@ const TABLE = {
 
 function build(currency: 'USD' | 'TRY'): Prices {
   const { monthly, yearly } = TABLE[currency];
-  const nf = currency === 'TRY'
-    ? new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 2, minimumFractionDigits: 0 })
-    : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2, minimumFractionDigits: 0 });
+  // Tam sayı kuruşsuz ("349 ₺"), küsuratlı iki haneli ("232,50 ₺" — "232,5" değil).
+  const format = (n: number) => new Intl.NumberFormat(currency === 'TRY' ? 'tr-TR' : 'en-US', {
+    style: 'currency', currency, minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2,
+  }).format(n);
   return {
     currency,
     monthly,
     yearly,
     yearlyMonthly: Math.round((yearly / 12) * 100) / 100,
     savings: Math.round(((monthly * 12 - yearly) / (monthly * 12)) * 100),
-    fmt: n => nf.format(n),
+    fmt: format,
   };
 }
 
