@@ -216,10 +216,61 @@ const HELP: { q: L9; a: L9 }[] = [
       fr: 'Cliquez sur votre nom en bas à gauche, choisissez « Supprimer mon compte et toutes mes données » dans la fenêtre « Mon compte » et confirmez. Vos journaux, trades, notes, photos et connexions MetaTrader sont supprimés définitivement ; c\'est irréversible.',
     },
   },
+  {
+    q: { tr: 'İşlemlerimi kimler görebilir?', en: 'Who can see my trades?', fa: 'چه کسانی معاملاتم را می‌بینند؟', ar: 'من يستطيع رؤية صفقاتي؟', ru: 'Кто видит мои сделки?', es: '¿Quién puede ver mis operaciones?', pt: 'Quem pode ver as minhas operações?', de: 'Wer kann meine Trades sehen?', fr: 'Qui peut voir mes trades ?' },
+    a: {
+      tr: 'Yalnızca sen. Her kayıt hesabına bağlı ve veritabanı, başka bir hesabın senin işlemlerini, notlarını ya da fotoğraflarını okumasına izin vermiyor. MetaTrader anahtarının tamamı saklanmıyor; yalnızca ilk ve son harfleri görünüyor. Verilerini istediğin an Hesabım penceresinden tamamen silebilirsin.',
+      en: 'Only you. Every record is tied to your account, and the database does not let any other account read your trades, notes or photos. Your MetaTrader key is never stored in full — only its first and last characters are shown. You can delete all your data at any time from the My account window.',
+      fa: 'فقط خودت. هر رکورد به حسابت متصل است و پایگاه داده اجازه نمی‌دهد حساب دیگری معاملات، یادداشت‌ها یا عکس‌هایت را بخواند. کلید متاتریدر هرگز کامل ذخیره نمی‌شود؛ فقط حروف اول و آخرش دیده می‌شود. هر وقت بخواهی می‌توانی همه داده‌هایت را از پنجره «حساب من» پاک کنی.',
+      ar: 'أنت فقط. كل سجل مرتبط بحسابك، ولا تسمح قاعدة البيانات لأي حساب آخر بقراءة صفقاتك أو ملاحظاتك أو صورك. لا يُحفظ مفتاح ميتاتريدر كاملاً أبداً؛ تظهر أحرفه الأولى والأخيرة فقط. يمكنك حذف كل بياناتك في أي وقت من نافذة «حسابي».',
+      ru: 'Только вы. Каждая запись привязана к вашему аккаунту, и база данных не позволяет другим аккаунтам читать ваши сделки, заметки или фото. Ключ MetaTrader целиком не хранится — видны только первые и последние символы. Удалить все данные можно в любой момент в окне «Мой аккаунт».',
+      es: 'Solo tú. Cada registro está ligado a tu cuenta y la base de datos no deja que ninguna otra cuenta lea tus operaciones, notas o fotos. La clave de MetaTrader nunca se guarda completa: solo se ven sus primeros y últimos caracteres. Puedes borrar todos tus datos cuando quieras desde la ventana Mi cuenta.',
+      pt: 'Só tu. Cada registo está ligado à tua conta e a base de dados não deixa nenhuma outra conta ler as tuas operações, notas ou fotos. A chave do MetaTrader nunca é guardada por inteiro — só se veem os primeiros e últimos caracteres. Podes apagar todos os teus dados quando quiseres na janela A minha conta.',
+      de: 'Nur du. Jeder Eintrag gehört zu deinem Konto, und die Datenbank lässt kein anderes Konto deine Trades, Notizen oder Fotos lesen. Dein MetaTrader-Schlüssel wird nie vollständig gespeichert – nur die ersten und letzten Zeichen sind sichtbar. Alle Daten kannst du jederzeit im Fenster „Mein Konto“ löschen.',
+      fr: 'Vous seul. Chaque enregistrement est lié à votre compte et la base de données ne permet à aucun autre compte de lire vos trades, notes ou photos. Votre clé MetaTrader n\'est jamais stockée en entier — seuls ses premiers et derniers caractères sont affichés. Vous pouvez supprimer toutes vos données à tout moment depuis la fenêtre Mon compte.',
+    },
+  },
+  {
+    q: { tr: 'Para birimini ve saat dilimini nasıl değiştiririm?', en: 'How do I change the currency and time zone?', fa: 'چطور واحد پول و منطقه زمانی را عوض کنم؟', ar: 'كيف أغيّر العملة والمنطقة الزمنية؟', ru: 'Как сменить валюту и часовой пояс?', es: '¿Cómo cambio la moneda y la zona horaria?', pt: 'Como mudo a moeda e o fuso horário?', de: 'Wie ändere ich Währung und Zeitzone?', fr: 'Comment changer la devise et le fuseau horaire ?' },
+    a: {
+      tr: 'Menünün altındaki adına tıkla; Hesabım penceresi açılır. Oradan tutarların hangi para biriminde gösterileceğini seçebilirsin. Saat dilimi bilgisayarından ya da telefonundan kendiliğinden alınır ve günlük işlem hakkı senin gününe göre sayılır.',
+      en: 'Click your name at the bottom of the menu to open My account. There you choose the currency amounts are shown in. The time zone is taken from your computer or phone automatically, and the daily trade allowance is counted by your own day.',
+      fa: 'روی نامت در پایین منو بزن تا پنجره «حساب من» باز شود. آنجا واحد پولی را که مبالغ با آن نمایش داده می‌شوند انتخاب می‌کنی. منطقه زمانی خودکار از کامپیوتر یا گوشی‌ات گرفته می‌شود و سهمیه روزانه معاملات بر اساس روز خودت شمرده می‌شود.',
+      ar: 'اضغط على اسمك أسفل القائمة لفتح نافذة «حسابي». هناك تختار العملة التي تُعرض بها المبالغ. تؤخذ المنطقة الزمنية تلقائياً من حاسوبك أو هاتفك، ويُحسب الحد اليومي للصفقات حسب يومك أنت.',
+      ru: 'Нажмите на своё имя внизу меню — откроется «Мой аккаунт». Там выбирается валюта, в которой показываются суммы. Часовой пояс берётся с компьютера или телефона автоматически, а дневной лимит сделок считается по вашим суткам.',
+      es: 'Pulsa tu nombre al final del menú para abrir Mi cuenta. Allí eliges la moneda en la que se muestran los importes. La zona horaria se toma automáticamente de tu ordenador o móvil, y el límite diario de operaciones se cuenta según tu propio día.',
+      pt: 'Carrega no teu nome no fundo do menu para abrir A minha conta. Aí escolhes a moeda em que os valores são mostrados. O fuso horário é lido automaticamente do computador ou telemóvel, e o limite diário de operações conta pelo teu próprio dia.',
+      de: 'Klicke unten im Menü auf deinen Namen, um „Mein Konto“ zu öffnen. Dort wählst du die Währung, in der Beträge angezeigt werden. Die Zeitzone wird automatisch von Computer oder Handy übernommen, und das tägliche Trade-Limit richtet sich nach deinem eigenen Tag.',
+      fr: 'Cliquez sur votre nom en bas du menu pour ouvrir Mon compte. Vous y choisissez la devise d\'affichage des montants. Le fuseau horaire est repris automatiquement de votre ordinateur ou téléphone, et la limite quotidienne de trades suit votre propre journée.',
+    },
+  },
+  {
+    q: { tr: 'Telefonda kullanabilir miyim?', en: 'Can I use it on my phone?', fa: 'می‌توانم با گوشی استفاده کنم؟', ar: 'هل يمكنني استخدامه على هاتفي؟', ru: 'Можно ли пользоваться с телефона?', es: '¿Puedo usarlo en el móvil?', pt: 'Posso usar no telemóvel?', de: 'Kann ich es auf dem Handy nutzen?', fr: 'Puis-je l\'utiliser sur mon téléphone ?' },
+    a: {
+      tr: 'Evet, tarayıcıdan. Ayrı bir uygulama indirmen gerekmiyor: iPhone\'da Safari\'de Paylaş → Ana Ekrana Ekle, Android\'de Chrome menüsünden Ana ekrana ekle. Simge journal\'ı doğrudan, tarayıcı çubuğu olmadan açar. MetaTrader eklentisi ise yalnızca bilgisayardaki MetaTrader 5\'te çalışır.',
+      en: 'Yes, in the browser — there is nothing to download. On iPhone use Safari → Share → Add to Home Screen; on Android use Chrome\'s menu → Add to Home screen. The icon opens your journal directly, without the browser bar. The MetaTrader add-on itself only runs in MetaTrader 5 on a computer.',
+      fa: 'بله، در مرورگر — چیزی برای دانلود نیست. در آیفون از Safari → اشتراک‌گذاری → افزودن به صفحه اصلی و در اندروید از منوی Chrome → افزودن به صفحه اصلی استفاده کن. آیکون، ژورنال را مستقیم و بدون نوار مرورگر باز می‌کند. افزونه متاتریدر فقط در متاتریدر ۵ روی کامپیوتر کار می‌کند.',
+      ar: 'نعم، من المتصفح — لا حاجة لتنزيل شيء. في iPhone استخدم Safari ← مشاركة ← إضافة إلى الشاشة الرئيسية، وفي Android قائمة Chrome ← إضافة إلى الشاشة الرئيسية. تفتح الأيقونة سجلك مباشرة دون شريط المتصفح. أما إضافة ميتاتريدر فتعمل فقط في ميتاتريدر 5 على الحاسوب.',
+      ru: 'Да, в браузере — скачивать ничего не нужно. На iPhone: Safari → «Поделиться» → «На экран „Домой“»; на Android: меню Chrome → «Добавить на главный экран». Значок открывает журнал сразу, без панели браузера. Сам модуль для MetaTrader работает только в MetaTrader 5 на компьютере.',
+      es: 'Sí, en el navegador; no hay nada que descargar. En iPhone usa Safari → Compartir → Añadir a pantalla de inicio; en Android, el menú de Chrome → Añadir a pantalla de inicio. El icono abre tu diario directamente, sin la barra del navegador. El complemento de MetaTrader solo funciona en MetaTrader 5 en un ordenador.',
+      pt: 'Sim, no navegador — não há nada para descarregar. No iPhone usa Safari → Partilhar → Adicionar ao ecrã principal; no Android, o menu do Chrome → Adicionar ao ecrã principal. O ícone abre o diário diretamente, sem a barra do navegador. O complemento do MetaTrader só funciona no MetaTrader 5 num computador.',
+      de: 'Ja, im Browser – herunterladen musst du nichts. Auf dem iPhone: Safari → Teilen → Zum Home-Bildschirm; auf Android: Chrome-Menü → Zum Startbildschirm hinzufügen. Das Symbol öffnet dein Journal direkt, ohne Browserleiste. Das MetaTrader-Add-on selbst läuft nur in MetaTrader 5 auf dem Computer.',
+      fr: 'Oui, dans le navigateur — rien à télécharger. Sur iPhone : Safari → Partager → Sur l\'écran d\'accueil ; sur Android : menu de Chrome → Ajouter à l\'écran d\'accueil. L\'icône ouvre directement votre journal, sans barre de navigateur. Le module MetaTrader, lui, ne fonctionne que dans MetaTrader 5 sur ordinateur.',
+    },
+  },
 ];
 
 /** En yeniden en eskiye. Tarih ISO; gösterirken kullanıcının diline göre biçimleniyor. */
 const CHANGELOG: { date: string; items: L9[] }[] = [
+  {
+    date: '2026-09-28',
+    items: [
+      { tr: 'Blog ve rehberler: MetaTrader 5 kurulumu, içe aktarma, journal tutmak, R değeri ve prop kuralları üzerine.', en: 'Blog and guides: setting up MetaTrader 5, importing, keeping a journal, R-multiples and prop firm rules.', fa: 'بلاگ و راهنماها: راه‌اندازی متاتریدر ۵، وارد کردن معاملات، نوشتن ژورنال، R و قوانین پراپ.', ar: 'مدونة وأدلة: إعداد ميتاتريدر 5، الاستيراد، تدوين السجل، مضاعف R وقواعد شركات التمويل.', ru: 'Блог и руководства: настройка MetaTrader 5, импорт, ведение журнала, R-мультипликатор и правила проп-фирм.', es: 'Blog y guías: configurar MetaTrader 5, importar, llevar un diario, múltiplos R y reglas de las prop firms.', pt: 'Blog e guias: configurar o MetaTrader 5, importar, manter um diário, múltiplos R e regras das prop firms.', de: 'Blog und Anleitungen: MetaTrader 5 einrichten, importieren, Journal führen, R-Multiples und Prop-Firm-Regeln.', fr: 'Blog et guides : configurer MetaTrader 5, importer, tenir un journal, multiples de R et règles des prop firms.' },
+      { tr: 'Hoş geldin ve deneme hatırlatma e-postaları, kullandığın dilde.', en: 'Welcome and trial reminder emails, in the language you use.', fa: 'ایمیل خوش‌آمد و یادآوری دوره آزمایشی، به زبانی که استفاده می‌کنی.', ar: 'رسائل ترحيب وتذكير بالتجربة، باللغة التي تستخدمها.', ru: 'Приветственные письма и напоминания о пробном периоде — на вашем языке.', es: 'Correos de bienvenida y recordatorios de la prueba, en tu idioma.', pt: 'E-mails de boas-vindas e lembretes do teste, na tua língua.', de: 'Willkommens- und Test-Erinnerungsmails in deiner Sprache.', fr: 'E-mails de bienvenue et rappels d\'essai, dans votre langue.' },
+      { tr: 'Telefonda ana ekrana eklenebiliyor; simge journal\'ı doğrudan açıyor.', en: 'Add it to your phone\'s home screen; the icon opens your journal directly.', fa: 'قابل افزودن به صفحه اصلی گوشی؛ آیکون مستقیم ژورنال را باز می‌کند.', ar: 'يمكن إضافته إلى الشاشة الرئيسية للهاتف؛ تفتح الأيقونة سجلك مباشرة.', ru: 'Можно добавить на главный экран телефона — значок сразу открывает журнал.', es: 'Añádelo a la pantalla de inicio del móvil; el icono abre tu diario directamente.', pt: 'Adiciona-o ao ecrã principal do telemóvel; o ícone abre o diário diretamente.', de: 'Lässt sich auf den Home-Bildschirm legen; das Symbol öffnet direkt dein Journal.', fr: 'Ajoutez-le à l\'écran d\'accueil de votre téléphone ; l\'icône ouvre directement votre journal.' },
+      { tr: 'İletişim: support@simpletradejournal.io.', en: 'Contact: support@simpletradejournal.io.', fa: 'تماس: support@simpletradejournal.io.', ar: 'التواصل: support@simpletradejournal.io.', ru: 'Связь: support@simpletradejournal.io.', es: 'Contacto: support@simpletradejournal.io.', pt: 'Contacto: support@simpletradejournal.io.', de: 'Kontakt: support@simpletradejournal.io.', fr: 'Contact : support@simpletradejournal.io.' },
+    ],
+  },
   {
     date: '2026-09-27',
     items: [

@@ -72,17 +72,20 @@ hesap ya da karar bekliyor.
   fiyat; karşılığında yorum. Yapılsın mı? (Ödeme sistemi gelince.)
 
 ### C. Bilgi gerektirmeyen, sonra yapılacaklar
-1. **Vercel Analytics** — çerezsiz ziyaretçi sayımı; Vercel panelinde açılıp
-   `@vercel/analytics` eklenir.
+1. **Vercel Analytics** — çerezsiz ziyaretçi sayımı. Kullanıcının Vercel panelinde
+   Analytics → Enable demesi gerekiyor (tek tık); sonra `@vercel/analytics` eklenir.
 2. **Dil başına adresler** (/tr, /de, /fa…) + hreflang + her dilde ön çizim —
    SEO'nun sonraki adımı (şu an ön çizim yalnız İngilizce).
 3. **Tam içerik güvenlik politikası** (script-src CSP) — Clerk, Supabase, Google
    Fonts, Cloudflare Turnstile ve fotoğraf bağlantıları için izin listesiyle; önce
    Report-Only olarak denenmeli (bozulursa giriş çalışmaz).
-4. **Blog / eğitim içeriği** — "prop firm trading journal", "MT5 trading journal"
-   aramaları için sayfalar, rakip karşılaştırmaları.
-5. **Yardım merkezini genişletmek** (şu an 10 soru) ve yol haritası sayfası.
-6. **PWA** (telefona eklenebilen uygulama) + sekme kapalıyken bildirim (web push).
+4. **Blog / eğitim içeriği** — YAPILDI (2026-09-28): /blog, 2 rehber + 3 yazı, EN+TR,
+   ön çizimli (src/content/articles.ts'e yazı eklemek yeterli; PAGES, sitemap
+   elle). Kalan: rakip karşılaştırmaları — rakiplerin güncel fiyat/özellikleri
+   doğrulanmadan yazılmamalı; daha fazla yazı; sitemap'i otomatik üretmek.
+5. **Yardım merkezi** — 13 soru + rehber bağlantıları. Kalan: yol haritası sayfası.
+6. **PWA** — manifest YAPILDI (ana ekrana ekle → /journal). Service worker bilerek
+   yok. Kalan: sekme kapalıyken bildirim (web push, service worker ister).
 7. **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate.
 8. **Sentry** (hata izleme), otomatik testler, durum sayfası.
 9. **Paket boyutu** — çeviri tablosu (src/lib/appCopyData.ts, ~89 KB) ana pakette;
