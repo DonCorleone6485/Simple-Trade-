@@ -1680,7 +1680,7 @@ export default function App() {
 
           {!loading && view === 'discipline' && (
             <DisciplineView
-              trades={openTrades.filter(tr => tr.user_id === user?.id)}
+              trades={openTrades.filter(tr => isGuest || tr.user_id === user?.id)}
               journalCount={accounts.length}
             />
           )}
