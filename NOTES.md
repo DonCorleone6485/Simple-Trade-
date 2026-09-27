@@ -34,6 +34,10 @@ her şey yapıldı (aşağıda "Yapılanlar"). Kalanların çoğu kullanıcıdan
 hesap ya da karar bekliyor.
 
 ### A. Kullanıcıdan bilgi / hesap bekleyenler
+> **2026-09-27 karar:** Ödeme sistemi (1) ve yasal sayfalar (2) şirket kurulana
+> kadar ERTELENDİ — ikisi de şirket adı ve adresi istiyor. Şirket kurulunca
+> ikisi birlikte ele alınacak; o zamana kadar gündeme getirme.
+
 1. **Ödeme sistemi** — şirket kurulunca Paddle veya Lemon Squeezy hesabı (şirket +
    banka bilgileri). Sonra: abonelik, fatura, iptal akışı; PaymentModal'daki
    "Ödeme Yap — Yakında" düğmesi; ödeme olayıyla (webhook) users.has_paid /
