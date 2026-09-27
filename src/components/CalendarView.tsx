@@ -39,7 +39,7 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
   const getMonthLabel = () => {
     if (language === 'tr') return new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric' }).format(currentDate);
     if (language === 'fa') return new Intl.DateTimeFormat('fa-IR', { month: 'long', year: 'numeric' }).format(currentDate);
-    return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
+    return new Intl.DateTimeFormat(localeOf(language), { month: 'long', year: 'numeric' }).format(currentDate);
   };
 
   const getDayKey = (day: number) => {
@@ -76,7 +76,10 @@ export default function CalendarView({ trades, onDelete, lockedTrades = [] }: Ca
     ? ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
     : language === 'fa'
     ? ['دوش', 'سه', 'چهار', 'پنج', 'جمعه', 'شنبه', 'یکشنبه']
-    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    // Diğer diller: haftanın günleri tarayıcının kendi yerel adlarıyla, Pazartesi'den başlayarak.
+    // 1 Ocak 2024 bir Pazartesi.
+    : Array.from({ length: 7 }, (_, i) =>
+        new Intl.DateTimeFormat(localeOf(language), { weekday: 'short' }).format(new Date(2024, 0, 1 + i)));
 
   const selectedTrades = selectedDay
     ? trades.filter(t => dayKey(t.date) === selectedDay)

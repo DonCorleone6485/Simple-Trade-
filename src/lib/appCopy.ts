@@ -27,3 +27,15 @@ export function localeOf(language: string): string {
     tr: 'tr-TR', en: 'en-US', fa: 'fa-IR', ar: 'ar-u-nu-latn', ru: 'ru-RU', es: 'es-ES', pt: 'pt-PT', de: 'de-DE', fr: 'fr-FR',
   } as Record<string, string>)[language] || 'en-US';
 }
+
+/**
+ * Yüzde, dilin kendi yazımıyla: Türkçe "%58", İngilizce "58%", Almanca ve
+ * Fransızca "58 %". Rakamlar her dilde Latin (tutarlarla aynı); Farsçada
+ * yalnız işaret "٪".
+ */
+export function pct(value: number | string, language: string, digits = 0): string {
+  const n = typeof value === 'number' ? value : parseFloat(value);
+  if (!isFinite(n)) return String(value);
+  const locale = language === 'fa' ? 'fa-IR-u-nu-latn' : localeOf(language);
+  return new Intl.NumberFormat(locale, { style: 'percent', minimumFractionDigits: digits, maximumFractionDigits: digits }).format(n / 100);
+}

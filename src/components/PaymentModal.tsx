@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { pick } from '../lib/appCopy';
+import { pick, pct } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { X, Check, Shield, Tag } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -104,7 +104,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                 ? { background: 'rgba(139,92,246,0.2)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.4)' }
                 : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-xs font-bold"
-                style={{ background: '#34d399', color: '#000' }}>%{savings}</span>
+                style={{ background: '#34d399', color: '#000' }}>{pct(savings, language)}</span>
               <div>{pick(language, 'Yıllık', 'Yearly')}</div>
               <div className="text-xs mt-0.5 font-normal">{prices.fmt(prices.yearlyMonthly)} / {pick(language, 'ay', 'mo')}</div>
             </button>

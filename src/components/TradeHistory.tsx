@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { pick, localeOf } from '../lib/appCopy';
+import { pick, localeOf, pct } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { Trade, OrderType } from '../types';
 import { isWinTrade, isLossTrade, isBreakevenTrade, lossAmount, winAmount, tradePnL, holdMinutes, formatDuration, isOpenTrade, realizedR, formatR } from '../lib/tradeMath';
@@ -260,21 +260,21 @@ export default function TradeHistory({
     const d = new Date(dateStr);
     if (language === 'fa') return new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium', timeStyle: 'short', calendar: 'persian' }).format(d);
     if (language === 'tr') return new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }).format(d);
-    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(d);
+    return new Intl.DateTimeFormat(localeOf(language), { dateStyle: 'medium', timeStyle: 'short' }).format(d);
   };
 
   const getMonthYear = (dateStr: string) => {
     const d = new Date(dateStr);
     if (language === 'fa') return new Intl.DateTimeFormat('fa-IR', { month: 'long', year: 'numeric', calendar: 'persian' }).format(d);
     if (language === 'tr') return new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric' }).format(d);
-    return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(d);
+    return new Intl.DateTimeFormat(localeOf(language), { month: 'long', year: 'numeric' }).format(d);
   };
 
   const getDayDate = (dateStr: string) => {
     const d = new Date(dateStr);
     if (language === 'fa') return new Intl.DateTimeFormat('fa-IR', { day: '2-digit', month: '2-digit', year: 'numeric', calendar: 'persian' }).format(d);
     if (language === 'tr') return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
-    return new Intl.DateTimeFormat('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
+    return new Intl.DateTimeFormat(localeOf(language), { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
   };
 
   // ── STATS ──────────────────────────────────────────────────────────────────
@@ -688,7 +688,7 @@ export default function TradeHistory({
             <div>
               <div style={figureLabel}>{t('totalReturn')}</div>
               <div className="font-mono" style={{ fontSize: '38px', letterSpacing: '-0.03em', color: returnPct >= 0 ? '#34d399' : '#f87171', fontVariantNumeric: 'tabular-nums' }}>
-                {returnPct >= 0 ? '+' : '\u2212'}%{Math.abs(returnPct).toFixed(1)}
+                {returnPct >= 0 ? '+' : '\u2212'}{pct(Math.abs(returnPct), language, 1)}
               </div>
             </div>
           )}
@@ -698,7 +698,7 @@ export default function TradeHistory({
         <div>
           <div className="flex items-baseline justify-between mb-3">
             <span style={figureLabel}>{t('winRate')}</span>
-            <span className="font-mono text-[15px]" style={{ fontVariantNumeric: 'tabular-nums' }}>%{winRate}</span>
+            <span className="font-mono text-[15px]" style={{ fontVariantNumeric: 'tabular-nums' }}>{pct(winRate, language)}</span>
           </div>
           <div className="flex h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
             {[
@@ -752,7 +752,7 @@ export default function TradeHistory({
                       {signedMoney(b.pnl)}
                     </span>
                     {b.rate != null && (
-                      <span className="font-mono text-[15px]" style={{ color: 'rgba(255,255,255,0.5)' }}>%{b.rate}</span>
+                      <span className="font-mono text-[15px]" style={{ color: 'rgba(255,255,255,0.5)' }}>{pct(b.rate, language)}</span>
                     )}
                   </div>
                   <div className="text-[11px] mt-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
@@ -937,7 +937,7 @@ export default function TradeHistory({
                   <div className="h-full rounded-full" style={{ width: `${rate}%`, background: dir === 'Buy' ? '#34d399' : '#f87171' }} />
                 </div>
                 <div className="flex items-baseline justify-between font-mono text-sm" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                  <span style={{ color: 'rgba(255,255,255,0.5)' }}>%{rate}</span>
+                  <span style={{ color: 'rgba(255,255,255,0.5)' }}>{pct(rate, language)}</span>
                   <span style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl)}</span>
                 </div>
               </div>
@@ -993,7 +993,7 @@ export default function TradeHistory({
                   <div key={setup} className="flex items-center gap-3">
                     <span className="text-sm font-medium truncate" style={{ color: '#818cf8', minWidth: '80px', maxWidth: '120px' }}>{setup}</span>
                     <div className="flex-1"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${winRate}%`, background: '#818cf8' }} /></div></div>
-                    <span className="text-xs font-mono w-8 text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>%{winRate}</span>
+                    <span className="text-xs font-mono w-8 text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>{pct(winRate, language)}</span>
                     <span className="text-xs font-mono w-16 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
                     <span className="text-xs w-8 text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>{total}</span>
                   </div>
@@ -1009,7 +1009,7 @@ export default function TradeHistory({
                   <div key={symbol} className="flex items-center gap-3">
                     <span className="text-sm font-medium font-mono" style={{ color: '#fff', minWidth: '80px' }}>{symbol}</span>
                     <div className="flex-1"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${winRate}%`, background: '#2dd4bf' }} /></div></div>
-                    <span className="text-xs font-mono w-8 text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>%{winRate}</span>
+                    <span className="text-xs font-mono w-8 text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>{pct(winRate, language)}</span>
                     <span className="text-xs font-mono w-16 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
                     <span className="text-xs w-8 text-end" style={{ color: 'rgba(255,255,255,0.5)' }}>{total}</span>
                   </div>
@@ -1027,7 +1027,7 @@ export default function TradeHistory({
                   <span className="text-sm font-medium w-24 text-white">{t(session as any)} <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>({total})</span></span>
                   <div className="flex-1 mx-4"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${rate}%`, background: '#818cf8' }} /></div></div>
                   <span className="text-xs font-mono w-12 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
-                  <span className="text-sm font-semibold font-mono w-10 text-end text-white ms-2">%{rate}</span>
+                  <span className="text-sm font-semibold font-mono w-10 text-end text-white ms-2">{pct(rate, language)}</span>
                 </div>
               ))}
             </div>
@@ -1040,7 +1040,7 @@ export default function TradeHistory({
                   <span className="text-sm font-medium w-24 text-white">{t(day as any)} <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>({total})</span></span>
                   <div className="flex-1 mx-4"><div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}><div className="h-full rounded-full" style={{ width: `${rate}%`, background: '#2dd4bf' }} /></div></div>
                   <span className="text-xs font-mono w-12 text-end" style={{ color: pnl >= 0 ? '#34d399' : '#f87171' }}>{signedMoney(pnl, 0)}</span>
-                  <span className="text-sm font-semibold font-mono w-10 text-end text-white ms-2">%{rate}</span>
+                  <span className="text-sm font-semibold font-mono w-10 text-end text-white ms-2">{pct(rate, language)}</span>
                 </div>
               )) : <p className="text-sm italic" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('emptyDesc')}</p>}
             </div>

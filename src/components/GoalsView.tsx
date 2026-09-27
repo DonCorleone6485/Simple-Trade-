@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { pick } from '../lib/appCopy';
+import { pick, pct, localeOf } from '../lib/appCopy';
 import { aria } from '../lib/aria';
 import { Trade, Account, JournalGoals } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -96,7 +96,7 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
   const getMonthLabel = () => {
     if (language === 'tr') return new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric' }).format(now);
     if (language === 'fa') return new Intl.DateTimeFormat('fa-IR', { month: 'long', year: 'numeric' }).format(now);
-    return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(now);
+    return new Intl.DateTimeFormat(localeOf(language), { month: 'long', year: 'numeric' }).format(now);
   };
 
   const handleSave = () => {
@@ -189,11 +189,11 @@ export default function GoalsView({ trades, account, onUpdateGoals }: GoalsViewP
                   <span className="text-xs font-medium uppercase tracking-wider">{t('winRateGoal')}</span>
                 </div>
                 <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  %{currentWinRate.toFixed(0)} / %{goals.winRate}
+                  {pct(currentWinRate, language)} / {pct(goals.winRate, language)}
                 </span>
               </div>
               <div className="font-mono text-[26px] mt-2" style={{ color: currentWinRate >= goals.winRate ? '#34d399' : '#fff' }}>
-                {currentWinRate >= goals.winRate && <Check className="w-5 h-5 inline-block me-1.5 -mt-0.5" />}%{currentWinRate.toFixed(0)}
+                {currentWinRate >= goals.winRate && <Check className="w-5 h-5 inline-block me-1.5 -mt-0.5" />}{pct(currentWinRate, language)}
               </div>
               <ProgressBar value={currentWinRate} max={goals.winRate} color={currentWinRate >= goals.winRate ? '#34d399' : '#8b5cf6'} />
             </div>

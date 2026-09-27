@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { pick, localeOf } from './lib/appCopy';
+import { pick, localeOf, pct } from './lib/appCopy';
 import { aria } from './lib/aria';
 import {
   PlusCircle, Globe, ChevronDown, ChevronLeft,
@@ -1253,7 +1253,7 @@ export default function App() {
                 {pick(language, 'Yıllık', 'Yearly')}
                 <span className="ms-1 px-1.5 py-0.5 rounded-full text-xs font-semibold"
                   style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
-                  %{prices.savings}
+                  {pct(prices.savings, language)}
                 </span>
               </span>
             </div>
