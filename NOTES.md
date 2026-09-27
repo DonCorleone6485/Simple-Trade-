@@ -50,9 +50,15 @@ hesap ya da karar bekliyor.
    reklamından ÖNCE. Çerez onay bandı da gerekecek (KVKK/GDPR).
 5. **Google Search Console** — siteyi Google hesabıyla eklemek; doğrulama için
    DNS kaydı ya da benim ekleyeceğim doğrulama dosyası. Sonra sitemap gönderilir.
-6. **E-posta akışları** — Resend (veya Loops) hesabı + alan adı doğrulaması (DNS).
-   Hoş geldin, "deneme yarın bitiyor", "deneme bitti", haftalık özet. En çok
-   satışı getireni deneme bitiş e-postası.
+6. **E-posta akışları** — kod hazır (api/_email.ts, api/emails.ts; günlük görev
+   09:00 UTC): hoş geldin, "deneme bitiyor", "deneme bitti", 9 dilde, abonelikten
+   çıkma bağlantılı. Gönderen hello@updates.simpletradejournal.io (Resend, eu-west-1),
+   cevaplar support@'a. Çalışması için kalan: Namecheap'te iki CNAME
+   (send.updates → send.forge.rmta.net, rsend.updates → rsend-euw1.forge.rmta.net;
+   DKIM TXT eklendi, MX eklenmeyecek) ve Vercel'de RESEND_API_KEY. İsteğe bağlı:
+   CRON_SECRET. Ödeme açılınca deneme postalarına Pro'ya geçiş bağlantısı
+   eklenmeli; haftalık özet sonra. Not: Vercel Hobby en fazla 12 fonksiyon —
+   api/ şu an tam 12 (alt çizgili dosyalar sayılmıyor).
 7. **Diğer ülkelere bölgesel fiyat** — onay: grup 1 tam fiyat (ABD, Batı Avrupa,
    İngiltere, Körfez), grup 2 %30 indirim (Doğu Avrupa, Latin Amerika), grup 3
    %50 indirim (Mısır, Hindistan, Pakistan, Nijerya, Endonezya…). Teknik yer:
