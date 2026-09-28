@@ -81,9 +81,13 @@ hesap ya da karar bekliyor.
    altında ana sayfa, yardım, değişiklikler, blog ve yazılar; 81 ön çizimli sayfa,
    hreflang + x-default, dilli sitemap. Tek yer: src/lib/langPath.ts (yol),
    src/lib/seoMeta.ts (başlık/açıklama), src/prerender.tsx (PAGES).
-3. **Tam içerik güvenlik politikası** (script-src CSP) — Clerk, Supabase, Google
-   Fonts, Cloudflare Turnstile ve fotoğraf bağlantıları için izin listesiyle; önce
-   Report-Only olarak denenmeli (bozulursa giriş çalışmaz).
+3. **Tam içerik güvenlik politikası** — Report-Only AÇIK (2026-09-29): vercel.json
+   Content-Security-Policy-Report-Only; ihlaller /api/emails?csp=1 → client_errors
+   (kind 'csp', aynı ihlal saatte bir) → günlük hata özeti. Satır içi tek betik
+   (prerender.mjs'teki `js` sınıfı) sha256 ile izinli — o satır değişirse hash de
+   değişmeli. Kalan: 1-2 hafta raporları izle (özellikle giriş, kayıt, Turnstile,
+   sesli not, fotoğraf), eksikleri ekle, sonra Report-Only → Content-Security-Policy
+   (mevcut frame-ancestors satırıyla birleştir).
 4. **Blog / eğitim içeriği** — YAPILDI (2026-09-28): /blog, 2 rehber + 3 yazı,
    ön çizimli. 9 DİLDE (2026-09-28): metinler src/content/articles/<dil>.ts, sıra ve
    tarih src/content/articles.ts; eksik dil İngilizceye düşer. Sayfa, sitemap ve

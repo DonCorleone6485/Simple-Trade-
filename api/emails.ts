@@ -120,8 +120,57 @@ async function contact(req: any, res: any) {
   return ok ? res.status(200).json({ ok: true }) : res.status(502).json({ error: 'send' });
 }
 
+/**
+ * İçerik güvenlik politikasının (vercel.json, şimdilik Report-Only) ihlal
+ * raporları. Tarayıcı engellemiyor, yalnız bildiriyor: politika sıkılaşmadan
+ * önce Clerk, Supabase ve fontların gerçekte nelere ihtiyaç duyduğunu görmek
+ * için. client_errors'a kind 'csp' ile yazılır, günlük hata özetine girer.
+ * Ayrı fonksiyon değil: Vercel ücretsiz planda 12 sınırındayız.
+ */
+async function cspReport(req: any, res: any) {
+  let raw: any = req.body;
+  try {
+    if (Buffer.isBuffer(raw)) raw = raw.toString('utf8');
+    if (typeof raw === 'string') raw = JSON.parse(raw);
+  } catch { return res.status(204).end(); }
+  // Eski biçim {"csp-report": {...}}; Reporting API [{type, body}, ...].
+  const reports: any[] = Array.isArray(raw)
+    ? raw.filter(r => r?.type === 'csp-violation').map(r => r.body)
+    : [raw?.['csp-report']];
+  const rows = [];
+  for (const r of reports.slice(0, 5)) {
+    if (!r || typeof r !== 'object') continue;
+    const directive = String(r.effectiveDirective || r['effective-directive'] || r['violated-directive'] || '').split(' ')[0];
+    const blocked = String(r.blockedURL || r['blocked-uri'] || '');
+    const source = String(r.sourceFile || r['source-file'] || '');
+    // Tarayıcı eklentileri sayfaya kendi kodunu sokuyor; bizim sorunumuz değil.
+    if (/extension:/.test(blocked) || /extension:/.test(source)) continue;
+    let where = blocked || 'inline';
+    try { where = new URL(blocked).origin; } catch { /* inline, eval, data… */ }
+    let path = '';
+    try { path = new URL(String(r.documentURL || r['document-uri'] || '')).pathname; } catch { /* yok */ }
+    rows.push({
+      kind: 'csp',
+      message: `CSP ${directive}: ${where}`.slice(0, 1000),
+      stack: JSON.stringify(r).slice(0, 4000),
+      url: path.slice(0, 500) || null,
+      user_agent: String(req.headers['user-agent'] || '').slice(0, 400) || null,
+    });
+  }
+  // Aynı ihlal her sayfa açılışında yeniden gelir; saatte bir kez yazmak yeter.
+  const hourAgo = new Date(Date.now() - 3600_000).toISOString();
+  for (const row of rows) {
+    const { count } = await supabase.from('client_errors')
+      .select('id', { count: 'exact', head: true })
+      .eq('kind', 'csp').eq('message', row.message).gte('created_at', hourAgo);
+    if (!count) await supabase.from('client_errors').insert(row);
+  }
+  return res.status(204).end();
+}
+
 export default async function handler(req: any, res: any) {
   if (req.query?.u) return unsubscribe(req, res);
+  if (req.query?.csp && req.method === 'POST') return cspReport(req, res);
   if (req.method === 'POST') return contact(req, res);
   if (req.method !== 'GET') return res.status(405).end();
   const secret = process.env.CRON_SECRET;

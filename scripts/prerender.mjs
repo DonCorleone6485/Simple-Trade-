@@ -33,6 +33,7 @@ function withBody(page, html) {
   if (!page.includes('<div id="root"></div>')) throw new Error('root div not found');
   return page
     .replace('<div id="root"></div>', `<div id="root"><div id="prerender">${html}</div></div>`)
+    // Bu satır içi betik vercel.json'daki CSP'de sha256 ile izinli: değişirse hash'i de güncelle.
     .replace('</head>', `<script>document.documentElement.classList.add('js')</script><style>.js #prerender{display:none}</style></head>`);
 }
 
