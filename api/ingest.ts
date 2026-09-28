@@ -489,6 +489,10 @@ export default async function handler(req: any, res: any) {
 
   await supabase.from('api_keys').update({ last_used_at: new Date().toISOString() }).eq('id', apiKey.id);
 
+  // EA grafikte hangi journal'a bağlı olduğunu yazsın: eski anahtar takılı
+  // kalınca işlemler fark edilmeden başka journal'a gidiyordu.
+  const { data: jn } = await supabase.from('journals').select('name').eq('id', apiKey.journal_id).maybeSingle();
+
   return res.status(200).json({
     inserted,
     completed,
@@ -496,6 +500,7 @@ export default async function handler(req: any, res: any) {
     adopted,
     skipped: trades.length - inserted - completed - refreshed - adopted,
     journalId: apiKey.journal_id,
+    journal: jn?.name || '',
     ...(trialEnded ? { trialEnded: 'This MetaTrader account was already used in another trial.' } : {}),
     ...(locked > 0 ? { locked, limit: 'Free plan: the first 2 trades of each day are open; the rest are saved locked.' } : {}),
   });

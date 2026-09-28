@@ -111,7 +111,7 @@ hesap ya da karar bekliyor.
   Mac'indeki MT4 ile derlenebilir: ~/Library/Application Support/net.metaquotes.wine.metatrader4).
 - Hesabım penceresi: para birimi seçimi, saat dilimi, "ad/e-posta/şifre" düğmesi.
 - MetaTrader sayfası: anahtarın bağlı olduğu hesap ("•••1234 · Sunucu").
-- EA'yı 1.06'ya güncellemek (grafikte "başka hesaba bağlı" uyarısı için).
+- EA'yı 1.07'ye güncellemek (grafikte bağlı journal'ın adı ve "başka hesaba bağlı" uyarısı).
   Not: iki hesapta aynı anahtar varsa, yayından sonra ilk bağlanan hesap sahiplenir.
 - İlk gerçek yeni üyede: kayıttan sonra örnek verinin kalkması, deneme akışı.
 - Hesap silme — kendi hesabıyla değil, boş bir test hesabıyla denenmeli.

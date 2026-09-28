@@ -12,7 +12,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Simple Trading Journal"
 #property link      "https://www.simpletradejournal.io"
-#property version   "1.06"
+#property version   "1.07"
 #property strict
 
 // Girdi etiketleri MQL5'te yorum satırından gelir ve ekranda öyle görünür.
@@ -53,6 +53,7 @@ bool     g_fullScanDone = false;  // geçmişin tamamı bir kez tarandı mı
 string   g_status   = "";  // grafiğe yazılan son durum
 bool     g_ready    = false; // anahtar girilmiş ve tarama başlamış mı
 string   g_key      = "";    // kullanılan anahtar: girilen ya da hatırlanan
+string   g_journal  = "";    // anahtarın bağlı olduğu journal (sunucudan)
 
 /**
  * Anahtarı hatırlarız. EA grafikten kalkıp yeniden eklendiğinde MetaTrader
@@ -94,7 +95,7 @@ void SaveKey(const string key)
 void Status(const string text)
   {
    g_status = text;
-   Comment("Simple Trading Journal\n", text);
+   Comment("Simple Trading Journal" + (g_journal != "" ? "  ->  Journal: " + g_journal : "") + "\n", text);
   }
 
 //+------------------------------------------------------------------+
@@ -576,6 +577,22 @@ void Scan()
      }
   }
 
+/**
+ * Sunucunun cevabındaki journal adı ("journal":"..."). Grafikte gösteriliyor:
+ * eski bir anahtar takılı kalırsa işlemlerin nereye gittiği ilk bakışta
+ * görünsün. Türkçe karakterler grafikte bozulabildiği için olduğu gibi yazılır.
+ */
+string JournalName(const string body)
+  {
+   string tag = "\"journal\":\"";
+   int s = StringFind(body, tag);
+   if(s < 0) return("");
+   s += StringLen(tag);
+   int e = StringFind(body, "\"", s);
+   if(e <= s) return("");
+   return(StringSubstr(body, s, e - s));
+  }
+
 //+------------------------------------------------------------------+
 bool Send(const string json, const int count)
   {
@@ -612,9 +629,15 @@ bool Send(const string json, const int count)
      }
 
    string body = CharArrayToString(result, 0, WHOLE_ARRAY, CP_UTF8);
+   if(status == 200)
+     {
+      string jn = JournalName(body);
+      if(jn != "") g_journal = jn;
+     }
 
    if(status != 200)
      {
+      if(status == 401 || status == 409) g_journal = "";
       if(status == 401)
         {
          Status("Anahtar gecersiz ya da iptal edilmis.\nSiteden yeni anahtar olusturup buraya yapistir.");

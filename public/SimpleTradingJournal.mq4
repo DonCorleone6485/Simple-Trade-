@@ -19,7 +19,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Simple Trading Journal"
 #property link      "https://www.simpletradejournal.io"
-#property version   "1.06"
+#property version   "1.07"
 #property strict
 
 input string ApiKey       = "";                                   // ApiKey  (stj_...)
@@ -35,6 +35,7 @@ int      g_total = 0;
 bool     g_fullScanDone = false;
 bool     g_ready = false;
 string   g_key = "";
+string   g_journal = "";
 int      g_lastOpenCount = -1;
 int      g_lastHistCount = -1;
 
@@ -60,7 +61,7 @@ void SaveKey(const string key)
    FileClose(h);
   }
 
-void Status(const string text) { Comment("Simple Trading Journal\n", text); }
+void Status(const string text) { Comment("Simple Trading Journal" + (g_journal != "" ? "  ->  Journal: " + g_journal : "") + "\n", text); }
 
 //+------------------------------------------------------------------+
 int OnInit()
@@ -373,6 +374,22 @@ void Scan()
      }
   }
 
+/**
+ * Sunucunun cevabındaki journal adı ("journal":"..."). Grafikte gösteriliyor:
+ * eski bir anahtar takılı kalırsa işlemlerin nereye gittiği ilk bakışta
+ * görünsün. Türkçe karakterler grafikte bozulabildiği için olduğu gibi yazılır.
+ */
+string JournalName(const string body)
+  {
+   string tag = "\"journal\":\"";
+   int s = StringFind(body, tag);
+   if(s < 0) return("");
+   s += StringLen(tag);
+   int e = StringFind(body, "\"", s);
+   if(e <= s) return("");
+   return(StringSubstr(body, s, e - s));
+  }
+
 //+------------------------------------------------------------------+
 bool Send(const string json, const int count)
   {
@@ -406,9 +423,15 @@ bool Send(const string json, const int count)
      }
 
    string body = CharArrayToString(result, 0, WHOLE_ARRAY, CP_UTF8);
+   if(status == 200)
+     {
+      string jn = JournalName(body);
+      if(jn != "") g_journal = jn;
+     }
 
    if(status != 200)
      {
+      if(status == 401 || status == 409) g_journal = "";
       if(status == 401)
         {
          Status("Anahtar gecersiz ya da iptal edilmis.\nSiteden yeni anahtar olusturup buraya yapistir.");
