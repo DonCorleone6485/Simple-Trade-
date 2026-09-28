@@ -230,15 +230,17 @@ export default async function handler(req: any, res: any) {
     }
   }
 
-  // Kullanıcının hangi işlemleri zaten var — aynı pozisyon iki kez gönderilse
-  // de ikinci kez eklenmesin. EA her açılışta geçmişi baştan taradığı için bu
-  // koruma sürekli devrede.
+  // Bu journal'da hangi işlemler zaten var — aynı pozisyon iki kez
+  // gönderilse de ikinci kez eklenmesin. EA her açılışta geçmişi baştan
+  // taradığı için bu koruma sürekli devrede.
   //
-  // Bakılan yer journal değil kullanıcının tamamı: EA'nın getirdiği bir
-  // işlemi başka bir journal'a taşıyan kullanıcıya, EA bir sonraki açılışta
-  // aynı işlemi eski journal'a yeniden yazıyordu. Numara tek başına yetmez —
-  // iki ayrı broker aynı pozisyon numarasını verebilir — sembolle birlikte
-  // eşleştiriyoruz.
+  // Bakılan yer anahtarın journal'ı: "bu journal'da varsa ekleme, yoksa ekle".
+  // Önce kullanıcının bütün journal'larına bakılıyordu; anahtar yanlışlıkla
+  // başka bir journal'a bağlanıp sonra düzeltilince, doğru journal'a hiçbir
+  // işlem gelmiyordu (hepsi "zaten var" sayılıyordu). Bedeli: EA'nın getirdiği
+  // bir işlem elle başka journal'a taşınırsa, EA yeniden başlarken onu kendi
+  // journal'ına yeniden yazar. Numara tek başına yetmez — iki ayrı broker aynı
+  // pozisyon numarasını verebilir — sembolle birlikte eşleştiriyoruz.
   const ids = trades.map(t => String(t.externalId ?? '')).filter(Boolean);
   const seenKey = (id: string, symbol: string) => `${id}|${symbol.toUpperCase().trim()}`;
   const known = new Map<string, OpenCandidate & { closed: boolean }>();
@@ -246,7 +248,7 @@ export default async function handler(req: any, res: any) {
     const { data: existing } = await supabase
       .from('trades')
       .select('id, external_id, symbol, type, date, result, risk, rr, stop_loss, entry_price')
-      .eq('user_id', apiKey.user_id).in('external_id', ids);
+      .eq('user_id', apiKey.user_id).eq('journal_id', apiKey.journal_id).in('external_id', ids);
     (existing || []).forEach((r: any) => {
       if (r.external_id) known.set(seenKey(String(r.external_id), r.symbol || ''), { ...r, closed: !!r.result });
     });
