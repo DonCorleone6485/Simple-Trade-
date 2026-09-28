@@ -128,9 +128,17 @@ async function contact(req: any, res: any) {
  * Ayrı fonksiyon değil: Vercel ücretsiz planda 12 sınırındayız.
  */
 async function cspReport(req: any, res: any) {
-  let raw: any = req.body;
+  // Tarayıcı application/csp-report ya da application/reports+json gönderiyor;
+  // Vercel bunları ayrıştırmıyor, gövde akıştan okunur.
+  const type = String(req.headers['content-type'] || '');
+  let raw: any;
   try {
-    if (Buffer.isBuffer(raw)) raw = raw.toString('utf8');
+    if (/^application\/json/.test(type)) raw = req.body;
+    else {
+      const chunks: Buffer[] = [];
+      for await (const c of req) chunks.push(Buffer.from(c));
+      raw = Buffer.concat(chunks).toString('utf8').slice(0, 64_000);
+    }
     if (typeof raw === 'string') raw = JSON.parse(raw);
   } catch { return res.status(204).end(); }
   // Eski biçim {"csp-report": {...}}; Reporting API [{type, body}, ...].
