@@ -10,7 +10,7 @@ const TEXT: Record<string, ArticleText> = {
         "p": "Her işlemi journal'a elle yazmak, insanların journal tutmayı bırakmasının bir numaralı sebebi. MetaTrader 5 eklentisiyle her işlem açıldığı anda kaydediliyor, kapandığında tamamlanıyor: giriş, çıkış, stop, lot, komisyon ve swap dahil. Sen yalnızca MetaTrader'ın bilemeyeceğini eklersin: setup'ın, gerekçen ve o anki hislerin."
       },
       {
-        "note": "MetaTrader 4 mü kullanıyorsun? Adımlar aynı: MetaTrader ekranında MetaTrader 4'ü seç, SimpleTradingJournal.mq4 dosyasını indir ve MQL4 → Experts klasörüne koy. MetaTrader 4 yeniden başlarken dosyayı kendisi derler."
+        "note": "MetaTrader 4 mü kullanıyorsun? Adımlar aynı: MetaTrader ekranında MetaTrader 4'ü seç, SimpleTradingJournal.ex4 dosyasını indir ve MQL4 → Experts klasörüne koy."
       },
       {
         "h2": "Ne gerekiyor"

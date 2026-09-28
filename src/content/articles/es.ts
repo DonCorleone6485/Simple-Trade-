@@ -7,7 +7,7 @@ const TEXT: Record<string, ArticleText> = {
     description: 'Paso a paso: instala el complemento de Simple Trading Journal en MT5 para que cada operación cerrada llegue sola a tu diario, con stop loss, riesgo y comisiones incluidos.',
     body: [
       { p: 'Escribir cada operación a mano es la principal razón por la que la gente deja de llevar un diario. Con el complemento de MetaTrader 5, cada operación se registra en el momento en que se abre y se completa al cerrarse: entrada, salida, stop loss, lotes, comisión y swap. Tú solo añades lo que MetaTrader no puede saber: tu setup, tu razonamiento y cómo te sentías.' },
-      { note: "¿Usas MetaTrader 4? Los pasos son los mismos: en la pantalla de MetaTrader elige MetaTrader 4, descarga SimpleTradingJournal.mq4 y ponlo en MQL4 → Experts. MetaTrader 4 lo compila solo al reiniciarse." },
+      { note: "¿Usas MetaTrader 4? Los pasos son los mismos: en la pantalla de MetaTrader elige MetaTrader 4, descarga SimpleTradingJournal.ex4 y ponlo en MQL4 → Experts." },
       { h2: 'Qué necesitas' },
       { ul: [
         'MetaTrader 5 en Windows o Mac (la terminal de escritorio; la app móvil no ejecuta complementos).',

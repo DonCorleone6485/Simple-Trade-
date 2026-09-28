@@ -19,13 +19,13 @@ interface ApiKey {
 }
 
 /**
- * MT4 eklentisi kaynak dosya olarak (.mq4): MetaTrader 4 Experts klasöründeki
- * kaynak dosyaları yeniden başlarken kendisi derliyor. Derlenmiş .ex4
- * veremiyoruz — MetaQuotes MT4'ü (ve derleyicisini) artık dağıtmıyor. Gerçek
- * 2026-09-28'de gerçek bir MT4'te (build 1481, MetaQuotes-Demo) denendi: MT4 kendisi
- * derledi, açılan/kapanan emir journal'a doğru saatle düştü.
+ * MT4 eklentisi derlenmiş hâliyle (.ex4). MetaQuotes MT4'ü artık dağıtmıyor;
+ * derleme MT4.app'in kendi Wine'ı (wine32on64) ve metaeditor.exe ile yapılıyor
+ * (bkz. NOTES.md). Kaynağı public/SimpleTradingJournal.mq4. Kaynak dosyayı
+ * vermek yetmiyordu: MT4 onu her açılışta derlemiyor, derlenmemiş eklenti de
+ * grafiğe sürüklenemiyor.
  */
-const MT4_FILE = '/SimpleTradingJournal.mq4';
+const MT4_FILE = '/SimpleTradingJournal.ex4';
 
 interface MTConnectProps {
   journalId: string;

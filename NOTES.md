@@ -107,8 +107,11 @@ hesap ya da karar bekliyor.
 ### D. Kullanıcının kontrol etmesi gerekenler
 - MT4 eklentisi DENENDİ (2026-09-28, MT4 build 1481, MetaQuotes-Demo): MT4 kendisi
   derledi, işlem doğru saatle geldi; Beta kaldırıldı, karşılaştırmalar "MT4 ve MT5".
-  .mq4 kaynak olarak veriliyor (MetaQuotes MT4 derleyicisini dağıtmıyor; kullanıcının
-  Mac'indeki MT4 ile derlenebilir: ~/Library/Application Support/net.metaquotes.wine.metatrader4).
+  Derlenmiş .ex4 veriliyor (kaynak MT4 açılışta her zaman derlenmiyordu). MT4'ü derlemek:
+    W="/Applications/MetaTrader 4.app/Contents/SharedSupport/wine/bin/wine32on64"
+    WINEPREFIX=~/Library/Application\ Support/net.metaquotes.wine.metatrader4 \
+      "$W" ".../MetaTrader 4/metaeditor.exe" /compile:'C:\<klasör>\SimpleTradingJournal.mq4' /log
+  (ayrı bir C:\ klasöründe derle, sonra sil). MT5: MetaTrader 5.app'in wine'ı + MetaEditor64.exe.
 - Hesabım penceresi: para birimi seçimi, saat dilimi, "ad/e-posta/şifre" düğmesi.
 - MetaTrader sayfası: anahtarın bağlı olduğu hesap ("•••1234 · Sunucu").
 - EA'yı 1.07'ye güncellemek (grafikte bağlı journal'ın adı ve "başka hesaba bağlı" uyarısı).

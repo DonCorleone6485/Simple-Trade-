@@ -7,7 +7,7 @@ const TEXT: Record<string, ArticleText> = {
     description: 'Schritt für Schritt: Installiere das Simple-Trading-Journal-Add-on in MT5, damit jeder geschlossene Trade automatisch in deinem Journal landet – mit Stop-Loss, Risiko und Gebühren.',
     body: [
       { p: 'Jeden Trade von Hand ins Journal zu tippen, ist der Hauptgrund, warum Leute mit dem Journaling aufhören. Mit dem MetaTrader-5-Add-on wird jeder Trade in dem Moment erfasst, in dem er eröffnet wird, und beim Schließen vervollständigt: Einstieg, Ausstieg, Stop-Loss, Lotgröße, Kommission und Swap. Du ergänzt nur, was MetaTrader nicht wissen kann: dein Setup, deine Begründung und wie du dich gefühlt hast.' },
-      { note: "Du nutzt MetaTrader 4? Die Schritte sind dieselben: Wähle auf dem MetaTrader-Bildschirm MetaTrader 4, lade SimpleTradingJournal.mq4 herunter und lege es in MQL4 → Experts. MetaTrader 4 kompiliert die Datei beim Neustart selbst." },
+      { note: "Du nutzt MetaTrader 4? Die Schritte sind dieselben: Wähle auf dem MetaTrader-Bildschirm MetaTrader 4, lade SimpleTradingJournal.ex4 herunter und lege es in MQL4 → Experts." },
       { h2: 'Was du brauchst' },
       { ul: [
         'MetaTrader 5 unter Windows oder Mac (das Desktop-Terminal – die Mobile-App kann keine Add-ons ausführen).',

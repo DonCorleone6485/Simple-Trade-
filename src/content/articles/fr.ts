@@ -7,7 +7,7 @@ const TEXT: Record<string, ArticleText> = {
     description: 'Pas à pas : installez le module Simple Trading Journal dans MT5 pour que chaque trade clôturé arrive automatiquement dans votre journal — stop loss, risque et frais compris.',
     body: [
       { p: 'Saisir chaque trade à la main est la principale raison pour laquelle on abandonne son journal. Avec le module MetaTrader 5, chaque trade est enregistré à l\'ouverture et complété à la clôture : entrée, sortie, stop loss, taille, commission et swap. Vous n\'ajoutez que ce que MetaTrader ne peut pas savoir : votre setup, votre raisonnement et votre état d\'esprit.' },
-      { note: "Vous utilisez MetaTrader 4 ? Les étapes sont les mêmes : sur l'écran MetaTrader, choisissez MetaTrader 4, téléchargez SimpleTradingJournal.mq4 et placez-le dans MQL4 → Experts. MetaTrader 4 le compile tout seul au redémarrage." },
+      { note: "Vous utilisez MetaTrader 4 ? Les étapes sont les mêmes : sur l'écran MetaTrader, choisissez MetaTrader 4, téléchargez SimpleTradingJournal.ex4 et placez-le dans MQL4 → Experts." },
       { h2: 'Ce qu\'il vous faut' },
       { ul: [
         'MetaTrader 5 sur Windows ou Mac (le terminal de bureau — l\'application mobile ne fait pas tourner de modules).',

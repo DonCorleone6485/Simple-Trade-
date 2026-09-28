@@ -10,7 +10,7 @@ const TEXT: Record<string, ArticleText> = {
         "p": "Typing every trade into a journal by hand is the main reason people stop journaling. With the MetaTrader 5 add-on, each trade is recorded the moment it opens and completed when it closes — entry, exit, stop loss, lot size, commission and swap included. You only add what MetaTrader cannot know: your setup, your reasoning and how you felt."
       },
       {
-        "note": "Using MetaTrader 4? The steps are the same: on the MetaTrader screen choose MetaTrader 4, download SimpleTradingJournal.mq4 and put it in MQL4 → Experts. MetaTrader 4 compiles it by itself when it restarts."
+        "note": "Using MetaTrader 4? The steps are the same: on the MetaTrader screen choose MetaTrader 4, download SimpleTradingJournal.ex4 and put it in MQL4 → Experts."
       },
       {
         "h2": "What you need"
