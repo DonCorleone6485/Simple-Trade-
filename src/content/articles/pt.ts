@@ -422,6 +422,109 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "pre-trade-checklist": {
+    "title": "A checklist antes de operar: como escrever uma que vais mesmo usar",
+    "description": "Porque é que uma checklist curta antes de entrar reduz as operações impulsivas, como escrever regras que se respondem com sim ou não e como verificar se a tua checklist funciona.",
+    "body": [
+      {
+        "p": "A maioria das más operações não vem de uma má análise. São operações abertas quando o setup estava só a meio — um nível quase atingido, um sinal quase confirmado — porque ficar parado parecia pior do que agir. Uma checklist permite-te tomar essa decisão antes de o momento chegar."
+      },
+      {
+        "h2": "Para que serve uma checklist"
+      },
+      {
+        "p": "Uma checklist não encontra operações por ti. Filtra as que já queres abrir, para que só passem as que encaixam no teu plano. Pilotos e cirurgiões usam checklists pela mesma razão: sob pressão, as pessoas saltam passos que sabem de cor."
+      },
+      {
+        "h2": "Regras que se respondem com sim ou não"
+      },
+      {
+        "p": "Cada ponto deve ser uma pergunta com uma resposta clara no momento da entrada. «A tendência é de subida?» está aberta a interpretação; «O preço está acima da média móvel de 200 períodos no gráfico de 4 horas?» não está."
+      },
+      {
+        "ul": [
+          "Contexto: a direção do tempo gráfico superior é a mesma da minha operação?",
+          "Local: a entrada está num nível que marquei antes da sessão, e não num que encontrei depois de o preço se mexer?",
+          "Gatilho: o meu sinal de entrada fechou mesmo, ou só começou a formar-se?",
+          "Risco: o stop está onde a ideia se prova errada, e o tamanho está dentro do meu risco por operação?",
+          "Calendário: não há notícias de alto impacto nos próximos 30 minutos?"
+        ]
+      },
+      {
+        "h2": "Mantém-na curta"
+      },
+      {
+        "p": "Três a sete pontos chegam. Uma lista de quinze é lida na diagonal e depois ignorada. Se um ponto nunca muda uma decisão, tira-o; se o mesmo erro continua a voltar, transforma-o num ponto."
+      },
+      {
+        "h2": "Uma lista por estratégia"
+      },
+      {
+        "p": "Se operas dois setups diferentes — um rompimento e um recuo, por exemplo — precisam de condições diferentes. Juntar os dois numa só lista deixa metade dos pontos sem sentido em cada operação, e marcar caixas sem sentido depressa se torna o hábito de marcar sem ler."
+      },
+      {
+        "h2": "Verifica se funciona"
+      },
+      {
+        "p": "Uma checklist é uma hipótese. Ao fim de 20–30 operações, compara as que tinham todos os pontos marcados com as que abriste mesmo assim. Se as completas não correm melhor, os pontos estão errados — muda-os em vez de desistir da ideia."
+      },
+      {
+        "h2": "No Simple Trading Journal"
+      },
+      {
+        "p": "Podes ter várias checklists com nome, uma por estratégia, escolher qual usa cada diário e marcar os pontos em cada operação. As operações que chegam do MetaTrader também recebem a checklist do diário, para a preencheres quando juntas as tuas notas."
+      }
+    ]
+  },
+  "trading-emotions-journal": {
+    "title": "Registar emoções no teu diário de trading: o que anotar e como usar",
+    "description": "Como etiquetar o estado emocional por trás de cada operação, que emoções costumam vir antes dos erros e como transformar essas etiquetas em regras em vez de arrependimentos.",
+    "body": [
+      {
+        "p": "Os traders costumam conhecer os seus erros. Depois do facto, contam-te que perseguiram um movimento por medo de o perder ou que duplicaram o tamanho para recuperar uma perda. O que raramente têm é um registo de quantas vezes isso acontece e de quanto custa. Etiquetar a emoção em cada operação transforma uma sensação vaga em algo que se pode contar."
+      },
+      {
+        "h2": "Regista no momento"
+      },
+      {
+        "p": "Anota a emoção ao entrar ou logo depois de fechar, não no fim da semana. A memória reescreve as operações: uma operação de vingança que por acaso ganhou passa a ser «uma boa leitura», e o medo por trás de uma saída antecipada é esquecido."
+      },
+      {
+        "h2": "Uma lista curta e fixa"
+      },
+      {
+        "p": "Escolhe sempre do mesmo conjunto de palavras, para que as operações se possam comparar. Uma lista útil separa os estados que ajudam dos que costumam prejudicar:"
+      },
+      {
+        "ul": [
+          "Ajudam: calma, foco, confiança.",
+          "Sinais de alerta: excesso de confiança, FOMO, medo, impaciência.",
+          "Sinais para parar: raiva, vingança, cansaço."
+        ]
+      },
+      {
+        "p": "Uma operação pode ter mais do que uma. Estar cansado e impaciente ao mesmo tempo é comum, e vale a pena saber."
+      },
+      {
+        "h2": "Procura padrões, não operações soltas"
+      },
+      {
+        "p": "Uma única operação de FOMO perdedora diz pouco. Vinte, ao lado das restantes operações, dizem muito. Ao fim de um mês, agrupa as operações por emoção e compara os resultados em R: muitos traders descobrem que a maior parte das perdas se concentra em duas ou três etiquetas."
+      },
+      {
+        "h2": "Transforma o padrão numa regra"
+      },
+      {
+        "p": "O objetivo não é deixar de sentir; é decidir de antemão o que fazes quando reparas. Se a tua etiqueta mais cara são as operações de vingança, uma regra como «depois de duas perdas seguidas, paro por hoje» faz mais do que qualquer força de vontade. Põe a regra na tua checklist para a encontrares antes da próxima entrada, não depois."
+      },
+      {
+        "h2": "No Simple Trading Journal"
+      },
+      {
+        "p": "Cada operação tem um seletor de emoções com doze estados comuns — os que ajudam e os sinais de alerta em cores diferentes — e podes acrescentar as tuas próprias palavras. As etiquetas aparecem na operação e são incluídas quando exportas as operações para Excel, para as ordenares e comparares."
+      }
+    ]
+  },
 };
 
 export default TEXT;

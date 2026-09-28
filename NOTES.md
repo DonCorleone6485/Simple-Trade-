@@ -94,7 +94,8 @@ hesap ya da karar bekliyor.
    yönlendirme kendiliğinden. Rakip karşılaştırmaları YAPILDI (2026-09-28): Tradezella, TraderSync,
    Edgewonk — /blog/<ad>-alternative, 9 dil; rakip verileri tek tabloda
    (üretici betik: compare_gen, veriler Eylül 2026) — fiyatlar 3-6 ayda bir
-   kontrol edilmeli. Kalan: daha fazla yazı.
+   kontrol edilmeli. 2026-09-29: pre-trade-checklist ve trading-emotions-journal (9 dil).
+   Kalan: daha fazla yazı.
 5. **Yardım merkezi** — 13 soru + rehber bağlantıları. Yol haritası YAPILDI (2026-09-29):
    /changelog başında "Sırada ne var" (InfoPage.tsx ROADMAP, 9 dil, tarih yok). Bir madde
    yapılınca ROADMAP'ten sil, CHANGELOG'a yaz.

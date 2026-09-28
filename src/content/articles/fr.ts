@@ -422,6 +422,109 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "pre-trade-checklist": {
+    "title": "La checklist avant un trade : comment en écrire une que vous utiliserez vraiment",
+    "description": "Pourquoi une courte checklist avant d'entrer réduit les trades impulsifs, comment écrire des règles auxquelles on répond par oui ou non, et comment vérifier que votre checklist fonctionne.",
+    "body": [
+      {
+        "p": "La plupart des mauvais trades ne viennent pas d'une mauvaise analyse. Ce sont des trades pris alors que le setup n'était qu'à moitié là — un niveau presque atteint, un signal presque confirmé — parce que rester les bras croisés semblait pire qu'agir. Une checklist vous permet de prendre cette décision avant que le moment n'arrive."
+      },
+      {
+        "h2": "À quoi sert une checklist"
+      },
+      {
+        "p": "Une checklist ne trouve pas de trades à votre place. Elle filtre ceux que vous voulez déjà prendre, pour ne laisser passer que ceux qui correspondent à votre plan. Les pilotes et les chirurgiens s'en servent pour la même raison : sous pression, on saute des étapes que l'on connaît par cœur."
+      },
+      {
+        "h2": "Des règles auxquelles on répond par oui ou non"
+      },
+      {
+        "p": "Chaque point doit être une question qui a une réponse claire au moment de l'entrée. « La tendance est-elle haussière ? » laisse place à l'interprétation ; « Le prix est-il au-dessus de la moyenne mobile 200 périodes sur le graphique 4 heures ? » non."
+      },
+      {
+        "ul": [
+          "Contexte : la direction de l'unité de temps supérieure est-elle la même que celle de mon trade ?",
+          "Emplacement : l'entrée se fait-elle sur un niveau marqué avant la séance, et non sur un niveau trouvé après que le prix a bougé ?",
+          "Déclencheur : mon signal d'entrée a-t-il vraiment clôturé, ou commence-t-il seulement à se former ?",
+          "Risque : le stop est-il là où l'idée devient fausse, et la taille reste-t-elle dans mon risque par trade ?",
+          "Calendrier : aucune annonce à fort impact n'est-elle prévue dans les 30 prochaines minutes ?"
+        ]
+      },
+      {
+        "h2": "Restez court"
+      },
+      {
+        "p": "Trois à sept points suffisent. Une liste de quinze est survolée, puis ignorée. Si un point ne change jamais une décision, retirez-le ; si la même erreur revient sans cesse, faites-en un point."
+      },
+      {
+        "h2": "Une liste par stratégie"
+      },
+      {
+        "p": "Si vous tradez deux setups différents — une cassure et un pullback, par exemple —, ils demandent des conditions différentes. Les réunir dans une seule liste rend la moitié des points inutiles à chaque trade, et cocher des cases inutiles devient vite l'habitude de cocher sans lire."
+      },
+      {
+        "h2": "Vérifiez qu'elle fonctionne"
+      },
+      {
+        "p": "Une checklist est une hypothèse. Après 20 à 30 trades, comparez ceux où tous les points étaient cochés avec ceux que vous avez pris quand même. Si les trades entièrement cochés ne font pas mieux, ce sont les mauvais points : changez-les plutôt que d'abandonner l'idée."
+      },
+      {
+        "h2": "Dans Simple Trading Journal"
+      },
+      {
+        "p": "Vous pouvez tenir plusieurs checklists nommées, une par stratégie, choisir celle qu'utilise chaque journal et cocher les points sur chaque trade. Les trades qui arrivent de MetaTrader reçoivent aussi la checklist du journal, que vous remplissez en ajoutant vos notes."
+      }
+    ]
+  },
+  "trading-emotions-journal": {
+    "title": "Noter ses émotions dans son journal de trading : quoi enregistrer et comment s'en servir",
+    "description": "Comment étiqueter l'état émotionnel derrière chaque trade, quelles émotions précèdent souvent les erreurs, et comment transformer ces étiquettes en règles plutôt qu'en regrets.",
+    "body": [
+      {
+        "p": "Les traders connaissent généralement leurs erreurs. Après coup, ils vous diront qu'ils ont couru après un mouvement de peur de le manquer, ou doublé la taille pour se refaire d'une perte. Ce qu'ils ont rarement, c'est une trace de la fréquence à laquelle cela arrive et de ce que cela coûte. Étiqueter l'émotion de chaque trade transforme une impression vague en quelque chose que l'on peut compter."
+      },
+      {
+        "h2": "Notez-la sur le moment"
+      },
+      {
+        "p": "Notez l'émotion à l'entrée ou juste après la clôture, pas en fin de semaine. La mémoire réécrit les trades : un trade de revanche qui a gagné par chance devient « une bonne lecture », et la peur derrière une sortie anticipée est oubliée."
+      },
+      {
+        "h2": "Une liste courte et fixe"
+      },
+      {
+        "p": "Choisissez toujours parmi les mêmes mots, pour que les trades soient comparables. Une liste utile sépare les états qui aident de ceux qui ont tendance à nuire :"
+      },
+      {
+        "ul": [
+          "Utiles : calme, concentré, confiant.",
+          "Signaux d'alerte : trop confiant, FOMO, craintif, impatient.",
+          "Signaux d'arrêt : en colère, revanche, fatigué."
+        ]
+      },
+      {
+        "p": "Un trade peut en avoir plusieurs. Être à la fois fatigué et impatient est fréquent, et c'est bon à savoir."
+      },
+      {
+        "h2": "Cherchez des tendances, pas des trades isolés"
+      },
+      {
+        "p": "Un seul trade FOMO perdant ne dit pas grand-chose. Vingt, mis à côté du reste de vos trades, en disent beaucoup. Au bout d'un mois, regroupez vos trades par émotion et comparez les résultats en R : beaucoup de traders découvrent que l'essentiel de leurs pertes se concentre sous deux ou trois étiquettes."
+      },
+      {
+        "h2": "Transformez la tendance en règle"
+      },
+      {
+        "p": "Le but n'est pas de ne plus rien ressentir, mais de décider à l'avance de ce que vous faites quand vous le remarquez. Si la revanche est votre étiquette la plus coûteuse, une règle comme « après deux pertes d'affilée, j'arrête pour la journée » fera plus que n'importe quelle volonté. Inscrivez la règle dans votre checklist pour la rencontrer avant la prochaine entrée, pas après."
+      },
+      {
+        "h2": "Dans Simple Trading Journal"
+      },
+      {
+        "p": "Chaque trade dispose d'un sélecteur d'émotions avec douze états courants — les utiles et les signaux d'alerte dans des couleurs différentes — et vous pouvez ajouter vos propres mots. Les étiquettes s'affichent sur le trade et sont incluses lorsque vous exportez vos trades vers Excel, pour les trier et les comparer."
+      }
+    ]
+  },
 };
 
 export default TEXT;

@@ -422,6 +422,109 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "pre-trade-checklist": {
+    "title": "La checklist antes de operar: cómo escribir una que de verdad uses",
+    "description": "Por qué una checklist corta antes de entrar reduce las operaciones impulsivas, cómo escribir reglas que se respondan con sí o no y cómo comprobar si tu checklist funciona.",
+    "body": [
+      {
+        "p": "La mayoría de las malas operaciones no vienen de un mal análisis. Son operaciones abiertas cuando el setup estaba a medias —un nivel casi alcanzado, una señal casi confirmada— porque quedarse quieto se sentía peor que actuar. Una checklist te permite tomar esa decisión antes de que llegue el momento."
+      },
+      {
+        "h2": "Para qué sirve una checklist"
+      },
+      {
+        "p": "Una checklist no encuentra operaciones por ti. Filtra las que ya quieres abrir, para que solo pasen las que encajan con tu plan. Pilotos y cirujanos las usan por la misma razón: bajo presión, la gente se salta pasos que conoce de memoria."
+      },
+      {
+        "h2": "Reglas que se responden con sí o no"
+      },
+      {
+        "p": "Cada punto debe ser una pregunta con una respuesta clara en el momento de entrar. «¿La tendencia es alcista?» se presta a interpretación; «¿Está el precio por encima de la media móvil de 200 periodos en el gráfico de 4 horas?» no."
+      },
+      {
+        "ul": [
+          "Contexto: ¿la dirección del marco temporal superior coincide con mi operación?",
+          "Ubicación: ¿la entrada está en un nivel que marqué antes de la sesión, y no en uno que encontré después de que el precio se moviera?",
+          "Gatillo: ¿mi señal de entrada ha cerrado de verdad, o solo ha empezado a formarse?",
+          "Riesgo: ¿el stop está donde la idea resulta equivocada, y el tamaño está dentro de mi riesgo por operación?",
+          "Calendario: ¿no hay noticias de alto impacto en los próximos 30 minutos?"
+        ]
+      },
+      {
+        "h2": "Que sea corta"
+      },
+      {
+        "p": "Con tres a siete puntos basta. Una lista de quince se lee por encima y luego se ignora. Si un punto nunca cambia una decisión, quítalo; si el mismo error vuelve una y otra vez, conviértelo en un punto."
+      },
+      {
+        "h2": "Una lista por estrategia"
+      },
+      {
+        "p": "Si operas dos setups distintos —por ejemplo, una ruptura y un retroceso—, necesitan condiciones distintas. Meter ambos en una sola lista deja la mitad de los puntos sin sentido en cada operación, y marcar casillas sin sentido se convierte enseguida en la costumbre de marcar sin leer."
+      },
+      {
+        "h2": "Comprueba si funciona"
+      },
+      {
+        "p": "Una checklist es una hipótesis. Tras 20–30 operaciones, compara las que tenían todos los puntos marcados con las que abriste de todos modos. Si las completas no van mejor, los puntos son los equivocados: cámbialos en lugar de abandonar la idea."
+      },
+      {
+        "h2": "En Simple Trading Journal"
+      },
+      {
+        "p": "Puedes tener varias checklists con nombre, una por estrategia, elegir cuál usa cada diario y marcar los puntos en cada operación. Las operaciones que llegan desde MetaTrader también reciben la checklist del diario, para que la completes al añadir tus notas."
+      }
+    ]
+  },
+  "trading-emotions-journal": {
+    "title": "Registrar emociones en tu diario de trading: qué anotar y cómo usarlo",
+    "description": "Cómo etiquetar el estado emocional detrás de cada operación, qué emociones suelen preceder a los errores y cómo convertir esas etiquetas en reglas en lugar de arrepentimientos.",
+    "body": [
+      {
+        "p": "Los traders suelen conocer sus errores. A posteriori te cuentan que persiguieron un movimiento por miedo a perdérselo o que doblaron el tamaño para recuperar una pérdida. Lo que casi nunca tienen es un registro de cuántas veces pasa y cuánto cuesta. Etiquetar la emoción en cada operación convierte una sensación vaga en algo que se puede contar."
+      },
+      {
+        "h2": "Anótalo en el momento"
+      },
+      {
+        "p": "Anota la emoción al entrar o justo después de cerrar, no al final de la semana. La memoria reescribe las operaciones: una operación de venganza que por suerte salió bien se convierte en «una buena lectura», y el miedo detrás de una salida anticipada se olvida."
+      },
+      {
+        "h2": "Una lista corta y fija"
+      },
+      {
+        "p": "Elige siempre del mismo conjunto de palabras, para que las operaciones se puedan comparar. Una lista útil separa los estados que ayudan de los que suelen perjudicar:"
+      },
+      {
+        "ul": [
+          "Ayudan: calma, concentración, confianza.",
+          "Señales de alerta: exceso de confianza, FOMO, miedo, impaciencia.",
+          "Señales de parar: enfado, venganza, cansancio."
+        ]
+      },
+      {
+        "p": "Una operación puede tener más de una. Estar cansado e impaciente a la vez es habitual, y conviene saberlo."
+      },
+      {
+        "h2": "Busca patrones, no operaciones sueltas"
+      },
+      {
+        "p": "Una sola operación de FOMO perdedora dice poco. Veinte, puestas junto al resto de tus operaciones, dicen mucho. Al cabo de un mes, agrupa tus operaciones por emoción y compara los resultados en R: muchos traders descubren que la mayoría de sus pérdidas se concentran bajo dos o tres etiquetas."
+      },
+      {
+        "h2": "Convierte el patrón en una regla"
+      },
+      {
+        "p": "No se trata de dejar de sentir, sino de decidir de antemano qué harás cuando lo notes. Si tu etiqueta más cara son las operaciones de venganza, una regla como «tras dos pérdidas seguidas, paro por hoy» hace más que cualquier fuerza de voluntad. Pon la regla en tu checklist para encontrártela antes de la siguiente entrada, no después."
+      },
+      {
+        "h2": "En Simple Trading Journal"
+      },
+      {
+        "p": "Cada operación tiene un selector de emociones con doce estados habituales —los que ayudan y las señales de alerta en colores distintos— y puedes añadir tus propias palabras. Las etiquetas aparecen en la operación y se incluyen al exportar tus operaciones a Excel, para que puedas ordenarlas y compararlas."
+      }
+    ]
+  },
 };
 
 export default TEXT;

@@ -585,6 +585,109 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "pre-trade-checklist": {
+    "title": "İşlem öncesi checklist: gerçekten kullanacağın bir liste nasıl yazılır",
+    "description": "Kısa bir işlem öncesi checklist neden dürtüsel işlemleri azaltır, evet/hayır ile cevaplanan kurallar nasıl yazılır ve listenin işe yarayıp yaramadığı nasıl anlaşılır.",
+    "body": [
+      {
+        "p": "Kötü işlemlerin çoğu kötü analizden gelmez. Setup yarım kalmışken açılan işlemlerdir: seviyeye neredeyse gelinmiş, sinyal neredeyse oluşmuş — beklemek, bir şey yapmaktan daha zor geldiği için girilmiştir. Checklist, bu kararı o an gelmeden vermeni sağlar."
+      },
+      {
+        "h2": "Checklist ne işe yarar"
+      },
+      {
+        "p": "Checklist senin yerine işlem bulmaz. Zaten girmek istediğin işlemleri süzer; yalnızca planına uyanlar geçer. Pilotlar ve cerrahlar da aynı sebeple checklist kullanır: baskı altında insan ezbere bildiği adımları atlar."
+      },
+      {
+        "h2": "Evet ya da hayır ile cevaplanan kurallar"
+      },
+      {
+        "p": "Her madde, giriş anında net cevabı olan bir soru olmalı. \"Trend yukarı mı?\" yoruma açık; \"Fiyat 4 saatlik grafikte 200 periyotluk hareketli ortalamanın üstünde mi?\" değil."
+      },
+      {
+        "ul": [
+          "Bağlam: üst zaman diliminin yönü işlemimle aynı mı?",
+          "Yer: giriş, seans öncesi işaretlediğim bir seviyede mi, yoksa fiyat hareket ettikten sonra bulduğum bir yerde mi?",
+          "Tetik: giriş sinyalim gerçekten kapandı mı, yoksa yalnızca oluşmaya mı başladı?",
+          "Risk: stop, fikrin yanlış çıktığı yerde mi ve lot işlem başı riskimin içinde mi?",
+          "Takvim: önümüzdeki 30 dakikada yüksek etkili haber yok mu?"
+        ]
+      },
+      {
+        "h2": "Kısa tut"
+      },
+      {
+        "p": "Üç ile yedi madde yeter. On beş maddelik liste önce göz ucuyla okunur, sonra hiç okunmaz. Bir madde hiçbir kararı değiştirmiyorsa sil; aynı hata tekrar tekrar geliyorsa onu maddeye çevir."
+      },
+      {
+        "h2": "Her strateji için ayrı liste"
+      },
+      {
+        "p": "İki farklı setup işletiyorsan — örneğin kırılım ve geri çekilme — koşulları da farklıdır. İkisini tek listeye sıkıştırınca her işlemde maddelerin yarısı alakasız kalır ve alakasız kutuları tiklemek, okumadan tikleme alışkanlığına dönüşür."
+      },
+      {
+        "h2": "İşe yarıyor mu, kontrol et"
+      },
+      {
+        "p": "Checklist bir hipotezdir. 20–30 işlemden sonra her maddesi tiklenmiş işlemleri, yine de girdiğin işlemlerle karşılaştır. Tam tiklenmiş işlemler daha iyi gitmiyorsa maddeler yanlıştır — fikirden vazgeçme, maddeleri değiştir."
+      },
+      {
+        "h2": "Simple Trading Journal'da"
+      },
+      {
+        "p": "Her strateji için bir tane olmak üzere birden fazla adlandırılmış checklist tutabilir, her journal'ın hangisini kullanacağını seçebilir ve maddeleri her işlemde tikleyebilirsin. MetaTrader'dan gelen işlemlere de journal'ın checklist'i eklenir; notlarını yazarken doldurursun."
+      }
+    ]
+  },
+  "trading-emotions-journal": {
+    "title": "Trading journal'ında duyguları kaydetmek: neyi yazmalı, nasıl kullanmalı",
+    "description": "Her işlemin arkasındaki duyguyu nasıl etiketlersin, hangi duygular genellikle hatalardan önce gelir ve bu etiketleri pişmanlık yerine kurala nasıl çevirirsin.",
+    "body": [
+      {
+        "p": "Trader'lar genellikle hatalarını bilir. Sonradan, bir hareketi kaçırma korkusuyla kovaladıklarını ya da kaybı geri almak için lotu ikiye katladıklarını anlatabilirler. Nadiren sahip oldukları şey, bunun ne sıklıkla olduğunun ve neye mal olduğunun kaydıdır. Her işleme duygu etiketi koymak, belirsiz bir hissi sayılabilir bir şeye çevirir."
+      },
+      {
+        "h2": "O anda kaydet"
+      },
+      {
+        "p": "Duyguyu girerken ya da kapattıktan hemen sonra yaz, hafta sonunda değil. Hafıza işlemleri yeniden yazar: şans eseri kazanan bir intikam işlemi \"iyi okuma\" olur, erken çıkışın arkasındaki korku unutulur."
+      },
+      {
+        "h2": "Kısa ve sabit bir liste"
+      },
+      {
+        "p": "Her seferinde aynı kelime grubundan seç ki işlemler karşılaştırılabilsin. İşe yarar bir liste, yardım eden hâlleri zarar vermeye yatkın olanlardan ayırır:"
+      },
+      {
+        "ul": [
+          "Yardım edenler: sakin, odaklı, kendinden emin.",
+          "Uyarı işaretleri: aşırı özgüvenli, FOMO, korkulu, sabırsız.",
+          "Dur işaretleri: sinirli, intikam, yorgun."
+        ]
+      },
+      {
+        "p": "Bir işlemin birden fazla etiketi olabilir. Aynı anda hem yorgun hem sabırsız olmak sık görülür ve bilmeye değer."
+      },
+      {
+        "h2": "Tek işleme değil, örüntüye bak"
+      },
+      {
+        "p": "Kaybeden tek bir FOMO işlemi sana pek bir şey söylemez. Yirmi tanesi, diğer işlemlerinin yanına konunca çok şey söyler. Bir ay sonra işlemlerini duyguya göre grupla ve sonuçları R cinsinden karşılaştır: birçok trader kayıplarının çoğunun iki üç etiketin altında toplandığını görür."
+      },
+      {
+        "h2": "Örüntüyü kurala çevir"
+      },
+      {
+        "p": "Amaç bir şey hissetmemek değil; fark ettiğinde ne yapacağına önceden karar vermek. En pahalı etiketin intikam işlemleriyse, \"üst üste iki kayıptan sonra o gün dur\" gibi bir kural her türlü iradeden fazlasını yapar. Kuralı checklist'ine yaz ki bir sonraki girişten önce karşına çıksın, sonra değil."
+      },
+      {
+        "h2": "Simple Trading Journal'da"
+      },
+      {
+        "p": "Her işlemde on iki yaygın hâlden oluşan bir duygu seçici var — yardım edenler ve uyarı işaretleri farklı renkte — ve kendi kelimelerini de ekleyebilirsin. Etiketler işlemde görünür ve işlemlerini Excel'e aktardığında dahil edilir; sıralayıp karşılaştırabilirsin."
+      }
+    ]
+  },
 };
 
 export default TEXT;

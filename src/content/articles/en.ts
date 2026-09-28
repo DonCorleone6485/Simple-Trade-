@@ -585,6 +585,109 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "pre-trade-checklist": {
+    "title": "The pre-trade checklist: how to write one you will actually use",
+    "description": "Why a short pre-trade checklist cuts impulsive trades, how to write rules you can answer yes or no, and how to check whether your checklist is working.",
+    "body": [
+      {
+        "p": "Most bad trades are not bad analysis. They are trades taken when the setup was only half there — a level almost reached, a signal almost confirmed — because sitting on your hands felt worse than acting. A checklist lets you make that decision before the moment arrives."
+      },
+      {
+        "h2": "What a checklist is for"
+      },
+      {
+        "p": "A checklist does not find trades for you. It filters the ones you already want to take, so that only those matching your plan get through. Pilots and surgeons use checklists for the same reason: under pressure, people skip steps they know by heart."
+      },
+      {
+        "h2": "Rules you can answer yes or no"
+      },
+      {
+        "p": "Every item should be a question with a clear answer at the moment of entry. \"Is the trend up?\" is open to interpretation; \"Is price above the 200-period moving average on the 4-hour chart?\" is not."
+      },
+      {
+        "ul": [
+          "Context: is the higher-timeframe direction the same as my trade?",
+          "Location: is the entry at a level I marked before the session, not one I found after price moved?",
+          "Trigger: has my entry signal actually closed, not just started to form?",
+          "Risk: is the stop where the idea is proven wrong, and is the size within my risk per trade?",
+          "Calendar: is there no high-impact news in the next 30 minutes?"
+        ]
+      },
+      {
+        "h2": "Keep it short"
+      },
+      {
+        "p": "Three to seven items is enough. A list of fifteen gets skimmed and then ignored. If an item never changes a decision, remove it; if the same mistake keeps coming back, turn it into an item."
+      },
+      {
+        "h2": "One list per strategy"
+      },
+      {
+        "p": "If you trade two different setups — a breakout and a pullback, say — they need different conditions. Forcing both into one list leaves half the items irrelevant on every trade, and ticking irrelevant boxes quickly becomes a habit of ticking without reading."
+      },
+      {
+        "h2": "Check whether it works"
+      },
+      {
+        "p": "A checklist is a hypothesis. After 20–30 trades, compare the trades where every item was ticked with the ones you entered anyway. If the fully checked trades do not do better, the items are the wrong ones — change them rather than dropping the idea."
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "You can keep several named checklists, one per strategy, choose which one each journal uses, and tick the items on every trade. Trades that arrive from MetaTrader get the journal's checklist too, so you can fill it in when you add your notes."
+      }
+    ]
+  },
+  "trading-emotions-journal": {
+    "title": "Tracking emotions in your trading journal: what to record and how to use it",
+    "description": "How to tag the emotional state behind each trade, which emotions tend to come before mistakes, and how to turn those tags into rules instead of regrets.",
+    "body": [
+      {
+        "p": "Traders usually know their mistakes. After the fact they can tell you that they chased a move for fear of missing it, or doubled the size to win back a loss. What they rarely have is a record of how often it happens and what it costs. Tagging emotions on every trade turns a vague feeling into something you can count."
+      },
+      {
+        "h2": "Record it at the time"
+      },
+      {
+        "p": "Note the emotion when you enter or right after you close, not at the end of the week. Memory rewrites trades: a revenge trade that happened to win becomes \"a good read\", and the fear behind an early exit is forgotten."
+      },
+      {
+        "h2": "A short, fixed list"
+      },
+      {
+        "p": "Pick from the same set of words every time, so trades can be compared. A useful list separates states that help from states that tend to hurt:"
+      },
+      {
+        "ul": [
+          "Helpful: calm, focused, confident.",
+          "Warning signs: overconfident, FOMO, fearful, impatient.",
+          "Stop signs: angry, revenge, tired."
+        ]
+      },
+      {
+        "p": "A trade can have more than one. Being tired and impatient at the same time is common, and worth knowing."
+      },
+      {
+        "h2": "Look for patterns, not single trades"
+      },
+      {
+        "p": "One losing FOMO trade tells you little. Twenty of them, set against the rest of your trades, tell you a lot. After a month, group your trades by emotion and compare the results in R: many traders find that most of their losses sit under two or three tags."
+      },
+      {
+        "h2": "Turn the pattern into a rule"
+      },
+      {
+        "p": "The point is not to stop feeling things; it is to decide in advance what you do when you notice them. If revenge trades are your most expensive tag, a rule such as \"after two losses in a row, stop for the day\" does more than any amount of willpower. Put the rule in your checklist so you meet it before the next entry, not after."
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "Every trade has an emotion picker with twelve common states — helpful ones and warning signs in different colours — and you can add your own words. The tags show on the trade and are included when you export your trades to Excel, so you can sort and compare them."
+      }
+    ]
+  },
 };
 
 export default TEXT;
