@@ -484,6 +484,35 @@ export default function App() {
     }
   };
 
+  /**
+   * İşlemler sayfa açıkken de tazelensin: MetaTrader'dan gelen işlem
+   * önceden ancak sayfa yenilenince görünüyordu. Bütün listeyi her seferinde
+   * indirmek yerine 15 saniyede bir yalnızca "değişti mi" soruluyor (işlem
+   * sayısı + en son değişiklik anı; updated_at veritabanında tetikleyiciyle
+   * tutuluyor). Değiştiyse liste yeniden yükleniyor. Sekme arka plandayken
+   * sorulmuyor; öne gelince hemen bakılıyor.
+   */
+  const tradesSig = useRef('');
+  useEffect(() => {
+    if (!user || isGuest || page !== 'journal') return;
+    let stop = false;
+    const check = async () => {
+      if (stop || document.hidden) return;
+      const [{ count }, { data }] = await Promise.all([
+        supabase.from('trades').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('trades').select('updated_at').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(1),
+      ]);
+      const sig = `${count ?? ''}|${data?.[0]?.updated_at ?? ''}`;
+      if (tradesSig.current && sig !== tradesSig.current) await loadTrades();
+      tradesSig.current = sig;
+    };
+    check();
+    const timer = window.setInterval(check, 15_000);
+    const onVisible = () => { if (!document.hidden) check(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { stop = true; window.clearInterval(timer); document.removeEventListener('visibilitychange', onVisible); };
+  }, [user?.id, isGuest, page]);
+
   // ── SAYFA YÖNLENDİRME (ana sayfa ↔ journal) ──
   /** Herkese açık sayfalar dilli adreste (/tr/blog); uygulama dilsiz (/journal). */
   const localized = (path: string) => (path.startsWith(JOURNAL_PATH) ? path : langPath(path, language));
