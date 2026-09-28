@@ -74,6 +74,22 @@ const UI: Record<string, L9> = {
   guideImport: { tr: 'İşlem geçmişini içe aktarmak', en: 'Importing your trade history', fa: 'وارد کردن تاریخچه معاملات', ar: 'استيراد سجل الصفقات', ru: 'Импорт истории сделок', es: 'Importar tu historial', pt: 'Importar o teu histórico', de: 'Handelshistorie importieren', fr: 'Importer votre historique' },
   home: { tr: 'Ana sayfa', en: 'Home', fa: 'صفحه اصلی', ar: 'الرئيسية', ru: 'Главная', es: 'Inicio', pt: 'Início', de: 'Startseite', fr: 'Accueil' },
   seeChangelog: { tr: 'Değişikliklere bak', en: 'See the changelog', fa: 'دیدن تغییرات', ar: 'عرض سجل التغييرات', ru: 'Что нового', es: 'Ver novedades', pt: 'Ver novidades', de: 'Änderungen ansehen', fr: 'Voir les nouveautés' },
+  roadmapTitle: { tr: 'Sırada ne var', en: 'What\'s next', fa: 'بعدی چیست', ar: 'ما القادم', ru: 'Что дальше', es: 'Lo que viene', pt: 'O que vem a seguir', de: 'Was als Nächstes kommt', fr: 'La suite' },
+  roadmapLead: {
+    tr: 'Tarih vermiyoruz; sıra, kullananların isteklerine göre değişebiliyor. Bir önerin varsa bize yaz.',
+    en: 'We don\'t give dates; the order can change with what users ask for. If you have a suggestion, write to us.',
+    fa: 'تاریخ نمی‌دهیم؛ ترتیب ممکن است با درخواست کاربران تغییر کند. اگر پیشنهادی داری، برایمان بنویس.',
+    ar: 'لا نحدد مواعيد؛ قد يتغير الترتيب حسب طلبات المستخدمين. إن كان لديك اقتراح فاكتب لنا.',
+    ru: 'Сроков мы не называем: порядок может меняться в зависимости от запросов пользователей. Есть предложение — напишите нам.',
+    es: 'No damos fechas; el orden puede cambiar según lo que pidan los usuarios. Si tienes una sugerencia, escríbenos.',
+    pt: 'Não damos datas; a ordem pode mudar conforme o que os utilizadores pedirem. Se tens uma sugestão, escreve-nos.',
+    de: 'Termine nennen wir nicht; die Reihenfolge kann sich nach den Wünschen der Nutzer ändern. Hast du einen Vorschlag, schreib uns.',
+    fr: 'Nous ne donnons pas de dates ; l\'ordre peut changer selon les demandes des utilisateurs. Une suggestion ? Écrivez-nous.',
+  },
+  roadmapNext: { tr: 'Sırada', en: 'Up next', fa: 'در نوبت', ar: 'التالي', ru: 'На очереди', es: 'Lo siguiente', pt: 'A seguir', de: 'Als Nächstes', fr: 'Prochainement' },
+  roadmapLater: { tr: 'Değerlendiriliyor', en: 'Being considered', fa: 'در حال بررسی', ar: 'قيد الدراسة', ru: 'Рассматривается', es: 'En estudio', pt: 'Em estudo', de: 'In Prüfung', fr: 'À l\'étude' },
+  roadmapSuggest: { tr: 'Öneri gönder', en: 'Send a suggestion', fa: 'فرستادن پیشنهاد', ar: 'أرسل اقتراحاً', ru: 'Отправить предложение', es: 'Enviar una sugerencia', pt: 'Enviar uma sugestão', de: 'Vorschlag senden', fr: 'Envoyer une suggestion' },
+  changesTitle: { tr: 'Yapılanlar', en: 'What changed', fa: 'تغییرات انجام‌شده', ar: 'ما تغيّر', ru: 'Что изменилось', es: 'Lo que cambió', pt: 'O que mudou', de: 'Was sich geändert hat', fr: 'Ce qui a changé' },
   seeHelp: { tr: 'Yardıma dön', en: 'Back to help', fa: 'بازگشت به راهنما', ar: 'العودة إلى المساعدة', ru: 'К помощи', es: 'Volver a la ayuda', pt: 'Voltar à ajuda', de: 'Zur Hilfe', fr: 'Retour à l\'aide' },
 };
 
@@ -262,6 +278,21 @@ const HELP: { q: L9; a: L9 }[] = [
   },
 ];
 
+/**
+ * Yol haritası: Değişiklikler sayfasının başında. Söz değil, niyet — tarih
+ * yok. Biri yapılınca buradan silinip CHANGELOG'a yazılır.
+ */
+const ROADMAP: { next: L9[]; later: L9[] } = {
+  next: [
+    { tr: 'Haftalık özet e-postası: haftanın işlemleri ve sonuçları kısaca, kullandığın dilde.', en: 'A weekly summary email: the week\'s trades and results in brief, in your language.', fa: 'ایمیل خلاصه هفتگی: معاملات و نتایج هفته به‌طور خلاصه، به زبان خودت.', ar: 'رسالة ملخص أسبوعية: صفقات الأسبوع ونتائجها باختصار، بلغتك.', ru: 'Еженедельная сводка на почту: сделки и результаты недели кратко, на вашем языке.', es: 'Un correo de resumen semanal: las operaciones y resultados de la semana, en breve y en tu idioma.', pt: 'Um e-mail de resumo semanal: as operações e os resultados da semana, em breve e no teu idioma.', de: 'Eine wöchentliche Zusammenfassung per E-Mail: die Trades und Ergebnisse der Woche kurz, in deiner Sprache.', fr: 'Un e-mail de résumé hebdomadaire : les trades et résultats de la semaine en bref, dans votre langue.' },
+    { tr: 'Adım adım MetaTrader kurulum videosu.', en: 'A step-by-step MetaTrader setup video.', fa: 'ویدیوی گام‌به‌گام راه‌اندازی متاتریدر.', ar: 'فيديو خطوة بخطوة لإعداد ميتاتريدر.', ru: 'Пошаговое видео по настройке MetaTrader.', es: 'Un vídeo paso a paso para configurar MetaTrader.', pt: 'Um vídeo passo a passo para configurar o MetaTrader.', de: 'Ein Schritt-für-Schritt-Video zur Einrichtung von MetaTrader.', fr: 'Une vidéo pas à pas pour configurer MetaTrader.' },
+    { tr: 'Daha fazla rehber ve yazı, dokuz dilde.', en: 'More guides and articles, in nine languages.', fa: 'راهنماها و مقاله‌های بیشتر، به نُه زبان.', ar: 'مزيد من الأدلة والمقالات، بتسع لغات.', ru: 'Больше руководств и статей на девяти языках.', es: 'Más guías y artículos, en nueve idiomas.', pt: 'Mais guias e artigos, em nove idiomas.', de: 'Mehr Anleitungen und Artikel, in neun Sprachen.', fr: 'Plus de guides et d\'articles, en neuf langues.' },
+  ],
+  later: [
+    { tr: 'MetaTrader dışındaki platformlardan otomatik kayıt: cTrader, TradingView, NinjaTrader, Tradovate.', en: 'Auto-sync from platforms beyond MetaTrader: cTrader, TradingView, NinjaTrader, Tradovate.', fa: 'ثبت خودکار از پلتفرم‌هایی غیر از متاتریدر: cTrader، TradingView، NinjaTrader، Tradovate.', ar: 'التسجيل التلقائي من منصات غير ميتاتريدر: cTrader وTradingView وNinjaTrader وTradovate.', ru: 'Автозапись с других платформ, кроме MetaTrader: cTrader, TradingView, NinjaTrader, Tradovate.', es: 'Registro automático desde plataformas además de MetaTrader: cTrader, TradingView, NinjaTrader, Tradovate.', pt: 'Registo automático a partir de plataformas além do MetaTrader: cTrader, TradingView, NinjaTrader, Tradovate.', de: 'Automatische Übernahme aus Plattformen neben MetaTrader: cTrader, TradingView, NinjaTrader, Tradovate.', fr: 'Synchronisation automatique depuis d\'autres plateformes que MetaTrader : cTrader, TradingView, NinjaTrader, Tradovate.' },
+  ],
+};
+
 /** En yeniden en eskiye. Tarih ISO; gösterirken kullanıcının diline göre biçimleniyor. */
 const CHANGELOG: { date: string; items: L9[] }[] = [
   {
@@ -410,6 +441,29 @@ export default function InfoPage({ kind, onHome, onOther, cta }: {
             </section>
           </div>
         ) : (
+          <>
+          <section className="rounded-2xl p-6 mb-14" style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}>
+            <h2 className="text-[20px] font-medium text-white mb-2">{s('roadmapTitle')}</h2>
+            <p className="text-[14px] leading-relaxed mb-5" style={{ color: 'rgba(255,255,255,0.55)' }}>{s('roadmapLead')}</p>
+            {([['roadmapNext', ROADMAP.next, '#8b5cf6'], ['roadmapLater', ROADMAP.later, 'rgba(255,255,255,0.35)']] as const).map(([label, items, dot]) => (
+              <div key={label} className="mb-5">
+                <h3 className="text-[13px] font-medium mb-2.5" style={{ color: '#f0b429' }}>{s(label)}</h3>
+                <ul className="space-y-2.5">
+                  {items.map((it, i) => (
+                    <li key={i} className="flex gap-3 text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                      <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: dot }} />
+                      <span>{it[lang]}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+            <a href={`mailto:${SUPPORT_EMAIL}`} onClick={openContact} className="inline-flex items-center gap-2 text-[14px] font-medium" style={{ color: '#a78bfa' }}>
+              <Mail className="w-4 h-4" />
+              {s('roadmapSuggest')}
+            </a>
+          </section>
+          <h2 className="text-[20px] font-medium text-white mb-6">{s('changesTitle')}</h2>
           <ol className="space-y-10">
             {CHANGELOG.map(entry => (
               <li key={entry.date}>
@@ -427,6 +481,7 @@ export default function InfoPage({ kind, onHome, onOther, cta }: {
               </li>
             ))}
           </ol>
+          </>
         )}
 
         <button onClick={onOther} className="link-gold inline-flex items-center gap-1.5 text-[14px] mt-14" style={{ color: '#a78bfa' }}>

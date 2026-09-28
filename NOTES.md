@@ -91,7 +91,9 @@ hesap ya da karar bekliyor.
    Edgewonk — /blog/<ad>-alternative, 9 dil; rakip verileri tek tabloda
    (üretici betik: compare_gen, veriler Eylül 2026) — fiyatlar 3-6 ayda bir
    kontrol edilmeli. Kalan: daha fazla yazı.
-5. **Yardım merkezi** — 13 soru + rehber bağlantıları. Kalan: yol haritası sayfası.
+5. **Yardım merkezi** — 13 soru + rehber bağlantıları. Yol haritası YAPILDI (2026-09-29):
+   /changelog başında "Sırada ne var" (InfoPage.tsx ROADMAP, 9 dil, tarih yok). Bir madde
+   yapılınca ROADMAP'ten sil, CHANGELOG'a yaz.
 6. **PWA + bildirim** — manifest YAPILDI; sekme kapalıyken bildirim YAPILDI (2026-09-28):
    public/sw.js (yalnız push, önbellek yok), src/lib/push.ts (abonelik),
    supabase/functions/push-alerts (dakikada bir, pg_cron + pg_net, sır vault'ta),
