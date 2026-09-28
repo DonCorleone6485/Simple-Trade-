@@ -3,21 +3,21 @@ import type { ArticleText } from '../articles';
 
 const TEXT: Record<string, ArticleText> = {
   "metatrader-5-auto-sync": {
-    "title": "MetaTrader 5'i trading journal'ına nasıl bağlarsın",
-    "description": "Adım adım: Simple Trading Journal eklentisini MT5'e kur, kapanan her işlem stop, risk ve masraflarıyla birlikte journal'ına kendiliğinden gelsin.",
+    "title": "MetaTrader 4 veya 5'i trading journal'ına nasıl bağlarsın",
+    "description": "Adım adım: Simple Trading Journal eklentisini MT4 ya da MT5'e kur, kapanan her işlem stop, risk ve masraflarıyla birlikte journal'ına kendiliğinden gelsin.",
     "body": [
       {
-        "p": "Her işlemi journal'a elle yazmak, insanların journal tutmayı bırakmasının bir numaralı sebebi. MetaTrader 5 eklentisiyle her işlem açıldığı anda kaydediliyor, kapandığında tamamlanıyor: giriş, çıkış, stop, lot, komisyon ve swap dahil. Sen yalnızca MetaTrader'ın bilemeyeceğini eklersin: setup'ın, gerekçen ve o anki hislerin."
+        "p": "Her işlemi journal'a elle yazmak, insanların journal tutmayı bırakmasının bir numaralı sebebi. MetaTrader eklentisiyle (MT4 ve MT5) her işlem açıldığı anda kaydediliyor, kapandığında tamamlanıyor: giriş, çıkış, stop, lot, komisyon ve swap dahil. Sen yalnızca MetaTrader'ın bilemeyeceğini eklersin: setup'ın, gerekçen ve o anki hislerin."
       },
       {
-        "note": "MetaTrader 4 mü kullanıyorsun? Adımlar aynı: MetaTrader ekranında MetaTrader 4'ü seç, SimpleTradingJournal.ex4 dosyasını indir ve MQL4 → Experts klasörüne koy."
+        "note": "MetaTrader 4 mü, 5 mi? Adımlar ikisinde de aynı, yalnız dosya ve klasör değişiyor. Uygulamadaki MetaTrader ekranında önce sürümünü seç: MetaTrader 5 için SimpleTradingJournal.ex5 ve MQL5 → Experts, MetaTrader 4 için SimpleTradingJournal.ex4 ve MQL4 → Experts."
       },
       {
         "h2": "Ne gerekiyor"
       },
       {
         "ul": [
-          "Windows ya da Mac'te MetaTrader 5 (masaüstü uygulaması — mobil uygulama eklenti çalıştıramaz).",
+          "Windows ya da Mac'te MetaTrader 4 veya MetaTrader 5 (masaüstü uygulaması — mobil uygulama eklenti çalıştıramaz).",
           "En az bir journal'ı olan bir Simple Trading Journal hesabı.",
           "İki dakika."
         ]
@@ -26,10 +26,10 @@ const TEXT: Record<string, ArticleText> = {
         "h2": "1. Eklentiyi indir"
       },
       {
-        "p": "Uygulamada menüden MetaTrader'ı aç ve SimpleTradingJournal.ex5 dosyasını indir. MetaTrader'da Dosya → Veri Klasörünü Aç, açılan pencerede MQL5 → Experts klasörüne gir ve dosyayı içine at."
+        "p": "Uygulamada menüden MetaTrader'ı aç, MetaTrader 4 ya da 5'i seç ve eklentiyi indir (MT5 için SimpleTradingJournal.ex5, MT4 için SimpleTradingJournal.ex4). MetaTrader'da Dosya → Veri Klasörünü Aç, açılan pencerede MQL5 → Experts klasörüne (MT4'te MQL4 → Experts) gir ve dosyayı içine at."
       },
       {
-        "note": "Mac'te \"Veri Klasörünü Aç\" bazı sürümlerde çalışmaz. O zaman Finder'da Git → Klasöre Git ile şuraya git: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts"
+        "note": "Mac'te \"Veri Klasörünü Aç\" bazı sürümlerde çalışmaz. O zaman Finder'da Git → Klasöre Git ile sürümüne uygun yola git. MetaTrader 5: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts — MetaTrader 4: ~/Library/Application Support/net.metaquotes.wine.metatrader4/drive_c/Program Files (x86)/MetaTrader 4/MQL4/Experts"
       },
       {
         "h2": "2. Bağlantıya izin ver"
@@ -50,7 +50,7 @@ const TEXT: Record<string, ArticleText> = {
         "h2": "4. Grafiğe sürükle ve anahtarı yapıştır"
       },
       {
-        "p": "Uygulamada bir bağlantı anahtarı oluştur (stj_ ile başlar). SimpleTradingJournal'ı herhangi bir grafiğin üstüne sürükle, Girdiler sekmesine geç, anahtarı ApiKey satırına yapıştır ve Tamam'a bas. Grafiğin sol üstünde bağlantının çalıştığı yazınca iş bitti."
+        "p": "Uygulamada bir bağlantı anahtarı oluştur (stj_ ile başlar). SimpleTradingJournal'ı herhangi bir grafiğin üstüne sürükle, Girdiler sekmesine geç, anahtarı ApiKey satırına yapıştır ve Tamam'a bas. Grafiğin sol üstünde bağlantının çalıştığı yazınca iş bitti. Aynı yerde işlemlerin hangi journal'a gittiği de yazar (Journal: …); doğru journal olduğundan emin ol."
       },
       {
         "p": "Her anahtar bir journal'a ait ve onunla bağlanan ilk işlem hesabına kilitlenir; böylece iki hesabın işlemleri aynı journal'da karışmaz. İkinci bir hesap için ikinci bir anahtar oluştur."
@@ -69,7 +69,7 @@ const TEXT: Record<string, ArticleText> = {
           "Sembol, yön, lot, giriş ve çıkış fiyatı ve saati.",
           "Stop ve kâr al. Sonradan taşısan da girdiğin andaki stop korunur; böylece riskin ve R değerlerin doğru kalır.",
           "Brüt sonuç, komisyon, swap ve net sonuç.",
-          "Parça parça kapatılan bir pozisyon (TP1, TP2…) tamamen kapandığında tek işlem olarak kaydedilir."
+          "MetaTrader 5'te parça parça kapatılan bir pozisyon (TP1, TP2…) tamamen kapandığında tek işlem olarak kaydedilir. MetaTrader 4'te kısmi kapanışta emrin kalan kısmı yeni numara alır, bu yüzden ayrı bir işlem olarak görünür."
         ]
       },
       {
@@ -78,7 +78,7 @@ const TEXT: Record<string, ArticleText> = {
       {
         "ul": [
           "Hiçbir şey gelmiyor: 2. adımdaki adresin tam olarak https://www.simpletradejournal.io olduğundan, eklentinin olduğu grafiğin açık olduğundan ve anahtarın boşluksuz yapıştırıldığından emin ol.",
-          "\"Anahtar başka hesaba bağlı\": anahtar zaten başka bir işlem hesabına ait. Bu hesap için yeni bir anahtar oluştur.",
+          "\"Anahtar başka hesaba bağlı\": anahtar zaten başka bir işlem hesabına ait. Bu hesap için yeni bir anahtar oluştur.", "İşlemler yanlış journal'a gidiyor: grafikteki \"Journal:\" satırı nereye gittiğini gösterir. Başka bir journal yazıyorsa eklenti hâlâ eski anahtarı kullanıyordur. Girdiler'i aç, ApiKey'i tamamen temizle, yeni anahtarı yapıştır, Enter'a ve sonra Tamam'a bas; eski anahtarı da uygulamadan iptal et.", "MetaTrader 4'te eklenti gri görünüyor ve sürüklenmiyor: MetaTrader ekranından indirdiğin SimpleTradingJournal.ex4 dosyasını kullan, sonra Kılavuz panelinde Uzman Danışmanlar'a sağ tıkla ve Yenile'yi seç.",
           "Anahtarı kaybettim: MetaTrader onu hatırlıyor. Gerçekten kaybettiysen uygulamada yenisini oluştur, eskisini iptal et."
         ]
       },
@@ -148,7 +148,7 @@ const TEXT: Record<string, ArticleText> = {
         "p": "Her işlem platformdaki kimliğini taşır; journal'da zaten olan işlem yeniden eklenmez, atlanır. Her hafta güncel raporu hiçbir şeyi temizlemeden aktarabilirsin. İşlem açıkken elle kaydettiysen, içe aktarma ikinci bir kayıt açmak yerine o kaydı tamamlar."
       },
       {
-        "p": "Bunun kendiliğinden olmasını mı istersin? MetaTrader 5'i bir kez bağla, kapanan işlemler otomatik gelsin — MetaTrader 5 rehberine bak."
+        "p": "Bunun kendiliğinden olmasını mı istersin? MetaTrader 4 ya da 5'i bir kez bağla, kapanan işlemler otomatik gelsin — MetaTrader rehberine bak."
       }
     ]
   },
@@ -277,7 +277,7 @@ const TEXT: Record<string, ArticleText> = {
         "h2": "Simple Trading Journal'da"
       },
       {
-        "p": "Bir işlemin stopu varsa — elle yazılmış, rapordan aktarılmış ya da MetaTrader 5'ten gelmiş — riski ve R değeri kendiliğinden hesaplanır; istatistiklerin, paradaki sonuçlarının yanında ortalama gerçekleşen R'yi de gösterir."
+        "p": "Bir işlemin stopu varsa — elle yazılmış, rapordan aktarılmış ya da MetaTrader'dan gelmiş — riski ve R değeri kendiliğinden hesaplanır; istatistiklerin, paradaki sonuçlarının yanında ortalama gerçekleşen R'yi de gösterir."
       }
     ]
   },

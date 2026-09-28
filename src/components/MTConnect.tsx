@@ -192,7 +192,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
           {tr('MetaTrader Bağlantısı', 'MetaTrader Connection')}
         </h2>
         <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          {tr('MetaTrader 5\'e kuracağın küçük bir eklenti, açtığın pozisyonları "{0}" journal\'ına anında yazar ve kapandıklarında aynı kayıtları sonuçla tamamlar. Rapor indirip yüklemene gerek kalmaz.', 'A small add-on installed in MetaTrader 5 writes the positions you open into "{0}" right away and completes them with the result when they close. No more exporting and uploading reports.', journalName)}
+          {tr('MetaTrader\'a (4 veya 5) kuracağın küçük bir eklenti, açtığın pozisyonları "{0}" journal\'ına anında yazar ve kapandıklarında aynı kayıtları sonuçla tamamlar. Rapor indirip yüklemene gerek kalmaz.', 'A small add-on installed in MetaTrader (4 or 5) writes the positions you open into "{0}" right away and completes them with the result when they close. No more exporting and uploading reports.', journalName)}
         </p>
         {!isPro && (
           <p className="text-[13px] leading-relaxed mt-3 px-3.5 py-2.5 rounded-xl"
@@ -355,6 +355,11 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
         {mt4 && (
           <p className="text-[13px] leading-relaxed mt-6 pt-5" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
             {tr('MetaTrader 4\'te kısmen kapattığın bir emrin kalan kısmı MetaTrader tarafından yeni numarayla açılır; journal\'da iki ayrı işlem olarak görünür.', 'In MetaTrader 4, when you close part of an order MetaTrader gives the rest a new ticket, so it shows as two separate trades in your journal.')}
+          </p>
+        )}
+        {mt4 && (
+          <p className="text-[13px] leading-relaxed mt-3" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            {tr('Mac kullanıyorsan "Veri Klasörünü Aç" bazı sürümlerde çalışmaz. MetaQuotes\'un MetaTrader 4 uygulamasında Finder\'da Git → Klasöre Git ile şuraya gidebilirsin: ~/Library/Application Support/net.metaquotes.wine.metatrader4/drive_c/Program Files (x86)/MetaTrader 4/MQL4/Experts', 'On a Mac, "Open Data Folder" does not work in some builds. For the MetaQuotes MetaTrader 4 app, in Finder use Go → Go to Folder and paste: ~/Library/Application Support/net.metaquotes.wine.metatrader4/drive_c/Program Files (x86)/MetaTrader 4/MQL4/Experts')}
           </p>
         )}
         {!mt4 && <p className="text-[13px] leading-relaxed mt-6 pt-5" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>

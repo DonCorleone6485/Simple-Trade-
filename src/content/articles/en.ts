@@ -3,21 +3,21 @@ import type { ArticleText } from '../articles';
 
 const TEXT: Record<string, ArticleText> = {
   "metatrader-5-auto-sync": {
-    "title": "How to connect MetaTrader 5 to your trading journal",
-    "description": "Step-by-step: install the Simple Trading Journal add-on in MT5 so every closed trade lands in your journal automatically — including stop loss, risk and fees.",
+    "title": "How to connect MetaTrader 4 or 5 to your trading journal",
+    "description": "Step-by-step: install the Simple Trading Journal add-on in MT4 or MT5 so every closed trade lands in your journal automatically — including stop loss, risk and fees.",
     "body": [
       {
-        "p": "Typing every trade into a journal by hand is the main reason people stop journaling. With the MetaTrader 5 add-on, each trade is recorded the moment it opens and completed when it closes — entry, exit, stop loss, lot size, commission and swap included. You only add what MetaTrader cannot know: your setup, your reasoning and how you felt."
+        "p": "Typing every trade into a journal by hand is the main reason people stop journaling. With the MetaTrader add-on (MT4 and MT5), each trade is recorded the moment it opens and completed when it closes — entry, exit, stop loss, lot size, commission and swap included. You only add what MetaTrader cannot know: your setup, your reasoning and how you felt."
       },
       {
-        "note": "Using MetaTrader 4? The steps are the same: on the MetaTrader screen choose MetaTrader 4, download SimpleTradingJournal.ex4 and put it in MQL4 → Experts."
+        "note": "MetaTrader 4 or 5? The steps are the same for both; only the file and the folder differ. On the MetaTrader screen in the app, choose your version first: MetaTrader 5 uses SimpleTradingJournal.ex5 and MQL5 → Experts, MetaTrader 4 uses SimpleTradingJournal.ex4 and MQL4 → Experts."
       },
       {
         "h2": "What you need"
       },
       {
         "ul": [
-          "MetaTrader 5 on Windows or Mac (the desktop terminal — the mobile app cannot run add-ons).",
+          "MetaTrader 4 or MetaTrader 5 on Windows or Mac (the desktop terminal — the mobile app cannot run add-ons).",
           "A Simple Trading Journal account with at least one journal.",
           "Two minutes."
         ]
@@ -26,10 +26,10 @@ const TEXT: Record<string, ArticleText> = {
         "h2": "1. Download the add-on"
       },
       {
-        "p": "In the app, open MetaTrader from the menu and download SimpleTradingJournal.ex5. In MetaTrader choose File → Open Data Folder, go into MQL5 → Experts, and drop the file there."
+        "p": "In the app, open MetaTrader from the menu, choose MetaTrader 4 or 5 and download the add-on (SimpleTradingJournal.ex5 for MT5, SimpleTradingJournal.ex4 for MT4). In MetaTrader choose File → Open Data Folder, go into MQL5 → Experts (MQL4 → Experts on MT4), and drop the file there."
       },
       {
-        "note": "On a Mac, \"Open Data Folder\" does not work in some builds. In Finder use Go → Go to Folder and paste: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts"
+        "note": "On a Mac, \"Open Data Folder\" does not work in some builds. In Finder use Go → Go to Folder and paste the path for your version. MetaTrader 5: ~/Library/Application Support/MetaTrader 5/Bottles/metatrader5/drive_c/Program Files/MetaTrader 5/MQL5/Experts — MetaTrader 4: ~/Library/Application Support/net.metaquotes.wine.metatrader4/drive_c/Program Files (x86)/MetaTrader 4/MQL4/Experts"
       },
       {
         "h2": "2. Allow the connection"
@@ -50,7 +50,7 @@ const TEXT: Record<string, ArticleText> = {
         "h2": "4. Drag it onto a chart and paste your key"
       },
       {
-        "p": "In the app, create a connection key (it starts with stj_). Drag SimpleTradingJournal onto any chart, open the Inputs tab, paste the key into ApiKey and click OK. When the top-left of the chart shows that the connection is working, you are done."
+        "p": "In the app, create a connection key (it starts with stj_). Drag SimpleTradingJournal onto any chart, open the Inputs tab, paste the key into ApiKey and click OK. When the top-left of the chart shows that the connection is working, you are done. It also shows which journal the trades go to (Journal: …) — check that it is the one you expect."
       },
       {
         "p": "Each key belongs to one journal and locks to the first trading account that connects with it, so trades from two accounts never mix in the same journal. For a second account, create a second key."
@@ -69,7 +69,7 @@ const TEXT: Record<string, ArticleText> = {
           "Symbol, direction, lot size, entry and exit price and time.",
           "Stop loss and take profit. The stop you entered with is kept even if you move it later, so your risk and R-multiples stay honest.",
           "Gross result, commission and swap, and the net result.",
-          "A position closed in parts (TP1, TP2…) is recorded as one trade once it is fully closed."
+          "On MetaTrader 5, a position closed in parts (TP1, TP2…) is recorded as one trade once it is fully closed. On MetaTrader 4, a partial close gives the rest of the order a new number, so it shows as a separate trade."
         ]
       },
       {
@@ -78,7 +78,7 @@ const TEXT: Record<string, ArticleText> = {
       {
         "ul": [
           "Nothing arrives: check that the address in step 2 is exactly https://www.simpletradejournal.io, that the chart with the add-on is still open, and that the key was pasted without spaces.",
-          "\"Key bound to another account\": the key already belongs to a different trading account. Create a new key for this account.",
+          "\"Key bound to another account\": the key already belongs to a different trading account. Create a new key for this account.", "Trades land in the wrong journal: the \"Journal:\" line on the chart shows where they go. If it names another journal, the add-on is still using an old key. Open its Inputs, clear ApiKey completely, paste the new key, press Enter and then OK, and revoke the old key in the app.", "On MetaTrader 4 the add-on is greyed out and cannot be dragged: use SimpleTradingJournal.ex4 downloaded from the MetaTrader screen, then right-click Expert Advisors in the Navigator and choose Refresh.",
           "Lost the key: MetaTrader remembers it. If you really lost it, create a new one in the app and revoke the old one."
         ]
       },
@@ -148,7 +148,7 @@ const TEXT: Record<string, ArticleText> = {
         "p": "Every trade carries its platform ID, so a trade that is already in the journal is skipped instead of added again. You can import an updated report every week without cleaning anything up. If you logged a trade by hand while it was still open, the import completes that entry instead of creating a second one."
       },
       {
-        "p": "Want this to happen by itself? Connect MetaTrader 5 once and closed trades arrive automatically — see the MetaTrader 5 guide."
+        "p": "Want this to happen by itself? Connect MetaTrader 4 or 5 once and closed trades arrive automatically — see the MetaTrader guide."
       }
     ]
   },
@@ -277,7 +277,7 @@ const TEXT: Record<string, ArticleText> = {
         "h2": "In Simple Trading Journal"
       },
       {
-        "p": "When a trade has a stop loss — typed in, imported from a report or synced from MetaTrader 5 — its risk and R-multiple are calculated automatically, and your statistics show your average realised R next to your results in money."
+        "p": "When a trade has a stop loss — typed in, imported from a report or synced from MetaTrader — its risk and R-multiple are calculated automatically, and your statistics show your average realised R next to your results in money."
       }
     ]
   },

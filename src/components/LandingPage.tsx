@@ -249,7 +249,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
       items: [
         {
           icon: <Zap className="w-5 h-5" />,
-          title: t('MetaTrader 5 Bağlantısı', 'MetaTrader 5 Connection', 'اتصال متاتریدر ۵'),
+          title: t('MetaTrader 4 ve 5 Bağlantısı', 'MetaTrader 4 & 5 Connection', 'اتصال متاتریدر ۴ و ۵'),
           desc: t(
             'Uzman danışmanı bir kez kur; kapanan her işlem journal\'ına kendiliğinden düşsün. Bir yıllık geçmişini de getirir.',
             'Install the expert advisor once; every closed trade lands in your journal by itself — and it brings a year of history with it.',
