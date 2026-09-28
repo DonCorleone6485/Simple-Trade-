@@ -437,6 +437,22 @@ function findHeader(rows: string[][]): number {
   return best >= 0 ? best : 0;
 }
 
+/**
+ * MetaTrader raporları UTF-8 değildir: MT5 UTF-16 (BOM'lu), MT4 ise
+ * Windows kod sayfası yazar. UTF-8 varsayılırsa dosya baştan sona bozuk
+ * okunur ve hiçbir sütun tanınmaz. Testler de gerçek raporu bununla okur.
+ */
+export function decodeReport(buf: ArrayBuffer): string {
+  const b = new Uint8Array(buf);
+  if (b[0] === 0xff && b[1] === 0xfe) return new TextDecoder('utf-16le').decode(buf);
+  if (b[0] === 0xfe && b[1] === 0xff) return new TextDecoder('utf-16be').decode(buf);
+  // BOM'suz UTF-16: ASCII karakterlerin arasında sıfır bayt kalır.
+  if (b.length > 3 && b[1] === 0x00 && b[3] === 0x00) return new TextDecoder('utf-16le').decode(buf);
+  const utf8 = new TextDecoder('utf-8').decode(buf);
+  if (!utf8.includes('\ufffd')) return utf8;
+  try { return new TextDecoder('windows-1254').decode(buf); } catch { return utf8; }
+}
+
 export function parseCSVFile(
   content: string,
   journalId: string,
@@ -567,22 +583,7 @@ export default function CSVImport({ onImport, onClose, journalId, journalName, u
   const [content, setContent] = useState('');
   const [showMapping, setShowMapping] = useState(false);
 
-  /**
-   * MetaTrader raporları UTF-8 değildir: MT5 UTF-16 (BOM'lu), MT4 ise
-   * Windows kod sayfası yazar. UTF-8 varsayılırsa dosya baştan sona bozuk
-   * okunur ve hiçbir sütun tanınmaz.
-   */
-  const readFileText = async (file: File): Promise<string> => {
-    const buf = await file.arrayBuffer();
-    const b = new Uint8Array(buf);
-    if (b[0] === 0xff && b[1] === 0xfe) return new TextDecoder('utf-16le').decode(buf);
-    if (b[0] === 0xfe && b[1] === 0xff) return new TextDecoder('utf-16be').decode(buf);
-    // BOM'suz UTF-16: ASCII karakterlerin arasında sıfır bayt kalır.
-    if (b.length > 3 && b[1] === 0x00 && b[3] === 0x00) return new TextDecoder('utf-16le').decode(buf);
-    const utf8 = new TextDecoder('utf-8').decode(buf);
-    if (!utf8.includes('\ufffd')) return utf8;
-    try { return new TextDecoder('windows-1254').decode(buf); } catch { return utf8; }
-  };
+  const readFileText = async (file: File): Promise<string> => decodeReport(await file.arrayBuffer());
 
   const processFile = (file: File) => {
     const name = file.name.toLowerCase();

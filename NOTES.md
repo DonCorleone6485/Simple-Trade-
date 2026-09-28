@@ -107,7 +107,14 @@ hesap ya da karar bekliyor.
 7. **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate.
 8. **Hata izleme** — YAPILDI (2026-09-28): Sentry yerine kendi hafif sistemimiz:
    src/lib/errorLog.ts → client_errors tablosu (yalnız ekleme), ErrorBoundary,
-   günlük özet support@'a (api/emails.ts). Kalan: otomatik testler, durum sayfası.
+   günlük özet support@'a (api/emails.ts). Otomatik testler YAPILDI (2026-09-29): `npm test`
+   (vitest, tests/): kâr/zarar ve R, açık işlem eşleştirme, dilli adresler, MT4/MT5 mesaj
+   tablosunun aynılığı, seans saatleri kopyası, yazıların 9 dilde aynı yapıda olması, dosya
+   kodlaması. Gerçek MT5 raporu testi dosya yoksa atlanır (STJ_MT5_REPORT ile yol verilebilir;
+   rapor 2026-09-29'da masaüstünde bulunamadı). Vercel testleri çalıştırmıyor — push'tan önce elle.
+   Durum: sağlık ucu /api/geo?health=1 (200 = fonksiyonlar + veritabanı ayakta, 503 = db yok).
+   Kalan: dış izleme + herkese açık durum sayfası (UptimeRobot ya da Better Stack, ücretsiz;
+   hesap kullanıcıda) — site çökerse kendi sitemizdeki durum sayfası da çöker.
 9. **Paket boyutu** — YAPILDI (2026-09-28): 7 dilin çeviri tablosu ayrı dosyada,
    yalnız o dillerde ve çizimden önce yükleniyor; ana paket 124 → 86 KB (gzip).
 
