@@ -78,8 +78,8 @@ const TEXT: Record<string, ArticleText> = {
       {
         "ul": [
           "Hiçbir şey gelmiyor: 2. adımdaki adresin tam olarak https://www.simpletradejournal.io olduğundan, eklentinin olduğu grafiğin açık olduğundan ve anahtarın boşluksuz yapıştırıldığından emin ol.",
-          "\"Anahtar başka hesaba bağlı\": anahtar zaten başka bir işlem hesabına ait. Bu hesap için yeni bir anahtar oluştur.", "İşlemler yanlış journal'a gidiyor: grafikteki \"Journal:\" satırı nereye gittiğini gösterir. Başka bir journal yazıyorsa eklenti hâlâ eski anahtarı kullanıyordur. Girdiler'i aç, ApiKey'i tamamen temizle, yeni anahtarı yapıştır, Enter'a ve sonra Tamam'a bas; eski anahtarı da uygulamadan iptal et.", "MetaTrader 4'te eklenti gri görünüyor ve sürüklenmiyor: MetaTrader ekranından indirdiğin SimpleTradingJournal.ex4 dosyasını kullan, sonra Kılavuz panelinde Uzman Danışmanlar'a sağ tıkla ve Yenile'yi seç.",
-          "Anahtarı kaybettim: MetaTrader onu hatırlıyor. Gerçekten kaybettiysen uygulamada yenisini oluştur, eskisini iptal et."
+          "\"Anahtar başka hesaba bağlı\": anahtar zaten başka bir işlem hesabına ait. Bu hesap için yeni bir anahtar oluştur.", "İşlemler yanlış journal'a gidiyor: grafikteki \"Journal:\" satırı nereye gittiğini gösterir. Başka bir journal yazıyorsa eklenti hâlâ eski anahtarı kullanıyordur. Girdiler'i aç, ApiKey'i tamamen temizle, yeni anahtarı yapıştır, Enter'a ve sonra Tamam'a bas. Yeni anahtar bağlandığı an eskisi kendiliğinden kapanır.", "MetaTrader 4'te eklenti gri görünüyor ve sürüklenmiyor: MetaTrader ekranından indirdiğin SimpleTradingJournal.ex4 dosyasını kullan, sonra Kılavuz panelinde Uzman Danışmanlar'a sağ tıkla ve Yenile'yi seç.",
+          "Anahtarı kaybettim: MetaTrader onu hatırlıyor. Gerçekten kaybettiysen uygulamada yenisini oluştur; yenisi bağlandığı an eskisi kendiliğinden kapanır."
         ]
       },
       {

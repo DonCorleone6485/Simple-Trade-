@@ -180,7 +180,25 @@ export default async function handler(req: any, res: any) {
   // Günlük hata özeti: son 24 saatte tarayıcılarda hata çıktıysa bize tek
   // posta (bkz. src/lib/errorLog.ts). Hata yoksa hiçbir şey gitmez.
   const errors = await errorDigest(now);
-  return res.status(200).json({ sent: counts, errors });
+
+  // MetaTrader anahtarı temizliği (Vercel'in 12 fonksiyon sınırı yüzünden
+  // ayrı görev değil, buraya ekli):
+  // • Oluşturulup 7 günde hiçbir hesaba bağlanmamış anahtarlar silinir —
+  //   "Anahtar Oluştur"a birkaç kez basınca biriken, hiç kullanılmayanlar.
+  //   last_used_at şartı, hesap bilgisi göndermeyen eski EA'ları korur.
+  // • Yenisiyle değiştirilmiş anahtarlar 7 gün boyunca listede "değiştirildi"
+  //   diye görünür, sonra silinir.
+  const weekAgo = new Date(now - 7 * 86400000).toISOString();
+  const { data: unused } = await supabase.from('api_keys').delete()
+    .is('mt_fingerprint', null).is('last_used_at', null).eq('revoked', false)
+    .lt('created_at', weekAgo).select('id');
+  const { data: replaced } = await supabase.from('api_keys').delete()
+    .not('replaced_by', 'is', null).lt('revoked_at', weekAgo).select('id');
+
+  return res.status(200).json({
+    sent: counts, errors,
+    keysRemoved: { unused: (unused || []).length, replaced: (replaced || []).length },
+  });
 }
 
 async function errorDigest(now: number): Promise<number> {

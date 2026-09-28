@@ -78,8 +78,8 @@ const TEXT: Record<string, ArticleText> = {
       {
         "ul": [
           "Nothing arrives: check that the address in step 2 is exactly https://www.simpletradejournal.io, that the chart with the add-on is still open, and that the key was pasted without spaces.",
-          "\"Key bound to another account\": the key already belongs to a different trading account. Create a new key for this account.", "Trades land in the wrong journal: the \"Journal:\" line on the chart shows where they go. If it names another journal, the add-on is still using an old key. Open its Inputs, clear ApiKey completely, paste the new key, press Enter and then OK, and revoke the old key in the app.", "On MetaTrader 4 the add-on is greyed out and cannot be dragged: use SimpleTradingJournal.ex4 downloaded from the MetaTrader screen, then right-click Expert Advisors in the Navigator and choose Refresh.",
-          "Lost the key: MetaTrader remembers it. If you really lost it, create a new one in the app and revoke the old one."
+          "\"Key bound to another account\": the key already belongs to a different trading account. Create a new key for this account.", "Trades land in the wrong journal: the \"Journal:\" line on the chart shows where they go. If it names another journal, the add-on is still using an old key. Open its Inputs, clear ApiKey completely, paste the new key, press Enter and then OK. The old key closes by itself as soon as the new one connects.", "On MetaTrader 4 the add-on is greyed out and cannot be dragged: use SimpleTradingJournal.ex4 downloaded from the MetaTrader screen, then right-click Expert Advisors in the Navigator and choose Refresh.",
+          "Lost the key: MetaTrader remembers it. If you really lost it, create a new one in the app; the old one closes by itself as soon as the new one connects."
         ]
       },
       {

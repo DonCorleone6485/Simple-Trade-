@@ -37,8 +37,8 @@ const TEXT: Record<string, ArticleText> = {
       { h2: 'Resolução de problemas' },
       { ul: [
         'Não chega nada: confirma que o endereço do passo 2 é exatamente https://www.simpletradejournal.io, que o gráfico com o complemento continua aberto e que a chave foi colada sem espaços.',
-        "«Chave associada a outra conta»: a chave já pertence a outra conta de trading. Cria uma chave nova para esta conta.", "As operações vão para o diário errado: a linha «Journal:» no gráfico mostra para onde vão. Se indicar outro diário, o complemento ainda usa uma chave antiga. Abre Inputs, apaga o ApiKey por completo, cola a chave nova, carrega em Enter e depois em OK, e revoga a chave antiga na app.", "No MetaTrader 4 o complemento aparece a cinzento e não se consegue arrastar: usa o ficheiro SimpleTradingJournal.ex4 descarregado no ecrã do MetaTrader e depois clica com o botão direito em Expert Advisors, no painel Navigator, e escolhe Refresh.",
-        'Perdi a chave: o MetaTrader lembra-se dela. Se a perdeste mesmo, cria uma nova na app e revoga a antiga.',
+        "«Chave associada a outra conta»: a chave já pertence a outra conta de trading. Cria uma chave nova para esta conta.", "As operações vão para o diário errado: a linha «Journal:» no gráfico mostra para onde vão. Se indicar outro diário, o complemento ainda usa uma chave antiga. Abre Inputs, apaga o ApiKey por completo, cola a chave nova, carrega em Enter e depois em OK. A chave antiga fecha-se sozinha assim que a nova se liga.", "No MetaTrader 4 o complemento aparece a cinzento e não se consegue arrastar: usa o ficheiro SimpleTradingJournal.ex4 descarregado no ecrã do MetaTrader e depois clica com o botão direito em Expert Advisors, no painel Navigator, e escolhe Refresh.",
+        "Perdi a chave: o MetaTrader lembra-se dela. Se a perdeste mesmo, cria uma nova na app; a antiga fecha-se sozinha assim que a nova se liga.",
       ] },
       { p: 'Preferes não instalar nada? Também podes importar o próprio relatório do MetaTrader — vê o guia de importação.' },
     ],

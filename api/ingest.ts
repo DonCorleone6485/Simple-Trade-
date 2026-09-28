@@ -180,6 +180,19 @@ async function usedInAnotherTrial(fingerprint: string, userId: string): Promise<
   return !!tried && tried.length > 0;
 }
 
+/** Kapanmış anahtarın cevabı: EA hesabın artık hangi journal'a gittiğini yazar. */
+async function replacedBody(newKeyId: string) {
+  const { data: k } = await supabase.from('api_keys').select('journal_id').eq('id', newKeyId).maybeSingle();
+  const { data: j } = k
+    ? await supabase.from('journals').select('name').eq('id', k.journal_id).maybeSingle()
+    : { data: null };
+  return {
+    error: 'This key was replaced by a newer key for the same MetaTrader account. You can remove the add-on from this chart.',
+    code: 'key_replaced',
+    journal: j?.name || '',
+  };
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -203,12 +216,17 @@ export default async function handler(req: any, res: any) {
 
   const { data: apiKey } = await supabase
     .from('api_keys')
-    .select('id, user_id, journal_id, mt_fingerprint')
+    .select('id, user_id, journal_id, mt_fingerprint, created_at, revoked, replaced_by')
     .eq('key_hash', hash(key))
-    .eq('revoked', false)
     .maybeSingle();
 
   if (!apiKey) return res.status(401).json({ error: 'Invalid key' });
+  if (apiKey.revoked) {
+    // Aynı MT hesabına yeni anahtar bağlandığı için kapandıysa EA bunu ve
+    // hesabın artık nereye gittiğini söylesin; "anahtar geçersiz" kafa karıştırır.
+    if (apiKey.replaced_by) return res.status(401).json(await replacedBody(apiKey.replaced_by));
+    return res.status(401).json({ error: 'Invalid key' });
+  }
 
   // Anahtar ilk bağlandığı MetaTrader hesabına kilitlenir. Aynı anahtar başka
   // bir hesabın grafiğine yapıştırılınca o hesabın işlemleri yanlış journal'a
@@ -227,6 +245,37 @@ export default async function handler(req: any, res: any) {
         error: 'This key is linked to another MetaTrader account. Create a new key for this account on the site.',
         code: 'key_bound_elsewhere',
       });
+    }
+
+    // Bir MT hesabının tek etkin anahtarı olur: en yeni oluşturulan kazanır.
+    // Eski anahtar başka bir grafikte ya da EA'nın hafızasında takılı kalınca
+    // işlemler fark edilmeden eski journal'a gidiyordu (2026-09-28, MT4
+    // denemesi). Yeni anahtar bağlandığı an eskiler kapanır; eski anahtarla
+    // gelen istek de, daha yenisi bağlıysa reddedilir. Oluşturmak tek başına
+    // bir şey kapatmaz — yalnızca gerçekten bağlanan anahtar eskisini kapatır.
+    const { data: siblings } = await supabase
+      .from('api_keys')
+      .select('id, created_at')
+      .eq('user_id', apiKey.user_id)
+      .eq('mt_fingerprint', fingerprint)
+      .eq('revoked', false)
+      .neq('id', apiKey.id);
+    const mine = new Date(apiKey.created_at).getTime();
+    const newer = (siblings || [])
+      .filter(k => new Date(k.created_at).getTime() > mine)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const nowIso = new Date().toISOString();
+    if (newer.length > 0) {
+      await supabase.from('api_keys')
+        .update({ revoked: true, revoked_at: nowIso, replaced_by: newer[0].id })
+        .eq('id', apiKey.id);
+      return res.status(401).json(await replacedBody(newer[0].id));
+    }
+    const older = (siblings || []).map(k => k.id);
+    if (older.length > 0) {
+      await supabase.from('api_keys')
+        .update({ revoked: true, revoked_at: nowIso, replaced_by: apiKey.id })
+        .in('id', older);
     }
   }
 
@@ -252,6 +301,19 @@ export default async function handler(req: any, res: any) {
     (existing || []).forEach((r: any) => {
       if (r.external_id) known.set(seenKey(String(r.external_id), r.symbol || ''), { ...r, closed: !!r.result });
     });
+  }
+
+  // Kullanıcının bu journal'dan sildiği ya da başka journal'a taşıdığı
+  // işlemler (trades_tombstone tetikleyicisi kaydeder). EA geçmişi düzenli
+  // olarak baştan taradığı için bunlar aksi hâlde kendiliğinden geri gelirdi.
+  // Kayıt journal'a özel: bir journal'dan silinen işlem başka journal'a gelebilir.
+  const tombstoned = new Set<string>();
+  if (ids.length > 0) {
+    const { data: gone } = await supabase
+      .from('trade_tombstones')
+      .select('external_id, symbol')
+      .eq('journal_id', apiKey.journal_id).in('external_id', ids);
+    (gone || []).forEach((r: any) => tombstoned.add(seenKey(String(r.external_id), r.symbol || '')));
   }
 
   // Ücretsiz planın sınırı burada değil, veritabanında: her işlem gününün ilk
@@ -323,6 +385,7 @@ export default async function handler(req: any, res: any) {
     const date = toISO(t.openTime);
     const symbol = (t.symbol || '').toUpperCase().trim();
     if (!date || !symbol) continue;
+    if (externalId && tombstoned.has(seenKey(externalId, symbol))) continue;
 
     // Eski uzmanlar bu alanı göndermez; yokluğu "kapandı" demektir.
     const stillOpen = String(t.state || '').toLowerCase() === 'open';

@@ -16,6 +16,8 @@ interface ApiKey {
   last_used_at: string | null;
   /** Anahtarın kilitlendiği MetaTrader hesabı: "•••4521 · Sunucu". Henüz bağlanmadıysa yok. */
   mt_hint?: string | null;
+  /** Aynı MT hesabına yeni anahtar bağlandığı için kendiliğinden kapandıysa: yeni anahtarın journal'ı. */
+  replacedIn?: string;
 }
 
 /**
@@ -235,6 +237,14 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                   title={tr('Bu anahtar yalnızca bu MetaTrader hesabından veri kabul eder.', 'This key only accepts data from this MetaTrader account.')}>
                   {k.mt_hint || tr('henüz hesaba bağlanmadı', 'not linked to an account yet')}
                 </span>
+                {/* Kendiliğinden kapanan anahtar: bir hafta nedeniyle birlikte görünür, sonra silinir. */}
+                {k.replacedIn !== undefined ? (
+                  <span className="text-[12px] ms-auto" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    {k.replacedIn
+                      ? tr('Yenisiyle değiştirildi: bu hesap artık "{0}" journal\'ına gönderiyor', 'Replaced by a newer key: this account now sends to "{0}"', k.replacedIn)
+                      : tr('Yenisiyle değiştirildi', 'Replaced by a newer key')}
+                  </span>
+                ) : (<>
                 {/* "Aktif": uzman son bir haftada bu anahtarla veri göndermiş. */}
                 {k.last_used_at && Date.now() - new Date(k.last_used_at).getTime() < 7 * 86400000 && (
                   <span className="text-[11px] font-medium px-2 py-0.5 rounded-full"
@@ -250,6 +260,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
                   title={tr('İptal et', 'Revoke')}>
                   <Trash2 className="w-4 h-4" />
                 </button>
+                </>)}
               </li>
             ))}
           </ul>
@@ -258,7 +269,7 @@ export default function MTConnect({ journalId, journalName }: MTConnectProps) {
             burada sadece ipucu var. Neden görünmediğini söylemezsek kullanıcı
             bunu bir eksik sanıyor. */}
         <p className="text-[12.5px] leading-relaxed mt-4 pt-4" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          {tr('Güvenlik için anahtarın tamamı saklanmaz, yalnızca ilk ve son harfleri görünür. MetaTrader anahtarı zaten hatırlar; kaybettiysen 4. adımdan yenisini oluştur ve eskisini buradan iptal et.', 'For security the full key is never stored; only its first and last characters are shown. MetaTrader remembers the key anyway; if you lose it, create a new one in step 4 and revoke the old one here.')}
+          {tr('Güvenlik için anahtarın tamamı saklanmaz, yalnızca ilk ve son harfleri görünür. MetaTrader anahtarı zaten hatırlar; kaybettiysen 4. adımdan yenisini oluştur. Aynı MetaTrader hesabından yeni anahtar bağlanınca eskisi kendiliğinden kapanır, iptal etmene gerek yok. Hiçbir hesaba bağlanmayan anahtarlar 7 gün sonra silinir.', 'For security the full key is never stored; only its first and last characters are shown. MetaTrader remembers the key anyway; if you lose it, create a new one in step 4. When a new key connects from the same MetaTrader account, the old one closes by itself — no need to revoke it. Keys never linked to an account are removed after 7 days.')}
           {' '}
           {tr('Her anahtar ilk bağlandığı MetaTrader hesabına kilitlenir; başka bir hesabın grafiğine yapıştırılırsa işlem göndermez. Her hesap için ayrı anahtar oluştur.', 'Each key locks to the first MetaTrader account it connects from; pasted into another account\'s chart it sends nothing. Create a separate key for each account.')}
         </p>

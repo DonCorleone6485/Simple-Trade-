@@ -56,11 +56,21 @@ export default async function handler(req: any, res: any) {
   if (req.method === 'GET') {
     const { data } = await supabase
       .from('api_keys')
-      .select('id, journal_id, key_hint, label, created_at, last_used_at, mt_hint')
+      .select('id, journal_id, key_hint, label, created_at, last_used_at, mt_hint, revoked, replaced_by')
       .eq('user_id', userId)
-      .eq('revoked', false)
+      // Etkin anahtarlar + aynı MT hesabına yenisi bağlandığı için kendiliğinden
+      // kapananlar (bir hafta "değiştirildi" diye görünür, sonra günlük görev siler).
+      .or('revoked.eq.false,replaced_by.not.is.null')
       .order('created_at', { ascending: false });
-    return res.status(200).json({ keys: data || [] });
+    const rows = data || [];
+    const byId = new Map(rows.map(k => [k.id, k]));
+    const { data: journals } = await supabase.from('journals').select('id, name').eq('user_id', userId);
+    const nameOf = new Map((journals || []).map(j => [j.id, j.name]));
+    const keys = rows.map(({ revoked, replaced_by, ...k }) => ({
+      ...k,
+      ...(revoked ? { replacedIn: nameOf.get(byId.get(replaced_by!)?.journal_id) || '' } : {}),
+    }));
+    return res.status(200).json({ keys });
   }
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });

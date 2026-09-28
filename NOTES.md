@@ -114,7 +114,18 @@ hesap ya da karar bekliyor.
   (ayrı bir C:\ klasöründe derle, sonra sil). MT5: MetaTrader 5.app'in wine'ı + MetaEditor64.exe.
 - Hesabım penceresi: para birimi seçimi, saat dilimi, "ad/e-posta/şifre" düğmesi.
 - MetaTrader sayfası: anahtarın bağlı olduğu hesap ("•••1234 · Sunucu").
-- EA'yı 1.07'ye güncellemek (grafikte bağlı journal'ın adı ve "başka hesaba bağlı" uyarısı).
+- EA'yı 1.08'e güncellemek (1.07: grafikte bağlı journal'ın adı; 1.08: saatte bir tam tarama,
+  "anahtar yenisiyle değiştirildi" mesajı).
+- MetaTrader anahtarları (2026-09-28): bir MT hesabının tek etkin anahtarı olur, EN YENİ
+  OLUŞTURULAN kazanır. Yeni anahtar bağlanınca aynı hesaba bağlı eskiler kendiliğinden kapanır
+  (api_keys.revoked_at, replaced_by); eski anahtarla gelen istek 401 code:key_replaced + yeni
+  journal adı alır. Listede bir hafta "Yenisiyle değiştirildi" görünür. Günlük görev
+  (api/emails.ts): 7 günde hiç bağlanmayan anahtarları ve 7 günlük değiştirilmişleri siler.
+- Silinen/taşınan MT işlemleri trade_tombstones tablosunda (trades_tombstone tetikleyicisi,
+  journal'a özel): EA saatte bir geçmişi baştan gönderdiği için aksi hâlde geri gelirdi.
+  Kullanıcı silinen bir işlemi geri isterse: o journal'ın satırını tablodan sil.
+- EA'nın grafik mesajları yalnız Türkçe (ASCII) — 9 dile çevrilmedi, ileride sunucudan
+  kullanıcının dilinde mesaj döndürülebilir.
   Not: iki hesapta aynı anahtar varsa, yayından sonra ilk bağlanan hesap sahiplenir.
 - İlk gerçek yeni üyede: kayıttan sonra örnek verinin kalkması, deneme akışı.
 - Hesap silme — kendi hesabıyla değil, boş bir test hesabıyla denenmeli.

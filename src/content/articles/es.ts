@@ -37,8 +37,8 @@ const TEXT: Record<string, ArticleText> = {
       { h2: 'Solución de problemas' },
       { ul: [
         'No llega nada: comprueba que la dirección del paso 2 es exactamente https://www.simpletradejournal.io, que el gráfico con el complemento sigue abierto y que la clave se pegó sin espacios.',
-        "«Clave vinculada a otra cuenta»: la clave ya pertenece a otra cuenta de trading. Crea una clave nueva para esta cuenta.", "Las operaciones llegan al diario equivocado: la línea «Journal:» del gráfico muestra adónde van. Si indica otro diario, el complemento sigue usando una clave antigua. Abre Inputs, borra ApiKey por completo, pega la clave nueva, pulsa Enter y luego OK, y revoca la clave antigua en la app.", "En MetaTrader 4 el complemento aparece en gris y no se puede arrastrar: usa el archivo SimpleTradingJournal.ex4 descargado desde la pantalla de MetaTrader y luego haz clic derecho en Expert Advisors, en el panel Navigator, y elige Refresh.",
-        'He perdido la clave: MetaTrader la recuerda. Si de verdad la perdiste, crea una nueva en la app y revoca la anterior.',
+        "«Clave vinculada a otra cuenta»: la clave ya pertenece a otra cuenta de trading. Crea una clave nueva para esta cuenta.", "Las operaciones llegan al diario equivocado: la línea «Journal:» del gráfico muestra adónde van. Si indica otro diario, el complemento sigue usando una clave antigua. Abre Inputs, borra ApiKey por completo, pega la clave nueva, pulsa Enter y luego OK. La clave antigua se cierra sola en cuanto se conecta la nueva.", "En MetaTrader 4 el complemento aparece en gris y no se puede arrastrar: usa el archivo SimpleTradingJournal.ex4 descargado desde la pantalla de MetaTrader y luego haz clic derecho en Expert Advisors, en el panel Navigator, y elige Refresh.",
+        "He perdido la clave: MetaTrader la recuerda. Si de verdad la perdiste, crea una nueva en la app; la anterior se cierra sola en cuanto se conecta la nueva.",
       ] },
       { p: '¿Prefieres no instalar nada? También puedes importar el propio informe de MetaTrader: consulta la guía de importación.' },
     ],

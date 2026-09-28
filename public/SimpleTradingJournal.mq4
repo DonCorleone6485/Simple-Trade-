@@ -19,7 +19,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Simple Trading Journal"
 #property link      "https://www.simpletradejournal.io"
-#property version   "1.07"
+#property version   "1.08"
 #property strict
 
 input string ApiKey       = "";                                   // ApiKey  (stj_...)
@@ -104,7 +104,21 @@ int OnInit()
 
 void OnDeinit(const int reason) { EventKillTimer(); Comment(""); }
 
-void OnTimer() { if(g_ready) { ScanOpen(); Scan(); } }
+// Saatte bir geçmişin tamamı yeniden gönderilir. Sunucu journal'da zaten
+// olanı atlıyor; bu sayede o an kabul edilmemiş bir işlem (ör. anahtar yanlış
+// journal'a bağlıyken gönderilmiş) eklentiyi yeniden başlatmadan gelir.
+// Kullanıcının journal'dan sildiği işlemi sunucu hatırlıyor, geri getirmiyor.
+datetime g_lastFullScan = 0;
+void MaybeFullRescan()
+  {
+   if(g_lastFullScan == 0) { g_lastFullScan = TimeLocal(); return; }
+   if(TimeLocal() - g_lastFullScan < 3600) return;
+   g_lastFullScan = TimeLocal();
+   ArrayResize(g_sent, 0);
+   g_fullScanDone = false;
+  }
+
+void OnTimer() { if(g_ready) { MaybeFullRescan(); ScanOpen(); Scan(); } }
 
 // MT4'te işlem olayı yok: her fiyatta emir sayıları değişti mi diye bakıyoruz,
 // değiştiyse (açıldı / kapandı) zamanlayıcıyı beklemeden gönderiyoruz.
@@ -432,6 +446,20 @@ bool Send(const string json, const int count)
    if(status != 200)
      {
       if(status == 401 || status == 409) g_journal = "";
+      if(status == 401 && StringFind(body, "\"key_replaced\"") >= 0)
+        {
+         // Aynı MT hesabına daha yeni bir anahtar bağlandı: bu grafik artık
+         // gereksiz. Göndermeyi bırakıyoruz ve nedenini söylüyoruz.
+         string to = JournalName(body);
+         g_ready = false;
+         EventKillTimer();
+         Status("Bu anahtar yenisiyle degistirildi.\n"
+                + (to != "" ? "Bu hesap artik \"" + to + "\" journal'ina gonderiyor.\n" : "")
+                + "Bu grafikteki eklentiyi kaldirabilirsin.");
+         Print("Bu anahtar aynı MetaTrader hesabına bağlanan daha yeni bir anahtarla değiştirildi",
+               (to != "" ? " (journal: " + to + ")" : ""), ". Bu grafikteki eklentiyi kaldırabilirsin.");
+         return(false);
+        }
       if(status == 401)
         {
          Status("Anahtar gecersiz ya da iptal edilmis.\nSiteden yeni anahtar olusturup buraya yapistir.");
