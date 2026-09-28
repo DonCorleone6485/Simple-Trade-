@@ -12,7 +12,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Simple Trading Journal"
 #property link      "https://www.simpletradejournal.io"
-#property version   "1.08"
+#property version   "1.09"
 #property strict
 
 // Girdi etiketleri MQL5'te yorum satırından gelir ve ekranda öyle görünür.
@@ -55,6 +55,240 @@ bool     g_ready    = false; // anahtar girilmiş ve tarama başlamış mı
 string   g_key      = "";    // kullanılan anahtar: girilen ya da hatırlanan
 string   g_journal  = "";    // anahtarın bağlı olduğu journal (sunucudan)
 
+//+------------------------------------------------------------------+
+//| Mesajlar: MetaTrader'ın kendi dilinde                             |
+//+------------------------------------------------------------------+
+// Grafikteki mesajlar MetaTrader'ın menülerini anıyor (Araçlar > Seçenekler…),
+// o yüzden dil sitenin değil terminalin dilidir: menü adları kullanıcının
+// ekranda gördüğüyle aynı olsun. Desteklenmeyen dilde İngilizce.
+// Sıra: en tr ru es pt de fr ar fa. Metni değiştirirsen MT4 ve MT5 dosyasında
+// birlikte değiştir.
+int g_lang = 0;
+
+int DetectLang()
+  {
+   string l = TerminalInfoString(TERMINAL_LANGUAGE);
+   StringToLower(l);
+   if(StringFind(l, "turk") == 0)    return(1);
+   if(StringFind(l, "russ") == 0)    return(2);
+   if(StringFind(l, "span") == 0)    return(3);
+   if(StringFind(l, "portu") == 0)   return(4);
+   if(StringFind(l, "germ") == 0)    return(5);
+   if(StringFind(l, "fren") == 0)    return(6);
+   if(StringFind(l, "arab") == 0)    return(7);
+   if(StringFind(l, "pers") == 0 || StringFind(l, "farsi") == 0) return(8);
+   return(0);
+  }
+
+#define T_NOKEY 0
+#define T_NOKEY_ALERT 1
+#define T_SCANNING 2
+#define T_RUNNING_OPEN 3
+#define T_WAITING 4
+#define T_NO_PERMISSION 5
+#define T_CONN_FAIL 6
+#define T_REPLACED 7
+#define T_REPLACED_TO 8
+#define T_REMOVE 9
+#define T_INVALID 10
+#define T_BOUND 11
+#define T_SERVER_ERR 12
+#define T_RUNNING_COUNT 13
+#define T_HISTORY_FAIL 14
+#define T_SENT_LOG 15
+
+string g_text[] =
+  {
+   // T_NOKEY
+   "KEY NOT ENTERED - the add-on is not working yet.\nPress F7 on the chart (or right-click > Expert Advisors > Properties),\npaste the key from the site into the ApiKey row on the Inputs tab, then OK.",
+   "ANAHTAR GİRİLMEMİŞ - şu an çalışmıyor.\nGrafikte F7'ye bas (ya da sağ tık > Uzman Danışmanlar > Özellikler),\nGirdiler sekmesinde ApiKey satırına sitedeki anahtarı yapıştır, Tamam.",
+   "КЛЮЧ НЕ ВВЕДЁН - дополнение пока не работает.\nНажмите F7 на графике (или правый клик > Советники > Свойства),\nна вкладке «Входные параметры» вставьте ключ с сайта в строку ApiKey и нажмите OK.",
+   "CLAVE NO INTRODUCIDA - el complemento todavía no funciona.\nPulsa F7 en el gráfico (o clic derecho > Asesores Expertos > Propiedades),\npega la clave del sitio en la fila ApiKey de la pestaña Parámetros de entrada y pulsa Aceptar.",
+   "CHAVE NÃO INTRODUZIDA - o complemento ainda não funciona.\nPressiona F7 no gráfico (ou clique direito > Expert Advisors > Propriedades),\ncola a chave do site na linha ApiKey do separador Parâmetros de entrada e clica em OK.",
+   "KEIN SCHLÜSSEL EINGEGEBEN - das Add-on arbeitet noch nicht.\nDrücke F7 im Chart (oder Rechtsklick > Expert Advisors > Eigenschaften),\nfüge den Schlüssel von der Website in die Zeile ApiKey im Reiter Eingaben ein und klicke OK.",
+   "CLÉ NON SAISIE - le module ne fonctionne pas encore.\nAppuyez sur F7 sur le graphique (ou clic droit > Expert Advisors > Propriétés),\ncollez la clé du site dans la ligne ApiKey de l'onglet Paramètres, puis OK.",
+   "لم يتم إدخال المفتاح - الإضافة لا تعمل بعد.\nاضغط F7 على الرسم البياني (أو انقر بالزر الأيمن > المستشارون الخبراء > الخصائص)،\nوالصق المفتاح من الموقع في سطر ApiKey في تبويب المدخلات، ثم موافق.",
+   "کلید وارد نشده - افزونه هنوز کار نمی‌کند.\nروی چارت F7 را بزن (یا راست‌کلیک > اکسپرت‌ها > ویژگی‌ها)،\nدر تب ورودی‌ها کلید سایت را در ردیف ApiKey بچسبان و تأیید را بزن.",
+   // T_NOKEY_ALERT
+   "Simple Trading Journal: no key entered, the add-on is not working. Press F7 on the chart and paste the key from the site into Inputs > ApiKey.",
+   "Simple Trading Journal: anahtar girilmedi, eklenti çalışmıyor. Grafikte F7'ye basıp Girdiler > ApiKey satırına sitedeki anahtarı yapıştır.",
+   "Simple Trading Journal: ключ не введён, дополнение не работает. Нажмите F7 на графике и вставьте ключ с сайта в «Входные параметры» > ApiKey.",
+   "Simple Trading Journal: no se introdujo la clave, el complemento no funciona. Pulsa F7 en el gráfico y pega la clave del sitio en Parámetros de entrada > ApiKey.",
+   "Simple Trading Journal: nenhuma chave introduzida, o complemento não funciona. Pressiona F7 no gráfico e cola a chave do site em Parâmetros de entrada > ApiKey.",
+   "Simple Trading Journal: kein Schlüssel eingegeben, das Add-on arbeitet nicht. Drücke F7 im Chart und füge den Schlüssel von der Website unter Eingaben > ApiKey ein.",
+   "Simple Trading Journal : aucune clé saisie, le module ne fonctionne pas. Appuyez sur F7 sur le graphique et collez la clé du site dans Paramètres > ApiKey.",
+   "Simple Trading Journal: لم يتم إدخال المفتاح، الإضافة لا تعمل. اضغط F7 على الرسم البياني والصق المفتاح من الموقع في المدخلات > ApiKey.",
+   "Simple Trading Journal: کلید وارد نشده و افزونه کار نمی‌کند. روی چارت F7 را بزن و کلید سایت را در ورودی‌ها > ApiKey بچسبان.",
+   // T_SCANNING
+   "Connected. Scanning the last %1 days...",
+   "Bağlandı. Son %1 gün taranıyor...",
+   "Подключено. Проверка сделок за последние %1 дн...",
+   "Conectado. Revisando los últimos %1 días...",
+   "Ligado. A verificar os últimos %1 dias...",
+   "Verbunden. Die letzten %1 Tage werden durchsucht...",
+   "Connecté. Analyse des %1 derniers jours...",
+   "تم الاتصال. جارٍ فحص آخر %1 يوم...",
+   "وصل شد. در حال بررسی %1 روز اخیر...",
+   // T_RUNNING_OPEN
+   "Running. Open trades were added to the journal;\nthe same entries will be completed with the result when they close.",
+   "Çalışıyor. Açık işlemler journal'a girildi;\nkapandıklarında aynı kayıtlar sonuçla tamamlanacak.",
+   "Работает. Открытые сделки добавлены в журнал;\nпосле закрытия эти же записи дополнятся результатом.",
+   "Funcionando. Las operaciones abiertas se añadieron al diario;\nal cerrarse, esos mismos registros se completarán con el resultado.",
+   "A funcionar. As operações abertas foram adicionadas ao diário;\nao fechar, os mesmos registos serão completados com o resultado.",
+   "Läuft. Offene Trades wurden ins Journal eingetragen;\nbeim Schließen werden dieselben Einträge mit dem Ergebnis ergänzt.",
+   "En marche. Les positions ouvertes ont été ajoutées au journal ;\nà la clôture, ces mêmes entrées seront complétées avec le résultat.",
+   "يعمل. أُضيفت الصفقات المفتوحة إلى السجل؛\nوعند إغلاقها تُستكمل السجلات نفسها بالنتيجة.",
+   "در حال کار. معاملات باز به ژورنال اضافه شدند؛\nبعد از بسته شدن، همان رکوردها با نتیجه کامل می‌شوند.",
+   // T_WAITING
+   "Connected. Waiting for the next closed trade.",
+   "Bağlantı tamam. Yeni kapanan işlem bekleniyor.",
+   "Подключено. Ожидание следующей закрытой сделки.",
+   "Conectado. Esperando la próxima operación cerrada.",
+   "Ligado. À espera da próxima operação fechada.",
+   "Verbunden. Warte auf den nächsten geschlossenen Trade.",
+   "Connecté. En attente de la prochaine position clôturée.",
+   "تم الاتصال. بانتظار الصفقة المغلقة التالية.",
+   "وصل شد. منتظر معامله بسته‌شده بعدی.",
+   // T_NO_PERMISSION
+   "Not allowed yet.\nIn Tools > Options > Expert Advisors, tick\n\"Allow WebRequest for listed URL\" and add to the list: %1",
+   "İzin yok.\nAraçlar > Seçenekler > Uzman Danışmanlar sekmesinde\n\"Listelenen URL'ler için WebRequest'e izin ver\" kutusunu işaretle\nve listeye ekle: %1",
+   "Нет разрешения.\nСервис > Настройки > Советники: отметьте\n«Разрешить WebRequest для следующих URL» и добавьте в список: %1",
+   "Sin permiso.\nEn Herramientas > Opciones > Asesores Expertos, marca la casilla\nque permite WebRequest para las URL de la lista y añade: %1",
+   "Sem permissão.\nEm Ferramentas > Opções > Expert Advisors, marca a opção\nque permite WebRequest para os URLs da lista e adiciona: %1",
+   "Keine Erlaubnis.\nUnter Extras > Optionen > Expert Advisors das Kästchen\nfür WebRequest bei aufgelisteten URLs anhaken und hinzufügen: %1",
+   "Pas d'autorisation.\nDans Outils > Options > Expert Advisors, cochez la case\nautorisant WebRequest pour les URL listées et ajoutez : %1",
+   "لا يوجد إذن.\nمن أدوات > خيارات > المستشارون الخبراء، فعّل خيار\nالسماح بـ WebRequest للعناوين المدرجة وأضف: %1",
+   "اجازه داده نشده.\nدر ابزارها > تنظیمات > اکسپرت‌ها، گزینه\nاجازه WebRequest برای آدرس‌های فهرست را تیک بزن و این را اضافه کن: %1",
+   // T_CONN_FAIL
+   "Could not connect (error %1). Check your internet connection.",
+   "Bağlantı kurulamadı (hata %1). İnternet bağlantını kontrol et.",
+   "Не удалось подключиться (ошибка %1). Проверьте подключение к интернету.",
+   "No se pudo conectar (error %1). Revisa tu conexión a internet.",
+   "Não foi possível ligar (erro %1). Verifica a tua ligação à internet.",
+   "Keine Verbindung (Fehler %1). Prüfe deine Internetverbindung.",
+   "Connexion impossible (erreur %1). Vérifiez votre connexion internet.",
+   "تعذّر الاتصال (خطأ %1). تحقق من اتصالك بالإنترنت.",
+   "اتصال برقرار نشد (خطا %1). اینترنتت را بررسی کن.",
+   // T_REPLACED
+   "This key was replaced by a newer one.",
+   "Bu anahtar yenisiyle değiştirildi.",
+   "Этот ключ заменён более новым.",
+   "Esta clave fue reemplazada por una más nueva.",
+   "Esta chave foi substituída por uma mais recente.",
+   "Dieser Schlüssel wurde durch einen neueren ersetzt.",
+   "Cette clé a été remplacée par une plus récente.",
+   "تم استبدال هذا المفتاح بمفتاح أحدث.",
+   "این کلید با کلید جدیدتری جایگزین شد.",
+   // T_REPLACED_TO
+   "This account now sends to the \"%1\" journal.",
+   "Bu hesap artık \"%1\" journal'ına gönderiyor.",
+   "Теперь этот счёт отправляет сделки в журнал «%1».",
+   "Esta cuenta ahora envía al diario \"%1\".",
+   "Esta conta agora envia para o diário \"%1\".",
+   "Dieses Konto sendet jetzt an das Journal \"%1\".",
+   "Ce compte envoie désormais au journal « %1 ».",
+   "هذا الحساب يرسل الآن إلى سجل \"%1\".",
+   "این حساب حالا به ژورنال «%1» می‌فرستد.",
+   // T_REMOVE
+   "You can remove the add-on from this chart.",
+   "Bu grafikteki eklentiyi kaldırabilirsin.",
+   "Дополнение можно удалить с этого графика.",
+   "Puedes quitar el complemento de este gráfico.",
+   "Podes remover o complemento deste gráfico.",
+   "Du kannst das Add-on von diesem Chart entfernen.",
+   "Vous pouvez retirer le module de ce graphique.",
+   "يمكنك إزالة الإضافة من هذا الرسم البياني.",
+   "می‌توانی افزونه را از این چارت برداری.",
+   // T_INVALID
+   "Key invalid or revoked.\nCreate a new key on the site and paste it here.",
+   "Anahtar geçersiz ya da iptal edilmiş.\nSiteden yeni anahtar oluşturup buraya yapıştır.",
+   "Ключ недействителен или отозван.\nСоздайте новый ключ на сайте и вставьте его сюда.",
+   "Clave no válida o revocada.\nCrea una clave nueva en el sitio y pégala aquí.",
+   "Chave inválida ou revogada.\nCria uma nova chave no site e cola-a aqui.",
+   "Schlüssel ungültig oder widerrufen.\nErstelle auf der Website einen neuen Schlüssel und füge ihn hier ein.",
+   "Clé invalide ou révoquée.\nCréez une nouvelle clé sur le site et collez-la ici.",
+   "المفتاح غير صالح أو ملغى.\nأنشئ مفتاحًا جديدًا في الموقع والصقه هنا.",
+   "کلید نامعتبر است یا لغو شده.\nدر سایت کلید جدیدی بساز و اینجا بچسبان.",
+   // T_BOUND
+   "This key is linked to another MetaTrader account.\nCreate a new key for this account on the site and paste it here.",
+   "Bu anahtar başka bir MetaTrader hesabına bağlı.\nBu hesap için siteden yeni anahtar oluşturup buraya yapıştır.",
+   "Этот ключ привязан к другому счёту MetaTrader.\nСоздайте на сайте новый ключ для этого счёта и вставьте его сюда.",
+   "Esta clave está vinculada a otra cuenta de MetaTrader.\nCrea una clave nueva para esta cuenta en el sitio y pégala aquí.",
+   "Esta chave está associada a outra conta do MetaTrader.\nCria uma nova chave para esta conta no site e cola-a aqui.",
+   "Dieser Schlüssel ist mit einem anderen MetaTrader-Konto verknüpft.\nErstelle auf der Website einen neuen Schlüssel für dieses Konto und füge ihn hier ein.",
+   "Cette clé est liée à un autre compte MetaTrader.\nCréez une nouvelle clé pour ce compte sur le site et collez-la ici.",
+   "هذا المفتاح مرتبط بحساب MetaTrader آخر.\nأنشئ مفتاحًا جديدًا لهذا الحساب في الموقع والصقه هنا.",
+   "این کلید به حساب MetaTrader دیگری وصل است.\nدر سایت برای این حساب کلید جدیدی بساز و اینجا بچسبان.",
+   // T_SERVER_ERR
+   "Server error (%1).",
+   "Sunucu hatası (%1).",
+   "Ошибка сервера (%1).",
+   "Error del servidor (%1).",
+   "Erro do servidor (%1).",
+   "Serverfehler (%1).",
+   "Erreur du serveur (%1).",
+   "خطأ في الخادم (%1).",
+   "خطای سرور (%1).",
+   // T_RUNNING_COUNT
+   "Running. Trades sent this session: %1",
+   "Çalışıyor. Bu oturumda gönderilen işlem: %1",
+   "Работает. Отправлено сделок за сеанс: %1",
+   "Funcionando. Operaciones enviadas en esta sesión: %1",
+   "A funcionar. Operações enviadas nesta sessão: %1",
+   "Läuft. In dieser Sitzung gesendete Trades: %1",
+   "En marche. Positions envoyées pendant cette session : %1",
+   "يعمل. الصفقات المرسلة في هذه الجلسة: %1",
+   "در حال کار. معاملات فرستاده‌شده در این جلسه: %1",
+   // T_HISTORY_FAIL
+   "Could not read the trade history.",
+   "İşlem geçmişi okunamadı.",
+   "Не удалось прочитать историю сделок.",
+   "No se pudo leer el historial de operaciones.",
+   "Não foi possível ler o histórico de operações.",
+   "Die Handelshistorie konnte nicht gelesen werden.",
+   "Impossible de lire l'historique des positions.",
+   "تعذّرت قراءة سجل الصفقات.",
+   "تاریخچه معاملات خوانده نشد.",
+   // T_SENT_LOG
+   "%1 trades sent.",
+   "%1 işlem gönderildi.",
+   "Отправлено сделок: %1.",
+   "%1 operaciones enviadas.",
+   "%1 operações enviadas.",
+   "%1 Trades gesendet.",
+   "%1 positions envoyées.",
+   "تم إرسال %1 صفقة.",
+   "%1 معامله فرستاده شد."
+  };
+
+string Tx(const int id) { return(g_text[id * 9 + g_lang]); }
+string Tx(const int id, const string a) { string s = g_text[id * 9 + g_lang]; StringReplace(s, "%1", a); return(s); }
+
+/**
+ * Grafik için aksansız yazım. Grafikte Türkçe harflerin bozulduğu görüldü;
+ * Latin alfabeli dillerde harfleri sadeleştiriyoruz (ş -> s, é -> e, ü -> ue).
+ * Rusça, Arapça ve Farsçada sadeleştirecek bir karşılık yok, olduğu gibi kalır.
+ */
+string Plain(string s)
+  {
+   if(g_lang >= 7 || g_lang == 2) return(s);
+   if(g_lang == 5)
+     {
+      StringReplace(s, "ä", "ae"); StringReplace(s, "ö", "oe"); StringReplace(s, "ü", "ue");
+      StringReplace(s, "Ä", "AE"); StringReplace(s, "Ö", "OE"); StringReplace(s, "Ü", "UE");
+     }
+   StringReplace(s, "ß", "ss");
+   string from = "çğıöşüÇĞİÖŞÜáàâãäéèêëíìîïóòôõúùûñÁÀÂÃÉÈÊÍÓÔÕÚÑ«»";
+   string to   = "cgiosuCGIOSUaaaaaeeeeiiiioooouuunAAAAEEEIOOOUN\"\"";
+   for(int i = 0; i < StringLen(from); i++)
+      StringReplace(s, StringSubstr(from, i, 1), StringSubstr(to, i, 1));
+   return(s);
+  }
+
+/** Günlüğe tek satır: grafikteki çok satırlı mesajın aynısı. */
+void LogLine(string s) { StringReplace(s, "\n", " "); Print(s); }
+
+
 /**
  * Anahtarı hatırlarız. EA grafikten kalkıp yeniden eklendiğinde MetaTrader
  * girdileri boş getiriyor; kullanıcı her seferinde anahtarı bulup yeniden
@@ -95,8 +329,10 @@ void SaveKey(const string key)
 void Status(const string text)
   {
    g_status = text;
-   Comment("Simple Trading Journal" + (g_journal != "" ? "  ->  Journal: " + g_journal : "") + "\n", text);
+   Comment("Simple Trading Journal" + (g_journal != "" ? "  ->  Journal: " + g_journal : "") + "\n", Plain(text));
   }
+/** Hem grafiğe hem Uzmanlar günlüğüne. */
+void Say(const string text) { Status(text); LogLine(text); }
 
 //+------------------------------------------------------------------+
 int OnInit()
@@ -105,6 +341,7 @@ int OnInit()
    // sessizce siler: kullanıcı onu grafikte sanır, oysa hiç çalışmaz — ve
    // günlerce öyle kalır. Grafikte kalıp neyin eksik olduğunu söylüyoruz;
    // anahtar Girdiler'e yapıştırılınca MetaTrader OnInit'i yeniden çağırır.
+   g_lang = DetectLang();
    g_key = ApiKey;
    StringTrimLeft(g_key); StringTrimRight(g_key);
    if(StringLen(g_key) < 8) g_key = LoadKey();
@@ -112,12 +349,8 @@ int OnInit()
    if(StringLen(g_key) < 8)
      {
       g_ready = false;
-      Status("ANAHTAR GIRILMEMIS - su an calismiyor.\n"
-             "Grafikte F7'ye bas (ya da sag tik > Uzman Danismanlar > Ozellikler),\n"
-             "Girdiler sekmesinde ApiKey satirina sitedeki anahtari yapistir, Tamam.");
-      Print("HATA: ApiKey boş. Grafikte F7 > Girdiler > ApiKey satırına journal'daki anahtarı yapıştır.");
-      Alert("Simple Trading Journal: anahtar girilmedi, eklenti çalışmıyor. "
-            "Grafikte F7'ye basıp Girdiler > ApiKey satırına sitedeki anahtarı yapıştır.");
+      Say(Tx(T_NOKEY));
+      Alert(Tx(T_NOKEY_ALERT));
       return(INIT_SUCCEEDED);
      }
    g_ready = true;
@@ -128,8 +361,7 @@ int OnInit()
    ArrayResize(g_openSig, 0);
 
    EventSetTimer(PollSeconds < 5 ? 5 : PollSeconds);
-   Status("Baglandi. Son " + IntegerToString(HistoryDays) + " gun taraniyor...");
-   Print("Simple Trading Journal bağlandı. İlk tarama: son ", HistoryDays, " gün.");
+   Say(Tx(T_SCANNING, IntegerToString(HistoryDays)));
 
    // Açılışta bir kez, işlem olmadan da bağlan: anahtarı hemen doğrular ve
    // hesabın gerçek sermayesini bildirir. Yeni işlem beklenirse journal
@@ -138,8 +370,7 @@ int OnInit()
    ScanOpen();
    Scan();
    if(g_total == 0)
-      Status("Calisiyor. Acik pozisyonlar journal'a girildi;\n"
-             "kapandiklarinda ayni kayitlar sonucla tamamlanacak.");
+      Status(Tx(T_RUNNING_OPEN));
    return(INIT_SUCCEEDED);
   }
 
@@ -296,7 +527,7 @@ void Hello()
      {
       // Sunucu kabul etti: anahtar doğru, bir dahaki eklemede hatırlanır.
       SaveKey(g_key);
-      Status("Baglanti tamam. Yeni kapanan islem bekleniyor.");
+      Status(Tx(T_WAITING));
      }
   }
 
@@ -393,7 +624,7 @@ void ScanOpen()
      {
       for(int i = 0; i < ready; i++)
          MarkOpen(ids[i], sigs[i]);
-      if(Verbose) Print(ready, " açık pozisyon gönderildi.");
+      if(Verbose) LogLine(Tx(T_SENT_LOG, IntegerToString(ready)));
      }
   }
 
@@ -418,7 +649,7 @@ void Scan()
 
    if(!HistorySelect(from, to))
      {
-      Print("HATA: geçmiş okunamadı.");
+      LogLine(Tx(T_HISTORY_FAIL));
       return;
      }
 
@@ -631,14 +862,11 @@ bool Send(const string json, const int count)
       int err = GetLastError();
       if(err == 4014)
         {
-         Status("Izin yok.\nAraclar > Secenekler > Uzman Danismanlar sekmesinde\n\"Listelenen URL'ler icin WebRequest'e izin ver\" kutusunu isaretle\nve listeye ekle: " + ServerUrl);
-         Print("HATA: WebRequest'e izin verilmemiş. Araçlar > Seçenekler > Uzman Danışmanlar sekmesinde ",
-               ServerUrl, " adresini listeye ekle.");
+         Say(Tx(T_NO_PERMISSION, ServerUrl));
         }
       else
         {
-         Status("Baglanti kurulamadi (hata " + IntegerToString(err) + "). Internet baglantisini kontrol et.");
-         Print("HATA: istek gönderilemedi (", err, ").");
+         Say(Tx(T_CONN_FAIL, IntegerToString(err)));
         }
       return(false);
      }
@@ -660,37 +888,33 @@ bool Send(const string json, const int count)
          string to = JournalName(body);
          g_ready = false;
          EventKillTimer();
-         Status("Bu anahtar yenisiyle degistirildi.\n"
-                + (to != "" ? "Bu hesap artik \"" + to + "\" journal'ina gonderiyor.\n" : "")
-                + "Bu grafikteki eklentiyi kaldirabilirsin.");
-         Print("Bu anahtar aynı MetaTrader hesabına bağlanan daha yeni bir anahtarla değiştirildi",
-               (to != "" ? " (journal: " + to + ")" : ""), ". Bu grafikteki eklentiyi kaldırabilirsin.");
+         Say(Tx(T_REPLACED) + "\n"
+             + (to != "" ? Tx(T_REPLACED_TO, to) + "\n" : "")
+             + Tx(T_REMOVE));
          return(false);
         }
       if(status == 401)
         {
-         Status("Anahtar gecersiz ya da iptal edilmis.\nSiteden yeni anahtar olusturup buraya yapistir.");
-         Print("Anahtar geçersiz ya da iptal edilmiş. Journal'dan yeni anahtar oluştur.");
+         Say(Tx(T_INVALID));
         }
       else if(status == 409)
         {
          // Anahtar başka bir MetaTrader hesabına bağlı: işlemler yanlış
          // journal'a gitmesin diye sunucu reddetti.
-         Status("Bu anahtar baska bir MetaTrader hesabina bagli.\nBu hesap icin siteden yeni anahtar olusturup buraya yapistir.");
-         Print("Bu anahtar başka bir MetaTrader hesabına bağlı. Bu hesap için sitede yeni anahtar oluştur.");
+         Say(Tx(T_BOUND));
         }
       else
-         Status("Sunucu hatasi (" + IntegerToString(status) + ").");
-      Print("HATA ", status, ": ", body);
+         Status(Tx(T_SERVER_ERR, IntegerToString(status)));
+      Print("HTTP ", status, ": ", body);
       return(false);
      }
 
    if(count > 0)
      {
       g_total += count;
-      Status("Calisiyor. Bu oturumda gonderilen islem: " + IntegerToString(g_total));
+      Status(Tx(T_RUNNING_COUNT, IntegerToString(g_total)));
      }
-   if(Verbose && count > 0) Print(count, " pozisyon gönderildi -> ", body);
+   if(Verbose && count > 0) Print(Tx(T_SENT_LOG, IntegerToString(count)), " -> ", body);
    return(true);
   }
 //+------------------------------------------------------------------+

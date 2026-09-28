@@ -114,8 +114,8 @@ hesap ya da karar bekliyor.
   (ayrı bir C:\ klasöründe derle, sonra sil). MT5: MetaTrader 5.app'in wine'ı + MetaEditor64.exe.
 - Hesabım penceresi: para birimi seçimi, saat dilimi, "ad/e-posta/şifre" düğmesi.
 - MetaTrader sayfası: anahtarın bağlı olduğu hesap ("•••1234 · Sunucu").
-- EA'yı 1.08'e güncellemek (1.07: grafikte bağlı journal'ın adı; 1.08: saatte bir tam tarama,
-  "anahtar yenisiyle değiştirildi" mesajı).
+- EA'yı 1.09'a güncellemek (1.07: grafikte bağlı journal'ın adı; 1.08: saatte bir tam tarama,
+  "anahtar yenisiyle değiştirildi" mesajı; 1.09: mesajlar MetaTrader'ın dilinde).
 - MetaTrader anahtarları (2026-09-28): bir MT hesabının tek etkin anahtarı olur, EN YENİ
   OLUŞTURULAN kazanır. Yeni anahtar bağlanınca aynı hesaba bağlı eskiler kendiliğinden kapanır
   (api_keys.revoked_at, replaced_by); eski anahtarla gelen istek 401 code:key_replaced + yeni
@@ -124,8 +124,13 @@ hesap ya da karar bekliyor.
 - Silinen/taşınan MT işlemleri trade_tombstones tablosunda (trades_tombstone tetikleyicisi,
   journal'a özel): EA saatte bir geçmişi baştan gönderdiği için aksi hâlde geri gelirdi.
   Kullanıcı silinen bir işlemi geri isterse: o journal'ın satırını tablodan sil.
-- EA'nın grafik mesajları yalnız Türkçe (ASCII) — 9 dile çevrilmedi, ileride sunucudan
-  kullanıcının dilinde mesaj döndürülebilir.
+- EA 1.09 (2026-09-29): grafik mesajları 9 dilde. Dil sitenin değil MetaTrader'ın dili
+  (TERMINAL_LANGUAGE) — mesajlar MT menülerini anıyor, menü adları ekrandakiyle aynı olsun;
+  desteklenmeyen dilde İngilizce. Tablo iki .mq dosyasında da ayrı (g_text[], sıra en tr ru es
+  pt de fr ar fa) — biri değişirse öteki de. Latin alfabeli dillerde grafiğe aksansız yazılır
+  (Plain()); ru/ar/fa kendi alfabesinde — grafikte doğru göründüğü henüz görülmedi, ilk
+  fırsatta MetaTrader dili Rusça/Farsça yapılıp bakılmalı. Menü adları (Araçlar > Seçenekler…)
+  tr/en/ru için MT'nin gerçek adları; diğer dillerde yaklaşık.
   Not: iki hesapta aynı anahtar varsa, yayından sonra ilk bağlanan hesap sahiplenir.
 - İlk gerçek yeni üyede: kayıttan sonra örnek verinin kalkması, deneme akışı.
 - Hesap silme — kendi hesabıyla değil, boş bir test hesabıyla denenmeli.

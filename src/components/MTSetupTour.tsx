@@ -487,12 +487,11 @@ export default function MTSetupTour() {
                   <span className="sym">EURUSD, H1</span>
                   <span className="smiley fx" data-from="3" data-to="4">☺</span>
                   <div className="comment fx" data-from="3" data-to="3">
-                    {'Simple Trading Journal\nBaglandi. Son 365 gun taraniyor...'}
+                    {'Simple Trading Journal\n' + tr('Baglandi. Son 365 gun taraniyor...', 'Connected. Scanning the last 365 days...')}
                   </div>
                   <div className="comment fx" data-from="4" data-to="4">
                     {'Simple Trading Journal\n'}
-                    <span className="ok">Calisiyor. Yeni kapanan islem bekleniyor.</span>
-                    {'\n7 islem gonderildi.'}
+                    <span className="ok">{tr('Calisiyor. Bu oturumda gonderilen islem: 7', 'Running. Trades sent this session: 7')}</span>
                   </div>
                 </div>
               </div>
