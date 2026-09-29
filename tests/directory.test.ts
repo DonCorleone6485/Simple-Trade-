@@ -21,7 +21,7 @@ describe('prop firma ve broker verisi', () => {
       expect(f.checked).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       for (const p of f.programs) {
         expect(p.source).toMatch(/^https:\/\//);
-        for (const v of [...p.targets, p.max, ...(p.daily ? [p.daily] : [])]) expect(v, `${f.slug} ${p.name}`).toMatch(pct);
+        for (const v of [...p.targets, p.max, ...(p.daily ? p.daily.split(' / ') : [])]) expect(v, `${f.slug} ${p.name}`).toMatch(pct);
       }
     }
     for (const b of BROKERS) {

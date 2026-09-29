@@ -25,7 +25,7 @@ Son güncelleme: 2026-09-29
 - [ ] **Haftalık özet e-postası** — kullanıcının haftası, kendi dilinde. `api/` 12 fonksiyonda: mevcut bir uca dal + Vercel cron.
 - [ ] **CSP'yi engelleme moduna almak** — 2026-10-06 … 10-13 arası, `client_errors` kind 'csp' raporlarına bakarak.
 - [ ] **Yeni blog yazıları** — 9 dilde, içerik kümelerine göre (§4).
-- 🟡 **Programatik prop firma / broker sayfaları** (§4) — ✅ 2026-09-29 ilk parti: 4 prop firma (FTMO, The5ers, Alpha Capital, Instant Funding) + 4 broker, 9 dilde. Kalan: yeni firmalar/broker'lar ve aylık kural kontrol görevi (SEO.md).
+- 🟡 **Programatik prop firma / broker sayfaları** (§4) — ✅ 2026-09-29 5 prop firma (FTMO, The5ers, Alpha Capital, Instant Funding, FundingPips) + 4 broker, 9 dilde; aylık kural kontrol görevi kuruldu. Kalan: FundedNext, FXIFY, E8 ve Türkiye'den açılmayan broker'lar (SEO.md).
 - [ ] **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate (büyük iş).
 
 ### Ertelenenler

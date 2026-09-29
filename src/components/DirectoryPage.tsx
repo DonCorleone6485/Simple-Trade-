@@ -333,10 +333,10 @@ export default function DirectoryPage({ path, onHome, onOpen, cta }: {
             head={[ui('program'), ...firm.programs.map(p => <span dir="ltr">{p.name}</span>)]}
             rows={[
               [ui('target'), ...firm.programs.map(p => p.targets.length ? <span dir="ltr">{p.targets.map(x => pct(x, lang)).join(' → ')}</span> : ui('none'))],
-              [ui('daily'), ...firm.programs.map(p => (p.daily ? pct(p.daily, lang) : ui('none')))],
+              [ui('daily'), ...firm.programs.map(p => (p.daily ? p.daily.split(' / ').map(x => pct(x, lang)).join(' / ') : ui('none')))],
               [ui('max'), ...firm.programs.map(p => pct(p.max, lang))],
               [ui('maxType'), ...firm.programs.map(p => maxTypeLabel(p.maxType))],
-              [ui('minDays'), ...firm.programs.map(p => !p.minDays ? ui('none')
+              [ui('minDays'), ...firm.programs.map(p => p.minDays === 'unknown' ? ui('notStated') : !p.minDays ? ui('none')
                 : p.minDays.profitable ? ui('profitableDays', { n: String(p.minDays.n) })
                 : p.minDays.n === 1 ? ui('day1') : ui('days', { n: String(p.minDays.n) }))],
             ]}

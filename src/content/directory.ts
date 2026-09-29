@@ -36,13 +36,13 @@ export interface PropProgram {
   name: string;
   /** Aşama hedefleri: ['10%', '5%']. Boş dizi: hedef yok. */
   targets: string[];
-  /** Günlük kayıp sınırı; null: yok. */
+  /** Günlük kayıp sınırı; null: yok. Satın alırken seçilen seçeneğe göre değişiyorsa '3% / 5%'. */
   daily: string | null;
   /** Toplam kayıp sınırı. */
   max: string;
   maxType: MaxType;
-  /** Asgari işlem günü; null: yok. `profitable`: kârlı gün sayılıyor. */
-  minDays: { n: number; profitable?: boolean } | null;
+  /** Asgari işlem günü; null: yok; 'unknown': kaynak söylemiyor. `profitable`: kârlı gün sayılıyor. */
+  minDays: { n: number; profitable?: boolean } | null | 'unknown';
   /** Bu programın rakamlarının alındığı resmî sayfa. */
   source: string;
 }
@@ -342,6 +342,83 @@ export const PROP_FIRMS: PropFirm[] = [
         'Pour demander un retrait sur un compte Instant Funding, il faut d\'abord atteindre 5 % de gain.',
         'Un jour ne compte comme jour de trading que si vous ouvrez un nouveau trade ; garder des positions des jours précédents ne compte pas.',
         'Instant Funding vend d\'autres programmes (Micro, Crypto, IF1…) avec des limites différentes. Vérifiez le vôtre sur leur page de règles.',
+      ],
+    },
+  },
+  {
+    slug: 'fundingpips',
+    name: 'FundingPips',
+    checked: '2026-09-29',
+    platforms: ['MT5', 'cTrader', 'Match-Trader'],
+    programs: [
+      { name: '2 Step Standard', targets: ['8%', '5%'], daily: '3% / 5%', max: '10%', maxType: null, minDays: null, source: 'https://fundingpips.com/trading-objectives' },
+      { name: '2 Step Flex', targets: ['10%', '8%'], daily: '4%', max: '12%', maxType: null, minDays: { n: 1 }, source: 'https://fundingpips.com/trading-objectives' },
+      { name: '2 Step Pro', targets: ['6%', '6%'], daily: '3%', max: '6%', maxType: null, minDays: null, source: 'https://fundingpips.com/trading-objectives' },
+      { name: '1 Step Flex', targets: ['12%'], daily: '2% / 3%', max: '12%', maxType: null, minDays: 'unknown', source: 'https://fundingpips.com/trading-objectives' },
+    ],
+    notes: {
+      en: [
+        'Where two daily limits are shown (2 Step Standard: 3% or 5%, 1 Step Flex: 2% or 3%), it depends on the option you chose at checkout.',
+        'Minimum trading days are per phase; a day counts with a trade of at least 0.01 lots. 2 Step Standard starts "from 0 days" depending on the option.',
+        'Close at least one trade every 30 days, or the account counts as inactive.',
+        'On the Master account you may not open or close positions 5 minutes before or after high-impact news on the affected currencies, and holding overnight or over the weekend needs the Swing add-on.',
+        'The rules apply to accounts bought after the latest update; existing accounts keep their original rules.',
+      ],
+      tr: [
+        'İki günlük sınır gösterilen yerlerde (2 Step Standard: %3 ya da %5, 1 Step Flex: %2 ya da %3) hangisinin geçerli olduğu satın alırken seçtiğin seçeneğe bağlıdır.',
+        'Asgari işlem günü her aşama için ayrıdır; bir gün en az 0,01 lotluk bir işlemle sayılır. 2 Step Standard seçeneğe göre "0 günden" başlar.',
+        'En az 30 günde bir işlem kapatmalısın; yoksa hesap etkin değil sayılır.',
+        'Master hesapta ilgili para birimlerindeki önemli haberlerden 5 dakika önce ve sonra pozisyon açılamaz ve kapatılamaz; gece ve hafta sonu pozisyon taşımak için Swing eklentisi gerekir.',
+        'Kurallar son güncellemeden sonra satın alınan hesaplar için geçerlidir; mevcut hesaplar eski kurallarıyla devam eder.',
+      ],
+      fa: [
+        'جایی که دو حد روزانه آمده (2 Step Standard: ۳٪ یا ۵٪، 1 Step Flex: ۲٪ یا ۳٪)، بسته به گزینه‌ای است که هنگام خرید انتخاب کرده‌ای.',
+        'حداقل روز معاملاتی برای هر مرحله جداست؛ روزی حساب می‌شود که دست‌کم یک معامله ۰٫۰۱ لات داشته باشد. 2 Step Standard بسته به گزینه «از ۰ روز» شروع می‌شود.',
+        'دست‌کم هر ۳۰ روز یک معامله ببند، وگرنه حساب غیرفعال به شمار می‌آید.',
+        'در حساب Master، از ۵ دقیقه پیش تا ۵ دقیقه پس از خبرهای مهم روی ارزهای مربوط نمی‌توانی پوزیشن باز یا بسته کنی و نگه‌داشتن پوزیشن در شب یا آخر هفته افزونه Swing می‌خواهد.',
+        'این قوانین برای حساب‌هایی است که پس از آخرین به‌روزرسانی خریده شده‌اند؛ حساب‌های موجود با قوانین قبلی ادامه می‌دهند.',
+      ],
+      ar: [
+        'حيث يظهر حدّان يوميان (2 Step Standard: 3٪ أو 5٪، و1 Step Flex: 2٪ أو 3٪) فالمعتمد يتوقف على الخيار الذي اخترته عند الشراء.',
+        'الحد الأدنى لأيام التداول لكل مرحلة؛ ويُحتسب اليوم بصفقة لا تقل عن 0.01 لوت. يبدأ 2 Step Standard «من 0 أيام» بحسب الخيار.',
+        'أغلق صفقة واحدة على الأقل كل 30 يوماً، وإلا اعتُبر الحساب غير نشط.',
+        'في حساب Master لا يجوز فتح أو إغلاق صفقات قبل الأخبار المهمة أو بعدها بخمس دقائق على العملات المعنية، والاحتفاظ بالصفقات ليلاً أو في عطلة نهاية الأسبوع يتطلب إضافة Swing.',
+        'تسري القواعد على الحسابات المشتراة بعد آخر تحديث؛ أما الحسابات القائمة فتبقى على قواعدها الأصلية.',
+      ],
+      ru: [
+        'Где указаны два дневных лимита (2 Step Standard: 3% или 5%, 1 Step Flex: 2% или 3%), действует тот, что выбран при покупке.',
+        'Минимум торговых дней — на каждом этапе; день засчитывается при сделке от 0,01 лота. У 2 Step Standard в зависимости от варианта — «от 0 дней».',
+        'Закрывайте хотя бы одну сделку каждые 30 дней, иначе счёт считается неактивным.',
+        'На Master-счёте нельзя открывать и закрывать позиции за 5 минут до и после важных новостей по затронутым валютам, а перенос через ночь и выходные требует дополнения Swing.',
+        'Правила действуют для счетов, купленных после последнего обновления; действующие счета сохраняют прежние правила.',
+      ],
+      es: [
+        'Donde se muestran dos límites diarios (2 Step Standard: 3% o 5%, 1 Step Flex: 2% o 3%), depende de la opción que elegiste al comprar.',
+        'Los días mínimos son por fase; un día cuenta con una operación de al menos 0,01 lotes. 2 Step Standard empieza «desde 0 días» según la opción.',
+        'Cierra al menos una operación cada 30 días o la cuenta se considera inactiva.',
+        'En la cuenta Master no puedes abrir ni cerrar posiciones 5 minutos antes o después de noticias de alto impacto en las divisas afectadas, y mantener posiciones de noche o el fin de semana requiere el complemento Swing.',
+        'Las reglas se aplican a cuentas compradas tras la última actualización; las cuentas existentes conservan sus reglas.',
+      ],
+      pt: [
+        'Onde aparecem dois limites diários (2 Step Standard: 3% ou 5%, 1 Step Flex: 2% ou 3%), depende da opção escolhida na compra.',
+        'Os dias mínimos são por fase; um dia conta com uma operação de pelo menos 0,01 lotes. O 2 Step Standard começa «a partir de 0 dias» conforme a opção.',
+        'Fecha pelo menos uma operação a cada 30 dias, ou a conta é considerada inativa.',
+        'Na conta Master não podes abrir nem fechar posições 5 minutos antes ou depois de notícias de alto impacto nas moedas afetadas, e manter posições durante a noite ou o fim de semana exige o extra Swing.',
+        'As regras aplicam-se a contas compradas depois da última atualização; as contas existentes mantêm as regras originais.',
+      ],
+      de: [
+        'Wo zwei Tageslimits stehen (2 Step Standard: 3 % oder 5 %, 1 Step Flex: 2 % oder 3 %), gilt die beim Kauf gewählte Option.',
+        'Mindesthandelstage gelten je Phase; ein Tag zählt mit einem Trade ab 0,01 Lot. 2 Step Standard beginnt je nach Option „ab 0 Tagen“.',
+        'Schließe mindestens alle 30 Tage einen Trade, sonst gilt das Konto als inaktiv.',
+        'Auf dem Master-Konto dürfen 5 Minuten vor und nach wichtigen News in den betroffenen Währungen keine Positionen eröffnet oder geschlossen werden; Halten über Nacht oder das Wochenende erfordert das Swing-Add-on.',
+        'Die Regeln gelten für Konten, die nach dem letzten Update gekauft wurden; bestehende Konten behalten ihre Regeln.',
+      ],
+      fr: [
+        'Là où deux limites journalières figurent (2 Step Standard : 3 % ou 5 %, 1 Step Flex : 2 % ou 3 %), c\'est l\'option choisie à l\'achat qui compte.',
+        'Les jours minimum s\'entendent par phase ; un jour compte avec un trade d\'au moins 0,01 lot. 2 Step Standard démarre « à partir de 0 jour » selon l\'option.',
+        'Clôturez au moins un trade tous les 30 jours, sinon le compte est considéré comme inactif.',
+        'Sur le compte Master, impossible d\'ouvrir ou de clôturer une position 5 minutes avant ou après une annonce majeure sur les devises concernées ; garder des positions la nuit ou le week-end nécessite l\'option Swing.',
+        'Les règles s\'appliquent aux comptes achetés après la dernière mise à jour ; les comptes existants gardent leurs règles d\'origine.',
       ],
     },
   },
