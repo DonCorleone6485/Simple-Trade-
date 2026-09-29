@@ -45,6 +45,38 @@
       "destination": "/:lang/guides/:slug.html"
     },
     {
+      "source": "/prop-firms",
+      "destination": "/prop-firms.html"
+    },
+    {
+      "source": "/prop-firms/:slug",
+      "destination": "/prop-firms/:slug.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/prop-firms",
+      "destination": "/:lang/prop-firms.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/prop-firms/:slug",
+      "destination": "/:lang/prop-firms/:slug.html"
+    },
+    {
+      "source": "/brokers",
+      "destination": "/brokers.html"
+    },
+    {
+      "source": "/brokers/:slug",
+      "destination": "/brokers/:slug.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/brokers",
+      "destination": "/:lang/brokers.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/brokers/:slug",
+      "destination": "/:lang/brokers/:slug.html"
+    },
+    {
       "source": "/journal",
       "destination": "/index.html"
     },

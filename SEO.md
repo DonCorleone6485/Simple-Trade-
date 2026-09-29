@@ -4,7 +4,7 @@ SEO ile ilgili yapılan ve yapılacak her iş burada. Bir SEO işi bittiğinde y
 bir iş çıktığında aynı değişiklikte buraya işlenir (tarihle). Genel iş listesi
 PLAN.md'de, teknik ayrıntılar NOTES.md'de.
 
-Son güncelleme: 2026-09-29
+Son güncelleme: 2026-09-29 (prop firma ve broker sayfaları)
 
 ---
 
@@ -106,16 +106,45 @@ Aynı düzen ileride rakip fiyatları için de kurulabilir.
 | /blog/tradersync-alternative | 2026-09-28 |
 | /blog/edgewonk-alternative | 2026-09-28 |
 
-Toplam: 14 sayfa × 9 dil = 126 adres (sitemap).
+**Prop firma sayfaları** — 2026-09-29 (veri: `src/content/directory.ts`, şablon: `src/components/DirectoryPage.tsx`):
+| Adres | Programlar | Kaynak |
+|---|---|---|
+| /prop-firms | liste sayfası | — |
+| /prop-firms/ftmo | Challenge 2-Step, 1-Step | ftmo.com/en/trading-objectives |
+| /prop-firms/the5ers | High Stakes, Hyper Growth | the5ers.com/high-stakes, /hyper-growth |
+| /prop-firms/alpha-capital | Pro 8%, Pro 10%, One 6/10/12% | help.alphacapitalgroup.uk (22 Tem 2026 tarihli yazılar) |
+| /prop-firms/instant-funding | Instant Funding, One-Phase, Two-Phase | instantfunding.com/trading-rules |
+
+Her sayfada: kural tablosu (hedef, günlük/toplam kayıp, nereden ölçüldüğü, asgari gün),
+firmaya özel notlar, Simple Trading Journal'da prop hesabı kurma adımları, "journal kapanan
+işlemleri sayar, firma açık pozisyonu da sayabilir" uyarısı, kaynak bağlantıları, son kontrol
+tarihi, "bağlantımız yok" notu, BreadcrumbList yapısal verisi. Firmanın sayfası bir şeyi
+açıkça söylemiyorsa tabloda "Belirtilmemiş" yazar, tahmin yazılmaz.
+
+**Broker sayfaları** — 2026-09-29:
+| Adres | Platformlar (resmî sitesinden) |
+|---|---|
+| /brokers | liste sayfası |
+| /brokers/pepperstone | MT4, MT5, cTrader, TradingView |
+| /brokers/blackbull-markets | MT4, MT5, cTrader, TradingView |
+| /brokers/axi | MT4, MT5, TradingView |
+| /brokers/oanda | MT4, TradingView |
+
+Her platform için Simple Trading Journal'a nasıl geldiği (MT4/MT5: EA ile otomatik ya da
+dosya; cTrader vb.: dosya; TradingView: henüz doğrudan yok) ve rehber bağlantıları.
+Bağlantılar: ana sayfa alt kısmı ("Prop Firmalar", "Broker'lar") ve /blog dizininin sonu.
+
+Toplam: 24 sayfa × 9 dil = 216 adres (sitemap).
 
 ## Yapılacaklar
 
 ### İçerik
 - ⬜ **İçerik kümeleri:** trading journal, prop firm, risk yönetimi, trader psikolojisi — her birinde 10–20 yazı. Şu an toplam 10.
 - ⬜ **Yeni karşılaştırmalar:** TradesViz, Tradervue, FX Replay.
-- ⬜ **Programatik prop firma sayfaları** (`/prop-firms/<firma>`): kurallar + nasıl takip edilir. 5–10 firmayla başla (FTMO, The5ers, FundedNext, FivePercentOnline, Funding Pips). Kaynak yalnız firmanın resmî sitesi; her kuralda kaynak bağlantısı ve "son kontrol" tarihi. Kurallar tek veri dosyasında; ayda bir zamanlanmış görev kaynak sayfaları karşılaştırır, fark varsa kullanıcıya sorar (kendiliğinden yayınlamaz). Uzun süre doğrulanamayan firmada sayılar gizlenir. Logo yok, ortaklık ima edilmez.
-- ⬜ **Programatik broker sayfaları** (`/brokers/<broker>`): o broker'dan işlemleri aktarma.
-- ⬜ **Liste sayfaları** /prop-firms ve /brokers; ana sayfa alt kısmından bağlantı.
+- 🟡 **Programatik prop firma sayfaları** (`/prop-firms/<firma>`) — ilk 4 firma YAPILDI (2026-09-29). Sıradakiler: FundedNext ve FundingPips (siteleri bot doğrulaması istiyor, otomatik okunamadı — tarayıcıdan elle bakılmalı), FXIFY (kurallar yalnız etkileşimli seçicide), E8 Markets. Kaynak yalnız firmanın resmî sitesi; her kuralda kaynak bağlantısı ve "son kontrol" tarihi. Kurallar tek veri dosyasında; ayda bir zamanlanmış görev kaynak sayfaları karşılaştırır, fark varsa kullanıcıya sorar (kendiliğinden yayınlamaz). Uzun süre doğrulanamayan firmada sayılar gizlenir. Logo yok, ortaklık ima edilmez.
+- 🟡 **Programatik broker sayfaları** (`/brokers/<broker>`) — ilk 4 broker YAPILDI (2026-09-29). IC Markets, Exness, XM, FxPro, Tickmill siteleri buradan (Türkiye) açılmadı; başka ağdan platform listesi doğrulanınca eklenebilir.
+- ✅ **Liste sayfaları** /prop-firms ve /brokers; ana sayfa alt kısmından ve blogdan bağlantı (2026-09-29).
+- ⬜ **Aylık kural kontrol görevi** — henüz kurulmadı (kullanıcı onayı bekliyor).
 
 ### Geri bağlantılar (başka sitelerden bize bağlantı)
 - ⬜ Dizinler: Product Hunt, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub (başvuru metinleri hazırlanacak, başvuruyu kullanıcı yapar).
@@ -124,7 +153,7 @@ Toplam: 14 sayfa × 9 dil = 126 adres (sitemap).
 
 ### Teknik
 - ⬜ Bing Webmaster Tools + IndexNow.
-- ⬜ Article / FAQPage / BreadcrumbList yapısal verisi.
+- 🟡 Yapısal veri: BreadcrumbList prop firma/broker sayfalarında var (2026-09-29); yazılarda BlogPosting/HowTo var. Kalan: yardım için FAQPage.
 - ⬜ Search Console'da dizine eklenmeyen sayfaları ve arama sorgularını ayda bir kontrol.
 
 ## Kurallar

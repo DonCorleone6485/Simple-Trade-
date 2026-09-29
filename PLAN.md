@@ -25,13 +25,14 @@ Son güncelleme: 2026-09-29
 - [ ] **Haftalık özet e-postası** — kullanıcının haftası, kendi dilinde. `api/` 12 fonksiyonda: mevcut bir uca dal + Vercel cron.
 - [ ] **CSP'yi engelleme moduna almak** — 2026-10-06 … 10-13 arası, `client_errors` kind 'csp' raporlarına bakarak.
 - [ ] **Yeni blog yazıları** — 9 dilde, içerik kümelerine göre (§4).
-- [ ] **Programatik prop firma / broker sayfaları** (§4) — nasıl yapılacağı SEO.md'de.
+- 🟡 **Programatik prop firma / broker sayfaları** (§4) — ✅ 2026-09-29 ilk parti: 4 prop firma (FTMO, The5ers, Alpha Capital, Instant Funding) + 4 broker, 9 dilde. Kalan: yeni firmalar/broker'lar ve aylık kural kontrol görevi (SEO.md).
 - [ ] **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate (büyük iş).
 
 ### Ertelenenler
 - Ödeme sistemi ve yasal sayfalar — şirket kurulunca. Bölgesel fiyat grupları, kurucu üye kampanyası, ortaklık programı buna bağlı.
 
 ### Biten (son)
+- ✅ 2026-09-29 Prop firma ve broker sayfaları (/prop-firms, /brokers), 9 dilde, 72 yeni adres.
 - ✅ 2026-09-29 EA 1.09 MT4'te kuruldu ve işlem aktarıyor.
 - ✅ 2026-09-29 Hesap silme test hesabıyla denendi.
 - ✅ 2026-09-29 Gerçek MT5 raporu bulundu; test raporun kendi özetiyle karşılaştırıyor.
@@ -75,7 +76,7 @@ Ayrıntılı kayıt (yapılanlar, sayfalar, araçlar, yapılacaklar): [SEO.md](S
 
 - ✅ Dil başına adresler (/tr, /fa, /ar …).
 - [ ] İçerik kümeleri: trading journal, prop firm, risk yönetimi, trader psikolojisi — her biri 10–20 yazı (şu an 10 yazı toplam).
-- [ ] Programatik sayfalar: her prop firma / broker için ("FTMO kuralları takip aracı").
+- 🟡 Programatik sayfalar: ✅ ilk 4 prop firma + 4 broker (2026-09-29); devamı SEO.md'de.
 - ✅ Karşılaştırma sayfaları (Tradezella, TraderSync, Edgewonk).
 - [ ] Geri bağlantılar: dizinler, konuk yazılar, forumlar, YouTube açıklamaları.
 

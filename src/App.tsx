@@ -51,6 +51,7 @@ const PropEvaluation = lazy(() => import('./components/PropEvaluation'));
 const LandingPage = lazy(() => import('./components/LandingPage'));
 const InfoPage = lazy(() => import('./components/InfoPage'));
 const ArticlePage = lazy(() => import('./components/ArticlePage'));
+const DirectoryPage = lazy(() => import('./components/DirectoryPage'));
 const ContactModal = lazy(() => import('./components/ContactModal'));
 const JournalDashboard = lazy(() => import('./components/JournalDashboard'));
 const PrintableReport = lazy(() => import('./components/PrintableReport'));
@@ -60,7 +61,7 @@ type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news' | 'discip
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect';
 type AuthView = 'signin' | 'signup';
 type AuthStage = 'landing' | 'auth';
-/** 'blog': /blog dizini ve /blog/…, /guides/… yazıları (ArticlePage). */
+/** 'blog': /blog dizini ve /blog/…, /guides/… yazıları (ArticlePage); /prop-firms/…, /brokers/… (DirectoryPage). */
 type Page = 'home' | 'journal' | 'help' | 'changelog' | 'blog';
 
 const JOURNAL_PATH = '/journal';
@@ -75,7 +76,7 @@ function pathParts(): string[] {
 function getInitialPage(): Page {
   const first = pathParts()[0];
   return first === 'journal' ? 'journal' : first === 'help' ? 'help' : first === 'changelog' ? 'changelog'
-    : first === 'blog' || first === 'guides' ? 'blog' : 'home';
+    : first === 'blog' || first === 'guides' || first === 'prop-firms' || first === 'brokers' ? 'blog' : 'home';
 }
 
 function pathForPage(page: Page): string {
@@ -1460,14 +1461,23 @@ export default function App() {
 
       {page === 'blog' && (
         <Suspense fallback={<div className="min-h-screen" style={{ background: '#0d0e1a' }} />}>
-          <ArticlePage
+          {/^\/(prop-firms|brokers)(\/|$)/.test(contentPath) ? (
+            <DirectoryPage
+              path={contentPath}
+              onHome={() => navigate('home')}
+              onOpen={openContent}
+              cta={isSignedIn
+                ? { label: t('guestGoJournal'), onClick: () => navigate('journal') }
+                : { label: t('guestStartFree'), onClick: startGuest }}
+            />
+          ) : <ArticlePage
             path={contentPath}
             onHome={() => navigate('home')}
             onOpen={openContent}
             cta={isSignedIn
               ? { label: t('guestGoJournal'), onClick: () => navigate('journal') }
               : { label: t('guestStartFree'), onClick: startGuest }}
-          />
+          />}
         </Suspense>
       )}
 

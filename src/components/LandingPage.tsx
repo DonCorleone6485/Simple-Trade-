@@ -934,6 +934,8 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 { label: t('Fiyatlandırma', 'Pricing', 'قیمت‌گذاری'), href: '#pricing' },
                 { label: t('Yardım', 'Help', 'راهنما'), href: langPath('/help', language) },
                 { label: t('Blog', 'Blog', 'بلاگ'), href: langPath('/blog', language) },
+                { label: t('Prop Firmalar', 'Prop Firms', 'پراپ فرم‌ها'), href: langPath('/prop-firms', language) },
+                { label: t("Broker'lar", 'Brokers', 'بروکرها'), href: langPath('/brokers', language) },
                 { label: t('İletişim', 'Contact', 'تماس با ما'), href: 'mailto:support@simpletradejournal.io' },
                 { label: t('Değişiklikler', 'Changelog', 'تغییرات'), href: langPath('/changelog', language) },
               ].map(l => (
