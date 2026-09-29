@@ -87,7 +87,7 @@ Trading kitlesi platformlara eşit dağılmıyor. Önceliğe göre:
 
 | Platform | Rol | Dil | Durum |
 |---|---|---|---|
-| **Instagram** (+ otomatik Threads) | Reels, karuseller, reklam | EN + TR + FA | [ ] |
+| **Instagram** (+ otomatik Threads) | Reels, karuseller, reklam | EN + TR + FA | ✅ 2026-09-30 hesap `@simpletradejournal` açıldı (social@), İşletme hesabı, logo, biyografi, site bağlantısı; Facebook bağlantısı ve iletişim bilgisi sonra |
 | **YouTube** | Kurulum eğitimleri (uzun) + Shorts; Google'da da çıkar | EN + TR (FA altyazı) | [ ] |
 | **TikTok** | Kısa video, hızlı büyüme | EN + TR | [ ] |
 | **X (Twitter)** | Trader topluluğunun kalbi; tartışma ve güncellemeler | EN | [ ] |
