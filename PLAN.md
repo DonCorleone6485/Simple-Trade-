@@ -34,7 +34,8 @@ Not: 29 Eylül'e kadar listelerde "biyografiler hazır" yazıyordu ama yazılmam
 2. ✅ 2026-09-29 **Kontrol listesi sayfası (Claude)** — [docs/social.md](docs/social.md): kayıt adresleri, kullanıcı adları, `social@` adımları, 9 dilde kısa/standart/uzun biyografi (karakter sınırları kontrol edildi).
 3. ✅ 2026-09-29 **`social@` takma adı (kullanıcı)** — Google Workspace'te eklendi (ilk denemede yanlışlıkla `sosial` yazılmıştı, `social` olarak düzeltildi) ve Gmail'de `to:social@` → "Sosyal medya" etiketi filtresi kuruldu. Yahoo'dan atılan deneme postası "Sosyal medya" etiketine düştü, doğrulandı; adımlar docs/social.md §0'da.
 4. [ ] **Hesaplar açılınca (Claude, kullanıcı onayıyla)** — kullanıcı giriş yaptıktan sonra profil fotoğrafı, biyografi ve site bağlantısı açık oturumda doldurulur.
-5. [ ] **Şifre yöneticisi (kullanıcı)** — Bitwarden ücretsiz planı yeterli; her hesaba ayrı uzun şifre ve 2FA.
+5. ✅ 2026-09-30 **Şifre yöneticisi (kullanıcı)** — Bitwarden ücretsiz plan kuruldu (Edge uzantısı + telefon, kendi 2FA'sı açık); Edge'in şifre kaydı kapatıldı, mevcut şirket şifreleri aktarıldı.
+- [ ] **TikTok kullanıcı adını düzelt — 2026-10-30 sonrası (kullanıcı; Claude oturum başında hatırlatır)** — kayıtta TikTok otomatik saçma bir `@` adı verdi, 30 gün değiştirilemiyor. Ay dolunca `simpletradejournal` yap (doluysa `simpletradejournal.app` ya da `stjournalapp`). O zamana kadar görünen ad `Simple Trading Journal`.
 6. [ ] **Siteye sosyal medya bağlantıları (Claude)** — hesaplar açılınca alt bilgiye ve yapısal veriye (sameAs) eklenir.
 
 ### Kullanıcıyı beklemeden yapılabilecekler
@@ -89,7 +90,7 @@ Trading kitlesi platformlara eşit dağılmıyor. Önceliğe göre:
 |---|---|---|---|
 | **Instagram** (+ otomatik Threads) | Reels, karuseller, reklam | EN + TR + FA | ✅ 2026-09-30 hesap `@simpletradejournal` açıldı (social@), İşletme hesabı, logo, biyografi, site bağlantısı; Facebook bağlantısı ve iletişim bilgisi sonra |
 | **YouTube** | Kurulum eğitimleri (uzun) + Shorts; Google'da da çıkar | EN + TR (FA altyazı) | [ ] |
-| **TikTok** | Kısa video, hızlı büyüme | EN + TR | [ ] |
+| **TikTok** | Kısa video, hızlı büyüme | EN + TR | 🟡 2026-09-30 hesap açıldı (social@, 2FA açık); `@` adı otomatik verildi, 30 gün sonra düzelt |
 | **X (Twitter)** | Trader topluluğunun kalbi; tartışma ve güncellemeler | EN | [ ] |
 | **Telegram kanalı** | Türk, İranlı ve Arap trader'lar burada çok yoğun | TR, FA, AR | [ ] |
 | **Discord** | Kullanıcı topluluğu, destek, geri bildirim | EN (dil kanallarıyla) | [ ] |
