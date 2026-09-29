@@ -26,7 +26,7 @@ Son güncelleme: 2026-09-29
 - ✅ 2026-09-29 **Haftalık özet e-postası** — pazartesi 09:00 UTC günlük görevle, 9 dilde, yalnız o hafta işlemi olana (`api/_digest.ts`).
 - [ ] **CSP'yi engelleme moduna almak** — 2026-10-06 … 10-13 arası, `client_errors` kind 'csp' raporlarına bakarak. Zamanlanmış görev `csp-enforce-check` 6 Ekim 10:00'da yapacak (29 Eylül'e kadar yalnız 'eval' ve 'wasm-eval' raporu, 2'şer).
 - 🟡 **Yeni blog yazıları** — 9 dilde, içerik kümelerine göre (§4). ✅ 2026-09-29 3 yazı: pozisyon büyüklüğü, intikam işlemi, beklenti ve kâr faktörü (toplam 13). Haftada 1 devam.
-- 🟡 **Programatik prop firma / broker sayfaları** (§4) — ✅ 2026-09-29 5 prop firma (FTMO, The5ers, Alpha Capital, Instant Funding, FundingPips) + 4 broker, 9 dilde; aylık kural kontrol görevi kuruldu. Kalan: FundedNext, FXIFY, E8 ve Türkiye'den açılmayan broker'lar (SEO.md).
+- 🟡 **Programatik prop firma / broker sayfaları** (§4) — ✅ 2026-09-29 5 prop firma (FTMO, The5ers, Alpha Capital, Instant Funding, FundingPips) + 4 broker, 9 dilde; aylık kural kontrol görevi kuruldu. ✅ 2026-09-29 E8 Markets eklendi (6 firma). Kalan: FundedNext, FXIFY ve Türkiye'den açılmayan broker'lar (SEO.md).
 - [ ] **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate (büyük iş).
 
 ### Ertelenenler

@@ -81,6 +81,7 @@ Aynı düzen ileride rakip fiyatları için de kurulabilir.
 | Gerçek 404 (olmayan sayfa 404 döner, ana sayfaya düşmez) | ✅ | canlıda doğrulandı |
 | Dil başına adresler: /tr, /fa, /ar, /ru, /es, /pt, /de, /fr + hreflang + x-default | ✅ 2026-09-28 | `src/lib/langPath.ts` |
 | Hız: kod bölme, ana paket 86 KB (gzip) | ✅ 2026-09-28 | |
+| Ön çizimde `$&` hatası: metinde "$'" geçen sayfalarda (Türkçe prop firma sayfaları) `<div id="root">` metnin içine basılıyordu | ✅ 2026-09-29 düzeltildi | `scripts/prerender.mjs` — replace artık fonksiyonla |
 | Yapısal veri: yazılar için Article, yardım için FAQPage, BreadcrumbList | ⬜ Yapılacak | Google'da zengin sonuç (tarih, SSS açılır kutusu) |
 | llms.txt (yapay zekâ asistanları için site özeti) | ⬜ İsteğe bağlı | |
 
@@ -118,6 +119,7 @@ Aynı düzen ileride rakip fiyatları için de kurulabilir.
 | /prop-firms/alpha-capital | Pro 8%, Pro 10%, One 6/10/12% | help.alphacapitalgroup.uk (22 Tem 2026 tarihli yazılar) |
 | /prop-firms/instant-funding | Instant Funding, One-Phase, Two-Phase | instantfunding.com/trading-rules |
 | /prop-firms/fundingpips | 2 Step Standard, 2 Step Flex, 2 Step Pro, 1 Step Flex | fundingpips.com/trading-objectives (tarayıcıyla okundu) |
+| /prop-firms/e8-markets | E8 One (ön ayarlı hesap), E8 Pro, E8 Signature | help.e8markets.com ürün yazıları (2026-09-29, tarayıcıyla; site bot doğrulaması istiyor ama tarayıcı kendiliğinden geçti). E8 One değerleri satın alırken değiştirilebilir — notta yazıyor. |
 
 Her sayfada: kural tablosu (hedef, günlük/toplam kayıp, nereden ölçüldüğü, asgari gün),
 firmaya özel notlar, Simple Trading Journal'da prop hesabı kurma adımları, "journal kapanan
@@ -138,7 +140,7 @@ Her platform için Simple Trading Journal'a nasıl geldiği (MT4/MT5: EA ile oto
 dosya; cTrader vb.: dosya; TradingView: henüz doğrudan yok) ve rehber bağlantıları.
 Bağlantılar: ana sayfa alt kısmı ("Prop Firmalar", "Broker'lar") ve /blog dizininin sonu.
 
-Toplam: 28 sayfa × 9 dil = 252 adres (sitemap, 2026-09-29).
+Toplam: 29 sayfa × 9 dil = 261 adres (sitemap, 2026-09-29).
 
 Search Console'da dizine ekleme istendi (2026-09-29): /prop-firms, /brokers, /tr/prop-firms, /prop-firms/ftmo.
 
@@ -147,7 +149,7 @@ Search Console'da dizine ekleme istendi (2026-09-29): /prop-firms, /brokers, /tr
 ### İçerik
 - ⬜ **İçerik kümeleri:** trading journal, prop firm, risk yönetimi, trader psikolojisi — her birinde 10–20 yazı. Şu an toplam 13 (2026-09-29: pozisyon büyüklüğü, intikam işlemi, beklenti/kâr faktörü eklendi).
 - ⬜ **Yeni karşılaştırmalar:** TradesViz, Tradervue, FX Replay.
-- 🟡 **Programatik prop firma sayfaları** (`/prop-firms/<firma>`) — 5 firma YAPILDI (2026-09-29; FundingPips aynı gün tarayıcıyla eklendi). Sıradakiler: FundedNext (bot doğrulaması, tarayıcı da geçemiyor — kullanıcı kuralları yapıştırırsa eklenir), FXIFY (tablo hesap büyüklüğü seçicisine bağlı, okunan değerler çelişkili), E8 Markets. Kaynak yalnız firmanın resmî sitesi; her kuralda kaynak bağlantısı ve "son kontrol" tarihi. Kurallar tek veri dosyasında; ayda bir zamanlanmış görev kaynak sayfaları karşılaştırır, fark varsa kullanıcıya sorar (kendiliğinden yayınlamaz). Uzun süre doğrulanamayan firmada sayılar gizlenir. Logo yok, ortaklık ima edilmez.
+- 🟡 **Programatik prop firma sayfaları** (`/prop-firms/<firma>`) — 5 firma YAPILDI (2026-09-29; FundingPips aynı gün tarayıcıyla eklendi). Sıradakiler: FundedNext (bot doğrulaması, tarayıcı da geçemiyor — kullanıcı kuralları yapıştırırsa eklenir), FXIFY (tablo hesap büyüklüğü seçicisine bağlı, okunan değerler çelişkili). ✅ E8 Markets eklendi (2026-09-29). Kaynak yalnız firmanın resmî sitesi; her kuralda kaynak bağlantısı ve "son kontrol" tarihi. Kurallar tek veri dosyasında; ayda bir zamanlanmış görev kaynak sayfaları karşılaştırır, fark varsa kullanıcıya sorar (kendiliğinden yayınlamaz). Uzun süre doğrulanamayan firmada sayılar gizlenir. Logo yok, ortaklık ima edilmez.
 - 🟡 **Programatik broker sayfaları** (`/brokers/<broker>`) — ilk 4 broker YAPILDI (2026-09-29). IC Markets, Exness, XM, FxPro, Tickmill siteleri buradan (Türkiye) açılmadı; başka ağdan platform listesi doğrulanınca eklenebilir.
 - ✅ **Liste sayfaları** /prop-firms ve /brokers; ana sayfa alt kısmından ve blogdan bağlantı (2026-09-29).
 - ✅ **Aylık kural kontrol görevi** — kuruldu (2026-09-29): masaüstü uygulamasında zamanlanmış görev `prop-firm-rules-check`, her ayın 1'i 10:00. Uygulama kapalıysa açılınca çalışır.

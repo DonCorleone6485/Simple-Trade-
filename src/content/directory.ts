@@ -422,6 +422,82 @@ export const PROP_FIRMS: PropFirm[] = [
       ],
     },
   },
+  {
+    slug: 'e8-markets',
+    name: 'E8 Markets',
+    checked: '2026-09-29',
+    platforms: ['MT5', 'cTrader', 'TradeLocker', 'Match-Trader'],
+    programs: [
+      { name: 'E8 One', targets: ['6%'], daily: '3%', max: '4%', maxType: 'trailing', minDays: null, source: 'https://help.e8markets.com/en/articles/11775980-e8-one' },
+      { name: 'E8 Pro', targets: ['8%'], daily: '2.5%', max: '8%', maxType: 'static', minDays: null, source: 'https://help.e8markets.com/en/articles/15274219-e8-pro' },
+      { name: 'E8 Signature', targets: ['6%'], daily: null, max: '3%', maxType: 'eodTrailing', minDays: null, source: 'https://help.e8markets.com/en/articles/11755943-e8-signature' },
+    ],
+    notes: {
+      en: [
+        'E8 One figures are for the preset account; the target, drawdown and payout can be changed at checkout, so your account may use other numbers.',
+        'E8 One\'s dynamic drawdown follows your highest closed balance (not open equity) and stops moving once it reaches the starting balance. E8 Signature\'s moves only with the end-of-day balance and also locks at the starting balance. E8 Pro\'s is static and moves only when the first payout is processed.',
+        'E8 One and E8 Pro measure the daily limit from the day\'s starting balance. On E8 Pro only 2% of the starting balance per day counts toward the target (daily profit cap).',
+        'E8 Signature has no daily loss limit in the challenge. On the funded (Performance) account a 2% daily pause stops trading until the next day without failing the account. Its total drawdown is 4% on 25K and 50K accounts and 3% on 100K and 150K; positions are closed at 23:00 server time.',
+        'On all three, close at least one trade every 60 days. E8 One\'s Performance account forbids trading from 5 minutes before to 5 minutes after high-impact news, and payouts have a best-day rule (E8 One 40%, E8 Signature 35%).',
+      ],
+      tr: [
+        'E8 One rakamları hazır (ön ayarlı) hesaba aittir; hedef, drawdown ve ödeme oranı satın alırken değiştirilebilir, yani senin hesabın başka sayılar kullanıyor olabilir.',
+        'E8 One\'ın dinamik drawdown\'u açık pozisyonu değil, ulaşılan en yüksek kapanmış bakiyeyi izler ve başlangıç bakiyesine ulaşınca durur. E8 Signature\'ınki yalnız gün sonu bakiyesiyle hareket eder, o da başlangıç bakiyesinde sabitlenir. E8 Pro\'nunki sabittir, yalnız ilk ödeme yapıldığında kayar.',
+        'E8 One ve E8 Pro günlük sınırı günün başlangıç bakiyesinden ölçer. E8 Pro\'da günde başlangıç bakiyesinin yalnız %2\'si hedefe sayılır (günlük kâr tavanı).',
+        'E8 Signature\'da sınav aşamasında günlük kayıp sınırı yoktur. Fonlu (Performance) hesapta %2\'lik günlük duraklama, hesabı düşürmeden işlemleri ertesi güne kadar durdurur. Toplam drawdown 25K ve 50K hesaplarda %4, 100K ve 150K\'da %3\'tür; pozisyonlar sunucu saatiyle 23:00\'te kapatılır.',
+        'Üçünde de en az 60 günde bir işlem kapatmalısın. E8 One\'ın Performance hesabında önemli haberlerden 5 dakika önce ile 5 dakika sonrası arasında işlem yasaktır; ödemelerde en iyi gün kuralı vardır (E8 One %40, E8 Signature %35).',
+      ],
+      fa: [
+        'اعداد E8 One مربوط به حساب پیش‌فرض است؛ هدف، دراودان و درصد پرداخت هنگام خرید قابل تغییرند، پس ممکن است حساب تو اعداد دیگری داشته باشد.',
+        'دراودان پویای E8 One بالاترین موجودی بسته‌شده را دنبال می‌کند (نه اکوییتی باز) و وقتی به موجودی اولیه برسد دیگر حرکت نمی‌کند. دراودان E8 Signature فقط با موجودی پایان روز جابه‌جا می‌شود و آن هم در موجودی اولیه قفل می‌شود. دراودان E8 Pro ثابت است و فقط با پردازش اولین برداشت جابه‌جا می‌شود.',
+        'E8 One و E8 Pro حد روزانه را از موجودی شروع روز می‌سنجند. در E8 Pro روزانه فقط ۲٪ از موجودی اولیه در هدف حساب می‌شود (سقف سود روزانه).',
+        'E8 Signature در مرحله چالش حد ضرر روزانه ندارد. در حساب تأمین‌شده (Performance) توقف روزانه ۲٪ معامله را تا روز بعد متوقف می‌کند بی‌آنکه حساب از دست برود. دراودان کل در حساب‌های 25K و 50K برابر ۴٪ و در 100K و 150K برابر ۳٪ است؛ پوزیشن‌ها ساعت ۲۳:۰۰ به وقت سرور بسته می‌شوند.',
+        'در هر سه، دست‌کم هر ۶۰ روز یک معامله ببند. در حساب Performance محصول E8 One معامله از ۵ دقیقه پیش تا ۵ دقیقه پس از خبرهای مهم ممنوع است و برداشت‌ها قانون بهترین روز دارند (E8 One ۴۰٪، E8 Signature ۳۵٪).',
+      ],
+      ar: [
+        'أرقام E8 One تخص الحساب المُعَد مسبقاً؛ يمكن تغيير الهدف والتراجع ونسبة الأرباح عند الشراء، لذا قد يستخدم حسابك أرقاماً أخرى.',
+        'يتبع التراجع الديناميكي في E8 One أعلى رصيد مغلق (لا الرصيد العائم) ويتوقف عن الحركة عند بلوغ الرصيد الابتدائي. أما في E8 Signature فيتحرك مع رصيد نهاية اليوم فقط ويُقفل أيضاً عند الرصيد الابتدائي. وفي E8 Pro هو ثابت ولا يتحرك إلا عند معالجة أول سحب.',
+        'يقيس E8 One وE8 Pro الحد اليومي من رصيد بداية اليوم. وفي E8 Pro لا يُحتسب للهدف يومياً إلا 2% من الرصيد الابتدائي (سقف الربح اليومي).',
+        'لا يوجد في E8 Signature حد خسارة يومي في مرحلة التحدي. وفي الحساب الممول (Performance) يوقف التوقف اليومي بنسبة 2% التداول حتى اليوم التالي دون إسقاط الحساب. التراجع الكلي 4% في حسابات 25K و50K و3% في 100K و150K؛ وتُغلق المراكز الساعة 23:00 بتوقيت الخادم.',
+        'في الثلاثة، أغلق صفقة واحدة على الأقل كل 60 يوماً. في حساب Performance الخاص بـE8 One يُمنع التداول من 5 دقائق قبل الأخبار المهمة إلى 5 دقائق بعدها، وتخضع السحوبات لقاعدة أفضل يوم (E8 One 40%، E8 Signature 35%).',
+      ],
+      ru: [
+        'Цифры E8 One — для стандартного счёта; цель, просадку и долю выплаты можно изменить при покупке, поэтому у вашего счёта могут быть другие значения.',
+        'Динамическая просадка E8 One следует за максимальным закрытым балансом (не за открытым эквити) и перестаёт двигаться, когда доходит до стартового баланса. У E8 Signature она двигается только по балансу на конец дня и тоже фиксируется на стартовом балансе. У E8 Pro она статическая и сдвигается только после первой выплаты.',
+        'E8 One и E8 Pro считают дневной лимит от баланса на начало дня. В E8 Pro в цель засчитывается не более 2% стартового баланса в день (дневной потолок прибыли).',
+        'У E8 Signature на этапе челленджа нет дневного лимита убытка. На фондированном (Performance) счёте дневная пауза 2% останавливает торговлю до следующего дня, не проваливая счёт. Общая просадка — 4% на счетах 25K и 50K и 3% на 100K и 150K; позиции закрываются в 23:00 по времени сервера.',
+        'Во всех трёх нужно закрывать хотя бы одну сделку каждые 60 дней. На Performance-счёте E8 One нельзя торговать в период от 5 минут до важных новостей до 5 минут после них, а для выплат действует правило лучшего дня (E8 One — 40%, E8 Signature — 35%).',
+      ],
+      es: [
+        'Las cifras de E8 One son las de la cuenta predefinida; el objetivo, el drawdown y el reparto se pueden cambiar al comprar, así que tu cuenta puede usar otros números.',
+        'El drawdown dinámico de E8 One sigue tu saldo cerrado más alto (no el equity abierto) y deja de moverse al llegar al saldo inicial. El de E8 Signature solo se mueve con el saldo de cierre del día y también se fija en el saldo inicial. El de E8 Pro es estático y solo se desplaza al procesarse el primer pago.',
+        'E8 One y E8 Pro miden el límite diario desde el saldo de inicio del día. En E8 Pro solo cuenta para el objetivo un 2% del saldo inicial por día (tope de beneficio diario).',
+        'E8 Signature no tiene límite de pérdida diaria en el challenge. En la cuenta financiada (Performance), una pausa diaria del 2% detiene el trading hasta el día siguiente sin suspender la cuenta. Su drawdown total es del 4% en cuentas de 25K y 50K y del 3% en 100K y 150K; las posiciones se cierran a las 23:00 hora del servidor.',
+        'En las tres, cierra al menos una operación cada 60 días. En la cuenta Performance de E8 One está prohibido operar desde 5 minutos antes hasta 5 minutos después de noticias de alto impacto, y los pagos tienen una regla del mejor día (E8 One 40%, E8 Signature 35%).',
+      ],
+      pt: [
+        'Os números do E8 One são da conta predefinida; o objetivo, o drawdown e a divisão de lucros podem ser alterados na compra, por isso a tua conta pode ter outros valores.',
+        'O drawdown dinâmico do E8 One segue o teu saldo fechado mais alto (não o equity aberto) e deixa de se mover quando chega ao saldo inicial. O do E8 Signature só se move com o saldo de fim do dia e também fica fixo no saldo inicial. O do E8 Pro é estático e só se desloca quando o primeiro pagamento é processado.',
+        'O E8 One e o E8 Pro medem o limite diário a partir do saldo de início do dia. No E8 Pro só conta para o objetivo 2% do saldo inicial por dia (teto de lucro diário).',
+        'O E8 Signature não tem limite de perda diária no challenge. Na conta financiada (Performance), uma pausa diária de 2% para o trading até ao dia seguinte sem reprovar a conta. O drawdown total é de 4% nas contas de 25K e 50K e de 3% nas de 100K e 150K; as posições são fechadas às 23:00, hora do servidor.',
+        'Nas três, fecha pelo menos uma operação a cada 60 dias. Na conta Performance do E8 One é proibido operar desde 5 minutos antes até 5 minutos depois de notícias de alto impacto, e os pagamentos têm uma regra do melhor dia (E8 One 40%, E8 Signature 35%).',
+      ],
+      de: [
+        'Die Zahlen für E8 One gelten für das voreingestellte Konto; Ziel, Drawdown und Gewinnbeteiligung lassen sich beim Kauf ändern, dein Konto kann also andere Werte haben.',
+        'Der dynamische Drawdown von E8 One folgt deinem höchsten geschlossenen Kontostand (nicht der offenen Equity) und bleibt stehen, sobald er den Startsaldo erreicht. Bei E8 Signature bewegt er sich nur mit dem Tagesendsaldo und friert ebenfalls beim Startsaldo ein. Bei E8 Pro ist er statisch und verschiebt sich erst mit der ersten Auszahlung.',
+        'E8 One und E8 Pro messen das Tageslimit vom Saldo zu Tagesbeginn. Bei E8 Pro zählen pro Tag höchstens 2 % des Startsaldos zum Ziel (tägliche Gewinnobergrenze).',
+        'E8 Signature hat in der Challenge kein Tagesverlustlimit. Auf dem finanzierten (Performance-)Konto stoppt eine tägliche Pause bei 2 % den Handel bis zum nächsten Tag, ohne das Konto zu verlieren. Der Gesamt-Drawdown beträgt 4 % bei 25K- und 50K-Konten und 3 % bei 100K und 150K; Positionen werden um 23:00 Serverzeit geschlossen.',
+        'Bei allen dreien musst du mindestens alle 60 Tage einen Trade schließen. Auf dem Performance-Konto von E8 One ist Handeln von 5 Minuten vor bis 5 Minuten nach wichtigen News verboten, und für Auszahlungen gilt eine Best-Day-Regel (E8 One 40 %, E8 Signature 35 %).',
+      ],
+      fr: [
+        'Les chiffres d\'E8 One sont ceux du compte prédéfini ; l\'objectif, le drawdown et le partage des gains peuvent être modifiés à l\'achat, votre compte peut donc avoir d\'autres valeurs.',
+        'Le drawdown dynamique d\'E8 One suit votre solde clôturé le plus haut (pas l\'equity ouverte) et cesse de bouger une fois arrivé au solde de départ. Celui d\'E8 Signature ne bouge qu\'avec le solde de fin de journée et se fige lui aussi au solde de départ. Celui d\'E8 Pro est statique et ne se déplace qu\'au traitement du premier retrait.',
+        'E8 One et E8 Pro mesurent la limite journalière à partir du solde de début de journée. Sur E8 Pro, seuls 2 % du solde de départ par jour comptent pour l\'objectif (plafond de gain journalier).',
+        'E8 Signature n\'a pas de limite de perte journalière pendant le challenge. Sur le compte financé (Performance), une pause journalière de 2 % arrête le trading jusqu\'au lendemain sans faire échouer le compte. Le drawdown total est de 4 % sur les comptes 25K et 50K et de 3 % sur 100K et 150K ; les positions sont clôturées à 23:00, heure du serveur.',
+        'Sur les trois, clôturez au moins un trade tous les 60 jours. Sur le compte Performance d\'E8 One, il est interdit de trader de 5 minutes avant à 5 minutes après une annonce majeure, et les retraits sont soumis à une règle du meilleur jour (E8 One 40 %, E8 Signature 35 %).',
+      ],
+    },
+  },
 ];
 
 export const BROKERS: Broker[] = [

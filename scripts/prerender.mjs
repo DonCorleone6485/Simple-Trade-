@@ -29,10 +29,14 @@ const RTL = ['fa', 'ar'];
 
 const esc = s => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
+// Yerleştirmeler hep fonksiyonla: metin olarak verilirse içindeki "$&", "$'"
+// gibi diziler replace'in özel desenleri sayılıyor. React ' karakterini
+// &#x27; yazdığı için "100.000 $'lık" → "$&#x27;" oluyor ve "$&" yerine
+// eşleşen <div id="root"></div> basılıyordu.
 function withBody(page, html) {
   if (!page.includes('<div id="root"></div>')) throw new Error('root div not found');
   return page
-    .replace('<div id="root"></div>', `<div id="root"><div id="prerender">${html}</div></div>`)
+    .replace('<div id="root"></div>', () => `<div id="root"><div id="prerender">${html}</div></div>`)
     // Bu satır içi betik vercel.json'daki CSP'de sha256 ile izinli: değişirse hash'i de güncelle.
     .replace('</head>', `<script>document.documentElement.classList.add('js')</script><style>.js #prerender{display:none}</style></head>`);
 }
@@ -45,15 +49,15 @@ function withHead(page, { title, description, path, lang }, alternates) {
     .join('');
   return page
     .replace(/<html lang="[^"]*">/, `<html lang="${lang}" dir="${RTL.includes(lang) ? 'rtl' : 'ltr'}">`)
-    .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
-    .replace(/(<meta name="description" content=")[^"]*(")/, `$1${esc(description)}$2`)
-    .replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${url}$2`)
-    .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${url}$2`)
-    .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${esc(title)}$2`)
-    .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${esc(description)}$2`)
-    .replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${esc(title)}$2`)
-    .replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${esc(description)}$2`)
-    .replace('</head>', `<meta property="og:locale" content="${OG_LOCALE[lang] || 'en_US'}" />${links}</head>`);
+    .replace(/<title>[^<]*<\/title>/, () => `<title>${esc(title)}</title>`)
+    .replace(/(<meta name="description" content=")[^"]*(")/, (_, a, b) => a + esc(description) + b)
+    .replace(/(<link rel="canonical" href=")[^"]*(")/, (_, a, b) => a + url + b)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/, (_, a, b) => a + url + b)
+    .replace(/(<meta property="og:title" content=")[^"]*(")/, (_, a, b) => a + esc(title) + b)
+    .replace(/(<meta property="og:description" content=")[^"]*(")/, (_, a, b) => a + esc(description) + b)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(")/, (_, a, b) => a + esc(title) + b)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/, (_, a, b) => a + esc(description) + b)
+    .replace('</head>', () => `<meta property="og:locale" content="${OG_LOCALE[lang] || 'en_US'}" />${links}</head>`);
 }
 
 const write = (file, content) => {
