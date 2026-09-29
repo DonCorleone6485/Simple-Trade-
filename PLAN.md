@@ -29,10 +29,9 @@ Son güncelleme: 2026-09-29
 - ✅ 2026-09-29 **Bing Webmaster Tools** — kullanıcı Google ile girip Search Console'dan içe aktardı.
 
 ### Sosyal medya kurulumu (2026-09-29'da konuşuldu; kullanıcı "bekle" dedi)
-Not: eski listelerde "kullanıcı adları ve 9 dilde biyografiler hazır" yazıyordu — yanlıştı. 27 Eylül'de yalnız önerildi, hiç yazılmadı.
-1. [ ] **Kullanıcı adı kontrolü (Claude)** — `@simpletradejournal` ve `@stjournal` 9 platformda boş mu, herkese açık profil adreslerinden bakılır.
-2. [ ] **Kontrol listesi sayfası (Claude)** — her platform için kayıt bağlantısı, kullanılacak kullanıcı adı, e-posta (`social@`) ve 9 dilde biyografi tek sayfada; kullanıcı sırayla açıp kopyala-yapıştır yapar.
-3. [ ] **`social@` takma adı (kullanıcı)** — Google Workspace yönetici panelinde; adımları Claude yazar.
+Not: 29 Eylül'e kadar listelerde "biyografiler hazır" yazıyordu ama yazılmamıştı; 2026-09-29'da yazıldı.
+1. ✅ 2026-09-29 **Kullanıcı adı kontrolü (Claude)** — `simpletradejournal` Instagram, YouTube, TikTok, Telegram, Facebook, LinkedIn'de boş; X 15 karakter sınırı yüzünden `@SimpleTradeJrnl` (boş); Reddit kontrol edilemedi. `@stjournal` çoğu yerde dolu. Ayrıntı: [docs/social.md](docs/social.md).
+2. ✅ 2026-09-29 **Kontrol listesi sayfası (Claude)** — [docs/social.md](docs/social.md): kayıt adresleri, kullanıcı adları, `social@` adımları, 9 dilde kısa/standart/uzun biyografi (karakter sınırları kontrol edildi). 3. [ ] **`social@` takma adı (kullanıcı)** — Google Workspace yönetici panelinde; adımları Claude yazar.
 4. [ ] **Hesaplar açılınca (Claude, kullanıcı onayıyla)** — kullanıcı giriş yaptıktan sonra profil fotoğrafı, biyografi ve site bağlantısı açık oturumda doldurulur.
 5. [ ] **Şifre yöneticisi (kullanıcı)** — Bitwarden ücretsiz planı yeterli; her hesaba ayrı uzun şifre ve 2FA.
 6. [ ] **Siteye sosyal medya bağlantıları (Claude)** — hesaplar açılınca alt bilgiye ve yapısal veriye (sameAs) eklenir.
@@ -98,7 +97,7 @@ Trading kitlesi platformlara eşit dağılmıyor. Önceliğe göre:
 | **Reddit** | Reklam değil, gerçekten yardım ederek (r/Daytrading, r/Forex) | EN | [ ] |
 
 Her dilde her platformda hesap açmak dağılmak demek. Öneri: EN ana hesaplar + TR ve FA
-için Instagram ve Telegram. Kullanıcı adları ve 9 dilde biyografiler henüz yazılmadı (bkz. §1 "Sosyal medya kurulumu").
+için Instagram ve Telegram. Kullanıcı adları ve 9 dilde biyografiler hazır: [docs/social.md](docs/social.md) (2026-09-29).
 
 ### §3 İş altyapısı
 - [ ] **Meta Business Suite:** Instagram, Facebook, reklam hesabı, Pixel ve katalog tek yerde.
@@ -162,6 +161,6 @@ rahatız, ama "kâr vaadi" dili hiçbir yerde kullanılmaz.
 
 ### İş bölümü
 - **Kullanıcı:** hesap açmak ve girişler, marka kararları, içerik onayı, video kayıtları.
-- **Claude:** 9 dilde biyografiler ([ ] henüz yazılmadı) ve marka kiti tanımı; siteye sosyal medya
+- **Claude:** ✅ 9 dilde biyografiler ([docs/social.md](docs/social.md)) ve marka kiti tanımı; siteye sosyal medya
   bağlantıları ve teknik işaretler; ✅ Bing ve dizin başvuru hazırlığı; n8n otomasyonları;
   ilk 30 günlük içerik takvimi ve paylaşımlar; ✅ dil başına SEO ve 🟡 programatik sayfalar.
