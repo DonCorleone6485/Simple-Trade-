@@ -4,7 +4,7 @@ SEO ile ilgili yapılan ve yapılacak her iş burada. Bir SEO işi bittiğinde y
 bir iş çıktığında aynı değişiklikte buraya işlenir (tarihle). Genel iş listesi
 PLAN.md'de, teknik ayrıntılar NOTES.md'de.
 
-Son güncelleme: 2026-09-29 (prop firma ve broker sayfaları)
+Son güncelleme: 2026-09-29 (IndexNow, 3 yazı, E8 Markets)
 
 ---
 
@@ -142,7 +142,8 @@ Bağlantılar: ana sayfa alt kısmı ("Prop Firmalar", "Broker'lar") ve /blog di
 
 Toplam: 29 sayfa × 9 dil = 261 adres (sitemap, 2026-09-29).
 
-Search Console'da dizine ekleme istendi (2026-09-29): /prop-firms, /brokers, /tr/prop-firms, /prop-firms/ftmo.
+Search Console'da dizine ekleme istendi (2026-09-29): /prop-firms, /brokers, /tr/prop-firms, /prop-firms/ftmo, /prop-firms/e8-markets, /blog/position-sizing-risk-per-trade, /blog/revenge-trading.
+IndexNow (Bing/Yandex) 2026-09-29: bütün sitemap (225) + yeni 47 adres (3 yazı × 9 dil, E8 × 9 dil, /prop-firms × 9 dil, /blog).
 
 ## Yapılacaklar
 
