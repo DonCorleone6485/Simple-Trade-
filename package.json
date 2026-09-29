@@ -10,7 +10,8 @@
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
     "check:copy": "node scripts/check-landing-copy.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "indexnow": "node scripts/indexnow.mjs"
   },
   "dependencies": {
     "@clerk/backend": "^3.17.1",

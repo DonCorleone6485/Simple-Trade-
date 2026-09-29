@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { createClerkClient, verifyToken } from '@clerk/backend';
 import { timingSafeEqual } from 'crypto';
-import { emailEnabled, sendContactMessage, sendEmail, sendInternal, toLang, unsubscribeToken } from './_email.js';
+import { emailEnabled, sendContactMessage, sendEmail, sendInternal, sendRendered, toLang, unsubscribeToken } from './_email.js';
+import { renderDigest, weekStats, type DigestTrade } from './_digest.js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -24,6 +25,8 @@ const supabase = createClient(
  * - Deneme bitiyor: bitişe 36 saatten az kalmışsa. Görev 24 saatte bir
  *   çalıştığı için her deneme bu pencereye bir kez düşüyor.
  * - Deneme bitti: son 3 gün içinde bitmişse.
+ * - Haftalık özet: pazartesi (bütçe yetmezse salı) — geçen haftanın
+ *   işlemleri. Yalnız o hafta kapanmış işlemi olana (bkz. _digest.ts).
  *
  * Her postanın "gönderildi" işareti ayrı sütunda; ikinci kez gitmez. Uç
  * herkese açık olsa bile zararsız: yalnızca zamanı gelmiş postalar gidiyor.
@@ -234,6 +237,8 @@ export default async function handler(req: any, res: any) {
       }
     }
   }
+  counts.weekly = await weeklyDigests(clerk, now, budget);
+
   // Günlük hata özeti: son 24 saatte tarayıcılarda hata çıktıysa bize tek
   // posta (bkz. src/lib/errorLog.ts). Hata yoksa hiçbir şey gitmez.
   const errors = await errorDigest(now);
@@ -256,6 +261,62 @@ export default async function handler(req: any, res: any) {
     sent: counts, errors,
     keysRemoved: { unused: (unused || []).length, replaced: (replaced || []).length },
   });
+}
+
+/**
+ * Haftalık özet. Hafta pazartesi 00:00 UTC'de başlar; pazartesi gönderilir,
+ * günlük 80 postalık bütçe yetmediyse kalanlar salı. weekly_digest_sent_at
+ * aynı haftaya ikinci postayı engeller.
+ */
+async function weeklyDigests(clerk: ReturnType<typeof createClerkClient>, now: number, budget: number): Promise<number> {
+  const today = new Date(now);
+  const dow = today.getUTCDay(); // 1 pazartesi, 2 salı
+  if ((dow !== 1 && dow !== 2) || budget <= 0) return 0;
+  const weekEnd = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - (dow - 1));
+  const weekStart = weekEnd - 7 * DAY;
+  const prevStart = weekStart - 7 * DAY;
+  const iso = (t: number) => new Date(t).toISOString();
+
+  const { data: trades } = await supabase.from('trades')
+    .select('user_id, date, symbol, result, reward, risk')
+    .gte('date', iso(prevStart)).lt('date', iso(weekEnd))
+    .or('locked.is.null,locked.eq.false').limit(20000);
+  const byUser = new Map<string, { week: DigestTrade[]; prev: DigestTrade[] }>();
+  for (const t of trades || []) {
+    const g = byUser.get(t.user_id) || { week: [], prev: [] };
+    (new Date(t.date).getTime() >= weekStart ? g.week : g.prev).push(t);
+    byUser.set(t.user_id, g);
+  }
+  const active = [...byUser.entries()].filter(([, g]) => g.week.some(t => !!t.result)).map(([id]) => id);
+  if (!active.length) return 0;
+
+  const { data: users } = await supabase.from('users')
+    .select('user_id, language, timezone, currency, weekly_digest_sent_at')
+    .in('user_id', active.slice(0, 500)).eq('emails_opt_out', false)
+    .or(`weekly_digest_sent_at.is.null,weekly_digest_sent_at.lt."${iso(weekEnd)}"`);
+
+  let sent = 0;
+  for (const u of users || []) {
+    if (sent >= budget) break;
+    const g = byUser.get(u.user_id)!;
+    const stats = weekStats(g.week, g.prev);
+    if (!stats) continue;
+    let email = '';
+    try {
+      const cu = await clerk.users.getUser(u.user_id);
+      email = cu.emailAddresses.find(e => e.id === cu.primaryEmailAddressId)?.emailAddress || cu.emailAddresses[0]?.emailAddress || '';
+    } catch { continue; }
+    if (!email) continue;
+    const m = renderDigest(stats, {
+      lang: toLang(u.language), userId: u.user_id, currency: u.currency, timeZone: u.timezone,
+      from: new Date(weekStart), to: new Date(weekEnd - 1),
+    });
+    if (await sendRendered('weekly', email, m)) {
+      await supabase.from('users').update({ weekly_digest_sent_at: new Date().toISOString() }).eq('user_id', u.user_id);
+      sent++;
+    }
+  }
+  return sent;
 }
 
 async function errorDigest(now: number): Promise<number> {

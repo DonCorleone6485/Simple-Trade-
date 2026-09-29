@@ -1,7 +1,8 @@
 import { createHmac } from 'crypto';
 
 /**
- * Otomatik e-postalar: hoş geldin, "deneme bitiyor", "deneme bitti".
+ * Otomatik e-postalar: hoş geldin, "deneme bitiyor", "deneme bitti"
+ * (haftalık özet ayrı dosyada: _digest.ts).
  *
  * Adı alt çizgiyle başlıyor: Vercel bu dosyayı ayrı bir adres (/api/_email)
  * olarak yayınlamıyor, yalnızca öbür uçlar içeri alıyor.
@@ -32,7 +33,7 @@ export const emailEnabled = () => !!process.env.RESEND_API_KEY;
 export function unsubscribeToken(userId: string): string {
   return createHmac('sha256', process.env.SUPABASE_SERVICE_KEY || '').update(`unsub:${userId}`).digest('hex').slice(0, 32);
 }
-const unsubscribeUrl = (userId: string) =>
+export const unsubscribeUrl = (userId: string) =>
   `${SITE}/api/emails?u=${encodeURIComponent(userId)}&t=${unsubscribeToken(userId)}`;
 
 type Mail = { subject: string; lead: string; body: string[]; cta: string; foot: string };
@@ -287,10 +288,14 @@ ${c.body.map(p => `<tr><td style="font-size:15px;line-height:1.6;color:#44465a;p
  * işaretini koymaz, bir sonraki turda yeniden dener.
  */
 export async function sendEmail(kind: Kind, to: string, opts: { userId: string; lang: Lang; date?: string; timeZone?: string | null }): Promise<boolean> {
+  const date = opts.date ? formatDate(opts.date, opts.lang, opts.timeZone) : undefined;
+  return sendRendered(kind, to, render(kind, opts.lang, opts.userId, { date }));
+}
+
+/** Hazır bir postayı (konu, html, metin, çıkış bağlantısı) gönderir — haftalık özet de bunu kullanıyor. */
+export async function sendRendered(kind: string, to: string, m: { subject: string; html: string; text: string; unsub: string }): Promise<boolean> {
   const key = process.env.RESEND_API_KEY;
   if (!key || !to) return false;
-  const date = opts.date ? formatDate(opts.date, opts.lang, opts.timeZone) : undefined;
-  const m = render(kind, opts.lang, opts.userId, { date });
   try {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',

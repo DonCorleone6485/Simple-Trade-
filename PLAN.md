@@ -17,11 +17,12 @@ Son güncelleme: 2026-09-29
 - [ ] **Meta Pixel kimliği** — Instagram reklamından önce; çerez bandı da gerekecek.
 - [ ] **Sosyal kanıt** — ilk kullanıcılardan gerçek yorumlar.
 - [ ] **Farsça ve Arapça çeviri kontrolü** — ana dili olan biri.
+- [ ] **Bing Webmaster Tools hesabı** — bing.com/webmasters → Google ile giriş → "Search Console'dan içe aktar" (hesap açmak kullanıcıya ait). IndexNow zaten çalışıyor, bu yalnız rapor görmek için.
 
 ### Kullanıcıyı beklemeden yapılabilecekler
 - [ ] **Dizin başvuru metinleri** — Product Hunt, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub. Başvuruyu kullanıcı yapar.
-- [ ] **Bing Webmaster Tools** — kullanıcının bir kez girişi gerekiyor (Search Console'dan içe aktarma); sonrası hazır.
-- [ ] **Haftalık özet e-postası** — kullanıcının haftası, kendi dilinde. `api/` 12 fonksiyonda: mevcut bir uca dal + Vercel cron.
+- ✅ 2026-09-29 **IndexNow (Bing, Yandex)** — `npm run indexnow` canlı sitemap'i bildirir; yeni sayfada `npm run indexnow -- /yol`. Bing Webmaster hesabı kullanıcıda (yukarıda).
+- ✅ 2026-09-29 **Haftalık özet e-postası** — pazartesi 09:00 UTC günlük görevle, 9 dilde, yalnız o hafta işlemi olana (`api/_digest.ts`).
 - [ ] **CSP'yi engelleme moduna almak** — 2026-10-06 … 10-13 arası, `client_errors` kind 'csp' raporlarına bakarak.
 - [ ] **Yeni blog yazıları** — 9 dilde, içerik kümelerine göre (§4).
 - 🟡 **Programatik prop firma / broker sayfaları** (§4) — ✅ 2026-09-29 5 prop firma (FTMO, The5ers, Alpha Capital, Instant Funding, FundingPips) + 4 broker, 9 dilde; aylık kural kontrol görevi kuruldu. Kalan: FundedNext, FXIFY, E8 ve Türkiye'den açılmayan broker'lar (SEO.md).
