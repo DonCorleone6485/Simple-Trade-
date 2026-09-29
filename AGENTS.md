@@ -35,4 +35,4 @@ Instructions for AI coding agents working in this repo.
 
 See [NOTES.md](NOTES.md) for the running log of project decisions and TODOs.
 
-[PLAN.md](PLAN.md) holds the open-work list and the growth plan. Read it at the start of a session, and in the same change that finishes (or adds) an item, update it there — tick it with ✅ and the date.
+[PLAN.md](PLAN.md) holds the open-work list and the growth plan. Read it at the start of a session, and in the same change that finishes (or adds) an item, update it there — tick it with ✅ and the date. SEO work (tools, pages, structured data, backlinks) is logged in [SEO.md](SEO.md) the same way.

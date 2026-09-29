@@ -25,7 +25,7 @@ Son güncelleme: 2026-09-29
 - [ ] **Haftalık özet e-postası** — kullanıcının haftası, kendi dilinde. `api/` 12 fonksiyonda: mevcut bir uca dal + Vercel cron.
 - [ ] **CSP'yi engelleme moduna almak** — 2026-10-06 … 10-13 arası, `client_errors` kind 'csp' raporlarına bakarak.
 - [ ] **Yeni blog yazıları** — 9 dilde, içerik kümelerine göre (§4).
-- [ ] **Programatik prop firma / broker sayfaları** (§4).
+- [ ] **Programatik prop firma / broker sayfaları** (§4) — nasıl yapılacağı SEO.md'de.
 - [ ] **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate (büyük iş).
 
 ### Ertelenenler
@@ -71,6 +71,8 @@ Son güncelleme: 2026-09-29
 - [ ] Canlı destek (isteğe bağlı): Crisp ücretsiz.
 
 ### §4 SEO
+Ayrıntılı kayıt (yapılanlar, sayfalar, araçlar, yapılacaklar): [SEO.md](SEO.md).
+
 - ✅ Dil başına adresler (/tr, /fa, /ar …).
 - [ ] İçerik kümeleri: trading journal, prop firm, risk yönetimi, trader psikolojisi — her biri 10–20 yazı (şu an 10 yazı toplam).
 - [ ] Programatik sayfalar: her prop firma / broker için ("FTMO kuralları takip aracı").
