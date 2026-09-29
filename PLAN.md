@@ -92,7 +92,7 @@ Trading kitlesi platformlara eşit dağılmıyor. Önceliğe göre:
 | **YouTube** | Kurulum eğitimleri (uzun) + Shorts; Google'da da çıkar | EN + TR (FA altyazı) | [ ] |
 | **TikTok** | Kısa video, hızlı büyüme | EN + TR | 🟡 2026-09-30 hesap açıldı (social@, 2FA açık); `@` adı otomatik verildi, 30 gün sonra düzelt |
 | **X (Twitter)** | Trader topluluğunun kalbi; tartışma ve güncellemeler | EN | ✅ 2026-09-30 `@SimpleTradeJrnl` açıldı (social@), profesyonel profil, logo, biyografi, site bağlantısı |
-| **Telegram kanalı** | Türk, İranlı ve Arap trader'lar burada çok yoğun | TR, FA, AR | [ ] |
+| **Telegram kanalı** | Türk, İranlı ve Arap trader'lar burada çok yoğun | TR, FA, AR | ✅ 2026-09-30 `t.me/simpletradejournal` açıldı (açıklama şimdilik İngilizce; TR/FA/AR içerik başlayınca açıklamaya eklenecek) |
 | **Discord** | Kullanıcı topluluğu, destek, geri bildirim | EN (dil kanallarıyla) | [ ] |
 | **LinkedIn şirket sayfası** | Güven, prop firma ortaklıkları, yatırımcı | EN | [ ] |
 | **Facebook sayfası** | Meta reklam hesabı ve Pixel için zorunlu | EN | [ ] |
