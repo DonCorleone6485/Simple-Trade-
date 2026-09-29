@@ -150,7 +150,7 @@ Search Console'da dizine ekleme istendi (2026-09-29): /prop-firms, /brokers, /tr
 - ✅ **Aylık kural kontrol görevi** — kuruldu (2026-09-29): masaüstü uygulamasında zamanlanmış görev `prop-firm-rules-check`, her ayın 1'i 10:00. Uygulama kapalıysa açılınca çalışır.
 
 ### Geri bağlantılar (başka sitelerden bize bağlantı)
-- ⬜ Dizinler: Product Hunt, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub (başvuru metinleri hazırlanacak, başvuruyu kullanıcı yapar).
+- 🟡 Dizinler: Product Hunt, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub — metinler hazır (2026-09-29, `docs/listings.md`); başvuruyu kullanıcı yapar.
 - ⬜ Sosyal medya profillerinde site bağlantısı.
 - ⬜ YouTube video açıklamaları, forumlar (Reddit, Forex Factory), konuk yazılar.
 

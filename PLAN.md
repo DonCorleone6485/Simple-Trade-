@@ -17,10 +17,11 @@ Son güncelleme: 2026-09-29
 - [ ] **Meta Pixel kimliği** — Instagram reklamından önce; çerez bandı da gerekecek.
 - [ ] **Sosyal kanıt** — ilk kullanıcılardan gerçek yorumlar.
 - [ ] **Farsça ve Arapça çeviri kontrolü** — ana dili olan biri.
+- [ ] **Dizin başvuruları** — metinler [docs/listings.md](docs/listings.md)'de hazır; hesap açıp göndermek kullanıcıda. G2/Capterra şirket bilgisi istiyor, şirketten sonra.
 - [ ] **Bing Webmaster Tools hesabı** — bing.com/webmasters → Google ile giriş → "Search Console'dan içe aktar" (hesap açmak kullanıcıya ait). IndexNow zaten çalışıyor, bu yalnız rapor görmek için.
 
 ### Kullanıcıyı beklemeden yapılabilecekler
-- [ ] **Dizin başvuru metinleri** — Product Hunt, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub. Başvuruyu kullanıcı yapar.
+- ✅ 2026-09-29 **Dizin başvuru metinleri** — [docs/listings.md](docs/listings.md): Product Hunt, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub; 9 dilde kısa açıklama.
 - ✅ 2026-09-29 **IndexNow (Bing, Yandex)** — `npm run indexnow` canlı sitemap'i bildirir; yeni sayfada `npm run indexnow -- /yol`. Bing Webmaster hesabı kullanıcıda (yukarıda).
 - ✅ 2026-09-29 **Haftalık özet e-postası** — pazartesi 09:00 UTC günlük görevle, 9 dilde, yalnız o hafta işlemi olana (`api/_digest.ts`).
 - [ ] **CSP'yi engelleme moduna almak** — 2026-10-06 … 10-13 arası, `client_errors` kind 'csp' raporlarına bakarak.
