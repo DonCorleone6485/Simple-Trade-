@@ -8,7 +8,7 @@
  */
 import { readFileSync } from 'node:fs';
 
-const FILES = ['src/components/LandingPage.tsx', 'src/components/PricingPage.tsx'];
+const FILES = ['src/components/LandingPage.tsx', 'src/components/PricingPage.tsx', 'src/components/PricingCards.tsx'];
 /** Marka adı bilerek çevrilmiyor. */
 const ALLOWED_UNTRANSLATED = new Set(['Simple Trading Journal']);
 
