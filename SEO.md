@@ -82,7 +82,7 @@ Aynı düzen ileride rakip fiyatları için de kurulabilir.
 | Dil başına adresler: /tr, /fa, /ar, /ru, /es, /pt, /de, /fr + hreflang + x-default | ✅ 2026-09-28 | `src/lib/langPath.ts` |
 | Hız: kod bölme, ana paket 86 KB (gzip) | ✅ 2026-09-28 | |
 | Ön çizimde `$&` hatası: metinde "$'" geçen sayfalarda (Türkçe prop firma sayfaları) `<div id="root">` metnin içine basılıyordu | ✅ 2026-09-29 düzeltildi | `scripts/prerender.mjs` — replace artık fonksiyonla |
-| Yapısal veri: yazılar için Article, yardım için FAQPage, BreadcrumbList | ⬜ Yapılacak | Google'da zengin sonuç (tarih, SSS açılır kutusu) |
+| Yapısal veri: yazılar için Article, yardım için FAQPage, BreadcrumbList | ✅ 2026-09-29 | Google'da zengin sonuç (tarih, SSS açılır kutusu) |
 | llms.txt (yapay zekâ asistanları için site özeti) | ⬜ İsteğe bağlı | |
 
 ## Sayfalar (9 dilde, ön çizimli)
@@ -162,7 +162,7 @@ IndexNow (Bing/Yandex) 2026-09-29: bütün sitemap (225) + yeni 47 adres (3 yaz�
 
 ### Teknik
 - ✅ IndexNow ve Bing Webmaster Tools (2026-09-29).
-- 🟡 Yapısal veri: BreadcrumbList prop firma/broker sayfalarında var (2026-09-29); yazılarda BlogPosting/HowTo var. Kalan: yardım için FAQPage.
+- ✅ 2026-09-29 Yapısal veri: BreadcrumbList prop firma/broker sayfalarında, yazılarda BlogPosting/HowTo, yardımda FAQPage (13 soru, 9 dilde; Google 2023'ten beri SSS açılır kutusunu çoğu siteye göstermiyor, fayda asıl Bing ve yapay zekâ aramalarında).
 - ⬜ Search Console'da dizine eklenmeyen sayfaları ve arama sorgularını ayda bir kontrol.
 
 ## Kurallar

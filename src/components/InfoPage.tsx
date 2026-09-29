@@ -426,6 +426,18 @@ export default function InfoPage({ kind, onHome, onOther, cta }: {
                 <a href={langPath('/guides/import-trade-history', lang)} className="text-[15px]" style={{ color: '#a78bfa' }}>{s('guideImport')} →</a>
               </div>
             </section>
+            {/* Sorular yapısal veri olarak da: arama motorları ve yapay zekâ
+                aramaları soru-cevabı sayfadan ayıklamadan okuyabilsin. */}
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              inLanguage: lang,
+              mainEntity: HELP.map(h => ({
+                '@type': 'Question',
+                name: h.q[lang],
+                acceptedAnswer: { '@type': 'Answer', text: h.a[lang] },
+              })),
+            }).replace(/</g, '\\u003c') }} />
             {/* Soruların altında: yardım sayfası, cevabı bulamayanın
                 bakacağı son yer; uygulamadaki "Yardım" da buraya geliyor. */}
             <section className="rounded-2xl p-6" style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}>
