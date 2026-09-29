@@ -12,7 +12,36 @@ yeniden kontrol edilir; arada biri alabilir.
 1. **`social@simpletradejournal.io` takma adı** (Google Workspace, ücretsiz):
    admin.google.com → **Dizin → Kullanıcılar** → admin@ satırına tıkla →
    **Kullanıcı bilgileri → Alternatif e-posta adresleri (takma adlar)** → `social` yaz →
-   **Kaydet**. Postalar admin@ gelen kutusuna düşer. Birkaç dakika içinde çalışır.
+   **Kaydet**. Birkaç dakika içinde çalışır. *(Durum 2026-09-29: henüz eklenmedi.)*
+
+   **Nasıl çalışır:** `social@` ayrı bir hesap değil, admin@'in ikinci adresi. Ayrı
+   giriş, ayrı şifre ya da ayrı gelen kutusu yok; social@'e gelen her posta doğrudan
+   admin@ gelen kutusuna düşer. Ek ücret yok. Platformlara kayıt olurken e-posta olarak
+   `social@simpletradejournal.io` yazılır; doğrulama kodları admin@'de okunur.
+
+   **Gmail'de ayırmak için filtre** (admin@ ile giriş yapılmışken): arama kutusundaki
+   ayar simgesi → **Kime:** `social@simpletradejournal.io` → **Filtre oluştur** →
+   **Etiketi uygula: "Sosyal medya"** (yeni etiket) → isteğe bağlı **Gelen kutusunu
+   atla** → **Filtre oluştur**. Böylece platform postaları tek etikette toplanır.
+
+   **Hangi platform hangi e-postayla açılır:**
+
+   | Platform | Kayıt e-postası | Not |
+   |---|---|---|
+   | Instagram | `social@` | |
+   | Threads | — | Instagram hesabıyla giriş, ayrı e-posta yok |
+   | YouTube | `admin@` (Google hesabı) | Takma adla Google girişi yapılmaz; kanal admin@ altında **marka hesabı** olarak açılır |
+   | TikTok | `social@` | |
+   | X | `social@` | |
+   | Telegram kanalı | — | E-posta değil telefon numarası ister |
+   | Facebook sayfası | Kişisel Facebook hesabı | Sayfa kişisel hesaptan açılır; sayfanın iletişim e-postası `support@` |
+   | LinkedIn şirket sayfası | Kişisel LinkedIn hesabı | Sayfa kişisel hesaptan açılır; sayfanın iletişim e-postası `support@` |
+   | Discord | `social@` | |
+   | Reddit | `social@` | |
+   | Meta Business Suite (ileride) | `social@` | İşletme hesabının iletişim e-postası |
+
+   Profillerde herkese görünen e-posta her zaman `support@` (aşağıda "Her profilde
+   ortak"); `social@` yalnız kayıt ve bildirimler için.
 2. **Şifre yöneticisi:** Bitwarden (ücretsiz plan yeter). Her hesaba ayrı, uzun,
    rastgele şifre; her hesapta iki adımlı doğrulama (2FA) açık.
 3. Profil fotoğrafı: logo (kare, en az 400×400). Kapak görselleri sonra marka kitiyle.
