@@ -49,7 +49,7 @@ interface ParseResult {
 }
 
 // ── PROPER CSV PARSER (handles quoted commas) ──────────────────────────────
-function parseCSVLine(line: string): string[] {
+function parseCSVLine(line: string, delim = ','): string[] {
   const result: string[] = [];
   let current = '';
   let inQuotes = false;
@@ -57,7 +57,7 @@ function parseCSVLine(line: string): string[] {
     const char = line[i];
     if (char === '"') {
       inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
+    } else if (char === delim && !inQuotes) {
       result.push(current.trim());
       current = '';
     } else {
@@ -139,14 +139,21 @@ function round2(n: number): number {
 
 function parseNumber(val: string): number {
   if (!val) return 0;
-  // "- 127,74" → -127.74 ve "26 973,16" → 26973.16
-  const cleaned = val
-    .replace(/"/g, '')
-    .trim()
-    .replace(/\s/g, '')   // boşlukları kaldır
-    .replace(',', '.');   // ondalık virgülü noktaya çevir
-  const num = parseFloat(cleaned);
-  return isNaN(num) ? 0 : num;
+  let s = val.replace(/"/g, '').replace(/\u2212/g, '-').trim();
+  // Muhasebe biçimi (NinjaTrader, ABD raporları): "($50.00)" eksidir.
+  const paren = /^\(.*\)$/.test(s);
+  // "- 127,74" → -127.74, "26 973,16" → 26973.16; "$", "€", "USD" gibi ekler atılır.
+  s = s.replace(/[()\s]/g, '').replace(/[^\d.,+-]/g, '');
+  const comma = s.lastIndexOf(','), dot = s.lastIndexOf('.');
+  if (comma >= 0 && dot >= 0) {
+    // İkisi birden varsa sonuncusu ondalık ayırıcıdır: "1,234.56" ya da "1.234,56".
+    s = dot > comma ? s.replace(/,/g, '') : s.replace(/\./g, '').replace(',', '.');
+  } else {
+    s = s.replace(',', '.'); // yalnız virgül: ondalık virgül
+  }
+  const num = parseFloat(s);
+  if (isNaN(num)) return 0;
+  return paren ? -Math.abs(num) : num;
 }
 
 function calcRR(openPrice: number, sl: number, tp: number, type: 'Buy' | 'Sell'): string {
@@ -227,7 +234,7 @@ const FIELD_NAMES: Record<keyof ColumnMap, string[]> = {
               'kapanış zamanı', 'çıkış zamanı', 'kapanış saati'],
   symbol: ['symbol', 'instrument', 'item', 'contract', 'market', 'pair', 'ticker',
            'sembol', 'enstrüman', 'parite'],
-  type: ['type', 'side', 'direction', 'action', 'b/s', 'buy/sell', 'opening direction', 'position type',
+  type: ['type', 'side', 'direction', 'action', 'b/s', 'buy/sell', 'opening direction', 'position type', 'market pos.',
          'tür', 'tur', 'yön', 'işlem türü', 'alış/satış'],
   openPrice: ['open price', 'opening price', 'entry price', 'price', 'fill price', 'avg entry price',
               'açılış fiyatı', 'giriş fiyatı', 'fiyat'],
@@ -242,7 +249,7 @@ const FIELD_NAMES: Record<keyof ColumnMap, string[]> = {
   swap: ['swap', 'swaps', 'rollover', 'takas'],
   fee: ['taxes', 'tax', 'fee', 'fees', 'ücret', 'vergi', 'masraf'],
   ticket: ['ticket', 'position', 'position id', 'positionid', 'order id', 'orderid',
-           'deal id', 'trade id', 'transaction id', 'pozisyon', 'bilet', 'emir no', 'işlem no'],
+           'deal id', 'trade id', 'transaction id', 'trade number', 'pozisyon', 'bilet', 'emir no', 'işlem no'],
 };
 
 export function guessColumns(headers: string[]): ColumnMap {
@@ -356,7 +363,7 @@ function parseRows(rows: string[][], c: ColumnMap, journalId: string, userId: st
 
     // Kapanış zamanı yalnızca gerçek bir tarihse alınır.
     let exitDate: string | undefined;
-    if (closeRaw && /\d{4}[.\-/]\d{2}[.\-/]\d{2}/.test(closeRaw)) {
+    if (closeRaw && /\d{4}[.\-/]\d{2}[.\-/]\d{2}|\d{1,2}\/\d{1,2}\/\d{4}/.test(closeRaw)) {
       const parsed = parseDate(closeRaw);
       if (new Date(parsed).getTime() >= new Date(openDate).getTime()) exitDate = parsed;
     }
@@ -412,7 +419,23 @@ function findRows(content: string): { rows: string[][]; error?: string } {
   }
   const raw = content.split('\n').filter(l => l.trim() !== '');
   if (raw.length < 2) return { rows: [], error: msg('Dosya boş veya geçersiz.', 'The file is empty or unreadable.') };
-  return { rows: raw.map(l => parseCSVLine(l)) };
+  const delim = guessDelimiter(raw.slice(0, 20));
+  return { rows: raw.map(l => parseCSVLine(l, delim)) };
+}
+
+/**
+ * Ayırıcı: virgül, noktalı virgül ya da sekme. Avrupa'daki Excel ve pek çok
+ * broker ";" yazar (ondalık virgül kullandıkları için); virgül varsayılırsa
+ * "1.234,56" iki hücreye bölünür. Tırnak dışındaki en sık karakter kazanır.
+ */
+function guessDelimiter(lines: string[]): string {
+  const count = (d: string) => lines.reduce((n, l) => {
+    let q = false, c = 0;
+    for (const ch of l) { if (ch === '"') q = !q; else if (ch === d && !q) c++; }
+    return n + c;
+  }, 0);
+  const [best] = [',', ';', '\t'].map(d => [d, count(d)] as const).sort((a, b) => b[1] - a[1])[0];
+  return best;
 }
 
 /**

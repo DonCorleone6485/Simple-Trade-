@@ -50,3 +50,37 @@ describe('dosya kodlaması', () => {
     expect(decodeReport(b.buffer)).toBe('Açılış');
   });
 });
+
+describe('ABD biçimli dosyalar', () => {
+  // NinjaTrader'ın işlem tablosu gibi: tutarlar "$", eksi parantezde, binlik
+  // ayırıcı virgül, tarih ay/gün/yıl. Önceden "$1,250.00" 0, "($75.50)" 0
+  // okunuyor, kapanış tarihi atılıyordu.
+  const csv = [
+    'Trade number,Instrument,Account,Market pos.,Qty,Entry price,Exit price,Entry time,Exit time,Profit,Commission',
+    '1,ES 12-26,Sim101,Long,1,5400.25,5425.25,9/22/2026 9:31:05 AM,9/22/2026 10:02:40 AM,"$1,250.00",($4.12)',
+    '2,NQ 12-26,Sim101,Short,1,19850.50,19854.28,9/22/2026 11:15:00 AM,9/22/2026 11:20:12 AM,($75.50),($4.12)',
+  ].join('\n');
+
+  it('tutarları, yönü ve kapanış zamanını doğru okur', () => {
+    const r = parseCSVFile(csv, 'j', 'u');
+    expect(r.errors).toEqual([]);
+    expect(r.trades).toHaveLength(2);
+    const [a, b] = r.trades;
+    expect(a.type).toBe('Buy');
+    expect(a.reward).toBe(1245.88);
+    expect(a.externalId).toBe('1');
+    expect(a.exitDate).toBeTruthy();
+    expect(b.type).toBe('Sell');
+    expect(b.reward).toBe(-79.62);
+  });
+
+  it('Avrupa biçimi bozulmaz', () => {
+    const eu = [
+      'Symbol;Type;Open Time;Close Time;Profit',
+      'EURUSD;buy;2026.09.22 10:00;2026.09.22 11:00;1.234,56',
+      'EURUSD;sell;2026.09.22 12:00;2026.09.22 13:00;- 127,74',
+    ].join('\n');
+    const r = parseCSVFile(eu, 'j', 'u');
+    expect(r.trades.map(t => t.reward)).toEqual([1234.56, -127.74]);
+  });
+});
