@@ -11,7 +11,6 @@ Son güncelleme: 2026-09-29
 ## 1. Kalan işler
 
 ### Kullanıcıdan bekleyenler
-- [ ] **Namecheap 2FA'yı yeniden açmak** — 2026-09-29'da destekle sıfırlandı, şu an kapalı. Öncelikli.
 - [ ] **Sosyal medya hesapları** — aynı kullanıcı adıyla (bkz. büyüme planı §1–2). Kullanıcı adları ve 9 dilde biyografiler hazır.
 - [ ] **Hakkımızda metni** — birkaç cümle; 9 dile çevrilip yerleştirilecek.
 - [ ] **MetaTrader kurulum videosu** — `~/Desktop/STJ-Kayit/` klasörüne 7 ekran kaydı (01-indir … 07-sonuc). Gelince Remotion kurgusu.
@@ -32,6 +31,7 @@ Son güncelleme: 2026-09-29
 - Ödeme sistemi ve yasal sayfalar — şirket kurulunca. Bölgesel fiyat grupları, kurucu üye kampanyası, ortaklık programı buna bağlı.
 
 ### Biten (son)
+- ✅ 2026-09-29 Namecheap 2FA yeniden açıldı (kullanıcı).
 - ✅ 2026-09-29 Prop firma ve broker sayfaları (/prop-firms, /brokers), 9 dilde, 72 yeni adres.
 - ✅ 2026-09-29 EA 1.09 MT4'te kuruldu ve işlem aktarıyor.
 - ✅ 2026-09-29 Hesap silme test hesabıyla denendi.
