@@ -32,7 +32,7 @@ Son güncelleme: 2026-09-29
 Not: 29 Eylül'e kadar listelerde "biyografiler hazır" yazıyordu ama yazılmamıştı; 2026-09-29'da yazıldı.
 1. ✅ 2026-09-29 **Kullanıcı adı kontrolü (Claude)** — `simpletradejournal` Instagram, YouTube, TikTok, Telegram, Facebook, LinkedIn'de boş; X 15 karakter sınırı yüzünden `@SimpleTradeJrnl` (boş); Reddit kontrol edilemedi. `@stjournal` çoğu yerde dolu. Ayrıntı: [docs/social.md](docs/social.md).
 2. ✅ 2026-09-29 **Kontrol listesi sayfası (Claude)** — [docs/social.md](docs/social.md): kayıt adresleri, kullanıcı adları, `social@` adımları, 9 dilde kısa/standart/uzun biyografi (karakter sınırları kontrol edildi).
-3. ✅ 2026-09-29 **`social@` takma adı (kullanıcı)** — Google Workspace'te eklendi (ilk denemede yanlışlıkla `sosial` yazılmıştı, `social` olarak düzeltildi) ve Gmail'de `to:social@` → "Sosyal medya" etiketi filtresi kuruldu. Deneme postası henüz doğrulanmadı; adımlar docs/social.md §0'da.
+3. ✅ 2026-09-29 **`social@` takma adı (kullanıcı)** — Google Workspace'te eklendi (ilk denemede yanlışlıkla `sosial` yazılmıştı, `social` olarak düzeltildi) ve Gmail'de `to:social@` → "Sosyal medya" etiketi filtresi kuruldu. Yahoo'dan atılan deneme postası "Sosyal medya" etiketine düştü, doğrulandı; adımlar docs/social.md §0'da.
 4. [ ] **Hesaplar açılınca (Claude, kullanıcı onayıyla)** — kullanıcı giriş yaptıktan sonra profil fotoğrafı, biyografi ve site bağlantısı açık oturumda doldurulur.
 5. [ ] **Şifre yöneticisi (kullanıcı)** — Bitwarden ücretsiz planı yeterli; her hesaba ayrı uzun şifre ve 2FA.
 6. [ ] **Siteye sosyal medya bağlantıları (Claude)** — hesaplar açılınca alt bilgiye ve yapısal veriye (sameAs) eklenir.

@@ -12,7 +12,7 @@ yeniden kontrol edilir; arada biri alabilir.
 1. **`social@simpletradejournal.io` takma adı** (Google Workspace, ücretsiz):
    admin.google.com → **Dizin → Kullanıcılar** → admin@ satırına tıkla →
    **Kullanıcı bilgileri → Alternatif e-posta adresleri (takma adlar)** → `social` yaz →
-   **Kaydet**. Birkaç dakika içinde çalışır. *(Durum 2026-09-29: eklendi, "Sosyal medya" filtresi kuruldu; deneme postası bekleniyor.)*
+   **Kaydet**. Birkaç dakika içinde çalışır. *(Durum 2026-09-29: eklendi, "Sosyal medya" filtresi kuruldu; deneme postası etikete düştü, çalışıyor.)*
 
    **Nasıl çalışır:** `social@` ayrı bir hesap değil, admin@'in ikinci adresi. Ayrı
    giriş, ayrı şifre ya da ayrı gelen kutusu yok; social@'e gelen her posta doğrudan
