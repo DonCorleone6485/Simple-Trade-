@@ -690,6 +690,67 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "overtrading": {
+    "title": "Sobreoperar: cómo saber si estás operando demasiado",
+    "description": "Qué es el overtrading, cómo se ve en tus propios datos, por qué las operaciones de más suelen costar dinero y límites sencillos para mantener bajo control tu número de operaciones.",
+    "body": [
+      {
+        "p": "Sobreoperar (overtrading) es abrir más operaciones de las que pide tu plan: entradas que ocurren porque estás frente a la pantalla, no porque apareció tu setup. En el momento rara vez parece un error. Cada operación parece razonable por sí sola; el problema solo se ve cuando las cuentas."
+      },
+      {
+        "h2": "Por qué las operaciones de más cuestan dinero"
+      },
+      {
+        "p": "Los buenos setups son limitados; el mercado no los ofrece cada hora. Cuando sube el número de operaciones, las de más suelen ser más débiles: setups casi formados, entradas en mitad del rango, operaciones en horas tranquilas. Cada operación además tiene costes —spread, comisión, swap— que se acumulan más rápido de lo que la mayoría espera."
+      },
+      {
+        "h2": "Causas habituales"
+      },
+      {
+        "ul": [
+          "Intentar recuperar una pérdida (operar por venganza).",
+          "El aburrimiento en un día lento, o sentir que un día sin operaciones es un día perdido.",
+          "Un objetivo diario de beneficio que te empuja a seguir hasta alcanzarlo.",
+          "Bajar a un marco temporal menor, donde los setups aparecen más a menudo pero significan menos.",
+          "Seguir después de una gran ganancia, cuando la confianza está en su punto más alto."
+        ]
+      },
+      {
+        "h2": "Cómo detectarlo en tu diario"
+      },
+      {
+        "ul": [
+          "Días con muchas más operaciones que tu día habitual.",
+          "Resultados según el número de operación del día: ¿tu cuarta y quinta operación son peores que la primera y la segunda?",
+          "Operaciones sin setup, o con un setup que solo usas de vez en cuando.",
+          "Muchas operaciones cortas seguidas en el mismo instrumento."
+        ]
+      },
+      {
+        "p": "La comparación que importa es sencilla: toma tus días más cargados y compara su resultado neto y su tasa de acierto con tus días normales. Si los días cargados son claramente peores, el número de operaciones es parte del problema."
+      },
+      {
+        "h2": "Límites que ayudan"
+      },
+      {
+        "ul": [
+          "Un máximo de operaciones por día, escrito antes de la sesión; por ejemplo, tu número habitual más una.",
+          "Parar tras un número fijo de pérdidas, sean cuantas sean las operaciones.",
+          "Solo cuentan los setups de tu lista de verificación; lo demás no es una operación.",
+          "Una franja horaria fija para operar; fuera de ella, ninguna entrada nueva."
+        ]
+      },
+      {
+        "p": "Un límite solo funciona si se fija de antemano. En la quinta operación del día, el argumento para una sexta siempre sonará convincente."
+      },
+      {
+        "h2": "En Simple Trading Journal"
+      },
+      {
+        "p": "La vista de disciplina calcula tu número habitual de operaciones por día a partir de tu propio historial y marca los días con más del doble (y al menos cuatro operaciones). Necesita al menos cinco días de trading para juzgar y muestra cuánto te costaron las operaciones de esos días frente al resto. El calendario muestra el número de operaciones y el resultado de cada día, y las operaciones de MetaTrader se incluyen automáticamente."
+      }
+    ]
+  },
 };
 
 export default TEXT;

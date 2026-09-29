@@ -853,6 +853,67 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "overtrading": {
+    "title": "Overtrading: how to tell when you are trading too much",
+    "description": "What overtrading is, how it shows up in your own trade data, why extra trades tend to cost money, and simple limits that keep your trade count in check.",
+    "body": [
+      {
+        "p": "Overtrading means taking more trades than your plan calls for — entries that happen because you are at the screen, not because your setup appeared. It rarely feels like a mistake in the moment. Each trade looks reasonable on its own; the problem only shows when you count them."
+      },
+      {
+        "h2": "Why extra trades cost money"
+      },
+      {
+        "p": "Good setups are limited; the market does not offer them every hour. When the number of trades goes up, the extra ones are usually weaker: setups that are almost there, entries in the middle of a range, trades in quiet hours. Every trade also carries costs — spread, commission, swap — and these add up faster than most traders expect."
+      },
+      {
+        "h2": "Common causes"
+      },
+      {
+        "ul": [
+          "Trying to win back a loss (revenge trading).",
+          "Boredom on a slow day, or the feeling that a day without trades is wasted.",
+          "A daily profit goal that pushes you to keep going until it is reached.",
+          "Dropping to a lower timeframe, where setups appear more often but mean less.",
+          "Carrying on after a big win, when confidence is at its highest."
+        ]
+      },
+      {
+        "h2": "How to spot it in your journal"
+      },
+      {
+        "ul": [
+          "Days with far more trades than your usual day.",
+          "Results by trade number within the day: are your fourth and fifth trades worse than your first and second?",
+          "Trades with no setup, or with a setup you only use occasionally.",
+          "Many short trades in a row on the same instrument."
+        ]
+      },
+      {
+        "p": "The comparison that matters is simple: take your busiest days and compare their net result and win rate with your normal days. If the busy days are clearly worse, the number of trades is part of the problem."
+      },
+      {
+        "h2": "Limits that help"
+      },
+      {
+        "ul": [
+          "A maximum number of trades per day, written down before the session — for example your usual number plus one.",
+          "A stop after a set number of losses, however many trades that is.",
+          "Only setups on your checklist count; anything else is not a trade.",
+          "A fixed trading window; outside it, no new entries."
+        ]
+      },
+      {
+        "p": "A limit only works if it is set in advance. At the fifth trade of the day, the case for a sixth will always sound convincing."
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "The discipline view works out your usual number of trades per day from your own history and marks days with more than twice that number (and at least four trades). It needs at least five trading days to judge, and it shows what the trades on those days cost compared with the rest. The calendar shows each day's trade count and result, and trades from MetaTrader are included automatically."
+      }
+    ]
+  },
 };
 
 export default TEXT;

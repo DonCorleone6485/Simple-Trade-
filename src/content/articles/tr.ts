@@ -853,6 +853,67 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "overtrading": {
+    "title": "Aşırı işlem: fazla işlem açtığını nasıl anlarsın",
+    "description": "Aşırı işlem (overtrading) nedir, kendi işlem verinde nasıl görünür, fazladan işlemler neden para kaybettirir ve işlem sayını kontrol altında tutan basit sınırlar.",
+    "body": [
+      {
+        "p": "Aşırı işlem, planının gerektirdiğinden fazla işlem açmaktır — kurulumun oluştuğu için değil, ekranın başında olduğun için açılan işlemler. O an nadiren hata gibi hissettirir. Her işlem tek başına makul görünür; sorun ancak onları saydığında ortaya çıkar."
+      },
+      {
+        "h2": "Fazladan işlemler neden pahalıya patlar"
+      },
+      {
+        "p": "İyi kurulumlar sınırlıdır; piyasa onları her saat sunmaz. İşlem sayısı arttıkça fazladan olanlar genellikle daha zayıftır: neredeyse oluşmuş kurulumlar, aralığın ortasında girişler, sakin saatlerde açılan işlemler. Her işlemin bir de maliyeti vardır — spread, komisyon, swap — ve bunlar çoğu trader'ın sandığından hızlı birikir."
+      },
+      {
+        "h2": "Sık görülen sebepler"
+      },
+      {
+        "ul": [
+          "Bir kaybı geri almaya çalışmak (intikam işlemi).",
+          "Durgun bir günde sıkılmak ya da işlemsiz geçen günü boşa gitmiş saymak.",
+          "Ulaşılana kadar devam etmeye iten günlük kâr hedefi.",
+          "Kurulumların daha sık çıktığı ama daha az şey anlattığı küçük zaman dilimine inmek.",
+          "Özgüvenin en yüksek olduğu anda, büyük bir kazançtan sonra devam etmek."
+        ]
+      },
+      {
+        "h2": "Journal'ında nasıl fark edersin"
+      },
+      {
+        "ul": [
+          "Olağan gününden çok daha fazla işlem açtığın günler.",
+          "Gün içindeki sıraya göre sonuçlar: dördüncü ve beşinci işlemlerin, birinci ve ikinciden kötü mü?",
+          "Kurulumu olmayan ya da ara sıra kullandığın bir kuruluma bağlanan işlemler.",
+          "Aynı enstrümanda art arda açılan çok sayıda kısa işlem."
+        ]
+      },
+      {
+        "p": "Önemli olan karşılaştırma basit: en yoğun günlerini al, net sonuçlarını ve kazanma oranlarını normal günlerinle karşılaştır. Yoğun günler belirgin şekilde kötüyse işlem sayısı sorunun bir parçasıdır."
+      },
+      {
+        "h2": "İşe yarayan sınırlar"
+      },
+      {
+        "ul": [
+          "Seanstan önce yazılmış günlük en fazla işlem sayısı — örneğin olağan sayın artı bir.",
+          "Kaçıncı işlem olursa olsun, belirli sayıda kayıptan sonra durmak.",
+          "Yalnız kontrol listendeki kurulumlar sayılır; gerisi işlem değildir.",
+          "Belirli bir işlem saati aralığı; dışında yeni giriş yok."
+        ]
+      },
+      {
+        "p": "Sınır ancak önceden konursa işe yarar. Günün beşinci işleminde altıncı için bulunan gerekçe her zaman ikna edici gelir."
+      },
+      {
+        "h2": "Simple Trading Journal'da"
+      },
+      {
+        "p": "Disiplin ekranı, kendi geçmişinden günde olağan kaç işlem açtığını çıkarır ve bunun iki katından fazla (en az dört) işlem açılan günleri işaretler. Karar vermek için en az beş işlem günü gerekir; o günlerdeki işlemlerin geri kalanlara göre sana neye mal olduğunu da gösterir. Takvim her günün işlem sayısını ve sonucunu gösterir; MetaTrader'dan gelen işlemler de otomatik olarak dahildir."
+      }
+    ]
+  },
 };
 
 export default TEXT;

@@ -25,7 +25,7 @@ Son güncelleme: 2026-09-29
 - ✅ 2026-09-29 **IndexNow (Bing, Yandex)** — `npm run indexnow` canlı sitemap'i bildirir; yeni sayfada `npm run indexnow -- /yol`. Bing Webmaster hesabı kullanıcıda (yukarıda).
 - ✅ 2026-09-29 **Haftalık özet e-postası** — cumartesi 09:00 UTC günlük görevle (cuma kapanışından sonra; 2026-09-29 pazartesiden alındı), 9 dilde, yalnız o hafta işlemi olana (`api/_digest.ts`).
 - [ ] **CSP'yi engelleme moduna almak** — 2026-10-06 … 10-13 arası, `client_errors` kind 'csp' raporlarına bakarak. Zamanlanmış görev `csp-enforce-check` 6 Ekim 10:00'da yapacak (29 Eylül'e kadar yalnız 'eval' ve 'wasm-eval' raporu, 2'şer).
-- 🟡 **Yeni blog yazıları** — 9 dilde, içerik kümelerine göre (§4). ✅ 2026-09-29 3 yazı: pozisyon büyüklüğü, intikam işlemi, beklenti ve kâr faktörü (toplam 13). Haftada 1 devam.
+- 🟡 **Yeni blog yazıları** — 9 dilde, içerik kümelerine göre (§4). ✅ 2026-09-29 3 yazı: pozisyon büyüklüğü, intikam işlemi, beklenti ve kâr faktörü (toplam 13). ✅ 2026-09-29 aşırı işlem (toplam 14). Haftada 1 devam.
 - 🟡 **Programatik prop firma / broker sayfaları** (§4) — ✅ 2026-09-29 5 prop firma (FTMO, The5ers, Alpha Capital, Instant Funding, FundingPips) + 4 broker, 9 dilde; aylık kural kontrol görevi kuruldu. ✅ 2026-09-29 E8 Markets eklendi (6 firma). Kalan: FundedNext, FXIFY ve Türkiye'den açılmayan broker'lar (SEO.md).
 - [ ] **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate (büyük iş). Engel: gerçek örnek dışa aktarım dosyası yok; Tradovate'te yön sütunu yok, TradingView bir işlemi iki satıra yazıyor — ezbere ayrıştırıcı yazılırsa kâr/zarar yanlış çıkar. Kullanıcı ya da ilk kullanıcılardan birer örnek dosya gelince yapılır. ✅ 2026-09-29 hazırlık: içe aktarıcı artık ABD biçimini ("$1,250.00", "($75.50)", 9/22/2026) ve ";"/sekme ayırıcılı dosyaları okuyor; NinjaTrader tarzı tablo elle eşleştirmeden geliyor.
 
@@ -77,7 +77,7 @@ Son güncelleme: 2026-09-29
 Ayrıntılı kayıt (yapılanlar, sayfalar, araçlar, yapılacaklar): [SEO.md](SEO.md).
 
 - ✅ Dil başına adresler (/tr, /fa, /ar …).
-- [ ] İçerik kümeleri: trading journal, prop firm, risk yönetimi, trader psikolojisi — her biri 10–20 yazı (şu an 13 yazı toplam).
+- [ ] İçerik kümeleri: trading journal, prop firm, risk yönetimi, trader psikolojisi — her biri 10–20 yazı (şu an 14 yazı toplam).
 - 🟡 Programatik sayfalar: ✅ ilk 4 prop firma + 4 broker (2026-09-29); devamı SEO.md'de.
 - ✅ Karşılaştırma sayfaları (Tradezella, TraderSync, Edgewonk).
 - [ ] Geri bağlantılar: dizinler, konuk yazılar, forumlar, YouTube açıklamaları.

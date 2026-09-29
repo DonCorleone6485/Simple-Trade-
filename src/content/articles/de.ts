@@ -690,6 +690,67 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "overtrading": {
+    "title": "Overtrading: So erkennst du, dass du zu viel tradest",
+    "description": "Was Overtrading ist, wie es in deinen eigenen Tradedaten sichtbar wird, warum zusätzliche Trades meist Geld kosten und einfache Grenzen, die deine Tradeanzahl im Griff halten.",
+    "body": [
+      {
+        "p": "Overtrading heißt, mehr Trades einzugehen, als dein Plan vorsieht – Einstiege, die passieren, weil du vor dem Bildschirm sitzt, nicht weil dein Setup aufgetaucht ist. Im Moment fühlt es sich selten wie ein Fehler an. Jeder Trade wirkt für sich vernünftig; das Problem zeigt sich erst, wenn du sie zählst."
+      },
+      {
+        "h2": "Warum zusätzliche Trades Geld kosten"
+      },
+      {
+        "p": "Gute Setups sind begrenzt; der Markt bietet sie nicht jede Stunde. Steigt die Zahl der Trades, sind die zusätzlichen meist schwächer: Setups, die fast passen, Einstiege mitten in der Range, Trades in ruhigen Stunden. Dazu hat jeder Trade Kosten – Spread, Kommission, Swap –, und die summieren sich schneller, als die meisten Trader erwarten."
+      },
+      {
+        "h2": "Häufige Ursachen"
+      },
+      {
+        "ul": [
+          "Einen Verlust zurückholen wollen (Revenge Trading).",
+          "Langeweile an einem ruhigen Tag oder das Gefühl, ein Tag ohne Trades sei verschwendet.",
+          "Ein tägliches Gewinnziel, das dich weitermachen lässt, bis es erreicht ist.",
+          "Der Wechsel auf einen kleineren Zeitrahmen, wo Setups häufiger auftauchen, aber weniger bedeuten.",
+          "Weitermachen nach einem großen Gewinn, wenn das Selbstvertrauen am höchsten ist."
+        ]
+      },
+      {
+        "h2": "So erkennst du es in deinem Journal"
+      },
+      {
+        "ul": [
+          "Tage mit deutlich mehr Trades als an einem üblichen Tag.",
+          "Ergebnisse nach Trade-Nummer im Tag: Sind dein vierter und fünfter Trade schlechter als der erste und zweite?",
+          "Trades ohne Setup oder mit einem Setup, das du nur gelegentlich nutzt.",
+          "Viele kurze Trades hintereinander im selben Instrument."
+        ]
+      },
+      {
+        "p": "Der entscheidende Vergleich ist einfach: Nimm deine vollsten Tage und vergleiche ihr Nettoergebnis und ihre Trefferquote mit normalen Tagen. Sind die vollen Tage klar schlechter, ist die Zahl der Trades Teil des Problems."
+      },
+      {
+        "h2": "Grenzen, die helfen"
+      },
+      {
+        "ul": [
+          "Eine Höchstzahl an Trades pro Tag, vor der Session aufgeschrieben – zum Beispiel deine übliche Zahl plus eins.",
+          "Schluss nach einer festen Zahl von Verlusten, egal wie viele Trades das sind.",
+          "Nur Setups von deiner Checkliste zählen; alles andere ist kein Trade.",
+          "Ein festes Handelsfenster; außerhalb keine neuen Einstiege."
+        ]
+      },
+      {
+        "p": "Eine Grenze wirkt nur, wenn sie vorher festgelegt ist. Beim fünften Trade des Tages klingt das Argument für einen sechsten immer überzeugend."
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "Die Disziplin-Ansicht ermittelt aus deiner eigenen Historie, wie viele Trades du üblicherweise pro Tag machst, und markiert Tage mit mehr als doppelt so vielen (und mindestens vier Trades). Für eine Bewertung braucht sie mindestens fünf Handelstage und zeigt, was die Trades an diesen Tagen im Vergleich zum Rest gekostet haben. Der Kalender zeigt Tradeanzahl und Ergebnis jedes Tages, und Trades aus MetaTrader kommen automatisch dazu."
+      }
+    ]
+  },
 };
 
 export default TEXT;

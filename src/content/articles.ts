@@ -66,6 +66,7 @@ export const ARTICLES: Article[] = [
   { slug: 'position-sizing-risk-per-trade', section: 'blog', date: '2026-09-29', minutes: 5 },
   { slug: 'revenge-trading', section: 'blog', date: '2026-09-29', minutes: 4 },
   { slug: 'expectancy-and-profit-factor', section: 'blog', date: '2026-09-29', minutes: 5 },
+  { slug: 'overtrading', section: 'blog', date: '2026-09-29', minutes: 4 },
   // Karşılaştırmalar: rakip bilgileri kendi fiyat/yardım sayfalarından
   // (Eylül 2026). Fiyatlar değişir — güncellerken tarihi de değiştir.
   { slug: 'tradezella-alternative', section: 'blog', date: '2026-09-28', minutes: 4 },

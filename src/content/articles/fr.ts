@@ -690,6 +690,67 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "overtrading": {
+    "title": "Surtrading : comment savoir si vous tradez trop",
+    "description": "Ce qu'est le surtrading (overtrading), comment il apparaît dans vos propres données, pourquoi les trades en trop coûtent généralement de l'argent et des limites simples pour garder le nombre de trades sous contrôle.",
+    "body": [
+      {
+        "p": "Le surtrading consiste à prendre plus de trades que votre plan ne le prévoit : des entrées qui arrivent parce que vous êtes devant l'écran, pas parce que votre setup est apparu. Sur le moment, cela ressemble rarement à une erreur. Chaque trade paraît raisonnable pris isolément ; le problème n'apparaît que lorsque vous les comptez."
+      },
+      {
+        "h2": "Pourquoi les trades en trop coûtent de l'argent"
+      },
+      {
+        "p": "Les bons setups sont limités ; le marché ne les offre pas toutes les heures. Quand le nombre de trades augmente, ceux en trop sont généralement plus faibles : setups presque formés, entrées au milieu d'un range, trades aux heures calmes. Chaque trade a aussi un coût — spread, commission, swap — qui s'accumule plus vite que la plupart des traders ne le pensent."
+      },
+      {
+        "h2": "Causes fréquentes"
+      },
+      {
+        "ul": [
+          "Vouloir récupérer une perte (revenge trading).",
+          "L'ennui un jour calme, ou l'impression qu'une journée sans trade est une journée perdue.",
+          "Un objectif de gain quotidien qui pousse à continuer jusqu'à l'atteindre.",
+          "Passer à une unité de temps plus petite, où les setups apparaissent plus souvent mais veulent dire moins.",
+          "Continuer après un gros gain, quand la confiance est au plus haut."
+        ]
+      },
+      {
+        "h2": "Comment le repérer dans votre journal"
+      },
+      {
+        "ul": [
+          "Des journées avec beaucoup plus de trades qu'une journée habituelle.",
+          "Les résultats selon le rang du trade dans la journée : vos quatrième et cinquième trades sont-ils moins bons que les deux premiers ?",
+          "Des trades sans setup, ou avec un setup que vous n'utilisez qu'occasionnellement.",
+          "Beaucoup de trades courts à la suite sur le même instrument."
+        ]
+      },
+      {
+        "p": "La comparaison utile est simple : prenez vos journées les plus chargées et comparez leur résultat net et leur taux de réussite à ceux de vos journées normales. Si les journées chargées sont nettement moins bonnes, le nombre de trades fait partie du problème."
+      },
+      {
+        "h2": "Des limites qui aident"
+      },
+      {
+        "ul": [
+          "Un nombre maximal de trades par jour, écrit avant la séance — par exemple votre nombre habituel plus un.",
+          "Un arrêt après un nombre fixe de pertes, quel que soit le nombre de trades.",
+          "Seuls les setups de votre checklist comptent ; le reste n'est pas un trade.",
+          "Une plage horaire fixe ; en dehors, aucune nouvelle entrée."
+        ]
+      },
+      {
+        "p": "Une limite ne fonctionne que si elle est fixée à l'avance. Au cinquième trade de la journée, l'argument pour un sixième paraîtra toujours convaincant."
+      },
+      {
+        "h2": "Dans Simple Trading Journal"
+      },
+      {
+        "p": "La vue discipline calcule votre nombre habituel de trades par jour à partir de votre propre historique et signale les journées qui en comptent plus du double (et au moins quatre trades). Il lui faut au moins cinq jours de trading pour juger, et elle montre ce qu'ont coûté les trades de ces journées par rapport aux autres. Le calendrier affiche le nombre de trades et le résultat de chaque jour, et les trades venus de MetaTrader sont inclus automatiquement."
+      }
+    ]
+  },
 };
 
 export default TEXT;
