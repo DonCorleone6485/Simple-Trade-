@@ -102,6 +102,7 @@ için Instagram ve Telegram. Kullanıcı adları ve 9 dilde biyografiler hazır:
 
 ### §3 İş altyapısı
 - [ ] **Meta Business Suite:** Instagram, Facebook, reklam hesabı, Pixel ve katalog tek yerde.
+- [ ] **Meta Verified (işletme doğrulaması):** Instagram'da teklif edildi (ilk hafta ücretsiz, sonra ücretli abonelik); şirket belgesi ister. Şirket kurulunca değerlendir, şimdi geçildi (2026-09-30).
 - ✅ 2026-09-29 **Bing Webmaster Tools** — ChatGPT'nin arama sonuçları Bing'den besleniyor; yapay zekâ aramalarında görünmek için önemli. IndexNow da kuruldu.
 - 🟡 **Tanıtım dizinleri:** Product Hunt lansmanı, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub. Hem geri bağlantı hem yorum toplar. ✅ Metinler hazır ([docs/listings.md](docs/listings.md)); başvuru kullanıcıda, G2/Capterra şirketten sonra.
 - [ ] **Ortaklık (affiliate) programı:** trader YouTuber'ları ve prop firmalar satış başına komisyon alır. En güçlü büyüme kanalı olabilir. Ödeme sistemiyle birlikte kurulur.
