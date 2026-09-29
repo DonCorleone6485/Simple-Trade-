@@ -21,11 +21,13 @@ Son güncelleme: 2026-09-29
 - ✅ 2026-09-29 **Bing Webmaster Tools** — kullanıcı Google ile girip Search Console'dan içe aktardı.
 
 ### Kullanıcıyı beklemeden yapılabilecekler
+- [ ] **Search Console dizine ekleme (2026-09-30)** — günlük kota 29 Eylül'de doldu; kalan: /blog/fx-replay-alternative, /help. Kota site başına günde ~10 istek.
+- [ ] **İlk haftalık özet e-postasını kontrol (2026-10-03 cumartesi)** — gönderim günlüğü ve `users.weekly_digest_sent_at`.
 - ✅ 2026-09-29 **Dizin başvuru metinleri** — [docs/listings.md](docs/listings.md): Product Hunt, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub; 9 dilde kısa açıklama.
 - ✅ 2026-09-29 **IndexNow (Bing, Yandex)** — `npm run indexnow` canlı sitemap'i bildirir; yeni sayfada `npm run indexnow -- /yol`. Bing Webmaster hesabı kullanıcıda (yukarıda).
 - ✅ 2026-09-29 **Haftalık özet e-postası** — cumartesi 09:00 UTC günlük görevle (cuma kapanışından sonra; 2026-09-29 pazartesiden alındı), 9 dilde, yalnız o hafta işlemi olana (`api/_digest.ts`).
 - [ ] **CSP'yi engelleme moduna almak** — 2026-10-06 … 10-13 arası, `client_errors` kind 'csp' raporlarına bakarak. Zamanlanmış görev `csp-enforce-check` 6 Ekim 10:00'da yapacak (29 Eylül'e kadar yalnız 'eval' ve 'wasm-eval' raporu, 2'şer).
-- 🟡 **Yeni blog yazıları** — 9 dilde, içerik kümelerine göre (§4). ✅ 2026-09-29 3 yazı: pozisyon büyüklüğü, intikam işlemi, beklenti ve kâr faktörü (toplam 13). ✅ 2026-09-29 aşırı işlem (toplam 14). Haftada 1 devam.
+- 🟡 **Yeni blog yazıları** — 9 dilde, içerik kümelerine göre (§4). ✅ 2026-09-29 3 yazı: pozisyon büyüklüğü, intikam işlemi, beklenti ve kâr faktörü (toplam 13). ✅ 2026-09-29 aşırı işlem. Toplam 17 sayfa (2 rehber, 9 yazı, 6 karşılaştırma). Haftada 1 devam; sıradaki konular prop firm ve risk kümesinden.
 - 🟡 **Programatik prop firma / broker sayfaları** (§4) — ✅ 2026-09-29 5 prop firma (FTMO, The5ers, Alpha Capital, Instant Funding, FundingPips) + 4 broker, 9 dilde; aylık kural kontrol görevi kuruldu. ✅ 2026-09-29 E8 Markets eklendi (6 firma). Kalan: FundedNext, FXIFY ve Türkiye'den açılmayan broker'lar (SEO.md).
 - [ ] **Yeni entegrasyonlar** — cTrader, TradingView, NinjaTrader, Tradovate (büyük iş). Engel: gerçek örnek dışa aktarım dosyası yok; Tradovate'te yön sütunu yok, TradingView bir işlemi iki satıra yazıyor — ezbere ayrıştırıcı yazılırsa kâr/zarar yanlış çıkar. Kullanıcı ya da ilk kullanıcılardan birer örnek dosya gelince yapılır. ✅ 2026-09-29 hazırlık: içe aktarıcı artık ABD biçimini ("$1,250.00", "($75.50)", 9/22/2026) ve ";"/sekme ayırıcılı dosyaları okuyor; NinjaTrader tarzı tablo elle eşleştirmeden geliyor.
 
@@ -33,6 +35,8 @@ Son güncelleme: 2026-09-29
 - Ödeme sistemi ve yasal sayfalar — şirket kurulunca. Bölgesel fiyat grupları, kurucu üye kampanyası, ortaklık programı buna bağlı.
 
 ### Biten (son)
+- ✅ 2026-09-29 Yardım sayfasına FAQPage yapısal verisi (13 soru, 9 dil).
+- ✅ 2026-09-29 Aşırı işlem yazısı + Tradervue, TradesViz, FX Replay karşılaştırmaları (9 dil, 36 yeni adres); IndexNow'a 38 adres, Search Console'da 3 adres.
 - ✅ 2026-09-29 Namecheap 2FA yeniden açıldı (kullanıcı).
 - ✅ 2026-09-29 Prop firma ve broker sayfaları (/prop-firms, /brokers), 9 dilde, 72 yeni adres.
 - ✅ 2026-09-29 EA 1.09 MT4'te kuruldu ve işlem aktarıyor.
@@ -77,9 +81,11 @@ Son güncelleme: 2026-09-29
 Ayrıntılı kayıt (yapılanlar, sayfalar, araçlar, yapılacaklar): [SEO.md](SEO.md).
 
 - ✅ Dil başına adresler (/tr, /fa, /ar …).
-- [ ] İçerik kümeleri: trading journal, prop firm, risk yönetimi, trader psikolojisi — her biri 10–20 yazı (şu an 14 yazı toplam).
-- 🟡 Programatik sayfalar: ✅ ilk 4 prop firma + 4 broker (2026-09-29); devamı SEO.md'de.
+- 🟡 İçerik kümeleri: trading journal, prop firm, risk yönetimi, trader psikolojisi — her biri 10–20 yazı. Şu an (2026-09-29) toplam 17: 2 rehber, 9 yazı, 6 karşılaştırma. Kümelere göre yazılar: journal/metrikler 4 (journal tutma, R-multiple, beklenti/kâr faktörü, işlem öncesi kontrol listesi), psikoloji 3 (duygular, intikam, aşırı işlem), risk 1 (pozisyon büyüklüğü), prop firm 1 (günlük kayıp/drawdown). En zayıf: prop firm ve risk — sıradaki yazılar oradan.
+- 🟡 Programatik sayfalar: ✅ 6 prop firma + 4 broker (2026-09-29); devamı SEO.md'de.
 - ✅ Karşılaştırma sayfaları (Tradezella, TraderSync, Edgewonk; ✅ 2026-09-29 Tradervue, TradesViz, FX Replay).
+- ✅ Yapısal veri: yazılarda BlogPosting/HowTo, dizin sayfalarında BreadcrumbList, yardımda FAQPage (2026-09-29).
+- ✅ Arama motorlarına bildirim: Search Console + Bing Webmaster + IndexNow (2026-09-29).
 - [ ] Geri bağlantılar: dizinler, konuk yazılar, forumlar, YouTube açıklamaları.
 
 ### §5 İçerik motoru
@@ -98,6 +104,6 @@ Haftada 1 uzun YouTube videosu → 4–5 kısa video (Reels/TikTok/Shorts), 1 ka
 Kural: yayın tam otomatik olmaz, son onay kullanıcıda. Kâr vaadi dili hiçbir yerde yok.
 
 ### §7 Sıralama
-- **Şimdi:** kullanıcı adları, marka kiti, şifre yöneticisi, hesaplar, Bing, dizinler, ✅ kesinti takibi.
+- **Şimdi:** kullanıcı adları, marka kiti, şifre yöneticisi, hesaplar, ✅ Bing, dizinler, ✅ kesinti takibi.
 - **Şirket kurulunca:** ödeme, yasal sayfalar, marka tescili, Meta Pixel + çerez bandı, ortaklık, Trustpilot.
 - **Sonra:** otomasyon merkezi, içerik motoru, bülten, Discord, ✅ dil başına SEO.

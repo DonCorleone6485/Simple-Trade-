@@ -153,7 +153,7 @@ IndexNow 2026-09-29 (ikinci tur): 38 adres — aşırı işlem yazısı + Trader
 ## Yapılacaklar
 
 ### İçerik
-- ⬜ **İçerik kümeleri:** trading journal, prop firm, risk yönetimi, trader psikolojisi — her birinde 10–20 yazı. Şu an toplam 14 (2026-09-29: pozisyon büyüklüğü, intikam işlemi, beklenti/kâr faktörü, aşırı işlem eklendi).
+- ⬜ **İçerik kümeleri:** trading journal, prop firm, risk yönetimi, trader psikolojisi — her birinde 10–20 yazı. Şu an 9 yazı + 2 rehber + 6 karşılaştırma = 17 (2026-09-29). Kümeler: journal/metrikler 4, psikoloji 3, risk 1, prop firm 1 — sıradakiler prop firm ve risk.
 - ✅ 2026-09-29 **Yeni karşılaştırmalar:** TradesViz, Tradervue, FX Replay (9 dilde; bilgiler rakiplerin kendi sayfalarından).
 - 🟡 **Programatik prop firma sayfaları** (`/prop-firms/<firma>`) — 5 firma YAPILDI (2026-09-29; FundingPips aynı gün tarayıcıyla eklendi). Sıradakiler: FundedNext (bot doğrulaması, tarayıcı da geçemiyor — kullanıcı kuralları yapıştırırsa eklenir), FXIFY (tablo hesap büyüklüğü seçicisine bağlı, okunan değerler çelişkili). ✅ E8 Markets eklendi (2026-09-29). Kaynak yalnız firmanın resmî sitesi; her kuralda kaynak bağlantısı ve "son kontrol" tarihi. Kurallar tek veri dosyasında; ayda bir zamanlanmış görev kaynak sayfaları karşılaştırır, fark varsa kullanıcıya sorar (kendiliğinden yayınlamaz). Uzun süre doğrulanamayan firmada sayılar gizlenir. Logo yok, ortaklık ima edilmez.
 - 🟡 **Programatik broker sayfaları** (`/brokers/<broker>`) — ilk 4 broker YAPILDI (2026-09-29). IC Markets, Exness, XM, FxPro, Tickmill siteleri buradan (Türkiye) açılmadı; başka ağdan platform listesi doğrulanınca eklenebilir.
