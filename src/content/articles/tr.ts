@@ -914,6 +914,261 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "tradervue-alternative": {
+    "title": "Simple Trading Journal ve Tradervue: dürüst bir karşılaştırma",
+    "description": "Tradervue alternatifi mi arıyorsun? Fiyat, ücretsiz plan, deneme ve MetaTrader desteği yan yana; hangisinin nerede güçlü olduğu da.",
+    "body": [
+      {
+        "p": "Tradervue en eski trading journal'lardan biri; ABD hisse, opsiyon ve vadeli işlem trader'ları arasında yaygın. Daha ucuz, kendi dilinde ya da MetaTrader otomatik kaydı olan bir alternatif arıyorsan, Simple Trading Journal'ın nasıl karşılaştırıldığı aşağıda."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "Tradervue"
+          ],
+          [
+            "Aylık fiyat",
+            "$14.99",
+            "$29.95 – $49.95"
+          ],
+          [
+            "Yıllık fiyat",
+            "$119",
+            "Fiyat sayfasında yok"
+          ],
+          [
+            "Ücretsiz plan",
+            "Var — günde 2 işlem, süre sınırı yok",
+            "Var — ayda 30 işlem içe aktarma"
+          ],
+          [
+            "Ücretsiz deneme",
+            "3 gün Pro, kart gerekmez",
+            "7 gün Silver ya da Gold; ücretsiz plana geçmezsen bitince karttan çekilir"
+          ],
+          [
+            "MetaTrader otomatik kayıt",
+            "MT4 ve MT5",
+            "Yok — MT4 ve MT5 rapor dosyası yükleyerek"
+          ],
+          [
+            "MetaTrader nasıl bağlanıyor",
+            "MetaTrader'a eklenti + anahtar, şifre paylaşılmaz",
+            "MetaTrader'da HTML rapor kaydedip yüklemek"
+          ],
+          [
+            "İçe aktarma",
+            "MT4/MT5 raporu, cTrader, TradeLocker, DXtrade, Match-Trader, her CSV",
+            "Uzun bir broker ve platform listesi; bazı broker'larda otomatik eşitleme"
+          ]
+        ]
+      },
+      {
+        "note": "Tradervue'nun fiyat ve özellikleri Eylül 2026'da kendi fiyat, platform ve yardım sayfalarından alındı; o tarihten beri değişmiş olabilir. Karar vermeden önce sitesine bak."
+      },
+      {
+        "h2": "Tradervue nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "ABD hisse, opsiyon ve vadeli işlemlerine derin destek; birçok ABD broker'ı ve platformu.",
+          "Ayrıntılı raporlar; üst planında çıkış analizi ve MFE/MAE istatistikleri.",
+          "Mentorluk ve işlemleri topluluğuyla paylaşma.",
+          "Çok uzun bir geçmiş."
+        ]
+      },
+      {
+        "h2": "Simple Trading Journal nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "MetaTrader 4 ve 5 işlemleri sen işlem yaptıkça kendiliğinden gelir — her seferinde rapor alıp yüklemen gerekmez.",
+          "Pro ayda $14.99 ya da yılda $119 — Tradervue'nun ücretli planları ayda $29.95'ten başlıyor.",
+          "Kart istemeyen 3 günlük Pro denemesi.",
+          "Uygulamanın tamamı Türkçe, Farsça ve Arapça dahil 9 dilde.",
+          "Yerleşik disiplin analizi (intikam işlemleri, kayıptan sonra artan risk, aşırı işlem, saat dışı işlem) ve prop firma limit takibi."
+        ]
+      },
+      {
+        "h2": "Hangisini seçmelisin?"
+      },
+      {
+        "p": "ABD hisse, opsiyon ya da vadeli işlemlerini bir ABD broker'ı üzerinden yapıyorsan Tradervue tam olarak bunun için kurulmuş. MetaTrader'da forex, endeks ya da altın işlemi yapıyorsan, işlemlerinin kendiliğinden kaydolmasını istiyorsan ve ücretsiz başlamayı tercih ediyorsan Simple Trading Journal'ı dene — ücretsiz plan kart istemez."
+      }
+    ]
+  },
+  "tradesviz-alternative": {
+    "title": "Simple Trading Journal ve TradesViz: dürüst bir karşılaştırma",
+    "description": "TradesViz alternatifi mi arıyorsun? Fiyat, ücretsiz plan, deneme ve MetaTrader bağlantısı yan yana; hangisinin nerede güçlü olduğu da.",
+    "body": [
+      {
+        "p": "TradesViz çok geniş bir istatistik, grafik, simülatör ve yapay zekâ aracı yelpazesi sunan bir trading journal. Daha sade, yıllıkta daha ucuz, kendi dilinde ya da forex için ücretsiz bir alternatif arıyorsan, Simple Trading Journal'ın nasıl karşılaştırıldığı aşağıda."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "TradesViz"
+          ],
+          [
+            "Aylık fiyat",
+            "$14.99",
+            "$19.99 – $29.99"
+          ],
+          [
+            "Yıllık fiyat",
+            "$119",
+            "$179.88 – $269.88"
+          ],
+          [
+            "Ücretsiz plan",
+            "Var — günde 2 işlem, süre sınırı yok, tüm enstrümanlar",
+            "Var — yalnız hisse senedi, ayda 3.000 gerçekleşme"
+          ],
+          [
+            "Ücretsiz deneme",
+            "3 gün Pro, kart gerekmez",
+            "7 gün Pro ya da Platinum"
+          ],
+          [
+            "MetaTrader otomatik kayıt",
+            "MT4 ve MT5",
+            "MT4 ve MT5 (ücretli planlarda; ücretsiz plan yalnız hisse)"
+          ],
+          [
+            "MetaTrader nasıl bağlanıyor",
+            "MetaTrader'a eklenti + anahtar, şifre paylaşılmaz",
+            "Hesap numarası + yatırımcı şifresi ya da MetaTrader'ın FTP ile rapor yayını"
+          ],
+          [
+            "İçe aktarma",
+            "MT4/MT5 raporu, cTrader, TradeLocker, DXtrade, Match-Trader, her CSV",
+            "250+ broker ve platform, 70+ otomatik eşitleme bağlantısı"
+          ]
+        ]
+      },
+      {
+        "note": "TradesViz'in fiyat ve özellikleri Eylül 2026'da kendi fiyat, broker ve blog sayfalarından alındı; o tarihten beri değişmiş olabilir. Karar vermeden önce sitesine bak."
+      },
+      {
+        "h2": "TradesViz nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "Çok daha geniş bir istatistik ve grafik seti — TradesViz'e göre 600'den fazla.",
+          "İşlem simülatörleri, işlem tekrarı, opsiyon araçları ve hisse tarayıcı.",
+          "İşlemlerinle ilgili soruları yanıtlayan yapay zekâ araçları.",
+          "Hisse, opsiyon, vadeli işlem ve kripto dahil çok daha fazla broker entegrasyonu."
+        ]
+      },
+      {
+        "h2": "Simple Trading Journal nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "Ücretsiz plan forex, endeks, altın ve diğer tüm enstrümanları kapsar — TradesViz'in ücretsiz planı yalnız hisse senedi.",
+          "Pro yılda $119 — TradesViz'in en ucuz yıllık planı $179.88.",
+          "MetaTrader 4 ve 5 küçük bir eklenti ve anahtarla bağlanır; yatırımcı şifreni hiç paylaşmazsın.",
+          "Öğrenmesi daha az ekran gerektiren, daha sade bir uygulama.",
+          "Uygulamanın tamamı Türkçe, Farsça ve Arapça dahil 9 dilde."
+        ]
+      },
+      {
+        "h2": "Hangisini seçmelisin?"
+      },
+      {
+        "p": "Olabilecek en derin analizi, simülatörleri ve yapay zekâ araçlarını istiyor ve gerçekten kullanacaksan TradesViz daha fazlasını sunuyor. MetaTrader'da forex ya da CFD işlemi yapıyorsan ve kendi dilinde, ücretsiz başlayabileceğin sade bir journal istiyorsan Simple Trading Journal'ı dene — ücretsiz plan kart istemez."
+      }
+    ]
+  },
+  "fx-replay-alternative": {
+    "title": "Simple Trading Journal ve FX Replay: hangisi ne işe yarar",
+    "description": "FX Replay mi Simple Trading Journal mı? Biri geriye dönük test platformu, diğeri gerçek işlemlerin için journal. Fiyat, ücretsiz plan ve MetaTrader desteği karşılaştırması.",
+    "body": [
+      {
+        "p": "FX Replay esas olarak bir geriye dönük test (backtest) platformu: geçmiş grafikleri yeniden oynatıp üzerinde işlem pratiği yaparsın; içinde bir journal da var. Simple Trading Journal ise hesabında gerçekten açtığın işlemler için bir journal. Göründüğünden daha az örtüşüyorlar — karşılaştırması aşağıda."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "FX Replay"
+          ],
+          [
+            "Asıl amaç",
+            "Gerçek işlemlerinin kaydı ve analizi",
+            "Geçmiş grafiklerde test, yanında journal"
+          ],
+          [
+            "Aylık fiyat",
+            "$14.99",
+            "$17.99 – $35"
+          ],
+          [
+            "Yıllık fiyat",
+            "$119",
+            "$180 – $350"
+          ],
+          [
+            "Ücretsiz plan",
+            "Var — günde 2 işlem, süre sınırı yok",
+            "Var — 2 test oturumu, 1 gösterge, 1 hafta veri saklama"
+          ],
+          [
+            "Ücretsiz deneme",
+            "3 gün Pro, kart gerekmez",
+            "Var, kart gerekmez (süresi belirtilmemiş)"
+          ],
+          [
+            "MetaTrader",
+            "MT4 ve MT5, eklenti + anahtarla otomatik kayıt",
+            "MT4 ve MT5 dosya yükleyerek"
+          ],
+          [
+            "İçe aktarma",
+            "MT4/MT5 raporu, cTrader, TradeLocker, DXtrade, Match-Trader, her CSV",
+            "Her CSV; NinjaTrader, Tradovate ve MT4/MT5 dosyaları"
+          ]
+        ]
+      },
+      {
+        "note": "FX Replay'in fiyat ve özellikleri Eylül 2026'da kendi fiyat ve journal sayfalarından alındı; o tarihten beri değişmiş olabilir. Karar vermeden önce sitesine bak."
+      },
+      {
+        "h2": "FX Replay nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "Geriye dönük test: geçmiş fiyat hareketini mum mum oynatma; Pro planında saniye düzeyinde veri.",
+          "Challenge kurallarıyla pratik için prop firma challenge simülatörü.",
+          "Bir stratejiyi, para riske atmadan önce büyük bir örneklemde denemek.",
+          "Discord'da hareketli bir topluluk."
+        ]
+      },
+      {
+        "h2": "Simple Trading Journal nerede daha güçlü"
+      },
+      {
+        "ul": [
+          "Gerçek MetaTrader 4 ve 5 işlemlerin sen işlem yaptıkça kendiliğinden kaydolur.",
+          "Pro ayda $14.99 ya da yılda $119.",
+          "Gerçek işlemlerde disiplin analizi: intikam işlemleri, kayıptan sonra artan risk, aşırı işlem, saat dışı işlem.",
+          "Gerçek challenge hesabında prop firma limit takibi.",
+          "Uygulamanın tamamı Türkçe, Farsça ve Arapça dahil 9 dilde."
+        ]
+      },
+      {
+        "h2": "Hangisini seçmelisin?"
+      },
+      {
+        "p": "İkisi farklı işler yapıyor. Bir stratejiyi geçmiş veride denemek için FX Replay tam bunun için yapılmış. Gerçekten açtığın işlemleri — özellikle MetaTrader'da — kaydedip incelemek için Simple Trading Journal'ı kullan. Birçok trader bir test aracını ve bir journal'ı birlikte kullanıyor; buradaki ücretsiz plan kart istemez."
+      }
+    ]
+  },
 };
 
 export default TEXT;

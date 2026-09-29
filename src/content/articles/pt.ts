@@ -751,6 +751,261 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "tradervue-alternative": {
+    "title": "Simple Trading Journal vs Tradervue: uma comparação honesta",
+    "description": "Procuras uma alternativa ao Tradervue? Preços, plano gratuito, teste e suporte ao MetaTrader lado a lado, e onde cada um é mais forte.",
+    "body": [
+      {
+        "p": "O Tradervue é um dos diários de trading mais antigos, popular entre quem opera ações, opções e futuros dos EUA. Se procuras uma alternativa mais barata, na tua língua ou com sincronização automática do MetaTrader, é assim que o Simple Trading Journal se compara."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "Tradervue"
+          ],
+          [
+            "Preço mensal",
+            "$14.99",
+            "$29.95 – $49.95"
+          ],
+          [
+            "Preço anual",
+            "$119",
+            "Não indicado na página de preços"
+          ],
+          [
+            "Plano gratuito",
+            "Sim — 2 operações por dia, sem limite de tempo",
+            "Sim — 30 operações importadas por mês"
+          ],
+          [
+            "Teste gratuito",
+            "3 dias de Pro, sem cartão",
+            "7 dias de Silver ou Gold; no fim é cobrado no cartão, a não ser que passes para o plano gratuito"
+          ],
+          [
+            "Sincronização automática com o MetaTrader",
+            "MT4 e MT5",
+            "Não — MT4 e MT5 carregando um ficheiro de relatório"
+          ],
+          [
+            "Como o MetaTrader se liga",
+            "Complemento no MetaTrader + chave, sem partilhar palavra-passe",
+            "Guardar um relatório HTML no MetaTrader e carregá-lo"
+          ],
+          [
+            "Importação",
+            "Relatório MT4/MT5, cTrader, TradeLocker, DXtrade, Match-Trader, qualquer CSV",
+            "Uma longa lista de corretoras e plataformas; sincronização com algumas corretoras"
+          ]
+        ]
+      },
+      {
+        "note": "Os preços e funcionalidades do Tradervue foram retirados das suas próprias páginas de preços, plataformas e ajuda em setembro de 2026 e podem ter mudado. Confirma no site antes de decidir."
+      },
+      {
+        "h2": "Onde o Tradervue é mais forte"
+      },
+      {
+        "ul": [
+          "Suporte profundo a ações, opções e futuros dos EUA, com muitas corretoras e plataformas americanas.",
+          "Relatórios detalhados e, no plano superior, análise de saídas e estatísticas MFE/MAE.",
+          "Mentoria e partilha de operações com a comunidade.",
+          "Um historial muito longo."
+        ]
+      },
+      {
+        "h2": "Onde o Simple Trading Journal é mais forte"
+      },
+      {
+        "ul": [
+          "As operações do MetaTrader 4 e 5 chegam sozinhas enquanto operas — não precisas de exportar e carregar um relatório de cada vez.",
+          "O Pro custa $14.99 por mês ou $119 por ano; os planos pagos do Tradervue começam em $29.95 por mês.",
+          "Teste do Pro de 3 dias sem cartão.",
+          "A aplicação inteira em 9 línguas, incluindo turco, persa e árabe.",
+          "Análise de disciplina incluída (operações de vingança, mais risco após perdas, overtrading, operar fora de horas) e acompanhamento dos limites de prop firms."
+        ]
+      },
+      {
+        "h2": "Qual escolher?"
+      },
+      {
+        "p": "Se operas ações, opções ou futuros dos EUA através de uma corretora americana, o Tradervue foi feito exatamente para isso. Se operas forex, índices ou ouro no MetaTrader, queres que as operações fiquem registadas sozinhas e preferes começar grátis, experimenta o Simple Trading Journal — o plano gratuito não pede cartão."
+      }
+    ]
+  },
+  "tradesviz-alternative": {
+    "title": "Simple Trading Journal vs TradesViz: uma comparação honesta",
+    "description": "Procuras uma alternativa ao TradesViz? Preços, plano gratuito, teste e sincronização com o MetaTrader lado a lado, e onde cada um é mais forte.",
+    "body": [
+      {
+        "p": "O TradesViz é um diário de trading com um conjunto enorme de estatísticas, gráficos, simuladores e ferramentas de IA. Se procuras uma alternativa mais simples, mais barata por ano, na tua língua ou gratuita para forex, é assim que o Simple Trading Journal se compara."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "TradesViz"
+          ],
+          [
+            "Preço mensal",
+            "$14.99",
+            "$19.99 – $29.99"
+          ],
+          [
+            "Preço anual",
+            "$119",
+            "$179.88 – $269.88"
+          ],
+          [
+            "Plano gratuito",
+            "Sim — 2 operações por dia, sem limite de tempo, todos os instrumentos",
+            "Sim — só ações, 3.000 execuções por mês"
+          ],
+          [
+            "Teste gratuito",
+            "3 dias de Pro, sem cartão",
+            "7 dias de Pro ou Platinum"
+          ],
+          [
+            "Sincronização automática com o MetaTrader",
+            "MT4 e MT5",
+            "MT4 e MT5 (planos pagos; o gratuito é só para ações)"
+          ],
+          [
+            "Como o MetaTrader se liga",
+            "Complemento no MetaTrader + chave, sem partilhar palavra-passe",
+            "Número de conta + palavra-passe de investidor, ou publicação de relatórios por FTP do MetaTrader"
+          ],
+          [
+            "Importação",
+            "Relatório MT4/MT5, cTrader, TradeLocker, DXtrade, Match-Trader, qualquer CSV",
+            "Mais de 250 corretoras e plataformas, mais de 70 ligações com sincronização automática"
+          ]
+        ]
+      },
+      {
+        "note": "Os preços e funcionalidades do TradesViz foram retirados das suas próprias páginas de preços, corretoras e blogue em setembro de 2026 e podem ter mudado. Confirma no site antes de decidir."
+      },
+      {
+        "h2": "Onde o TradesViz é mais forte"
+      },
+      {
+        "ul": [
+          "Um conjunto muito maior de estatísticas e gráficos — mais de 600, segundo o TradesViz.",
+          "Simuladores de trading, repetição de operações, ferramentas de opções e um screener de ações.",
+          "Ferramentas de IA que respondem a perguntas sobre as tuas operações.",
+          "Muitas mais integrações com corretoras, incluindo ações, opções, futuros e criptomoedas."
+        ]
+      },
+      {
+        "h2": "Onde o Simple Trading Journal é mais forte"
+      },
+      {
+        "ul": [
+          "O plano gratuito cobre forex, índices, ouro e qualquer outro instrumento — o do TradesViz é só para ações.",
+          "O Pro custa $119 por ano — o plano anual mais barato do TradesViz custa $179.88.",
+          "O MetaTrader 4 e 5 ligam-se com um pequeno complemento e uma chave; nunca partilhas a palavra-passe de investidor.",
+          "Uma aplicação mais simples, com menos ecrãs para aprender.",
+          "A aplicação inteira em 9 línguas, incluindo turco, persa e árabe."
+        ]
+      },
+      {
+        "h2": "Qual escolher?"
+      },
+      {
+        "p": "Se queres a análise mais profunda possível, simuladores e ferramentas de IA e vais mesmo usá-los, o TradesViz oferece mais. Se operas forex ou CFD no MetaTrader e queres um diário claro na tua língua com que possas começar grátis, experimenta o Simple Trading Journal — o plano gratuito não pede cartão."
+      }
+    ]
+  },
+  "fx-replay-alternative": {
+    "title": "Simple Trading Journal vs FX Replay: para que serve cada um",
+    "description": "FX Replay ou Simple Trading Journal? Um é uma plataforma de backtesting, o outro um diário das tuas operações reais. Preços, planos gratuitos e MetaTrader comparados.",
+    "body": [
+      {
+        "p": "O FX Replay é sobretudo uma plataforma de backtesting: reproduzes gráficos históricos e praticas operações neles, e inclui um diário. O Simple Trading Journal é um diário das operações que abres de facto na tua conta. Sobrepõem-se menos do que parece — é assim que se comparam."
+      },
+      {
+        "table": [
+          [
+            "",
+            "Simple Trading Journal",
+            "FX Replay"
+          ],
+          [
+            "Objetivo principal",
+            "Registo e análise das tuas operações reais",
+            "Backtesting em gráficos históricos, com diário"
+          ],
+          [
+            "Preço mensal",
+            "$14.99",
+            "$17.99 – $35"
+          ],
+          [
+            "Preço anual",
+            "$119",
+            "$180 – $350"
+          ],
+          [
+            "Plano gratuito",
+            "Sim — 2 operações por dia, sem limite de tempo",
+            "Sim — 2 sessões de backtesting, 1 indicador, dados guardados 1 semana"
+          ],
+          [
+            "Teste gratuito",
+            "3 dias de Pro, sem cartão",
+            "Sim, sem cartão (duração não indicada)"
+          ],
+          [
+            "MetaTrader",
+            "Sincronização automática de MT4 e MT5 com complemento + chave",
+            "MT4 e MT5 carregando um ficheiro"
+          ],
+          [
+            "Importação",
+            "Relatório MT4/MT5, cTrader, TradeLocker, DXtrade, Match-Trader, qualquer CSV",
+            "Qualquer CSV; ficheiros do NinjaTrader, Tradovate e MT4/MT5"
+          ]
+        ]
+      },
+      {
+        "note": "Os preços e funcionalidades do FX Replay foram retirados das suas próprias páginas de preços e do diário em setembro de 2026 e podem ter mudado. Confirma no site antes de decidir."
+      },
+      {
+        "h2": "Onde o FX Replay é mais forte"
+      },
+      {
+        "ul": [
+          "Backtesting: reproduzir o preço passado vela a vela, com dados ao segundo no plano Pro.",
+          "Um simulador de desafios de prop firms para praticar com as regras do desafio.",
+          "Testar uma estratégia numa amostra grande antes de arriscar dinheiro.",
+          "Uma comunidade ativa no Discord."
+        ]
+      },
+      {
+        "h2": "Onde o Simple Trading Journal é mais forte"
+      },
+      {
+        "ul": [
+          "As tuas operações reais do MetaTrader 4 e 5 ficam registadas sozinhas enquanto operas.",
+          "O Pro custa $14.99 por mês ou $119 por ano.",
+          "Análise de disciplina sobre operações reais: vingança, mais risco após perdas, overtrading, operar fora de horas.",
+          "Acompanhamento dos limites da prop firm na tua conta de desafio real.",
+          "A aplicação inteira em 9 línguas, incluindo turco, persa e árabe."
+        ]
+      },
+      {
+        "h2": "Qual escolher?"
+      },
+      {
+        "p": "Fazem trabalhos diferentes. Para testar uma estratégia com dados passados, o FX Replay foi feito para isso. Para registar e rever as operações que fazes de facto — sobretudo no MetaTrader —, usa o Simple Trading Journal. Muitos traders usam uma ferramenta de backtesting e um diário lado a lado; aqui o plano gratuito não pede cartão."
+      }
+    ]
+  },
 };
 
 export default TEXT;

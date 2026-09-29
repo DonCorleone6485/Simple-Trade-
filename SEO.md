@@ -110,6 +110,9 @@ Aynı düzen ileride rakip fiyatları için de kurulabilir.
 | /blog/tradezella-alternative | 2026-09-28 |
 | /blog/tradersync-alternative | 2026-09-28 |
 | /blog/edgewonk-alternative | 2026-09-28 |
+| /blog/tradervue-alternative | 2026-09-29 (tradervue.com/site/pricing, help.tradervue.com, /site/platforms) |
+| /blog/tradesviz-alternative | 2026-09-29 (tradesviz.com/pricing, /brokers-list, blog/auto-import-mt5fa) |
+| /blog/fx-replay-alternative | 2026-09-29 (fxreplay.com/pricing, /trading-journal) — farklı kategori: backtest platformu |
 
 **Prop firma sayfaları** — 2026-09-29 (veri: `src/content/directory.ts`, şablon: `src/components/DirectoryPage.tsx`):
 | Adres | Programlar | Kaynak |
@@ -141,7 +144,7 @@ Her platform için Simple Trading Journal'a nasıl geldiği (MT4/MT5: EA ile oto
 dosya; cTrader vb.: dosya; TradingView: henüz doğrudan yok) ve rehber bağlantıları.
 Bağlantılar: ana sayfa alt kısmı ("Prop Firmalar", "Broker'lar") ve /blog dizininin sonu.
 
-Toplam: 30 sayfa × 9 dil = 270 adres (sitemap, 2026-09-29).
+Toplam: 33 sayfa × 9 dil = 297 adres (sitemap, 2026-09-29).
 
 Search Console'da dizine ekleme istendi (2026-09-29): /prop-firms, /brokers, /tr/prop-firms, /prop-firms/ftmo, /prop-firms/e8-markets, /blog/position-sizing-risk-per-trade, /blog/revenge-trading.
 IndexNow (Bing/Yandex) 2026-09-29: bütün sitemap (225) + yeni 47 adres (3 yazı × 9 dil, E8 × 9 dil, /prop-firms × 9 dil, /blog).
@@ -150,7 +153,7 @@ IndexNow (Bing/Yandex) 2026-09-29: bütün sitemap (225) + yeni 47 adres (3 yaz�
 
 ### İçerik
 - ⬜ **İçerik kümeleri:** trading journal, prop firm, risk yönetimi, trader psikolojisi — her birinde 10–20 yazı. Şu an toplam 14 (2026-09-29: pozisyon büyüklüğü, intikam işlemi, beklenti/kâr faktörü, aşırı işlem eklendi).
-- ⬜ **Yeni karşılaştırmalar:** TradesViz, Tradervue, FX Replay.
+- ✅ 2026-09-29 **Yeni karşılaştırmalar:** TradesViz, Tradervue, FX Replay (9 dilde; bilgiler rakiplerin kendi sayfalarından).
 - 🟡 **Programatik prop firma sayfaları** (`/prop-firms/<firma>`) — 5 firma YAPILDI (2026-09-29; FundingPips aynı gün tarayıcıyla eklendi). Sıradakiler: FundedNext (bot doğrulaması, tarayıcı da geçemiyor — kullanıcı kuralları yapıştırırsa eklenir), FXIFY (tablo hesap büyüklüğü seçicisine bağlı, okunan değerler çelişkili). ✅ E8 Markets eklendi (2026-09-29). Kaynak yalnız firmanın resmî sitesi; her kuralda kaynak bağlantısı ve "son kontrol" tarihi. Kurallar tek veri dosyasında; ayda bir zamanlanmış görev kaynak sayfaları karşılaştırır, fark varsa kullanıcıya sorar (kendiliğinden yayınlamaz). Uzun süre doğrulanamayan firmada sayılar gizlenir. Logo yok, ortaklık ima edilmez.
 - 🟡 **Programatik broker sayfaları** (`/brokers/<broker>`) — ilk 4 broker YAPILDI (2026-09-29). IC Markets, Exness, XM, FxPro, Tickmill siteleri buradan (Türkiye) açılmadı; başka ağdan platform listesi doğrulanınca eklenebilir.
 - ✅ **Liste sayfaları** /prop-firms ve /brokers; ana sayfa alt kısmından ve blogdan bağlantı (2026-09-29).

@@ -72,6 +72,9 @@ export const ARTICLES: Article[] = [
   { slug: 'tradezella-alternative', section: 'blog', date: '2026-09-28', minutes: 4 },
   { slug: 'tradersync-alternative', section: 'blog', date: '2026-09-28', minutes: 4 },
   { slug: 'edgewonk-alternative', section: 'blog', date: '2026-09-28', minutes: 4 },
+  { slug: 'tradervue-alternative', section: 'blog', date: '2026-09-29', minutes: 4 },
+  { slug: 'tradesviz-alternative', section: 'blog', date: '2026-09-29', minutes: 4 },
+  { slug: 'fx-replay-alternative', section: 'blog', date: '2026-09-29', minutes: 4 },
 ];
 
 export const articlePath = (a: Pick<Article, 'section' | 'slug'>) => `/${a.section}/${a.slug}`;

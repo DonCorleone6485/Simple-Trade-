@@ -79,7 +79,7 @@ Ayrıntılı kayıt (yapılanlar, sayfalar, araçlar, yapılacaklar): [SEO.md](S
 - ✅ Dil başına adresler (/tr, /fa, /ar …).
 - [ ] İçerik kümeleri: trading journal, prop firm, risk yönetimi, trader psikolojisi — her biri 10–20 yazı (şu an 14 yazı toplam).
 - 🟡 Programatik sayfalar: ✅ ilk 4 prop firma + 4 broker (2026-09-29); devamı SEO.md'de.
-- ✅ Karşılaştırma sayfaları (Tradezella, TraderSync, Edgewonk).
+- ✅ Karşılaştırma sayfaları (Tradezella, TraderSync, Edgewonk; ✅ 2026-09-29 Tradervue, TradesViz, FX Replay).
 - [ ] Geri bağlantılar: dizinler, konuk yazılar, forumlar, YouTube açıklamaları.
 
 ### §5 İçerik motoru
