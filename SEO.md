@@ -63,7 +63,7 @@ Aynı düzen ileride rakip fiyatları için de kurulabilir.
 |---|---|---|
 | Google Search Console | ✅ 2026-09-27 | Alan adı mülkü, admin@ hesabıyla (otomatik doğrulandı). Sitemap gönderildi. Ana sayfa, /blog ve MT5 rehberi için dizine ekleme istendi. Yeni önemli sayfada: URL denetimi → "Dizine eklenmesini iste". |
 | Vercel Analytics | ✅ 2026-09-28 | Ziyaretçi sayısı ve hangi sayfaların okunduğu (ücretsiz plan). |
-| Bing Webmaster Tools | ⬜ Kullanıcıda | ChatGPT ve Copilot aramaları Bing'den besleniyor. Hesap açmak kullanıcıya ait: bing.com/webmasters → Google ile giriş → Search Console'dan içe aktar. Dizine ekleme IndexNow ile zaten gidiyor; hesap raporlar için. |
+| Bing Webmaster Tools | ✅ 2026-09-29 | ChatGPT ve Copilot aramaları Bing'den besleniyor. Kullanıcı Google hesabıyla girip Search Console'dan içe aktardı (site + sitemap). Raporlar ilk gün birkaç saatte doluyor. Dizine ekleme IndexNow ile. |
 | IndexNow | ✅ 2026-09-29 | Yeni/değişen sayfayı Bing ve Yandex'e anında bildirir. Anahtar `public/8ed09c22….txt`; `npm run indexnow` (hepsi) ya da `npm run indexnow -- /blog/yeni` (yalnız verilenler), yayından sonra. |
 | Yandex Webmaster | ⬜ İsteğe bağlı | Rusça trader'lar için. |
 | Meta Pixel | ⬜ Bekliyor | SEO değil, reklam ölçümü; kimlik kullanıcıdan gelecek. |
@@ -161,7 +161,7 @@ IndexNow (Bing/Yandex) 2026-09-29: bütün sitemap (225) + yeni 47 adres (3 yaz�
 - ⬜ YouTube video açıklamaları, forumlar (Reddit, Forex Factory), konuk yazılar.
 
 ### Teknik
-- ✅ IndexNow (2026-09-29). ⬜ Bing Webmaster hesabı (kullanıcı).
+- ✅ IndexNow ve Bing Webmaster Tools (2026-09-29).
 - 🟡 Yapısal veri: BreadcrumbList prop firma/broker sayfalarında var (2026-09-29); yazılarda BlogPosting/HowTo var. Kalan: yardım için FAQPage.
 - ⬜ Search Console'da dizine eklenmeyen sayfaları ve arama sorgularını ayda bir kontrol.
 
