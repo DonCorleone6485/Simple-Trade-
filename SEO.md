@@ -148,7 +148,7 @@ Toplam: 33 sayfa × 9 dil = 297 adres (sitemap, 2026-09-29).
 
 Search Console'da dizine ekleme istendi (2026-09-29): /prop-firms, /brokers, /tr/prop-firms, /prop-firms/ftmo, /prop-firms/e8-markets, /blog/position-sizing-risk-per-trade, /blog/revenge-trading.
 IndexNow (Bing/Yandex) 2026-09-29: bütün sitemap (225) + yeni 47 adres (3 yazı × 9 dil, E8 × 9 dil, /prop-firms × 9 dil, /blog).
-IndexNow 2026-09-29 (ikinci tur): 38 adres — aşırı işlem yazısı + Tradervue/TradesViz/FX Replay karşılaştırmaları (4 × 9 dil), /help (FAQPage), /blog. Search Console'da dizine ekleme isteği henüz yapılmadı.
+IndexNow 2026-09-29 (ikinci tur): 38 adres — aşırı işlem yazısı + Tradervue/TradesViz/FX Replay karşılaştırmaları (4 × 9 dil), /help (FAQPage), /blog. Search Console'da dizine ekleme istendi (2026-09-29): /blog/overtrading, /blog/tradervue-alternative, /blog/tradesviz-alternative. Günlük kota doldu — kalan: /blog/fx-replay-alternative, /help (2026-09-30'da gönderilecek).
 
 ## Yapılacaklar
 
