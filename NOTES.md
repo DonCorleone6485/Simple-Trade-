@@ -153,7 +153,7 @@ hesap ya da karar bekliyor.
   tr/en/ru için MT'nin gerçek adları; diğer dillerde yaklaşık.
   Not: iki hesapta aynı anahtar varsa, yayından sonra ilk bağlanan hesap sahiplenir.
 - İlk gerçek yeni üyede: kayıttan sonra örnek verinin kalkması, deneme akışı.
-- Hesap silme — kendi hesabıyla değil, boş bir test hesabıyla denenmeli.
+- Hesap silme — DENENDİ (kullanıcı, 2026-09-29'dan önce): test hesabı silindi, onay geldi.
 - Çeviriler — Farsça ve Arapçayı ana dili olan birine kontrol ettirmek
   (src/lib/appCopyData.ts, InfoPage.tsx, LanguageContext.tsx).
 
