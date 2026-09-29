@@ -116,7 +116,8 @@ hesap ya da karar bekliyor.
    Dış izleme + durum sayfası YAPILDI (2026-09-29): Better Stack ücretsiz plan (uptime.betterstack.com,
    ekip t606017, kullanıcının hesabı). İki izleme, 3 dakikada bir, uyarı e-postayla: ana sayfa ve
    /api/geo?health=1. Herkese açık sayfa: https://simpletradejournal.betteruptime.com ("Website",
-   "App & MetaTrader sync"). Kalan: status.simpletradejournal.io bağlamak (Namecheap'te CNAME).
+   "App & MetaTrader sync"). Özel adres YAPILDI: https://status.simpletradejournal.io (Namecheap CNAME
+   status → statuspage.betteruptime.com). Namecheap 2FA 2026-09-29'da destekle sıfırlandı — yeniden kurulmalı.
    "Incidents"teki "Sample incident" Better Stack'in örnek kaydı, gerçek arıza değil.
 9. **Paket boyutu** — YAPILDI (2026-09-28): 7 dilin çeviri tablosu ayrı dosyada,
    yalnız o dillerde ve çizimden önce yükleniyor; ana paket 124 → 86 KB (gzip).
