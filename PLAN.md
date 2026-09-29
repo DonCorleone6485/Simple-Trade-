@@ -23,7 +23,7 @@ Son güncelleme: 2026-09-29
 ### Kullanıcıyı beklemeden yapılabilecekler
 - ✅ 2026-09-29 **Dizin başvuru metinleri** — [docs/listings.md](docs/listings.md): Product Hunt, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub; 9 dilde kısa açıklama.
 - ✅ 2026-09-29 **IndexNow (Bing, Yandex)** — `npm run indexnow` canlı sitemap'i bildirir; yeni sayfada `npm run indexnow -- /yol`. Bing Webmaster hesabı kullanıcıda (yukarıda).
-- ✅ 2026-09-29 **Haftalık özet e-postası** — pazartesi 09:00 UTC günlük görevle, 9 dilde, yalnız o hafta işlemi olana (`api/_digest.ts`).
+- ✅ 2026-09-29 **Haftalık özet e-postası** — cumartesi 09:00 UTC günlük görevle (cuma kapanışından sonra; 2026-09-29 pazartesiden alındı), 9 dilde, yalnız o hafta işlemi olana (`api/_digest.ts`).
 - [ ] **CSP'yi engelleme moduna almak** — 2026-10-06 … 10-13 arası, `client_errors` kind 'csp' raporlarına bakarak. Zamanlanmış görev `csp-enforce-check` 6 Ekim 10:00'da yapacak (29 Eylül'e kadar yalnız 'eval' ve 'wasm-eval' raporu, 2'şer).
 - 🟡 **Yeni blog yazıları** — 9 dilde, içerik kümelerine göre (§4). ✅ 2026-09-29 3 yazı: pozisyon büyüklüğü, intikam işlemi, beklenti ve kâr faktörü (toplam 13). Haftada 1 devam.
 - 🟡 **Programatik prop firma / broker sayfaları** (§4) — ✅ 2026-09-29 5 prop firma (FTMO, The5ers, Alpha Capital, Instant Funding, FundingPips) + 4 broker, 9 dilde; aylık kural kontrol görevi kuruldu. ✅ 2026-09-29 E8 Markets eklendi (6 firma). Kalan: FundedNext, FXIFY ve Türkiye'den açılmayan broker'lar (SEO.md).

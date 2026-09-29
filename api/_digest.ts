@@ -5,7 +5,7 @@ import { unsubscribeUrl, type Lang } from './_email.js';
  *
  * Yalnızca o hafta en az bir kapanmış işlemi olana gider — işlem yoksa
  * "bu hafta hiçbir şey yapmadın" postası atmıyoruz. Gönderimi api/emails.ts
- * (günlük görev) pazartesi ve salı yapıyor; ayrı fonksiyon değil, Vercel'in
+ * (günlük görev) cumartesi ve pazar yapıyor; ayrı fonksiyon değil, Vercel'in
  * ücretsiz planında 12 fonksiyon sınırındayız.
  *
  * Hesaplar src/lib/tradeMath.ts ile aynı; oradan içe alınmıyor çünkü
@@ -71,55 +71,55 @@ const COPY: Record<Lang, Copy> = {
     subject: 'Haftan: {n} işlem', lead: '{range} arasındaki işlemlerinin özeti.',
     trades: 'İşlem', winRate: 'Kazanma oranı', net: 'Net sonuç', best: 'En iyi işlem', worst: 'En kötü işlem',
     top: 'En çok işlem yapılan', prev: 'Önceki hafta net', tip: 'Haftanın notlarına bir göz at: hangi işlemler plana uygundu, hangileri değildi?',
-    cta: 'Journal\'ını aç', foot: 'Bu özet her pazartesi, yalnız o hafta işlem kaydettiysen gelir.',
+    cta: 'Journal\'ını aç', foot: 'Bu özet her cumartesi, yalnız o hafta işlem kaydettiysen gelir.',
   },
   en: {
     subject: 'Your week: {n} trades', lead: 'A summary of your trades from {range}.',
     trades: 'Trades', winRate: 'Win rate', net: 'Net result', best: 'Best trade', worst: 'Worst trade',
     top: 'Most traded', prev: 'Previous week net', tip: 'Take a look at the week\'s notes: which trades followed your plan and which didn\'t?',
-    cta: 'Open your journal', foot: 'This summary arrives on Mondays, only if you logged trades that week.',
+    cta: 'Open your journal', foot: 'This summary arrives on Saturdays, only if you logged trades that week.',
   },
   fa: {
     subject: 'هفته تو: {n} معامله', lead: 'خلاصه معاملاتت در بازه {range}.',
     trades: 'معامله', winRate: 'نرخ برد', net: 'نتیجه خالص', best: 'بهترین معامله', worst: 'بدترین معامله',
     top: 'بیشترین نماد', prev: 'خالص هفته قبل', tip: 'یادداشت‌های این هفته را مرور کن: کدام معاملات طبق برنامه بود و کدام نبود؟',
-    cta: 'باز کردن ژورنال', foot: 'این خلاصه هر دوشنبه می‌آید، فقط اگر آن هفته معامله‌ای ثبت کرده باشی.',
+    cta: 'باز کردن ژورنال', foot: 'این خلاصه هر شنبه می‌آید، فقط اگر آن هفته معامله‌ای ثبت کرده باشی.',
   },
   ar: {
     subject: 'أسبوعك: {n} صفقات', lead: 'ملخص صفقاتك في الفترة {range}.',
     trades: 'الصفقات', winRate: 'نسبة الربح', net: 'النتيجة الصافية', best: 'أفضل صفقة', worst: 'أسوأ صفقة',
     top: 'الأكثر تداولاً', prev: 'صافي الأسبوع السابق', tip: 'ألقِ نظرة على ملاحظات الأسبوع: أي الصفقات اتبعت خطتك وأيها لم تتبعها؟',
-    cta: 'افتح سجلك', foot: 'يصلك هذا الملخص كل يوم اثنين، فقط إذا سجلت صفقات في ذلك الأسبوع.',
+    cta: 'افتح سجلك', foot: 'يصلك هذا الملخص كل يوم سبت، فقط إذا سجلت صفقات في ذلك الأسبوع.',
   },
   ru: {
     subject: 'Ваша неделя: сделок — {n}', lead: 'Итоги ваших сделок за {range}.',
     trades: 'Сделки', winRate: 'Доля прибыльных', net: 'Итог', best: 'Лучшая сделка', worst: 'Худшая сделка',
     top: 'Чаще всего', prev: 'Итог прошлой недели', tip: 'Загляните в заметки за неделю: какие сделки были по плану, а какие нет?',
-    cta: 'Открыть журнал', foot: 'Эта сводка приходит по понедельникам, только если за неделю были сделки.',
+    cta: 'Открыть журнал', foot: 'Эта сводка приходит по субботам, только если за неделю были сделки.',
   },
   es: {
     subject: 'Tu semana: {n} operaciones', lead: 'Resumen de tus operaciones del {range}.',
     trades: 'Operaciones', winRate: 'Tasa de acierto', net: 'Resultado neto', best: 'Mejor operación', worst: 'Peor operación',
     top: 'Más operado', prev: 'Neto semana anterior', tip: 'Echa un vistazo a las notas de la semana: ¿qué operaciones siguieron tu plan y cuáles no?',
-    cta: 'Abrir tu diario', foot: 'Este resumen llega los lunes, solo si registraste operaciones esa semana.',
+    cta: 'Abrir tu diario', foot: 'Este resumen llega los sábados, solo si registraste operaciones esa semana.',
   },
   pt: {
     subject: 'A tua semana: {n} operações', lead: 'Resumo das tuas operações de {range}.',
     trades: 'Operações', winRate: 'Taxa de acerto', net: 'Resultado líquido', best: 'Melhor operação', worst: 'Pior operação',
     top: 'Mais negociado', prev: 'Líquido da semana anterior', tip: 'Dá uma olhada nas notas da semana: que operações seguiram o teu plano e quais não?',
-    cta: 'Abrir o teu diário', foot: 'Este resumo chega às segundas-feiras, só se registaste operações nessa semana.',
+    cta: 'Abrir o teu diário', foot: 'Este resumo chega aos sábados, só se registaste operações nessa semana.',
   },
   de: {
     subject: 'Deine Woche: {n} Trades', lead: 'Zusammenfassung deiner Trades vom {range}.',
     trades: 'Trades', winRate: 'Trefferquote', net: 'Nettoergebnis', best: 'Bester Trade', worst: 'Schlechtester Trade',
     top: 'Am häufigsten gehandelt', prev: 'Netto Vorwoche', tip: 'Wirf einen Blick auf die Notizen der Woche: Welche Trades folgten deinem Plan, welche nicht?',
-    cta: 'Journal öffnen', foot: 'Diese Zusammenfassung kommt montags – nur wenn du in der Woche Trades erfasst hast.',
+    cta: 'Journal öffnen', foot: 'Diese Zusammenfassung kommt samstags – nur wenn du in der Woche Trades erfasst hast.',
   },
   fr: {
     subject: 'Votre semaine : {n} trades', lead: 'Résumé de vos trades du {range}.',
     trades: 'Trades', winRate: 'Taux de réussite', net: 'Résultat net', best: 'Meilleur trade', worst: 'Pire trade',
     top: 'Le plus tradé', prev: 'Net semaine précédente', tip: 'Jetez un œil aux notes de la semaine : quels trades ont suivi votre plan, lesquels non ?',
-    cta: 'Ouvrir votre journal', foot: 'Ce résumé arrive le lundi, seulement si vous avez enregistré des trades cette semaine-là.',
+    cta: 'Ouvrir votre journal', foot: 'Ce résumé arrive le samedi, seulement si vous avez enregistré des trades cette semaine-là.',
   },
 };
 

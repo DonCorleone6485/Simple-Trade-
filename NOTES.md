@@ -61,8 +61,9 @@ hesap ya da karar bekliyor.
    "deneme bitiyor", "deneme bitti", 9 dilde (api/_email.ts, api/emails.ts; günlük
    görev 09:00 UTC). Resend (updates.simpletradejournal.io, doğrulandı). Kalan:
    ödeme açılınca deneme postalarına Pro'ya geçiş bağlantısı; isteğe bağlı CRON_SECRET.
-   Haftalık özet — YAPILDI (2026-09-29): api/_digest.ts, aynı günlük görev pazartesi
-   (bütçe yetmezse salı) gönderir; geçen pazartesi–pazar UTC, yalnız kapanmış işlemi
+   Haftalık özet — YAPILDI (2026-09-29): api/_digest.ts, aynı günlük görev cumartesi
+   (bütçe yetmezse pazar) gönderir — forex cuma kapandığı için; pencere geçen cumartesi–cuma UTC
+   (hafta sonu kripto işlemleri de sayılır), yalnız kapanmış işlemi
    olana, kilitli işlemler hariç. users.weekly_digest_sent_at (sütun eklendi). Not: Vercel Hobby en fazla 12 fonksiyon — api/ tam 12.
 7. **Diğer ülkelere bölgesel fiyat** — onay: grup 1 tam fiyat (ABD, Batı Avrupa,
    İngiltere, Körfez), grup 2 %30 indirim (Doğu Avrupa, Latin Amerika), grup 3

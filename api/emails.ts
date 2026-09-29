@@ -25,8 +25,8 @@ const supabase = createClient(
  * - Deneme bitiyor: bitişe 36 saatten az kalmışsa. Görev 24 saatte bir
  *   çalıştığı için her deneme bu pencereye bir kez düşüyor.
  * - Deneme bitti: son 3 gün içinde bitmişse.
- * - Haftalık özet: pazartesi (bütçe yetmezse salı) — geçen haftanın
- *   işlemleri. Yalnız o hafta kapanmış işlemi olana (bkz. _digest.ts).
+ * - Haftalık özet: cumartesi (bütçe yetmezse pazar) — piyasa cuma
+ *   kapanınca biten haftanın işlemleri. Yalnız o hafta kapanmış işlemi olana (bkz. _digest.ts).
  *
  * Her postanın "gönderildi" işareti ayrı sütunda; ikinci kez gitmez. Uç
  * herkese açık olsa bile zararsız: yalnızca zamanı gelmiş postalar gidiyor.
@@ -264,15 +264,17 @@ export default async function handler(req: any, res: any) {
 }
 
 /**
- * Haftalık özet. Hafta pazartesi 00:00 UTC'de başlar; pazartesi gönderilir,
- * günlük 80 postalık bütçe yetmediyse kalanlar salı. weekly_digest_sent_at
- * aynı haftaya ikinci postayı engeller.
+ * Haftalık özet. Forex cuma akşamı kapandığı için cumartesi gönderilir,
+ * günlük 80 postalık bütçe yetmediyse kalanlar pazar. Pencere geçen
+ * cumartesi 00:00 UTC'den bu cumartesi 00:00'a: hafta sonu işlem yapan
+ * (kripto) kullanıcıların işlemleri de bir haftaya düşer, arada kaybolmaz.
+ * weekly_digest_sent_at aynı haftaya ikinci postayı engeller.
  */
 async function weeklyDigests(clerk: ReturnType<typeof createClerkClient>, now: number, budget: number): Promise<number> {
   const today = new Date(now);
-  const dow = today.getUTCDay(); // 1 pazartesi, 2 salı
-  if ((dow !== 1 && dow !== 2) || budget <= 0) return 0;
-  const weekEnd = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - (dow - 1));
+  const dow = today.getUTCDay(); // 6 cumartesi, 0 pazar
+  if ((dow !== 6 && dow !== 0) || budget <= 0) return 0;
+  const weekEnd = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - (dow === 0 ? 1 : 0));
   const weekStart = weekEnd - 7 * DAY;
   const prevStart = weekStart - 7 * DAY;
   const iso = (t: number) => new Date(t).toISOString();
