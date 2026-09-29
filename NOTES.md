@@ -132,8 +132,10 @@ hesap ya da karar bekliyor.
   (ayrı bir C:\ klasöründe derle, sonra sil). MT5: MetaTrader 5.app'in wine'ı + MetaEditor64.exe.
 - Hesabım penceresi: para birimi seçimi, saat dilimi, "ad/e-posta/şifre" düğmesi.
 - MetaTrader sayfası: anahtarın bağlı olduğu hesap ("•••1234 · Sunucu").
-- EA'yı 1.09'a güncellemek (1.07: grafikte bağlı journal'ın adı; 1.08: saatte bir tam tarama,
-  "anahtar yenisiyle değiştirildi" mesajı; 1.09: mesajlar MetaTrader'ın dilinde).
+- EA 1.09 MT4'e kuruldu (2026-09-29, •••3104 · MetaQuotes-Demo, journal "mt4 test"): yeni
+  anahtar bağlandı, eski anahtar kendiliğinden "yenisiyle değiştirildi" oldu, işlemler geldi,
+  çift kayıt yok. (1.07: grafikte bağlı journal'ın adı; 1.08: saatte bir tam tarama,
+  "anahtar yenisiyle değiştirildi" mesajı; 1.09: mesajlar MetaTrader'ın dilinde.)
 - MetaTrader anahtarları (2026-09-28): bir MT hesabının tek etkin anahtarı olur, EN YENİ
   OLUŞTURULAN kazanır. Yeni anahtar bağlanınca aynı hesaba bağlı eskiler kendiliğinden kapanır
   (api_keys.revoked_at, replaced_by); eski anahtarla gelen istek 401 code:key_replaced + yeni
