@@ -525,6 +525,171 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "position-sizing-risk-per-trade": {
+    "title": "Tamaño de posición: cuánto arriesgar por operación y cómo calcular el lotaje",
+    "description": "Cómo elegir un riesgo fijo por operación, convertirlo en lotaje a partir de la distancia del stop y comprobar en tu diario que de verdad lo cumples.",
+    "body": [
+      {
+        "p": "Dos traders pueden abrir la misma operación al mismo precio y con el mismo stop y terminar con cuentas muy distintas. La diferencia es el tamaño. El tamaño de posición decide cuánto te cuesta una pérdida y, por tanto, cuántas pérdidas seguidas puedes aguantar mientras tu ventaja se manifiesta."
+      },
+      {
+        "h2": "Empieza por el riesgo, no por los lotes"
+      },
+      {
+        "p": "Muchos traders eligen primero el lotaje —«yo opero 1 lote»— y dejan que el stop decida cuánto pierden. Así cada pérdida tiene un tamaño diferente. Dale la vuelta: decide qué parte de la cuenta aceptas perder si salta el stop y calcula el tamaño que lo cumple."
+      },
+      {
+        "h2": "Elegir el riesgo por operación"
+      },
+      {
+        "p": "Un porcentaje fijo de la cuenta —a menudo entre el 0,5% y el 2%— es el punto de partida habitual. El número importa menos que mantenerlo constante. Con un 1% de riesgo, diez pérdidas seguidas cuestan alrededor del 10% de la cuenta; con un 5%, la misma racha cuesta cerca del 40% y cada operación posterior tiene que trabajar mucho más para recuperarlo."
+      },
+      {
+        "p": "En una cuenta de prop firm, calcula también según sus límites: si la pérdida diaria máxima es del 5%, un riesgo del 2% por operación solo deja sitio para dos pérdidas completas en un día."
+      },
+      {
+        "h2": "El cálculo"
+      },
+      {
+        "code": "Tamaño de posición = Importe en riesgo ÷ (Distancia del stop × Valor por punto)"
+      },
+      {
+        "p": "Ejemplo: una cuenta de 10.000 $ que arriesga el 1% tiene 100 $ para perder. El stop en EURUSD está a 25 pips y un lote estándar vale unos 10 $ por pip. 100 $ ÷ (25 × 10 $) = 0,4 lotes. Si el stop está a 50 pips, el tamaño se reduce a la mitad, 0,2 lotes, y el riesgo sigue siendo 100 $."
+      },
+      {
+        "p": "El valor por punto cambia según el instrumento y el bróker (oro, índices y cripto cotizan de otra forma), así que consulta una vez la especificación del contrato en tu plataforma y anótala."
+      },
+      {
+        "h2": "Errores habituales"
+      },
+      {
+        "ul": [
+          "Alejar el stop después de entrar sin reducir el tamaño: el riesgo crece en silencio.",
+          "Subir el tamaño tras una pérdida para recuperarla antes.",
+          "Redondear el lotaje hacia arriba cada vez: 0,37 pasa a 0,4 y luego a 0,5.",
+          "Olvidar el spread y la comisión, que hacen la pérdida real algo mayor que la prevista."
+        ]
+      },
+      {
+        "h2": "Compruébalo en tu diario"
+      },
+      {
+        "p": "Anota el riesgo previsto en cada operación. Tras unas semanas, mira las operaciones perdedoras: si algunas perdieron dos o tres veces lo habitual, tu tamaño no es tan fijo como crees. Leer los resultados en R (beneficio o pérdida dividido entre el riesgo previsto) hace que esos casos salten a la vista."
+      },
+      {
+        "h2": "En Simple Trading Journal"
+      },
+      {
+        "p": "Cada operación tiene un campo de riesgo y los resultados se pueden leer en R. Puedes añadir a tus objetivos un riesgo máximo por operación, y la vista de disciplina marca las operaciones en las que, justo después de una pérdida, el riesgo subió a más de 1,5 veces el de la operación anterior."
+      }
+    ]
+  },
+  "revenge-trading": {
+    "title": "Revenge trading: cómo detectarlo en tu diario y frenarlo",
+    "description": "Cómo se ve el revenge trading en los datos, por qué sale tan caro y reglas prácticas para que la operación siguiente a una pérdida no sea emocional.",
+    "body": [
+      {
+        "p": "Se cierra una pérdida y a los pocos minutos vuelves a estar en el mercado —a menudo en el mismo instrumento, a veces con más tamaño— para recuperarla. Eso es revenge trading, operar por venganza. Casi todos los traders lo han hecho; la cuestión es con qué frecuencia y cuánto cuesta."
+      },
+      {
+        "h2": "Por qué sale tan caro"
+      },
+      {
+        "p": "La operación después de una pérdida suele abrirse por un motivo distinto a tu plan: arreglar una sensación. El setup es más débil, la entrada es precipitada y el tamaño tiende a crecer. Un solo mal día puede deshacer semanas de trading cuidadoso."
+      },
+      {
+        "h2": "Cómo se ve en los datos"
+      },
+      {
+        "ul": [
+          "Una operación nueva abierta pocos minutos después de cerrar una perdedora.",
+          "El riesgo de esa operación es claramente mayor que el de la anterior.",
+          "Varias operaciones seguidas en un día que empezó con una pérdida.",
+          "Operaciones fuera de las horas en las que sueles operar."
+        ]
+      },
+      {
+        "p": "No necesitas recordar cómo te sentías para encontrarlas. Las horas, los tamaños y los resultados ya están en tu diario."
+      },
+      {
+        "h2": "Mídelo"
+      },
+      {
+        "p": "Separa las operaciones que encajan con esos patrones del resto y compara los resultados. Si el grupo marcado pierde dinero mientras el resto de tu trading está más o menos plano o en positivo, has encontrado lo más valioso que puedes corregir, y es una regla, no una estrategia."
+      },
+      {
+        "h2": "Reglas que ayudan"
+      },
+      {
+        "ul": [
+          "Pausa: tras una pérdida, ninguna operación nueva durante 15–30 minutos.",
+          "Stop diario: después de dos pérdidas seguidas o de perder una cantidad fija, se acabó el día.",
+          "El tamaño nunca sube tras una pérdida; si cambia, baja.",
+          "Antes de la siguiente operación, repasa tu checklist desde el principio."
+        ]
+      },
+      {
+        "p": "Escribe la regla antes de la sesión. Decidir en el momento es justo lo que no funciona."
+      },
+      {
+        "h2": "En Simple Trading Journal"
+      },
+      {
+        "p": "La vista de disciplina lee tus operaciones y marca la operación abierta en los 15 minutos siguientes a una pérdida, el riesgo más de 1,5 veces mayor que el de la operación anterior tras una pérdida, los días con muchas más operaciones de lo normal y las operaciones fuera de tu horario habitual. Luego muestra cuánto costaron frente al resto. Las operaciones que llegan de MetaTrader se incluyen automáticamente."
+      }
+    ]
+  },
+  "expectancy-and-profit-factor": {
+    "title": "Esperanza matemática y profit factor: los dos números que dicen si tu trading funciona",
+    "description": "Qué son la esperanza matemática (expectancy) y el profit factor, cómo calcularlos con tus propias operaciones y por qué una tasa de acierto alta dice poco por sí sola.",
+    "body": [
+      {
+        "p": "La tasa de acierto es el número que más citan los traders y, por sí sola, el menos útil. Una estrategia que gana el 80% de las veces puede perder dinero, y una que gana el 35% puede ser sólida. Dos números responden a la pregunta de verdad —¿gana dinero a lo largo de muchas operaciones?—: la esperanza matemática y el profit factor."
+      },
+      {
+        "h2": "Esperanza matemática"
+      },
+      {
+        "p": "La esperanza es el resultado medio por operación a lo largo de muchas operaciones."
+      },
+      {
+        "code": "Esperanza = (Tasa de acierto × Ganancia media) − (Tasa de fallo × Pérdida media)"
+      },
+      {
+        "p": "Ejemplo: ganas el 40% de las operaciones, la ganancia media es de 300 $ y la pérdida media de 150 $. 0,40 × 300 − 0,60 × 150 = 120 − 90 = 30 $. De media, cada operación ha sumado 30 $. Un número positivo significa que el enfoque ha funcionado en estas operaciones; uno negativo, que no, por buenos que parecieran algunos días."
+      },
+      {
+        "p": "Expresada en R en vez de en dinero —ganancia y pérdida media divididas entre tu riesgo habitual—, la esperanza se puede comparar entre cuentas de distinto tamaño y entre periodos."
+      },
+      {
+        "h2": "Profit factor"
+      },
+      {
+        "code": "Profit factor = Beneficio bruto ÷ Pérdida bruta"
+      },
+      {
+        "p": "Con los mismos números en 100 operaciones: 40 × 300 $ = 12.000 $ ganados, 60 × 150 $ = 9.000 $ perdidos, un profit factor de 1,33. Por encima de 1 las ganadoras pesan más que las perdedoras; por debajo, no. Se lee rápido, pero no dice cuántas operaciones hicieron falta para llegar ahí."
+      },
+      {
+        "h2": "Por qué engaña la tasa de acierto"
+      },
+      {
+        "p": "Una tasa de acierto alta suele venir de cerrar beneficios pronto y dejar correr las pérdidas. Diez ganancias de 50 $ y una pérdida de 600 $ son un 91% de acierto y 100 $ de pérdida neta. La esperanza lo muestra al instante; la tasa de acierto lo esconde."
+      },
+      {
+        "h2": "¿Cuántas operaciones bastan?"
+      },
+      {
+        "p": "Con una muestra pequeña estos números se mueven mucho. Veinte operaciones pueden parecer excelentes o terribles por azar. Míralos sobre al menos 30–50 operaciones y compáralos por setup, no con toda la cuenta mezclada."
+      },
+      {
+        "h2": "En Simple Trading Journal"
+      },
+      {
+        "p": "La página de estadísticas muestra la esperanza, el profit factor, el ratio de pago, la ganancia y la pérdida media y la tasa de acierto, calculados con tus operaciones cerradas, incluidas las que llegan de MetaTrader o se importan de un informe. La tabla de rendimiento por setup muestra la tasa de acierto y el resultado neto de cada uno, para que veas cuál sostiene tus resultados."
+      }
+    ]
+  },
 };
 
 export default TEXT;

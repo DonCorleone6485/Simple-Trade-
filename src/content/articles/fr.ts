@@ -525,6 +525,171 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "position-sizing-risk-per-trade": {
+    "title": "Taille de position : combien risquer par trade et comment calculer le lot",
+    "description": "Comment choisir un risque fixe par trade, le convertir en taille de lot à partir de la distance du stop, et vérifier dans votre journal que vous le respectez vraiment.",
+    "body": [
+      {
+        "p": "Deux traders peuvent prendre le même trade au même prix avec le même stop et finir avec des comptes très différents. La différence, c'est la taille. La taille de position décide combien vous coûte une perte, et donc combien de pertes d'affilée vous pouvez encaisser pendant que votre avantage se manifeste."
+      },
+      {
+        "h2": "Partir du risque, pas des lots"
+      },
+      {
+        "p": "Beaucoup de traders choisissent d'abord le lot — « je trade 1 lot » — et laissent le stop décider de ce qu'ils perdent. Chaque perte a alors une taille différente. Inversez : décidez quelle part du compte vous acceptez de perdre si le stop est touché, puis calculez la taille qui le garantit."
+      },
+      {
+        "h2": "Choisir le risque par trade"
+      },
+      {
+        "p": "Un pourcentage fixe du compte — souvent entre 0,5 % et 2 % — est le point de départ habituel. Le chiffre compte moins que sa constance. Avec 1 % de risque, dix pertes d'affilée coûtent environ 10 % du compte ; avec 5 %, la même série coûte près de 40 %, et chaque trade suivant doit travailler beaucoup plus pour le récupérer."
+      },
+      {
+        "p": "Sur un compte de prop firm, dimensionnez aussi selon ses limites : si la perte journalière maximale est de 5 %, un risque de 2 % par trade ne laisse de place qu'à deux pertes complètes dans la journée."
+      },
+      {
+        "h2": "Le calcul"
+      },
+      {
+        "code": "Taille de position = Montant risqué ÷ (Distance du stop × Valeur du point)"
+      },
+      {
+        "p": "Exemple : un compte de 10 000 $ qui risque 1 % a 100 $ à perdre. Le stop sur EURUSD est à 25 pips, et un lot standard vaut environ 10 $ par pip. 100 $ ÷ (25 × 10 $) = 0,4 lot. Si le stop est à 50 pips, la taille est divisée par deux, 0,2 lot — le risque reste 100 $."
+      },
+      {
+        "p": "La valeur du point dépend de l'instrument et du courtier (l'or, les indices et la crypto sont cotés différemment) : consultez une fois la spécification du contrat dans votre plateforme et notez-la."
+      },
+      {
+        "h2": "Erreurs courantes"
+      },
+      {
+        "ul": [
+          "Éloigner le stop après l'entrée sans réduire la taille — le risque grossit sans bruit.",
+          "Augmenter la taille après une perte pour la rattraper plus vite.",
+          "Arrondir le lot vers le haut à chaque fois : 0,37 devient 0,4, puis 0,5.",
+          "Oublier le spread et la commission, qui rendent la perte réelle un peu plus grande que prévu."
+        ]
+      },
+      {
+        "h2": "Vérifiez dans votre journal"
+      },
+      {
+        "p": "Notez le risque prévu sur chaque trade. Après quelques semaines, regardez les trades perdants : si certains ont perdu deux ou trois fois le montant habituel, votre taille n'est pas aussi fixe que vous le pensez. Lire les résultats en R (gain ou perte divisé par le risque prévu) fait ressortir ces cas immédiatement."
+      },
+      {
+        "h2": "Dans Simple Trading Journal"
+      },
+      {
+        "p": "Chaque trade a un champ de risque et les résultats peuvent se lire en R. Vous pouvez ajouter à vos objectifs un risque maximal par trade, et la vue discipline signale les trades où, juste après une perte, le risque a dépassé 1,5 fois celui du trade précédent."
+      }
+    ]
+  },
+  "revenge-trading": {
+    "title": "Revenge trading : le repérer dans votre journal et l'arrêter",
+    "description": "À quoi ressemble le revenge trading dans les données, pourquoi il coûte si cher, et des règles pratiques pour que le trade qui suit une perte ne soit pas émotionnel.",
+    "body": [
+      {
+        "p": "Une perte se clôture et, quelques minutes plus tard, vous êtes de retour sur le marché — souvent sur le même instrument, parfois avec une taille plus grosse — pour la rattraper. C'est le revenge trading, le trading de vengeance. Presque tous les traders l'ont fait ; la question est de savoir à quelle fréquence, et ce que cela coûte."
+      },
+      {
+        "h2": "Pourquoi cela coûte si cher"
+      },
+      {
+        "p": "Le trade qui suit une perte est généralement pris pour une autre raison que votre plan : réparer une émotion. Le setup est plus faible, l'entrée précipitée, et la taille a tendance à grossir. Une seule mauvaise journée peut effacer des semaines de trading soigné."
+      },
+      {
+        "h2": "À quoi cela ressemble dans les données"
+      },
+      {
+        "ul": [
+          "Un nouveau trade ouvert quelques minutes après la clôture d'un trade perdant.",
+          "Le risque de ce trade est nettement plus élevé que celui du précédent.",
+          "Plusieurs trades rapprochés un jour qui a commencé par une perte.",
+          "Des trades en dehors des heures où vous tradez habituellement."
+        ]
+      },
+      {
+        "p": "Nul besoin de vous souvenir de ce que vous ressentiez pour trouver ces trades. Les heures, les tailles et les résultats sont déjà dans votre journal."
+      },
+      {
+        "h2": "Mesurez-le"
+      },
+      {
+        "p": "Séparez les trades qui correspondent à ces schémas du reste et comparez les résultats. Si le groupe signalé perd de l'argent alors que le reste de votre trading est à peu près à l'équilibre ou positif, vous avez trouvé ce qu'il y a de plus précieux à corriger — et c'est une règle, pas une stratégie."
+      },
+      {
+        "h2": "Des règles qui aident"
+      },
+      {
+        "ul": [
+          "Temps de pause : après une perte, pas de nouveau trade pendant 15 à 30 minutes.",
+          "Stop journalier : après deux pertes d'affilée ou un montant perdu fixé, la journée est finie.",
+          "La taille n'augmente jamais après une perte ; si elle change, elle baisse.",
+          "Avant le trade suivant, reprenez votre checklist depuis le début."
+        ]
+      },
+      {
+        "p": "Écrivez la règle avant la séance. Décider sur le moment, c'est précisément ce qui ne marche pas."
+      },
+      {
+        "h2": "Dans Simple Trading Journal"
+      },
+      {
+        "p": "La vue discipline lit vos trades existants et signale un trade ouvert dans les 15 minutes suivant une perte, un risque supérieur à 1,5 fois celui du trade précédent après une perte, les jours avec beaucoup plus de trades que d'habitude et les trades hors de vos horaires habituels. Elle montre ensuite ce que ces trades ont coûté par rapport au reste. Les trades qui arrivent de MetaTrader sont inclus automatiquement."
+      }
+    ]
+  },
+  "expectancy-and-profit-factor": {
+    "title": "Espérance et profit factor : les deux chiffres qui montrent si votre trading fonctionne",
+    "description": "Ce que signifient l'espérance (expectancy) et le profit factor, comment les calculer à partir de vos propres trades, et pourquoi un taux de réussite élevé en dit peu à lui seul.",
+    "body": [
+      {
+        "p": "Le taux de réussite est le chiffre que les traders citent le plus, et à lui seul le moins utile. Une stratégie qui gagne 80 % du temps peut perdre de l'argent, et une qui gagne 35 % peut être solide. Deux chiffres répondent à la vraie question — est-ce que cela rapporte sur un grand nombre de trades ? — : l'espérance et le profit factor."
+      },
+      {
+        "h2": "L'espérance"
+      },
+      {
+        "p": "L'espérance est le résultat moyen par trade sur un grand nombre de trades."
+      },
+      {
+        "code": "Espérance = (Taux de réussite × Gain moyen) − (Taux d'échec × Perte moyenne)"
+      },
+      {
+        "p": "Exemple : vous gagnez 40 % de vos trades, le gain moyen est de 300 $ et la perte moyenne de 150 $. 0,40 × 300 − 0,60 × 150 = 120 − 90 = 30 $. En moyenne, chaque trade a rapporté 30 $. Un chiffre positif signifie que l'approche a fonctionné sur ces trades ; un chiffre négatif, qu'elle n'a pas fonctionné, aussi bonnes qu'aient paru certaines journées."
+      },
+      {
+        "p": "Exprimée en R plutôt qu'en argent — gain et perte moyens divisés par votre risque habituel —, l'espérance se compare d'une taille de compte à l'autre et d'une période à l'autre."
+      },
+      {
+        "h2": "Le profit factor"
+      },
+      {
+        "code": "Profit factor = Gains bruts ÷ Pertes brutes"
+      },
+      {
+        "p": "Avec les mêmes chiffres sur 100 trades : 40 × 300 $ = 12 000 $ gagnés, 60 × 150 $ = 9 000 $ perdus, soit un profit factor de 1,33. Au-dessus de 1, les gagnants l'emportent sur les perdants ; en dessous, non. Il se lit vite, mais ne dit pas combien de trades il a fallu pour y arriver."
+      },
+      {
+        "h2": "Pourquoi le taux de réussite trompe"
+      },
+      {
+        "p": "Un taux de réussite élevé vient souvent de prises de bénéfices trop rapides et de pertes qu'on laisse courir. Dix gains de 50 $ et une perte de 600 $, c'est 91 % de réussite et 100 $ de perte nette. L'espérance le montre tout de suite ; le taux de réussite le cache."
+      },
+      {
+        "h2": "Combien de trades suffisent ?"
+      },
+      {
+        "p": "Sur un petit échantillon, ces chiffres bougent beaucoup. Vingt trades peuvent sembler excellents ou désastreux par hasard. Regardez-les sur au moins 30 à 50 trades, et comparez-les par setup plutôt que pour tout le compte mélangé."
+      },
+      {
+        "h2": "Dans Simple Trading Journal"
+      },
+      {
+        "p": "La page de statistiques affiche l'espérance, le profit factor, le ratio gain/perte, le gain et la perte moyens et le taux de réussite, calculés sur vos trades clôturés — y compris ceux qui arrivent de MetaTrader ou sont importés d'un relevé. Le tableau de performance par setup montre le taux de réussite et le résultat net de chacun, pour voir lequel porte vos résultats."
+      }
+    ]
+  },
 };
 
 export default TEXT;

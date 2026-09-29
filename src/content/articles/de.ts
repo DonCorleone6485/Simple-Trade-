@@ -525,6 +525,171 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "position-sizing-risk-per-trade": {
+    "title": "Positionsgröße: wie viel du pro Trade riskierst und wie du die Lotgröße berechnest",
+    "description": "Wie du ein festes Risiko pro Trade wählst, es aus dem Stop-Abstand in eine Lotgröße umrechnest und im Journal prüfst, ob du dich wirklich daran hältst.",
+    "body": [
+      {
+        "p": "Zwei Trader können denselben Trade zum selben Kurs mit demselben Stop eingehen und am Ende sehr unterschiedliche Konten haben. Der Unterschied ist die Größe. Die Positionsgröße entscheidet, was dich ein einzelner Verlust kostet – und damit, wie viele Verluste in Folge du überstehst, während sich dein Vorteil zeigt."
+      },
+      {
+        "h2": "Vom Risiko ausgehen, nicht von Lots"
+      },
+      {
+        "p": "Viele Trader wählen zuerst die Lotgröße – „ich handle 1 Lot“ – und lassen den Stop entscheiden, wie viel sie verlieren. So ist jeder Verlust unterschiedlich groß. Dreh es um: Lege fest, welchen Teil des Kontos du verlieren willst, wenn der Stop greift, und berechne dann die Größe, die genau das ergibt."
+      },
+      {
+        "h2": "Das Risiko pro Trade wählen"
+      },
+      {
+        "p": "Ein fester Prozentsatz des Kontos – oft zwischen 0,5 % und 2 % – ist der übliche Ausgangspunkt. Die Zahl selbst ist weniger wichtig, als sie konstant zu halten. Bei 1 % Risiko kosten zehn Verluste in Folge etwa 10 % des Kontos; bei 5 % kostet dieselbe Serie rund 40 %, und jeder weitere Trade muss viel mehr leisten, um das zurückzuholen."
+      },
+      {
+        "p": "Auf einem Prop-Firm-Konto richte die Größe auch nach deren Grenzen aus: Liegt das Tagesverlustlimit bei 5 %, lässt ein Risiko von 2 % pro Trade nur Platz für zwei volle Verluste an einem Tag."
+      },
+      {
+        "h2": "Die Berechnung"
+      },
+      {
+        "code": "Positionsgröße = Risikobetrag ÷ (Stop-Abstand × Wert pro Punkt)"
+      },
+      {
+        "p": "Beispiel: Ein Konto mit 10.000 $ und 1 % Risiko hat 100 $ zu verlieren. Der Stop bei EURUSD liegt 25 Pips entfernt, ein Standardlot ist etwa 10 $ pro Pip wert. 100 $ ÷ (25 × 10 $) = 0,4 Lots. Liegt der Stop 50 Pips entfernt, halbiert sich die Größe auf 0,2 Lots – das Risiko bleibt 100 $."
+      },
+      {
+        "p": "Der Wert pro Punkt hängt von Instrument und Broker ab (Gold, Indizes und Krypto werden anders notiert). Sieh dir die Kontraktspezifikation in deiner Plattform einmal an und notiere sie."
+      },
+      {
+        "h2": "Häufige Fehler"
+      },
+      {
+        "ul": [
+          "Den Stop nach dem Einstieg weiter weg setzen, ohne die Größe zu verringern – das Risiko wächst unbemerkt.",
+          "Nach einem Verlust die Größe erhöhen, um ihn schneller zurückzuholen.",
+          "Die Lotgröße jedes Mal aufrunden: aus 0,37 wird 0,4, dann 0,5.",
+          "Spread und Kommission vergessen, die den echten Verlust etwas größer machen als geplant."
+        ]
+      },
+      {
+        "h2": "Im Journal prüfen"
+      },
+      {
+        "p": "Notiere bei jedem Trade das geplante Risiko. Sieh dir nach ein paar Wochen die Verlusttrades an: Haben einige das Zwei- oder Dreifache des Üblichen verloren, ist deine Größe nicht so fest, wie du denkst. Ergebnisse in R (Gewinn oder Verlust geteilt durch das geplante Risiko) machen solche Ausreißer sofort sichtbar."
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "Jeder Trade hat ein Risikofeld, und Ergebnisse lassen sich in R lesen. Du kannst deinen Zielen ein maximales Risiko pro Trade hinzufügen, und die Disziplin-Ansicht markiert Trades, bei denen das Risiko direkt nach einem Verlust auf mehr als das 1,5-Fache des vorherigen Trades gestiegen ist."
+      }
+    ]
+  },
+  "revenge-trading": {
+    "title": "Revenge Trading: wie du es im Journal erkennst und stoppst",
+    "description": "Wie Revenge Trading in den Daten aussieht, warum es so teuer ist und welche praktischen Regeln verhindern, dass der Trade nach einem Verlust ein emotionaler wird.",
+    "body": [
+      {
+        "p": "Ein Verlust wird geschlossen, und wenige Minuten später bist du wieder im Markt – oft im selben Instrument, manchmal mit größerer Position –, um ihn zurückzuholen. Das ist Revenge Trading, Rache-Trading. Fast jeder Trader hat es schon getan; die Frage ist, wie oft und was es kostet."
+      },
+      {
+        "h2": "Warum es so teuer ist"
+      },
+      {
+        "p": "Der Trade nach einem Verlust wird meist aus einem anderen Grund als deinem Plan eröffnet: um ein Gefühl zu reparieren. Das Setup ist schwächer, der Einstieg überhastet, die Größe wächst tendenziell. Ein einziger schlechter Tag kann Wochen sorgfältigen Tradings zunichtemachen."
+      },
+      {
+        "h2": "Wie es in den Daten aussieht"
+      },
+      {
+        "ul": [
+          "Ein neuer Trade, eröffnet wenige Minuten nach dem Schließen eines Verlusttrades.",
+          "Das Risiko dieses Trades ist deutlich höher als beim vorherigen.",
+          "Mehrere Trades kurz hintereinander an einem Tag, der mit einem Verlust begann.",
+          "Trades außerhalb der Uhrzeiten, in denen du normalerweise handelst."
+        ]
+      },
+      {
+        "p": "Um diese Trades zu finden, musst du dich nicht erinnern, wie du dich gefühlt hast. Zeiten, Größen und Ergebnisse stehen bereits in deinem Journal."
+      },
+      {
+        "h2": "Miss es"
+      },
+      {
+        "p": "Trenne die Trades, die zu diesen Mustern passen, vom Rest und vergleiche die Ergebnisse. Verliert die markierte Gruppe Geld, während dein übriges Trading ungefähr bei null oder im Plus liegt, hast du das Wertvollste gefunden, das du ändern kannst – und das ist eine Regel, keine Strategie."
+      },
+      {
+        "h2": "Regeln, die helfen"
+      },
+      {
+        "ul": [
+          "Abkühlphase: nach einem Verlust 15–30 Minuten kein neuer Trade.",
+          "Tagesstopp: nach zwei Verlusten in Folge oder einem festen Verlustbetrag ist der Tag vorbei.",
+          "Nach einem Verlust steigt die Größe nie; wenn sie sich ändert, dann nach unten.",
+          "Vor dem nächsten Trade die Checkliste von vorn durchgehen."
+        ]
+      },
+      {
+        "p": "Schreib die Regel vor der Session auf. Im Moment zu entscheiden ist genau das, was nicht funktioniert."
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "Die Disziplin-Ansicht liest deine vorhandenen Trades und markiert einen Trade, der innerhalb von 15 Minuten nach einem Verlust eröffnet wurde, ein Risiko von mehr als dem 1,5-Fachen des vorherigen Trades nach einem Verlust, Tage mit deutlich mehr Trades als üblich und Trades außerhalb deiner üblichen Uhrzeiten. Dann zeigt sie, was diese Trades im Vergleich zum Rest gekostet haben. Trades aus MetaTrader werden automatisch einbezogen."
+      }
+    ]
+  },
+  "expectancy-and-profit-factor": {
+    "title": "Erwartungswert und Profit-Faktor: die zwei Zahlen, die zeigen, ob dein Trading funktioniert",
+    "description": "Was Erwartungswert (Expectancy) und Profit-Faktor bedeuten, wie du sie aus deinen eigenen Trades berechnest und warum eine hohe Trefferquote allein wenig über eine Strategie sagt.",
+    "body": [
+      {
+        "p": "Die Trefferquote ist die Zahl, die Trader am häufigsten nennen – und allein die am wenigsten nützliche. Eine Strategie, die in 80 % der Fälle gewinnt, kann Geld verlieren, eine mit 35 % kann solide sein. Zwei Zahlen beantworten die eigentliche Frage – bringt das über viele Trades Geld? –: Erwartungswert und Profit-Faktor."
+      },
+      {
+        "h2": "Erwartungswert"
+      },
+      {
+        "p": "Der Erwartungswert ist das durchschnittliche Ergebnis pro Trade über eine große Zahl von Trades."
+      },
+      {
+        "code": "Erwartungswert = (Trefferquote × Durchschnittsgewinn) − (Verlustquote × Durchschnittsverlust)"
+      },
+      {
+        "p": "Beispiel: Du gewinnst 40 % der Trades, der Durchschnittsgewinn beträgt 300 $, der Durchschnittsverlust 150 $. 0,40 × 300 − 0,60 × 150 = 120 − 90 = 30 $. Im Schnitt hat jeder Trade 30 $ gebracht. Eine positive Zahl heißt, der Ansatz hat bei diesen Trades funktioniert; eine negative, dass nicht – egal wie gut sich einzelne Tage angefühlt haben."
+      },
+      {
+        "p": "In R statt in Geld ausgedrückt – Durchschnittsgewinn und -verlust geteilt durch dein übliches Risiko – lässt sich der Erwartungswert über Kontogrößen und Zeiträume hinweg vergleichen."
+      },
+      {
+        "h2": "Profit-Faktor"
+      },
+      {
+        "code": "Profit-Faktor = Bruttogewinn ÷ Bruttoverlust"
+      },
+      {
+        "p": "Mit denselben Zahlen über 100 Trades: 40 × 300 $ = 12.000 $ gewonnen, 60 × 150 $ = 9.000 $ verloren, ein Profit-Faktor von 1,33. Über 1 überwiegen die Gewinner, darunter nicht. Er ist schnell gelesen, sagt aber nicht, wie viele Trades dafür nötig waren."
+      },
+      {
+        "h2": "Warum die Trefferquote täuscht"
+      },
+      {
+        "p": "Eine hohe Trefferquote entsteht oft, wenn Gewinne früh mitgenommen und Verluste laufen gelassen werden. Zehn Gewinne von 50 $ und ein Verlust von 600 $ ergeben 91 % Trefferquote und 100 $ Nettoverlust. Der Erwartungswert zeigt das sofort; die Trefferquote verdeckt es."
+      },
+      {
+        "h2": "Wie viele Trades reichen?"
+      },
+      {
+        "p": "Bei einer kleinen Stichprobe schwanken diese Zahlen stark. Zwanzig Trades können zufällig hervorragend oder schrecklich aussehen. Betrachte sie über mindestens 30–50 Trades und vergleiche sie je Setup statt für das ganze Konto durcheinander."
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "Die Statistikseite zeigt Erwartungswert, Profit-Faktor, Payoff-Ratio, Durchschnittsgewinn und -verlust sowie die Trefferquote, berechnet aus deinen geschlossenen Trades – einschließlich Trades aus MetaTrader oder aus einem importierten Bericht. Die Tabelle zur Setup-Performance zeigt Trefferquote und Nettoergebnis jedes Setups, damit du siehst, welches deine Ergebnisse trägt."
+      }
+    ]
+  },
 };
 
 export default TEXT;

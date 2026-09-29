@@ -688,6 +688,171 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "position-sizing-risk-per-trade": {
+    "title": "Position sizing: how much to risk per trade, and how to calculate the lot size",
+    "description": "How to choose a fixed risk per trade, turn it into a lot size from your stop distance, and check in your journal that you actually stick to it.",
+    "body": [
+      {
+        "p": "Two traders can take the same trade at the same price with the same stop and end up with very different accounts. The difference is size. Position sizing decides how much a single loss costs you, and so how many losses in a row you can survive while your edge plays out."
+      },
+      {
+        "h2": "Start from risk, not from lots"
+      },
+      {
+        "p": "Many traders pick a lot size first — \"I trade 1 lot\" — and let the stop decide how much they lose. That makes every loss a different size. Turn it around: decide how much of the account you are willing to lose if the stop is hit, then work out the size that makes that true."
+      },
+      {
+        "h2": "Choosing a risk per trade"
+      },
+      {
+        "p": "A fixed percentage of the account — often somewhere between 0.5% and 2% — is the usual starting point. The number matters less than keeping it constant. With 1% risk, ten losses in a row cost roughly 10% of the account; with 5% risk, the same streak costs about 40%, and every later trade has to work much harder to get it back."
+      },
+      {
+        "p": "On a prop firm account, size from the firm's limits as well: if the daily loss limit is 5%, a 2% risk per trade leaves room for only two full losses in a day."
+      },
+      {
+        "h2": "The calculation"
+      },
+      {
+        "code": "Position size = Risk amount ÷ (Stop distance × Value per point)"
+      },
+      {
+        "p": "Example: a $10,000 account risking 1% has $100 to lose. The stop on EURUSD is 25 pips away, and one standard lot is worth about $10 per pip. $100 ÷ (25 × $10) = 0.4 lots. If the stop is 50 pips away, the size halves to 0.2 lots — the risk stays $100."
+      },
+      {
+        "p": "The value per point differs by instrument and by broker (gold, indices and crypto are quoted differently), so check the contract specification in your platform once and write it down."
+      },
+      {
+        "h2": "Common mistakes"
+      },
+      {
+        "ul": [
+          "Moving the stop further away after entry without reducing size — the risk quietly grows.",
+          "Raising the size after a loss to win it back faster.",
+          "Rounding up the lot size every time: 0.37 becomes 0.4, then 0.5.",
+          "Forgetting spread and commission, which make the real loss slightly larger than planned."
+        ]
+      },
+      {
+        "h2": "Check it in your journal"
+      },
+      {
+        "p": "Write the planned risk on every trade. After a few weeks, look at the losing trades: if some of them lost two or three times the usual amount, your sizing is not as fixed as you think. Measuring results in R (profit or loss divided by the planned risk) makes these outliers easy to spot."
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "Each trade has a risk field, and results can be read in R. Your goals can include a maximum risk per trade, and the discipline view flags trades where the risk jumped to more than 1.5 times the previous trade right after a loss."
+      }
+    ]
+  },
+  "revenge-trading": {
+    "title": "Revenge trading: how to spot it in your journal and stop it",
+    "description": "What revenge trading looks like in the data, why it is so expensive, and practical rules that stop the next trade after a loss from being an emotional one.",
+    "body": [
+      {
+        "p": "A loss closes, and within minutes you are back in the market — often in the same instrument, sometimes with a bigger size — to win it back. That is revenge trading. Almost every trader has done it; the question is how often, and what it costs."
+      },
+      {
+        "h2": "Why it hurts so much"
+      },
+      {
+        "p": "The trade after a loss is usually taken for a different reason than your plan: to fix a feeling. The setup is weaker, the entry is rushed, and the size tends to grow. A single bad day can then undo weeks of careful trading."
+      },
+      {
+        "h2": "What it looks like in the data"
+      },
+      {
+        "ul": [
+          "A new trade opened within a few minutes of a losing trade closing.",
+          "The risk on that trade is noticeably larger than on the one before.",
+          "Several trades in quick succession on a day that started with a loss.",
+          "Trades outside the hours you normally trade."
+        ]
+      },
+      {
+        "p": "You do not need to remember how you felt to find these trades. The times, the sizes and the results are already in your journal."
+      },
+      {
+        "h2": "Measure it"
+      },
+      {
+        "p": "Separate the trades that match the patterns above from the rest and compare the results. If the flagged group loses money while the rest of your trading is roughly flat or positive, you have found the most valuable thing to fix — and it is a rule, not a strategy."
+      },
+      {
+        "h2": "Rules that help"
+      },
+      {
+        "ul": [
+          "A cooling-off period: after a loss, no new trade for 15–30 minutes.",
+          "A daily stop: after two losses in a row, or a fixed amount lost, stop for the day.",
+          "Size never goes up after a loss; if anything, it goes down.",
+          "Before the next trade, go through your checklist from the top."
+        ]
+      },
+      {
+        "p": "Write the rule down before the session. Deciding in the moment is exactly what does not work."
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "The discipline view reads your existing trades and marks a trade opened within 15 minutes of a loss, a risk more than 1.5 times the previous trade after a loss, days with far more trades than usual, and trades outside your usual hours. It then shows what those trades cost compared with the rest. Trades that arrive from MetaTrader are included automatically."
+      }
+    ]
+  },
+  "expectancy-and-profit-factor": {
+    "title": "Expectancy and profit factor: the two numbers that show whether your trading works",
+    "description": "What expectancy and profit factor mean, how to calculate them from your own trades, and why a high win rate alone says little about a strategy.",
+    "body": [
+      {
+        "p": "Win rate is the number traders quote most, and it is the least useful on its own. A strategy that wins 80% of the time can still lose money, and one that wins 35% of the time can be solid. Two numbers answer the real question — does this make money over many trades? — expectancy and profit factor."
+      },
+      {
+        "h2": "Expectancy"
+      },
+      {
+        "p": "Expectancy is the average result per trade over a large number of trades."
+      },
+      {
+        "code": "Expectancy = (Win rate × Average win) − (Loss rate × Average loss)"
+      },
+      {
+        "p": "Example: you win 40% of trades, the average win is $300 and the average loss is $150. 0.40 × 300 − 0.60 × 150 = 120 − 90 = $30. On average, each trade has added $30. A positive number means the approach has worked on these trades; a negative one means it has not, however good individual days felt."
+      },
+      {
+        "p": "Expressed in R instead of money — average win and loss divided by your usual risk — expectancy can be compared across account sizes and periods."
+      },
+      {
+        "h2": "Profit factor"
+      },
+      {
+        "code": "Profit factor = Gross profit ÷ Gross loss"
+      },
+      {
+        "p": "With the same numbers over 100 trades: 40 × $300 = $12,000 won, 60 × $150 = $9,000 lost, a profit factor of 1.33. Above 1 the winners outweigh the losers; below 1 they do not. It is quick to read, but it ignores how many trades it took to get there."
+      },
+      {
+        "h2": "Why win rate misleads"
+      },
+      {
+        "p": "A high win rate often comes from taking profits early and letting losses run. Ten wins of $50 and one loss of $600 is a 91% win rate and a net loss of $100. Expectancy shows this immediately; win rate hides it."
+      },
+      {
+        "h2": "How many trades are enough?"
+      },
+      {
+        "p": "These numbers move a lot over a small sample. Twenty trades can look excellent or terrible by chance. Look at them over at least 30–50 trades, and compare them per setup rather than for your whole account mixed together."
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "The statistics page shows expectancy, profit factor, payoff ratio, average win and loss, and win rate, calculated from your closed trades — including trades that arrive from MetaTrader or are imported from a report. The setup performance table shows the win rate and net result of each setup, so you can see which one carries your results."
+      }
+    ]
+  },
 };
 
 export default TEXT;

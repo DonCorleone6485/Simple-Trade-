@@ -98,6 +98,9 @@ Aynı düzen ileride rakip fiyatları için de kurulabilir.
 | /blog/prop-firm-daily-loss-and-drawdown | Yazı | 2026-09-28 |
 | /blog/pre-trade-checklist | Yazı | 2026-09-29 |
 | /blog/trading-emotions-journal | Yazı | 2026-09-29 |
+| /blog/position-sizing-risk-per-trade | Yazı (risk yönetimi) | 2026-09-29 |
+| /blog/revenge-trading | Yazı (psikoloji) | 2026-09-29 |
+| /blog/expectancy-and-profit-factor | Yazı (journal metrikleri) | 2026-09-29 |
 
 **Rakip karşılaştırmaları** (rakip fiyatları Eylül 2026; 3–6 ayda bir kontrol et):
 | Adres | Eklendi |
@@ -135,14 +138,14 @@ Her platform için Simple Trading Journal'a nasıl geldiği (MT4/MT5: EA ile oto
 dosya; cTrader vb.: dosya; TradingView: henüz doğrudan yok) ve rehber bağlantıları.
 Bağlantılar: ana sayfa alt kısmı ("Prop Firmalar", "Broker'lar") ve /blog dizininin sonu.
 
-Toplam: 25 sayfa × 9 dil = 225 adres (sitemap).
+Toplam: 28 sayfa × 9 dil = 252 adres (sitemap, 2026-09-29).
 
 Search Console'da dizine ekleme istendi (2026-09-29): /prop-firms, /brokers, /tr/prop-firms, /prop-firms/ftmo.
 
 ## Yapılacaklar
 
 ### İçerik
-- ⬜ **İçerik kümeleri:** trading journal, prop firm, risk yönetimi, trader psikolojisi — her birinde 10–20 yazı. Şu an toplam 10.
+- ⬜ **İçerik kümeleri:** trading journal, prop firm, risk yönetimi, trader psikolojisi — her birinde 10–20 yazı. Şu an toplam 13 (2026-09-29: pozisyon büyüklüğü, intikam işlemi, beklenti/kâr faktörü eklendi).
 - ⬜ **Yeni karşılaştırmalar:** TradesViz, Tradervue, FX Replay.
 - 🟡 **Programatik prop firma sayfaları** (`/prop-firms/<firma>`) — 5 firma YAPILDI (2026-09-29; FundingPips aynı gün tarayıcıyla eklendi). Sıradakiler: FundedNext (bot doğrulaması, tarayıcı da geçemiyor — kullanıcı kuralları yapıştırırsa eklenir), FXIFY (tablo hesap büyüklüğü seçicisine bağlı, okunan değerler çelişkili), E8 Markets. Kaynak yalnız firmanın resmî sitesi; her kuralda kaynak bağlantısı ve "son kontrol" tarihi. Kurallar tek veri dosyasında; ayda bir zamanlanmış görev kaynak sayfaları karşılaştırır, fark varsa kullanıcıya sorar (kendiliğinden yayınlamaz). Uzun süre doğrulanamayan firmada sayılar gizlenir. Logo yok, ortaklık ima edilmez.
 - 🟡 **Programatik broker sayfaları** (`/brokers/<broker>`) — ilk 4 broker YAPILDI (2026-09-29). IC Markets, Exness, XM, FxPro, Tickmill siteleri buradan (Türkiye) açılmadı; başka ağdan platform listesi doğrulanınca eklenebilir.

@@ -688,6 +688,171 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "position-sizing-risk-per-trade": {
+    "title": "Pozisyon büyüklüğü: işlem başına ne kadar risk almalı, lot nasıl hesaplanır",
+    "description": "İşlem başına sabit bir risk seçmek, bunu stop mesafesinden lot büyüklüğüne çevirmek ve journal'da gerçekten uyup uymadığını kontrol etmek.",
+    "body": [
+      {
+        "p": "İki trader aynı işleme aynı fiyattan, aynı stopla girip bambaşka hesaplarla çıkabilir. Farkı yaratan büyüklüktür. Pozisyon büyüklüğü tek bir kaybın sana neye mal olacağını, yani avantajın kendini gösterene kadar üst üste kaç kayba dayanabileceğini belirler."
+      },
+      {
+        "h2": "Lottan değil, riskten başla"
+      },
+      {
+        "p": "Çoğu trader önce lotu seçer — \"ben 1 lot açarım\" — ve ne kadar kaybedeceğine stop karar verir. Böylece her kayıp farklı büyüklükte olur. Tersine çevir: stop çalışırsa hesabın ne kadarını kaybetmeyi kabul ettiğine karar ver, sonra bunu sağlayan büyüklüğü hesapla."
+      },
+      {
+        "h2": "İşlem başına riski seçmek"
+      },
+      {
+        "p": "Hesabın sabit bir yüzdesi — çoğunlukla %0,5 ile %2 arası — olağan başlangıç noktasıdır. Sayının kendisi, onu sabit tutmaktan daha az önemlidir. %1 riskle üst üste on kayıp hesabın yaklaşık %10'una mal olur; %5 riskle aynı seri yaklaşık %40 götürür ve sonraki her işlemin bunu geri getirmek için çok daha fazla çalışması gerekir."
+      },
+      {
+        "p": "Prop firma hesabında firmanın sınırlarına göre de hesapla: günlük kayıp sınırı %5 ise işlem başına %2 risk, bir günde yalnızca iki tam kayba yer bırakır."
+      },
+      {
+        "h2": "Hesap"
+      },
+      {
+        "code": "Pozisyon büyüklüğü = Risk tutarı ÷ (Stop mesafesi × Puan başına değer)"
+      },
+      {
+        "p": "Örnek: %1 risk alan 10.000 $'lık hesabın kaybetmeye ayırdığı tutar 100 $. EURUSD'de stop 25 pip uzakta, bir standart lot pip başına yaklaşık 10 $. 100 $ ÷ (25 × 10 $) = 0,4 lot. Stop 50 pip uzaktaysa büyüklük yarıya, 0,2 lota iner — risk yine 100 $ kalır."
+      },
+      {
+        "p": "Puan başına değer enstrümana ve brokera göre değişir (altın, endeksler ve kripto farklı fiyatlanır); platformundaki sözleşme özelliklerine bir kez bak ve not al."
+      },
+      {
+        "h2": "Sık yapılan hatalar"
+      },
+      {
+        "ul": [
+          "Girişten sonra stopu uzaklaştırıp büyüklüğü küçültmemek — risk sessizce büyür.",
+          "Kayıptan sonra daha hızlı geri almak için büyüklüğü artırmak.",
+          "Lotu her seferinde yukarı yuvarlamak: 0,37 önce 0,4, sonra 0,5 olur.",
+          "Spread ve komisyonu unutmak; gerçek kayıp plandakinden biraz büyük olur."
+        ]
+      },
+      {
+        "h2": "Journal'da kontrol et"
+      },
+      {
+        "p": "Her işlemde planlanan riski yaz. Birkaç hafta sonra kaybeden işlemlere bak: bazıları olağan tutarın iki üç katını kaybettiyse, büyüklüğün sandığın kadar sabit değil. Sonuçları R cinsinden (kâr ya da zarar ÷ planlanan risk) okumak bu aykırı işlemleri kolayca gösterir."
+      },
+      {
+        "h2": "Simple Trading Journal'da"
+      },
+      {
+        "p": "Her işlemin bir risk alanı var ve sonuçlar R cinsinden okunabiliyor. Hedeflerine işlem başına azami risk ekleyebilirsin; disiplin ekranı da bir kayıptan hemen sonra riskin bir önceki işlemin 1,5 katından fazlasına çıktığı işlemleri işaretler."
+      }
+    ]
+  },
+  "revenge-trading": {
+    "title": "İntikam işlemi (revenge trading): journal'da nasıl fark edilir, nasıl durdurulur",
+    "description": "İntikam işleminin verilerde nasıl göründüğü, neden bu kadar pahalı olduğu ve kayıptan sonraki işlemin duygusal olmasını engelleyen pratik kurallar.",
+    "body": [
+      {
+        "p": "Bir kayıp kapanıyor ve birkaç dakika içinde yeniden piyasadasın — çoğu zaman aynı enstrümanda, bazen daha büyük lotla — kaybı geri almak için. Buna intikam işlemi denir. Neredeyse her trader bunu yapmıştır; asıl soru ne sıklıkla yaptığın ve sana neye mal olduğu."
+      },
+      {
+        "h2": "Neden bu kadar pahalı"
+      },
+      {
+        "p": "Kayıptan sonraki işlem genellikle planın dışında bir sebeple açılır: bir duyguyu düzeltmek için. Kurulum daha zayıf, giriş aceleye gelmiş, büyüklük de büyümeye meyillidir. Tek bir kötü gün, haftalarca dikkatle yapılan işi silebilir."
+      },
+      {
+        "h2": "Verilerde nasıl görünür"
+      },
+      {
+        "ul": [
+          "Kaybeden bir işlem kapandıktan birkaç dakika sonra açılan yeni işlem.",
+          "Bu işlemin riski bir öncekinden belirgin şekilde büyük.",
+          "Kayıpla başlayan bir günde art arda açılan birkaç işlem.",
+          "Normalde işlem yaptığın saatlerin dışındaki işlemler."
+        ]
+      },
+      {
+        "p": "Bu işlemleri bulmak için o an ne hissettiğini hatırlamana gerek yok. Saatler, büyüklükler ve sonuçlar zaten journal'ında."
+      },
+      {
+        "h2": "Ölç"
+      },
+      {
+        "p": "Yukarıdaki kalıplara uyan işlemleri diğerlerinden ayır ve sonuçları karşılaştır. İşaretlenen grup para kaybederken geri kalanı aşağı yukarı başa baş ya da artıdaysa, düzeltilecek en değerli şeyi buldun — ve bu bir strateji değil, bir kural."
+      },
+      {
+        "h2": "İşe yarayan kurallar"
+      },
+      {
+        "ul": [
+          "Soğuma süresi: kayıptan sonra 15–30 dakika yeni işlem yok.",
+          "Günlük durma: üst üste iki kayıptan ya da belirli bir tutar kaybettikten sonra o gün bitti.",
+          "Kayıptan sonra büyüklük asla artmaz; değişecekse azalır.",
+          "Sonraki işlemden önce checklist'ini baştan geç."
+        ]
+      },
+      {
+        "p": "Kuralı seanstan önce yaz. O an karar vermek tam olarak işe yaramayan şey."
+      },
+      {
+        "h2": "Simple Trading Journal'da"
+      },
+      {
+        "p": "Disiplin ekranı mevcut işlemlerini okur ve bir kayıptan sonraki 15 dakika içinde açılan işlemi, kayıptan sonra riskin bir önceki işlemin 1,5 katını aştığı işlemi, olağandan çok daha fazla işlem yapılan günleri ve her zamanki saatlerin dışındaki işlemleri işaretler. Sonra bu işlemlerin diğerlerine göre neye mal olduğunu gösterir. MetaTrader'dan gelen işlemler de kendiliğinden dahil."
+      }
+    ]
+  },
+  "expectancy-and-profit-factor": {
+    "title": "Beklenti (expectancy) ve kâr faktörü: trading'inin işe yarayıp yaramadığını gösteren iki sayı",
+    "description": "Beklenti ve kâr faktörünün ne anlama geldiği, kendi işlemlerinden nasıl hesaplanacağı ve yüksek kazanma oranının tek başına neden az şey söylediği.",
+    "body": [
+      {
+        "p": "Kazanma oranı trader'ların en çok söylediği sayıdır ve tek başına en az işe yarayanıdır. İşlemlerin %80'ini kazanan bir strateji para kaybedebilir, %35'ini kazanan bir strateji sağlam olabilir. Asıl soruya — bu, çok sayıda işlemde para kazandırıyor mu? — iki sayı cevap verir: beklenti ve kâr faktörü."
+      },
+      {
+        "h2": "Beklenti"
+      },
+      {
+        "p": "Beklenti, çok sayıda işlem üzerinden işlem başına ortalama sonuçtur."
+      },
+      {
+        "code": "Beklenti = (Kazanma oranı × Ortalama kazanç) − (Kaybetme oranı × Ortalama kayıp)"
+      },
+      {
+        "p": "Örnek: işlemlerin %40'ını kazanıyorsun, ortalama kazanç 300 $, ortalama kayıp 150 $. 0,40 × 300 − 0,60 × 150 = 120 − 90 = 30 $. Ortalamada her işlem 30 $ eklemiş. Artı bir sayı, yaklaşımın bu işlemlerde işe yaradığını; eksi bir sayı, tek tek günler ne kadar iyi hissettirmiş olursa olsun işe yaramadığını gösterir."
+      },
+      {
+        "p": "Para yerine R cinsinden — ortalama kazanç ve kaybı olağan riskine bölerek — hesaplanan beklenti, farklı hesap büyüklükleri ve dönemler arasında karşılaştırılabilir."
+      },
+      {
+        "h2": "Kâr faktörü"
+      },
+      {
+        "code": "Kâr faktörü = Brüt kâr ÷ Brüt zarar"
+      },
+      {
+        "p": "Aynı sayılarla 100 işlemde: 40 × 300 $ = 12.000 $ kazanç, 60 × 150 $ = 9.000 $ kayıp, kâr faktörü 1,33. 1'in üstünde kazananlar kaybedenlerden ağır basar; altında basmaz. Hızlı okunur ama oraya kaç işlemde gelindiğini hesaba katmaz."
+      },
+      {
+        "h2": "Kazanma oranı neden yanıltır"
+      },
+      {
+        "p": "Yüksek kazanma oranı çoğu zaman kârı erken alıp zararı koşturmaktan gelir. 50 $'lık on kazanç ve 600 $'lık bir kayıp, %91 kazanma oranı ve 100 $ net zarardır. Beklenti bunu hemen gösterir; kazanma oranı gizler."
+      },
+      {
+        "h2": "Kaç işlem yeterli?"
+      },
+      {
+        "p": "Bu sayılar küçük bir örneklemde çok oynar. Yirmi işlem şans eseri mükemmel ya da berbat görünebilir. En az 30–50 işlem üzerinden bak ve bütün hesabı karışık değil, kurulum bazında karşılaştır."
+      },
+      {
+        "h2": "Simple Trading Journal'da"
+      },
+      {
+        "p": "İstatistik sayfası beklentiyi, kâr faktörünü, ödeme oranını (payoff), ortalama kazanç ve kaybı ve kazanma oranını kapanmış işlemlerinden hesaplar — MetaTrader'dan gelen ya da rapordan içe aktarılan işlemler dahil. Kurulum performansı tablosu her kurulumun kazanma oranını ve net sonucunu gösterir; sonuçlarını hangisinin taşıdığını görürsün."
+      }
+    ]
+  },
 };
 
 export default TEXT;
