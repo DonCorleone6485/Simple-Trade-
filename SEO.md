@@ -8,6 +8,55 @@ Son güncelleme: 2026-09-29
 
 ---
 
+## SEO nasıl bir çalışma? (kısa anlatım)
+
+**Amaç:** İnsanlar Google'da (ve Bing'de, ChatGPT gibi asistanlarda) bir şey aradığında
+karşılarına bizim sitemizin çıkması. Reklam parası ödemeden gelen ziyaretçi demek.
+
+**Nasıl işler:** Google sürekli siteleri gezer (buna "tarama" denir), okuduğu sayfaları
+kendi dizinine ekler, sonra her arama için en iyi cevabı veren sayfaları üste koyar.
+Bizim işimiz üç şey:
+1. **Google sayfalarımızı bulabilsin ve okuyabilsin** — teknik SEO.
+2. **Sayfalarımız insanların aradığı sorulara iyi cevap versin** — içerik.
+3. **Başka siteler bizden bahsetsin, bize bağlantı versin** — geri bağlantı. Google
+   bunu "bu site güvenilir" işareti sayar.
+Bir de **ölçüm**: hangi aramada kaçıncı çıkıyoruz, kaç kişi tıklıyor (Search Console).
+
+**Ne kadar sürede sonuç verir:** Yavaş. Yeni bir sayfanın Google'da yerleşmesi birkaç
+hafta ile birkaç ay sürer; yeni bir alan adı ilk 3–6 ayda az görünür. Ama bir kez
+yerleşince sayfa yıllarca bedava ziyaretçi getirir. Bu yüzden erken ve düzenli
+yapmak önemli, bir kerede çok yapmak değil.
+
+### Ne zaman ne yapılır (takvim)
+
+| Ne zaman | Ne yapılır | Kim |
+|---|---|---|
+| **Her yeni sayfada** | 9 dilde yazılır, başlık/açıklama, sitemap'e kendiliğinden girer; önemliyse Search Console'da "dizine eklenmesini iste". Bu dosyaya eklenir. | Claude |
+| **Haftada 1** | Yeni bir yazı (içerik kümelerinden). | Claude yazar, kullanıcı onaylar |
+| **Ayda 1** | Search Console raporu: hangi aramalarda çıkıyoruz, tıklamalar, dizine eklenmeyen sayfalar, hatalar. Sonuca göre başlık/açıklama düzeltmeleri. | Claude bakar, kullanıcıya özet |
+| **Ayda 1** | Prop firma kuralları kontrolü (aşağıda). | Otomatik görev + kullanıcı onayı |
+| **3–6 ayda 1** | Rakip karşılaştırma sayfalarındaki fiyatları kontrol; eski yazıları güncelleme. | Claude |
+| **Sürekli** | Geri bağlantı: dizinler, sosyal medya profilleri, YouTube açıklamaları, forumlarda yardım. | Çoğu kullanıcı (hesaplar ona ait), metinleri Claude hazırlar |
+
+### Otomatik kontrol görevi (prop firma kuralları) — henüz kurulmadı
+
+Prop firma sayfaları yapılınca kurulacak:
+1. Kurallar tek bir veri dosyasında durur; her kuralın yanında **kaynak bağlantısı**
+   (firmanın resmî sayfası) ve **son kontrol tarihi** vardır.
+2. **Ayda bir** zamanlanmış bir görev (Claude, arka planda) her firmanın kaynak
+   sayfasını açar, bizdeki kurallarla karşılaştırır.
+3. Fark bulursa **kendiliğinden yayınlamaz**; kullanıcıya özet gelir:
+   "FTMO günlük kayıp limitini %5'ten %4'e çekmiş, güncelleyeyim mi?" Onay gelince
+   veri dosyası değişir, 9 dildeki sayfalar kendiliğinden güncellenir.
+4. Fark yoksa yalnız "son kontrol" tarihi yenilenir.
+5. Bir firma uzun süre doğrulanamazsa (site değişti, kapandı) o sayfadaki sayılar
+   gizlenir, okuyucu firmanın sitesine yönlendirilir. Eski kuralı doğruymuş gibi
+   göstermektense hiç göstermemek.
+
+Aynı düzen ileride rakip fiyatları için de kurulabilir.
+
+---
+
 ## Arama motorları ve araçlar
 
 | Araç | Durum | Ayrıntı |
