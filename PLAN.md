@@ -17,7 +17,7 @@ Son güncelleme: 2026-09-29
 - [ ] **CSP'yi engelleme moduna almak — 2026-10-06 … 10-13** — `client_errors` kind 'csp' raporlarına bakarak. Zamanlanmış görev `csp-enforce-check` 6 Ekim 10:00'da yapacak (29 Eylül'e kadar yalnız 'eval' ve 'wasm-eval' raporu, 2'şer).
 
 ### Kullanıcıdan bekleyenler
-- [ ] **Sosyal medya hesapları** — aynı kullanıcı adıyla (bkz. büyüme planı §1–2). Kullanıcı adları ve 9 dilde biyografiler hazır.
+- [ ] **Sosyal medya hesapları** — aynı kullanıcı adıyla (bkz. büyüme planı §1–2 ve aşağıdaki "Sosyal medya kurulumu"). Hesap açmak, şifre, telefon doğrulaması ve CAPTCHA kullanıcıda; Claude şifreye dokunmaz.
 - [ ] **Hakkımızda metni** — birkaç cümle; 9 dile çevrilip yerleştirilecek.
 - [ ] **MetaTrader kurulum videosu** — `~/Desktop/STJ-Kayit/` klasörüne 7 ekran kaydı (01-indir … 07-sonuc). Gelince Remotion kurgusu.
 - [ ] **Meta Pixel kimliği** — Instagram reklamından önce; çerez bandı da gerekecek.
@@ -27,6 +27,15 @@ Son güncelleme: 2026-09-29
 - [ ] **İlk gerçek yeni üyeyi izlemek** — kayıttan sonra örnek verinin kalkması ve deneme akışı (kullanıcı haber verir, ben kontrol ederim).
 - [ ] **Hesabım penceresini kontrol** — para birimi, saat dilimi, profil ve MetaTrader sayfasındaki "•••1234 · Sunucu" satırı.
 - ✅ 2026-09-29 **Bing Webmaster Tools** — kullanıcı Google ile girip Search Console'dan içe aktardı.
+
+### Sosyal medya kurulumu (2026-09-29'da konuşuldu; kullanıcı "bekle" dedi)
+Not: eski listelerde "kullanıcı adları ve 9 dilde biyografiler hazır" yazıyordu — yanlıştı. 27 Eylül'de yalnız önerildi, hiç yazılmadı.
+1. [ ] **Kullanıcı adı kontrolü (Claude)** — `@simpletradejournal` ve `@stjournal` 9 platformda boş mu, herkese açık profil adreslerinden bakılır.
+2. [ ] **Kontrol listesi sayfası (Claude)** — her platform için kayıt bağlantısı, kullanılacak kullanıcı adı, e-posta (`social@`) ve 9 dilde biyografi tek sayfada; kullanıcı sırayla açıp kopyala-yapıştır yapar.
+3. [ ] **`social@` takma adı (kullanıcı)** — Google Workspace yönetici panelinde; adımları Claude yazar.
+4. [ ] **Hesaplar açılınca (Claude, kullanıcı onayıyla)** — kullanıcı giriş yaptıktan sonra profil fotoğrafı, biyografi ve site bağlantısı açık oturumda doldurulur.
+5. [ ] **Şifre yöneticisi (kullanıcı)** — Bitwarden ücretsiz planı yeterli; her hesaba ayrı uzun şifre ve 2FA.
+6. [ ] **Siteye sosyal medya bağlantıları (Claude)** — hesaplar açılınca alt bilgiye ve yapısal veriye (sameAs) eklenir.
 
 ### Kullanıcıyı beklemeden yapılabilecekler
 - [ ] **MetaTrader eklentisinin (EA) mesajlarını 9 dile çevirmek** — sunucu şu an hata/uyarı mesajlarını yalnız İngilizce döndürüyor (`api/ingest.ts`); kullanıcının dilinde döndürülebilir.
@@ -89,7 +98,7 @@ Trading kitlesi platformlara eşit dağılmıyor. Önceliğe göre:
 | **Reddit** | Reklam değil, gerçekten yardım ederek (r/Daytrading, r/Forex) | EN | [ ] |
 
 Her dilde her platformda hesap açmak dağılmak demek. Öneri: EN ana hesaplar + TR ve FA
-için Instagram ve Telegram. Kullanıcı adları ve 9 dilde biyografiler hazır.
+için Instagram ve Telegram. Kullanıcı adları ve 9 dilde biyografiler henüz yazılmadı (bkz. §1 "Sosyal medya kurulumu").
 
 ### §3 İş altyapısı
 - [ ] **Meta Business Suite:** Instagram, Facebook, reklam hesabı, Pixel ve katalog tek yerde.
@@ -153,6 +162,6 @@ rahatız, ama "kâr vaadi" dili hiçbir yerde kullanılmaz.
 
 ### İş bölümü
 - **Kullanıcı:** hesap açmak ve girişler, marka kararları, içerik onayı, video kayıtları.
-- **Claude:** 9 dilde biyografiler (✅ hazır) ve marka kiti tanımı; siteye sosyal medya
+- **Claude:** 9 dilde biyografiler ([ ] henüz yazılmadı) ve marka kiti tanımı; siteye sosyal medya
   bağlantıları ve teknik işaretler; ✅ Bing ve dizin başvuru hazırlığı; n8n otomasyonları;
   ilk 30 günlük içerik takvimi ve paylaşımlar; ✅ dil başına SEO ve 🟡 programatik sayfalar.
