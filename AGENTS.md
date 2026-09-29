@@ -34,3 +34,5 @@ Instructions for AI coding agents working in this repo.
 - `VITE_SUPABASE_ANON_KEY`
 
 See [NOTES.md](NOTES.md) for the running log of project decisions and TODOs.
+
+[PLAN.md](PLAN.md) holds the open-work list and the growth plan. Read it at the start of a session, and in the same change that finishes (or adds) an item, update it there — tick it with ✅ and the date.
