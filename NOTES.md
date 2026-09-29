@@ -111,7 +111,8 @@ hesap ya da karar bekliyor.
    (vitest, tests/): kâr/zarar ve R, açık işlem eşleştirme, dilli adresler, MT4/MT5 mesaj
    tablosunun aynılığı, seans saatleri kopyası, yazıların 9 dilde aynı yapıda olması, dosya
    kodlaması. Gerçek MT5 raporu testi dosya yoksa atlanır (STJ_MT5_REPORT ile yol verilebilir;
-   rapor 2026-09-29'da masaüstünde bulunamadı). Vercel testleri çalıştırmıyor — push'tan önce elle.
+   rapor ~/Desktop/ReportHistory-26659718.html'e geri kondu: 23 işlem, net −2.877,33; beklenen
+   değerler raporun kendi özetinden okunuyor). Vercel testleri çalıştırmıyor — push'tan önce elle.
    Durum: sağlık ucu /api/geo?health=1 (200 = fonksiyonlar + veritabanı ayakta, 503 = db yok).
    Dış izleme + durum sayfası YAPILDI (2026-09-29): Better Stack ücretsiz plan (uptime.betterstack.com,
    ekip t606017, kullanıcının hesabı). İki izleme, 3 dakikada bir, uyarı e-postayla: ana sayfa ve

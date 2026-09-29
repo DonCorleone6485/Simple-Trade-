@@ -9,19 +9,31 @@ import { decodeReport, parseCSVFile } from '../src/components/CSVImport';
  * dosyası kendi varsayımımızı kendimize doğrulatır; bu rapor dört gerçek
  * hatayı buldu (UTF-16, gizli dolgu hücresi, nete girmeyen komisyon,
  * stop/manuel ayrımı). Kişisel hesap verisi içerdiği için depoda değil:
- * yoksa test atlanır. Yer: STJ_MT5_REPORT ya da aşağıdaki varsayılan.
+ * yoksa test atlanır. Yer: STJ_MT5_REPORT ya da aşağıdaki varsayılanlar.
+ * Beklenen sonuç raporun kendi özetinden okunur (Toplam İşlem, Toplam Net
+ * Kar), böylece daha yeni bir rapor da aynı testten geçer.
  */
-const REPORT = process.env.STJ_MT5_REPORT || `${homedir()}/Desktop/Live Journal/ReportHistory-26659718.html`;
+const REPORT = process.env.STJ_MT5_REPORT || [
+  `${homedir()}/Desktop/Live Journal/ReportHistory-26659718.html`,
+  `${homedir()}/Desktop/ReportHistory-26659718.html`,
+].find(existsSync) || '';
 
-describe.skipIf(!existsSync(REPORT))('gerçek MT5 raporu', () => {
-  it('7 işlem, toplam net −1.634,28', () => {
+/** Özet tablosunda etiketin yanındaki sayı ("-2 877.33" → -2877.33). */
+function summary(text: string, label: string): number {
+  const m = text.match(new RegExp(`${label}:\\s*</td>\\s*<td[^>]*>(?:<b>)?\\s*([-\\d\\s.,]+)`));
+  if (!m) throw new Error(`Raporda "${label}" yok`);
+  return Number(m[1].replace(/\s/g, ''));
+}
+
+describe.skipIf(!REPORT)('gerçek MT5 raporu', () => {
+  it('işlem sayısı ve toplam net, raporun özetiyle aynı', () => {
     const buf = readFileSync(REPORT);
     const text = decodeReport(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
     const r = parseCSVFile(text, 'j', 'u');
     expect(r.errors).toEqual([]);
-    expect(r.trades).toHaveLength(7);
+    expect(r.trades).toHaveLength(summary(text, 'Toplam İşlem'));
     const net = r.trades.reduce((s, t) => s + (t.reward || 0), 0);
-    expect(Math.round(net * 100) / 100).toBe(-1634.28);
+    expect(Math.round(net * 100) / 100).toBe(summary(text, 'Toplam Net Kar'));
   });
 });
 
