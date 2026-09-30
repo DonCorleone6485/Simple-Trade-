@@ -37,7 +37,7 @@ Not: 29 Eylül'e kadar listelerde "biyografiler hazır" yazıyordu ama yazılmam
 5. ✅ 2026-09-30 **Şifre yöneticisi (kullanıcı)** — Bitwarden ücretsiz plan kuruldu (Edge uzantısı + telefon, kendi 2FA'sı açık); Edge'in şifre kaydı kapatıldı, mevcut şirket şifreleri aktarıldı.
 - [ ] **YouTube kanalını aç — admin@ hesabı 30 günlük olunca (kullanıcı; Claude oturum başında hatırlatır)** — hesap yaşı: admin.google.com → Dizin → Kullanıcılar → admin@ → oluşturma tarihi. Uygun olunca admin@ ile youtube.com → Kanal oluştur → marka hesabı, ad `Simple Trading Journal`, `@simpletradejournal`, logo + uzun biyografi (docs/social.md §2). Acele yok: uzun video üretimi henüz planda yok. Kişisel hesapla açıp sahipliği devretmek de mümkün ama gereksiz.
 - [ ] **TikTok kullanıcı adını düzelt — 2026-10-30 sonrası (kullanıcı; Claude oturum başında hatırlatır)** — kayıtta TikTok otomatik saçma bir `@` adı verdi, 30 gün değiştirilemiyor. Ay dolunca `simpletradejournal` yap (doluysa `simpletradejournal.app` ya da `stjournalapp`). O zamana kadar görünen ad `Simple Trading Journal`.
-6. [ ] **Siteye sosyal medya bağlantıları (Claude)** — hesaplar açılınca alt bilgiye ve yapısal veriye (sameAs) eklenir.
+6. ✅ 2026-09-30 **Siteye sosyal medya bağlantıları (Claude)** — alt bilgide 6 bağlantı, `index.html` Organization `sameAs`'ında aynı 6 adres. Eksik: TikTok (2026-10-30 sonrası kullanıcı adı düzelince), YouTube, Discord; açılınca iki yere de eklenir.
 
 ### Kullanıcıyı beklemeden yapılabilecekler
 - [ ] **MetaTrader eklentisinin (EA) mesajlarını 9 dile çevirmek** — sunucu şu an hata/uyarı mesajlarını yalnız İngilizce döndürüyor (`api/ingest.ts`); kullanıcının dilinde döndürülebilir.

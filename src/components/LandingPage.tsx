@@ -960,10 +960,27 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             </div>
           </div>
 
-          <div className="mt-12 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="mt-12 pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
             <p className="text-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
               © {new Date().getFullYear()} Simple Trading Journal
             </p>
+            {/* Marka adları çevrilmez. TikTok, kullanıcı adı düzelince (2026-10-30
+                sonrası) ve YouTube/Discord açılınca eklenecek; index.html'deki
+                sameAs ile aynı liste. */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              {[
+                { label: 'Instagram', href: 'https://www.instagram.com/simpletradejournal/' },
+                { label: 'X', href: 'https://x.com/SimpleTradeJrnl' },
+                { label: 'Telegram', href: 'https://t.me/simpletradejournal' },
+                { label: 'Facebook', href: 'https://www.facebook.com/simpletradejournalapp' },
+                { label: 'LinkedIn', href: 'https://www.linkedin.com/company/simpletradejournal' },
+                { label: 'Reddit', href: 'https://www.reddit.com/user/simpletradejournal/' },
+              ].map(l => (
+                <a key={l.href} href={l.href} target="_blank" rel="me noopener noreferrer" className="nav-link nav-link-dim text-[12.5px]">
+                  {l.label}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </footer>
