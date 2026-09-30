@@ -156,7 +156,7 @@ açıklamanın altına eklemek için.
 
 ## 4. Discord sunucusu (2026-09-30)
 
-Sunucu "Simple Trading Journal". Kanallar hepsi İngilizce adlı metin kanalı:
+Sunucu "Simple Trading Journal", kalıcı davet: https://discord.gg/yUJ5NXyJHg (ilk bağlantı 30 gün sonra sona eriyordu, yenisi süresiz). Kanallar hepsi İngilizce adlı metin kanalı:
 `welcome`, `announcements`, `general`, `support`, `feedback`; `LANGUAGES` kategorisinde
 `turkish`, `persian`. Arapça kanalı ilk Arapça kullanıcı gelince açılır.
 `welcome` ve `announcements` yalnız okunur (@everyone → Mesaj gönder ✗).

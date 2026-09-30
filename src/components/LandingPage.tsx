@@ -965,7 +965,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
               © {new Date().getFullYear()} Simple Trading Journal
             </p>
             {/* Marka adları çevrilmez. TikTok, kullanıcı adı düzelince (2026-10-30
-                sonrası) ve YouTube/Discord açılınca eklenecek; index.html'deki
+                sonrası) ve YouTube açılınca eklenecek; index.html'deki
                 sameAs ile aynı liste. */}
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
               {[
@@ -975,6 +975,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 { label: 'Facebook', href: 'https://www.facebook.com/simpletradejournalapp' },
                 { label: 'LinkedIn', href: 'https://www.linkedin.com/company/simpletradejournal' },
                 { label: 'Reddit', href: 'https://www.reddit.com/user/simpletradejournal/' },
+                { label: 'Discord', href: 'https://discord.gg/yUJ5NXyJHg' },
               ].map(l => (
                 <a key={l.href} href={l.href} target="_blank" rel="me noopener noreferrer" className="nav-link nav-link-dim text-[12.5px]">
                   {l.label}
