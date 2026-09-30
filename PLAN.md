@@ -96,7 +96,7 @@ Trading kitlesi platformlara eşit dağılmıyor. Önceliğe göre:
 | **Telegram kanalı** | Türk, İranlı ve Arap trader'lar burada çok yoğun | TR, FA, AR | ✅ 2026-09-30 `t.me/simpletradejournal` açıldı (açıklama şimdilik İngilizce; TR/FA/AR içerik başlayınca açıklamaya eklenecek) |
 | **Discord** | Kullanıcı topluluğu, destek, geri bildirim | EN (dil kanallarıyla) | [ ] |
 | **LinkedIn şirket sayfası** | Güven, prop firma ortaklıkları, yatırımcı | EN | [ ] |
-| **Facebook sayfası** | Meta reklam hesabı ve Pixel için zorunlu | EN | [ ] |
+| **Facebook sayfası** | Meta reklam hesabı ve Pixel için zorunlu | EN | ✅ 2026-09-30 sayfa açıldı (kişisel hesaptan), Yazılım şirketi, logo, biyografi, site bağlantısı, eylem düğmesi = siteyi ziyaret et. Sonra: kullanıcı adı `simpletradejournal` (kontrol et), Meta Business'ta ayrı `Simple Trading Journal` portföyü, Instagram bağlantısı, ikinci yönetici |
 | **Reddit** | Reklam değil, gerçekten yardım ederek (r/Daytrading, r/Forex) | EN | [ ] |
 
 Her dilde her platformda hesap açmak dağılmak demek. Öneri: EN ana hesaplar + TR ve FA
