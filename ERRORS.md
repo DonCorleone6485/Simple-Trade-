@@ -195,5 +195,9 @@ TypeError: Failed to fetch dynamically imported module: https://www.simpletradej
 
 <!-- ERRORS:END -->
 
+## Onay bekleyen düzeltmeler
+- **Eski sekmede "Failed to fetch dynamically imported module"** (son 3 günde ~20 kişi, her yeni yayından sonra): dal `fix/stale-chunk-reload`, `src/lib/lazyRetry.ts`. Sayfa dosyası yüklenemezse bir kez yeniden yüklenir, döngüye girmez. 74 test geçiyor, build temiz. Kullanıcı onaylayınca main'e alınır.
+- `@clerk/clerk-react: publishableKey invalid` (8×): büyük ihtimalle yerel geliştirme (yerel Clerk anahtarı geçersiz, canlıda sorun yok); kullanıcı raporu değil, işlem yok.
+
 ## Çözülenler
 _Henüz yok._
