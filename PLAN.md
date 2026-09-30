@@ -40,6 +40,7 @@ Not: 29 Eylül'e kadar listelerde "biyografiler hazır" yazıyordu ama yazılmam
 6. ✅ 2026-09-30 **Siteye sosyal medya bağlantıları (Claude)** — alt bilgide 6 bağlantı, `index.html` Organization `sameAs`'ında aynı 6 adres. Discord 2026-09-30 eklendi. Eksik: TikTok (2026-10-30 sonrası kullanıcı adı düzelince), YouTube; açılınca iki yere de eklenir.
 
 ### Kullanıcıyı beklemeden yapılabilecekler
+- ✅ 2026-09-30 **Hata izleme ve otomatik düzeltme döngüsü** — sunucu hataları da `client_errors`'a (kind 'server'), `ERRORS.md`, zamanlanmış görev `error-triage` (her saat 08-23, geceleri 2 saatte bir; uygulama açıkken çalışır). Düzeltme dalda hazırlanır, main'e kullanıcı onayıyla alınır. İlk bulgu: eski sekmede sayfa dosyası hatası, düzeltildi.
 - [ ] **MetaTrader eklentisinin (EA) mesajlarını 9 dile çevirmek** — sunucu şu an hata/uyarı mesajlarını yalnız İngilizce döndürüyor (`api/ingest.ts`); kullanıcının dilinde döndürülebilir.
 - [ ] **DMARC'ı sıkılaştırmak** (p=none → p=quarantine) — önce admin@'e gelen DMARC raporlarında Google, Clerk ve Resend'in geçtiğini görmek gerekiyor. Şu an `p=none`.
 - ✅ 2026-09-29 **Dizin başvuru metinleri** — [docs/listings.md](docs/listings.md): Product Hunt, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub; 9 dilde kısa açıklama.
