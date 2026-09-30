@@ -17,7 +17,7 @@ Son güncelleme: 2026-09-30
 - [ ] **CSP'yi engelleme moduna almak — 2026-10-06 … 10-13** — `client_errors` kind 'csp' raporlarına bakarak. Zamanlanmış görev `csp-enforce-check` 6 Ekim 10:00'da yapacak (29 Eylül'e kadar yalnız 'eval' ve 'wasm-eval' raporu, 2'şer).
 
 ### Kullanıcıdan bekleyenler
-- [ ] **Sosyal medya hesapları** — aynı kullanıcı adıyla (bkz. büyüme planı §1–2 ve aşağıdaki "Sosyal medya kurulumu"). Hesap açmak, şifre, telefon doğrulaması ve CAPTCHA kullanıcıda; Claude şifreye dokunmaz.
+- 🟡 **Sosyal medya hesapları** — ✅ 2026-09-30 Instagram, TikTok, X, Telegram, Facebook, LinkedIn, Reddit açıldı; kalan: Discord, YouTube (30 gün). Aynı kullanıcı adıyla (bkz. büyüme planı §1–2 ve aşağıdaki "Sosyal medya kurulumu"). Hesap açmak, şifre, telefon doğrulaması ve CAPTCHA kullanıcıda; Claude şifreye dokunmaz.
 - [ ] **Hakkımızda metni** — birkaç cümle; 9 dile çevrilip yerleştirilecek.
 - [ ] **MetaTrader kurulum videosu** — `~/Desktop/STJ-Kayit/` klasörüne 7 ekran kaydı (01-indir … 07-sonuc). Gelince Remotion kurgusu.
 - [ ] **Meta Pixel kimliği** — Instagram reklamından önce; çerez bandı da gerekecek.
@@ -33,7 +33,7 @@ Not: 29 Eylül'e kadar listelerde "biyografiler hazır" yazıyordu ama yazılmam
 1. ✅ 2026-09-29 **Kullanıcı adı kontrolü (Claude)** — `simpletradejournal` Instagram, YouTube, TikTok, Telegram, Facebook, LinkedIn'de boş; X 15 karakter sınırı yüzünden `@SimpleTradeJrnl` (boş); Reddit kontrol edilemedi. `@stjournal` çoğu yerde dolu. Ayrıntı: [docs/social.md](docs/social.md).
 2. ✅ 2026-09-29 **Kontrol listesi sayfası (Claude)** — [docs/social.md](docs/social.md): kayıt adresleri, kullanıcı adları, `social@` adımları, 9 dilde kısa/standart/uzun biyografi (karakter sınırları kontrol edildi).
 3. ✅ 2026-09-29 **`social@` takma adı (kullanıcı)** — Google Workspace'te eklendi (ilk denemede yanlışlıkla `sosial` yazılmıştı, `social` olarak düzeltildi) ve Gmail'de `to:social@` → "Sosyal medya" etiketi filtresi kuruldu. Yahoo'dan atılan deneme postası "Sosyal medya" etiketine düştü, doğrulandı; adımlar docs/social.md §0'da.
-4. [ ] **Hesaplar açılınca (Claude, kullanıcı onayıyla)** — kullanıcı giriş yaptıktan sonra profil fotoğrafı, biyografi ve site bağlantısı açık oturumda doldurulur.
+4. ✅ 2026-09-30 **Hesaplar açılınca profil alanları** — 7 hesapta logo, biyografi ve site bağlantısı dolduruldu (çoğunu kullanıcı, LinkedIn'de Genel Bakış ve uzmanlıkları Claude). Kalan: Discord, YouTube ve sonradan açılacaklar için aynısı.
 5. ✅ 2026-09-30 **Şifre yöneticisi (kullanıcı)** — Bitwarden ücretsiz plan kuruldu (Edge uzantısı + telefon, kendi 2FA'sı açık); Edge'in şifre kaydı kapatıldı, mevcut şirket şifreleri aktarıldı.
 - [ ] **YouTube kanalını aç — admin@ hesabı 30 günlük olunca (kullanıcı; Claude oturum başında hatırlatır)** — hesap yaşı: admin.google.com → Dizin → Kullanıcılar → admin@ → oluşturma tarihi. Uygun olunca admin@ ile youtube.com → Kanal oluştur → marka hesabı, ad `Simple Trading Journal`, `@simpletradejournal`, logo + uzun biyografi (docs/social.md §2). Acele yok: uzun video üretimi henüz planda yok. Kişisel hesapla açıp sahipliği devretmek de mümkün ama gereksiz.
 - [ ] **TikTok kullanıcı adını düzelt — 2026-10-30 sonrası (kullanıcı; Claude oturum başında hatırlatır)** — kayıtta TikTok otomatik saçma bir `@` adı verdi, 30 gün değiştirilemiyor. Ay dolunca `simpletradejournal` yap (doluysa `simpletradejournal.app` ya da `stjournalapp`). O zamana kadar görünen ad `Simple Trading Journal`.
