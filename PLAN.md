@@ -11,7 +11,7 @@ Son güncelleme: 2026-09-30
 ## 1. Kalan işler
 
 ### Yakın tarihli
-- [ ] **Google Workspace ödemesi — 2026-10-11** — ücretli dönem başlıyor; o tarihe kadar karta ödeme yöntemi eklenmiş olmalı (kullanıcı). Hatırlatma görevi 2026-10-25'e kurulu.
+- ✅ 2026-09-30 **Google Workspace ödemesi** — ödeme yöntemi ilk gün eklenmiş (kullanıcı bildirdi); ücretli dönem 2026-10-11'de başlıyor, ek işlem yok. 2026-10-25 hatırlatma görevi gereksiz kalmış olabilir.
 - [ ] **Search Console dizine ekleme — 2026-09-30** — günlük kota 29 Eylül'de doldu; kalan: /blog/fx-replay-alternative, /help. Kota site başına günde ~10 istek.
 - [ ] **İlk haftalık özet e-postasını kontrol — 2026-10-03 cumartesi** — gönderim günlüğü ve `users.weekly_digest_sent_at`.
 - [ ] **CSP'yi engelleme moduna almak — 2026-10-06 … 10-13** — `client_errors` kind 'csp' raporlarına bakarak. Zamanlanmış görev `csp-enforce-check` 6 Ekim 10:00'da yapacak (29 Eylül'e kadar yalnız 'eval' ve 'wasm-eval' raporu, 2'şer).
@@ -22,7 +22,7 @@ Son güncelleme: 2026-09-30
 - [ ] **MetaTrader kurulum videosu** — `~/Desktop/STJ-Kayit/` klasörüne 7 ekran kaydı (01-indir … 07-sonuc). Gelince Remotion kurgusu.
 - [ ] **Meta Pixel kimliği** — Instagram reklamından önce; çerez bandı da gerekecek.
 - [ ] **Sosyal kanıt** — ilk kullanıcılardan gerçek yorumlar.
-- [ ] **Farsça ve Arapça çeviri kontrolü** — ana dili olan biri.
+- 🟡 **Farsça ve Arapça çeviri kontrolü** — ✅ 2026-09-30 Arapça, ana dili olan biri kontrol etti, sorun yok (kullanıcı bildirdi). Kalan: Farsça.
 - [ ] **Dizin başvuruları** — metinler [docs/listings.md](docs/listings.md)'de hazır; hesap açıp göndermek kullanıcıda. G2/Capterra şirket bilgisi istiyor, şirketten sonra.
 - [ ] **İlk gerçek yeni üyeyi izlemek** — kayıttan sonra örnek verinin kalkması ve deneme akışı (kullanıcı haber verir, ben kontrol ederim).
 - [ ] **Hesabım penceresini kontrol** — para birimi, saat dilimi, profil ve MetaTrader sayfasındaki "•••1234 · Sunucu" satırı.
