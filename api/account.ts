@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { createClerkClient, verifyToken } from '@clerk/backend';
+import { withErrorLog } from './_log';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -24,7 +25,7 @@ const supabase = createClient(
  * Sıra önemli: Clerk hesabı en son siliniyor. Veritabanı silme yarıda
  * kalırsa kullanıcı hâlâ giriş yapıp yeniden deneyebilsin.
  */
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const secret = process.env.CLERK_SECRET_KEY;
@@ -74,3 +75,5 @@ export default async function handler(req: any, res: any) {
 
   return res.status(200).json({ deleted: true });
 }
+
+export default withErrorLog('account', handler);

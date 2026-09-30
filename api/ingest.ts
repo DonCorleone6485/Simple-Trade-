@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { createHash } from 'crypto';
+import { withErrorLog } from './_log';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -193,7 +194,7 @@ async function replacedBody(newKeyId: string) {
   };
 }
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
@@ -570,3 +571,5 @@ export default async function handler(req: any, res: any) {
     ...(locked > 0 ? { locked, limit: 'Free plan: the first 2 trades of each day are open; the rest are saved locked.' } : {}),
   });
 }
+
+export default withErrorLog('ingest', handler);

@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { verifyToken } from '@clerk/backend';
 import { createHash, randomBytes } from 'crypto';
+import { withErrorLog } from './_log';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -39,7 +40,7 @@ async function requireUser(req: any): Promise<AuthResult> {
   }
 }
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   const auth = await requireUser(req);
   if ('error' in auth) {
     if (auth.error === 'unconfigured') {
@@ -110,3 +111,5 @@ export default async function handler(req: any, res: any) {
 
   return res.status(400).json({ error: 'Unknown action' });
 }
+
+export default withErrorLog('keys', handler);

@@ -1,5 +1,6 @@
 import { verifyToken } from '@clerk/backend';
 import { createClient } from '@supabase/supabase-js';
+import { withErrorLog } from './_log';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -32,7 +33,7 @@ async function userFromRequest(req: any): Promise<string | null> {
   }
 }
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -180,3 +181,5 @@ madde işaretli listeler kullan.`;
     return res.status(500).json({ error: error.message || 'Server error' });
   }
 }
+
+export default withErrorLog('analyze', handler);

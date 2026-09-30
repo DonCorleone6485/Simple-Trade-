@@ -3,6 +3,7 @@ import { createClerkClient, verifyToken } from '@clerk/backend';
 import { isDisposableEmailDomain } from 'disposable-email-domains-js';
 import { createHash } from 'crypto';
 import { sendEmail, toLang } from './_email.js';
+import { withErrorLog } from './_log';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -45,7 +46,7 @@ function isDisposable(email: string): boolean {
   return false;
 }
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const secret = process.env.CLERK_SECRET_KEY;
@@ -136,3 +137,5 @@ export default async function handler(req: any, res: any) {
   );
   return res.status(200).json({ status: 'trial', endsAt: endsAt.toISOString() });
 }
+
+export default withErrorLog('trial', handler);

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { withErrorLog } from './_log';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -49,7 +50,7 @@ async function refresh() {
   return rows.length;
 }
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   const { from, to, refresh: wantRefresh } = req.query || {};
 
   try {
@@ -84,3 +85,5 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({ error: e?.message || 'Failed' });
   }
 }
+
+export default withErrorLog('calendar', handler);

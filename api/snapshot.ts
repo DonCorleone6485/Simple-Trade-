@@ -1,6 +1,7 @@
 import { verifyToken } from '@clerk/backend';
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
+import { withErrorLog } from './_log';
 
 /**
  * Bir bağlantıdaki resmi indirir ve tarayıcıya geri verir.
@@ -151,7 +152,7 @@ async function readImage(res: Response): Promise<{ base64: string; contentType: 
   return { base64: buf.toString('base64'), contentType: type };
 }
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'method' });
 
   const userId = await userFromRequest(req);
@@ -195,3 +196,5 @@ export default async function handler(req: any, res: any) {
     return res.status(msg === 'failed' ? 500 : 400).json({ error: msg });
   }
 }
+
+export default withErrorLog('snapshot', handler);

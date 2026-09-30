@@ -1,5 +1,6 @@
 import { verifyToken } from '@clerk/backend';
 import { createClient } from '@supabase/supabase-js';
+import { withErrorLog } from './_log';
 
 /**
  * Sesle yazdırılmış işlem notunu düzenli metne çevirir.
@@ -94,7 +95,7 @@ async function userFromRequest(req: any): Promise<string | null> {
   }
 }
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   // Groq çağrısı bize para/kota maliyeti; kimliği doğrulanmamış istek kabul etmeyiz.
@@ -140,3 +141,5 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({ error: e?.message || 'Failed' });
   }
 }
+
+export default withErrorLog('tidy', handler);

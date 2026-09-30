@@ -1,5 +1,6 @@
 import { verifyToken } from '@clerk/backend';
 import { createClient } from '@supabase/supabase-js';
+import { withErrorLog } from './_log';
 
 /**
  * Kaydedilmiş sesli notu yazıya çevirir.
@@ -61,7 +62,7 @@ const EXT: Record<string, string> = {
   'audio/mpeg': 'mp3', 'audio/wav': 'wav', 'audio/x-m4a': 'm4a',
 };
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   // Groq çağrısı kota harcıyor; kimliği doğrulanmamış istek kabul etmeyiz.
@@ -106,3 +107,5 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({ error: e?.message || 'Failed' });
   }
 }
+
+export default withErrorLog('transcribe', handler);

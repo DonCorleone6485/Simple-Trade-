@@ -3,6 +3,7 @@ import { createClerkClient, verifyToken } from '@clerk/backend';
 import { timingSafeEqual } from 'crypto';
 import { emailEnabled, sendContactMessage, sendEmail, sendInternal, sendRendered, toLang, unsubscribeToken } from './_email.js';
 import { renderDigest, weekStats, type DigestTrade } from './_digest.js';
+import { withErrorLog } from './_log';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || 'https://obaqhbfaeejepocsdgiv.supabase.co',
@@ -179,7 +180,7 @@ async function cspReport(req: any, res: any) {
   return res.status(204).end();
 }
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   if (req.query?.u) return unsubscribe(req, res);
   if (req.query?.csp && req.method === 'POST') return cspReport(req, res);
   if (req.method === 'POST') return contact(req, res);
@@ -342,3 +343,5 @@ async function errorDigest(now: number): Promise<number> {
   );
   return data.length;
 }
+
+export default withErrorLog('emails', handler);
