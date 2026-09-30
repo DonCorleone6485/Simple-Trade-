@@ -59,7 +59,7 @@ yeniden kontrol edilir; arada biri alabilir.
 | 7 | Facebook sayfası | `facebook.com/simpletradejournalapp` | ✅ açıldı 2026-09-30; `simpletradejournal` Facebook'ta alınamadı | facebook.com/pages/create | Kişisel Facebook hesabı gerekir; sayfa ondan açılır. Meta Business Suite ve Pixel için şart |
 | 8 | LinkedIn şirket sayfası | `linkedin.com/company/simpletradejournal` | ✅ boş | linkedin.com/company/setup/new | Kişisel LinkedIn hesabı gerekir |
 | 9 | Discord sunucusu | "Simple Trading Journal" | — | discord.com/register → Sunucu oluştur | Özel adres (discord.gg/…) yalnız yükseltilmiş sunucularda var; kalıcı bir davet bağlantısı kullanılır |
-| 10 | Reddit | `u/simpletradejournal` | kontrol edilemedi | reddit.com/register | Tarayıcıdan açılmadı; kayıtta görülür. Reklam için değil, yardım ederek kullanılacak |
+| 10 | Reddit | `u/simpletradejournal` | ✅ açıldı 2026-09-30 | reddit.com/register | Reklam için değil, yardım ederek kullanılacak. Görünen ad `Simple Trading Journal` |
 
 `@stjournal` Instagram, TikTok, X, YouTube ve Telegram'da dolu — yedek olarak işe yaramıyor.
 Bir yerde `simpletradejournal` alınmışsa yedek: `simpletradejournal.app` (Instagram,

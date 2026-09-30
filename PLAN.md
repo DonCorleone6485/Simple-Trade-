@@ -97,7 +97,7 @@ Trading kitlesi platformlara eşit dağılmıyor. Önceliğe göre:
 | **Discord** | Kullanıcı topluluğu, destek, geri bildirim | EN (dil kanallarıyla) | [ ] |
 | **LinkedIn şirket sayfası** | Güven, prop firma ortaklıkları, yatırımcı | EN | ✅ 2026-09-30 `linkedin.com/company/simpletradejournal`: Yazılım Geliştirme, slogan, web sitesi, Genel Bakış açıklaması ve 6 uzmanlık kaydedildi (uzmanlık kutusu: etiketi yazıp yanındaki + ile onayla, Enter değil). Kapak görseli sonra; kuruluş yılı 2026 ve büyüklük 2-10 çalışan formda öyle duruyor, şirket kurulunca gözden geçir |
 | **Facebook sayfası** | Meta reklam hesabı ve Pixel için zorunlu | EN | ✅ 2026-09-30 sayfa açıldı (kişisel hesaptan), Yazılım şirketi, logo, biyografi, site bağlantısı, eylem düğmesi = siteyi ziyaret et. Kullanıcı adı `simpletradejournal` alınamadı, `facebook.com/simpletradejournalapp` alındı. Sonra: Meta Business'ta ayrı `Simple Trading Journal` portföyü, Instagram bağlantısı, ikinci yönetici |
-| **Reddit** | Reklam değil, gerçekten yardım ederek (r/Daytrading, r/Forex) | EN | [ ] |
+| **Reddit** | Reklam değil, gerçekten yardım ederek (r/Daytrading, r/Forex) | EN | ✅ 2026-09-30 `u/simpletradejournal` açıldı (social@), görünen ad `Simple Trading Journal`, logo, sade hakkında yazısı. Şimdilik paylaşım yok: yeni hesapla link koymak spam sayılır, önce yorum ve yardımla başla |
 
 Her dilde her platformda hesap açmak dağılmak demek. Öneri: EN ana hesaplar + TR ve FA
 için Instagram ve Telegram. Kullanıcı adları ve 9 dilde biyografiler hazır: [docs/social.md](docs/social.md) (2026-09-29).
