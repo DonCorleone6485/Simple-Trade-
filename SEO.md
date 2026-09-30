@@ -186,6 +186,7 @@ Kaynak: web araması ve rakiplerin herkese açık sayfaları (WebFetch). **Arama
 **Kapatılanlar (2026-09-30):**
 - ✅ Ücretsiz araçlar, 9 dilde, kayıt istemez: `/tools` (dizin), `/tools/position-size-calculator`, `/tools/risk-reward-calculator`, `/tools/prop-firm-loss-calculator`. Hesaplar `src/lib/toolMath.ts` (16 test), metinler `src/content/tools.ts`, görünüş `src/components/ToolPage.tsx`. Prop aracının ön ayarları `directory.ts`'teki programlardan gelir (günlük ve toplam sınırı tek bir yüzde olanlar). WebApplication + BreadcrumbList yapısal verisi.
 - ✅ `/blog/forex-trading-journal` ve `/guides/trading-glossary` (14 terim) — 9 dilde.
+- ✅ 2026-09-30 IndexNow: 6 adres (`/tools`, 3 araç, forex journal yazısı, sözlük) → 200 OK. Search Console'da dizine ekleme kullanıcıda (günlük kota ~10; önce /tools ve position-size-calculator).
 - ⬜ Sözlük terim başına ayrı sayfaya bölünebilir (TradesViz gibi); önce tek sayfanın Search Console'da nasıl çıktığına bak.
 - ⬜ Broker sayısı hâlâ 4; entegrasyon sayfaları genişletilebilir.
 
