@@ -56,7 +56,7 @@ yeniden kontrol edilir; arada biri alabilir.
 | 4 | TikTok | `@simpletradejournal` | ✅ boş | tiktok.com/signup | Sonra **İşletme hesabına** geç |
 | 5 | X | `@SimpleTradeJrnl` | ✅ boş | x.com/i/flow/signup | X en fazla 15 karakter kabul ediyor; `simpletradejournal` sığmıyor. `@stjournal` dolu (2011'den kalma boş hesap) |
 | 6 | Telegram kanalı | `@simpletradejournal` | ✅ boş | Telegram uygulaması → Yeni kanal → Herkese açık | Telefon numarası ister. `@stjournal` dolu |
-| 7 | Facebook sayfası | `facebook.com/simpletradejournal` | ✅ boş görünüyor | facebook.com/pages/create | Kişisel Facebook hesabı gerekir; sayfa ondan açılır. Meta Business Suite ve Pixel için şart |
+| 7 | Facebook sayfası | `facebook.com/simpletradejournalapp` | ✅ açıldı 2026-09-30; `simpletradejournal` Facebook'ta alınamadı | facebook.com/pages/create | Kişisel Facebook hesabı gerekir; sayfa ondan açılır. Meta Business Suite ve Pixel için şart |
 | 8 | LinkedIn şirket sayfası | `linkedin.com/company/simpletradejournal` | ✅ boş | linkedin.com/company/setup/new | Kişisel LinkedIn hesabı gerekir |
 | 9 | Discord sunucusu | "Simple Trading Journal" | — | discord.com/register → Sunucu oluştur | Özel adres (discord.gg/…) yalnız yükseltilmiş sunucularda var; kalıcı bir davet bağlantısı kullanılır |
 | 10 | Reddit | `u/simpletradejournal` | kontrol edilemedi | reddit.com/register | Tarayıcıdan açılmadı; kayıtta görülür. Reklam için değil, yardım ederek kullanılacak |
