@@ -81,7 +81,7 @@ Ana fikir: **tek bir içerik merkezi olsun, her şey oradan otomatik dağılsın
 |---|---|---|
 | **Aynı kullanıcı adı her yerde** (`@simpletradejournal`, doluysa `@stjournal`) | Tanınırlık. Kullanılmasa bile bütün platformlarda şimdiden kapılmalı. | 🟡 2026-09-30 Instagram, Telegram, Reddit: `simpletradejournal`; X `SimpleTradeJrnl`; Facebook `simpletradejournalapp`; LinkedIn `simpletradejournal`; TikTok 30 gün sonra düzelecek; YouTube ve Discord bekliyor |
 | **Marka kiti:** logo çeşitleri, renkler, yazı tipleri, Canva şablonları | Bütün paylaşımlar aynı kurumsal görünsün. | [ ] |
-| **Şifre yöneticisi** (Bitwarden / 1Password) + her hesapta iki adımlı doğrulama | Hesap çalınması bir markayı bitirebilir. | ✅ 2026-09-30 Bitwarden kuruldu; TikTok ve X'te 2FA açık, diğer hesaplarda 2FA kontrol edilecek |
+| **Şifre yöneticisi** (Bitwarden / 1Password) + her hesapta iki adımlı doğrulama | Hesap çalınması bir markayı bitirebilir. | ✅ 2026-09-30 Bitwarden kuruldu; 2FA hepsinde açık: TikTok, X, Discord, Instagram, Telegram, Facebook, LinkedIn, Reddit (kullanıcı bildirdi) |
 | Hesaplar kişisel değil **şirket adresleriyle** (yeni `social@` takma adı) | Hesaplar şirketin olsun, kişiye bağlı kalmasın. | ✅ 2026-09-30 `social@`; Facebook ve LinkedIn sayfaları kişisel hesaptan açıldı (ikinci yönetici eklenecek), YouTube `admin@` |
 | **Marka tescili** (TÜRKPATENT) + yedek alan adları (.com vb.) | İsmi başkası alamasın. Şirket kurulunca. | [ ] |
 
