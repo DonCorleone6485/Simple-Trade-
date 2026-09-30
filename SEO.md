@@ -183,6 +183,12 @@ Kaynak: web araması ve rakiplerin herkese açık sayfaları (WebFetch). **Arama
 3. **Forex/MT5'e özel journal sayfaları** — `forex-trading-journal`, `mt5 trading journal` gibi; bizde MT5 rehberi var ama forex journal başlıklı sayfa yok.
 4. **Entegrasyon sayfası sayısı** — rakipler yüzlerce; biz 4 broker + 6 prop firma. Broker sayfaları genişletilebilir (SEO.md'deki kalan liste).
 
+**Kapatılanlar (2026-09-30):**
+- ✅ Ücretsiz araçlar, 9 dilde, kayıt istemez: `/tools` (dizin), `/tools/position-size-calculator`, `/tools/risk-reward-calculator`, `/tools/prop-firm-loss-calculator`. Hesaplar `src/lib/toolMath.ts` (16 test), metinler `src/content/tools.ts`, görünüş `src/components/ToolPage.tsx`. Prop aracının ön ayarları `directory.ts`'teki programlardan gelir (günlük ve toplam sınırı tek bir yüzde olanlar). WebApplication + BreadcrumbList yapısal verisi.
+- ✅ `/blog/forex-trading-journal` ve `/guides/trading-glossary` (14 terim) — 9 dilde.
+- ⬜ Sözlük terim başına ayrı sayfaya bölünebilir (TradesViz gibi); önce tek sayfanın Search Console'da nasıl çıktığına bak.
+- ⬜ Broker sayısı hâlâ 4; entegrasyon sayfaları genişletilebilir.
+
 **Güçlü olduğumuz taraf:** prop firma kural sayfaları (9 dilde, kaynaklı), 9 dil, MT4/MT5 otomatik aktarım. Rakipler çoğunlukla İngilizce ve vadeli/hisse ağırlıklı.
 
 **Önerilen sıra:** (1) 3 ücretsiz araç, (2) `forex trading journal` sayfası, (3) sözlük, (4) Search Console'da 2-3 hafta veri birikince gerçek sorgulara göre düzelt.

@@ -4,8 +4,10 @@ import LandingPage from './components/LandingPage';
 import InfoPage from './components/InfoPage';
 import ArticlePage from './components/ArticlePage';
 import DirectoryPage from './components/DirectoryPage';
+import ToolPage from './components/ToolPage';
 import { ARTICLES, articlePath, articleText, type ArticleLang } from './content/articles';
 import { DIRECTORY_PATHS, directoryMeta, isDirectoryPath } from './content/directory';
+import { TOOL_PATHS, isToolPath, toolMeta } from './content/tools';
 import { LanguageProvider, type Language } from './context/LanguageContext';
 import { loadAppCopy } from './lib/appCopy';
 import { ALL_LANGS, langPath } from './lib/langPath';
@@ -48,6 +50,7 @@ const BASES: { base: string; meta: (l: Language) => { title: string; description
     meta: (l: Language) => ({ title: `${articleText(a, l).title} — Simple Trading Journal`, description: articleText(a, l).description }),
   })),
   ...DIRECTORY_PATHS.map(base => ({ base, meta: (l: Language) => directoryMeta(base, l as ArticleLang)! })),
+  ...TOOL_PATHS.map(base => ({ base, meta: (l: Language) => toolMeta(base, l as ArticleLang)! })),
 ];
 
 export const PAGES: PrerenderPage[] = BASES.flatMap(({ base, meta }) =>
@@ -72,6 +75,7 @@ export function render(page: Pick<PrerenderPage, 'base' | 'lang'>): string {
   else if (base === '/help' || base === '/changelog') {
     body = <InfoPage kind={base.slice(1) as 'help' | 'changelog'} onHome={noop} onOther={noop} cta={cta} />;
   } else if (isDirectoryPath(base)) body = <DirectoryPage path={base} onHome={noop} onOpen={noop} cta={cta} />;
+  else if (isToolPath(base)) body = <ToolPage path={base} onHome={noop} onOpen={noop} cta={cta} />;
   else body = <ArticlePage path={base} onHome={noop} onOpen={noop} cta={cta} />;
   return renderToString(<LanguageProvider initial={lang}>{body}</LanguageProvider>);
 }

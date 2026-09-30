@@ -77,6 +77,22 @@
       "destination": "/:lang/brokers/:slug.html"
     },
     {
+      "source": "/tools",
+      "destination": "/tools.html"
+    },
+    {
+      "source": "/tools/:slug",
+      "destination": "/tools/:slug.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/tools",
+      "destination": "/:lang/tools.html"
+    },
+    {
+      "source": "/:lang(tr|fa|ar|ru|es|pt|de|fr)/tools/:slug",
+      "destination": "/:lang/tools/:slug.html"
+    },
+    {
       "source": "/journal",
       "destination": "/index.html"
     },

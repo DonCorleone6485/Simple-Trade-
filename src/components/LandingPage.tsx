@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { openContact } from '../lib/contact';
 import { langPath } from '../lib/langPath';
+import { TOOL_TEXT } from '../content/tools';
 import { useLanguage } from '../context/LanguageContext';
 import { SESSIONS, sessionState } from '../lib/sessions';
 import { copy } from '../lib/landingCopy';
@@ -936,6 +937,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
                 { label: t('Blog', 'Blog', 'بلاگ'), href: langPath('/blog', language) },
                 { label: t('Prop Firmalar', 'Prop Firms', 'پراپ فرم‌ها'), href: langPath('/prop-firms', language) },
                 { label: t("Broker'lar", 'Brokers', 'بروکرها'), href: langPath('/brokers', language) },
+                { label: TOOL_TEXT[(language in TOOL_TEXT ? language : 'en') as keyof typeof TOOL_TEXT].tools, href: langPath('/tools', language) },
                 { label: t('İletişim', 'Contact', 'تماس با ما'), href: 'mailto:support@simpletradejournal.io' },
                 { label: t('Değişiklikler', 'Changelog', 'تغییرات'), href: langPath('/changelog', language) },
               ].map(l => (

@@ -7,7 +7,7 @@
  * sayfalar birbirini hreflang ile gösteriyor (scripts/prerender.mjs).
  *
  * Yalnızca herkese açık sayfalar dilli: ana sayfa, yardım, değişiklikler,
- * blog ve yazılar, prop firma ve broker sayfaları. Uygulama (/journal) dilden bağımsız — orada dil kullanıcının
+ * blog ve yazılar, prop firma ve broker sayfaları, ücretsiz araçlar (/tools). Uygulama (/journal) dilden bağımsız — orada dil kullanıcının
  * kendi seçimi.
  */
 export const URL_LANGS = ['tr', 'fa', 'ar', 'ru', 'es', 'pt', 'de', 'fr'] as const;

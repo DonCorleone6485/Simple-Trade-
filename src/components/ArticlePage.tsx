@@ -5,6 +5,7 @@ import { Lock as LogoLock } from './Logo';
 import { ARTICLES, ARTICLE_LANGS, articlePath, articleText, findArticle, type Article, type ArticleLang, type Block } from '../content/articles';
 import { langPath } from '../lib/langPath';
 import { DIRECTORY_LINKS } from './DirectoryPage';
+import { TOOL_TEXT } from '../content/tools';
 
 /**
  * Blog dizini (/blog) ve tek tek yazılar (/guides/…, /blog/…).
@@ -181,15 +182,19 @@ export default function ArticlePage({ path, onHome, onOpen, cta }: {
             <div className="grid gap-4 mb-12">
               {comparisons.map(a => <ArticleCard key={a.slug} a={a} lang={lang} onOpen={onOpen} minRead={ui('minRead')} />)}
             </div>
-            <h2 className="text-[12px] uppercase tracking-[0.14em] mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{DIRECTORY_LINKS.propFirms[lang]} · {DIRECTORY_LINKS.brokers[lang]}</h2>
+            <h2 className="text-[12px] uppercase tracking-[0.14em] mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{DIRECTORY_LINKS.propFirms[lang]} · {DIRECTORY_LINKS.brokers[lang]} · {TOOL_TEXT[lang].tools}</h2>
             <div className="grid gap-4">
-              {([['/prop-firms', DIRECTORY_LINKS.propFirms, DIRECTORY_LINKS.propLead], ['/brokers', DIRECTORY_LINKS.brokers, DIRECTORY_LINKS.brokerLead]] as const).map(([to, title, text]) => (
+              {([
+                ['/prop-firms', DIRECTORY_LINKS.propFirms[lang], DIRECTORY_LINKS.propLead[lang]],
+                ['/brokers', DIRECTORY_LINKS.brokers[lang], DIRECTORY_LINKS.brokerLead[lang]],
+                ['/tools', TOOL_TEXT[lang].tools, TOOL_TEXT[lang].indexLead],
+              ] as const).map(([to, title, text]) => (
                 <a key={to} href={langPath(to, lang)} onClick={e => { e.preventDefault(); onOpen(to); }}
                   className="block rounded-2xl p-6 transition-colors hover:bg-white/[0.05]"
                   style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
                   dir={isRtl(lang) ? 'rtl' : 'ltr'}>
-                  <h3 className="text-[17px] font-medium text-white mb-2">{title[lang]}</h3>
-                  <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>{text[lang]}</p>
+                  <h3 className="text-[17px] font-medium text-white mb-2">{title}</h3>
+                  <p className="text-[14.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>{text}</p>
                 </a>
               ))}
             </div>
