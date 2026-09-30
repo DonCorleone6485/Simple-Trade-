@@ -12,7 +12,7 @@ Son güncelleme: 2026-09-30
 
 ### Yakın tarihli
 - ✅ 2026-09-30 **Google Workspace ödemesi** — ödeme yöntemi ilk gün eklenmiş (kullanıcı bildirdi); ücretli dönem 2026-10-11'de başlıyor, ek işlem yok. 2026-10-25 hatırlatma görevi gereksiz kalmış olabilir.
-- [ ] **Search Console dizine ekleme — 2026-09-30** — günlük kota 29 Eylül'de doldu; kalan: /blog/fx-replay-alternative, /help. Kota site başına günde ~10 istek.
+- ✅ 2026-09-30 **Search Console dizine ekleme** — /tools, /tools/position-size-calculator ve /help için istek gönderildi; /blog/fx-replay-alternative zaten Google'da çıktı, istek gerekmedi (kullanıcı bildirdi). 2-3 hafta sonra Search Console gerçek sorgularına bak.
 - [ ] **İlk haftalık özet e-postasını kontrol — 2026-10-03 cumartesi** — gönderim günlüğü ve `users.weekly_digest_sent_at`.
 - [ ] **CSP'yi engelleme moduna almak — 2026-10-06 … 10-13** — `client_errors` kind 'csp' raporlarına bakarak. Zamanlanmış görev `csp-enforce-check` 6 Ekim 10:00'da yapacak (29 Eylül'e kadar yalnız 'eval' ve 'wasm-eval' raporu, 2'şer).
 
