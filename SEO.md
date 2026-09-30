@@ -170,6 +170,23 @@ IndexNow 2026-09-29 (ikinci tur): 38 adres — aşırı işlem yazısı + Trader
 - ✅ 2026-09-29 Yapısal veri: BreadcrumbList prop firma/broker sayfalarında, yazılarda BlogPosting/HowTo, yardımda FAQPage (13 soru, 9 dilde; Google 2023'ten beri SSS açılır kutusunu çoğu siteye göstermiyor, fayda asıl Bing ve yapay zekâ aramalarında).
 - ⬜ Search Console'da dizine eklenmeyen sayfaları ve arama sorgularını ayda bir kontrol.
 
+## Rakip analizi — 2026-09-30
+Kaynak: web araması ve rakiplerin herkese açık sayfaları (WebFetch). **Arama hacmi verisi yok** (Ahrefs/Semrush erişimi yok); aşağıdakiler rakiplerin ne ürettiğini gösterir, hangi kelimenin kaç arama aldığını değil. TraderSync sitemap'i 403 verdi, TradesViz'de yalnız sitemap dizini okunabildi.
+
+**TradeZella** (en büyük rakip): ~1.100 adres. ~400 blog yazısı, ~600 entegrasyon (broker/platform) sayfası, 15+ `/vs/` karşılaştırma, 6 `/trader-journal/` çeşidi (forex, kripto, vadeli), 5 hedef kitle sayfası, **10 ücretsiz araç** (pozisyon büyüklüğü, drawdown toparlanma, Monte Carlo, risk/ödül, prop firma ROI, fibonacci, vadeli işlem, opsiyon; kayıt istemiyor). Blog konuları: psikoloji (revenge, overtrading, FOMO), risk, pozisyon büyüklüğü, backtest, prop firma rehberi, `forex-trading-journal`.
+**TradesViz:** 12 sitemap; blog, broker sayfaları, **sözlük (glossary)**, psikoloji merkezi, **ülke sayfaları**, video, MT5 FTP/EA otomatik aktarım yazıları.
+**MT5/prop firma odaklı küçük rakipler:** TraderInsight.pro, PropLedger, Prop Tracker Pro, JournalPlus, ProfitLogHQ (yalnız MT5), TraderWaves, UltraTrader. Hepsi "prop firma kuralı otomatik yükler + günlük kayıp/drawdown takibi" vaadinde; bizim güçlü olduğumuz alanla aynı.
+
+**Bizim boşluklarımız (rakiplerde var, bizde yok):**
+1. **Ücretsiz araçlar/hesap makineleri** — TradeZella'da 10 tane, bizde hiç yok. Kayıt istemeyen araçlar hem arama alır hem link toplar. En kolay ilk üçü: pozisyon büyüklüğü, risk/ödül, prop firma günlük kayıp/drawdown hesabı (kural verisi zaten `src/content/directory.ts`'te).
+2. **Sözlük (glossary)** — kısa terim sayfaları (drawdown, expectancy, R-multiple, profit factor, lot, pip…). Uzun kuyruk arama, 9 dilde çoğalır.
+3. **Forex/MT5'e özel journal sayfaları** — `forex-trading-journal`, `mt5 trading journal` gibi; bizde MT5 rehberi var ama forex journal başlıklı sayfa yok.
+4. **Entegrasyon sayfası sayısı** — rakipler yüzlerce; biz 4 broker + 6 prop firma. Broker sayfaları genişletilebilir (SEO.md'deki kalan liste).
+
+**Güçlü olduğumuz taraf:** prop firma kural sayfaları (9 dilde, kaynaklı), 9 dil, MT4/MT5 otomatik aktarım. Rakipler çoğunlukla İngilizce ve vadeli/hisse ağırlıklı.
+
+**Önerilen sıra:** (1) 3 ücretsiz araç, (2) `forex trading journal` sayfası, (3) sözlük, (4) Search Console'da 2-3 hafta veri birikince gerçek sorgulara göre düzelt.
+
 ## Kurallar
 - Kâr vaadi dili yok ("bununla kazanırsın" vb.).
 - Her yeni sayfa aynı değişiklikte 9 dilde.
