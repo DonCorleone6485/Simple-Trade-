@@ -57,3 +57,5 @@ kapaklarda bu yüzden yalnız STJ işareti kullanıldı.
 ## Kalanlar
 - Paylaşım şablonları (Instagram 1080×1350 karusel, X 1600×900): henüz yok.
 - Kapak yüklemesi hesaplarda: kullanıcı yapar.
+
+LinkedIn kapağı tek satır: alan çok ince (191 px) ve LinkedIn üstten alttan kırpıyor, üç satır sığmadı.
