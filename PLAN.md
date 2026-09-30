@@ -22,7 +22,7 @@ Son güncelleme: 2026-09-30
 - [ ] **MetaTrader kurulum videosu** — `~/Desktop/STJ-Kayit/` klasörüne 7 ekran kaydı (01-indir … 07-sonuc). Gelince Remotion kurgusu.
 - [ ] **Meta Pixel kimliği** — Instagram reklamından önce; çerez bandı da gerekecek.
 - [ ] **Sosyal kanıt** — ilk kullanıcılardan gerçek yorumlar.
-- 🟡 **Farsça ve Arapça çeviri kontrolü** — ✅ 2026-09-30 Arapça, ana dili olan biri kontrol etti, sorun yok (kullanıcı bildirdi). Kalan: Farsça.
+- 🟡 **Farsça ve Arapça çeviri kontrolü** — ✅ 2026-09-30 Arapça, ana dili olan biri kontrol etti, sorun yok (kullanıcı bildirdi). ✅ 2026-09-30 Farsça'yı ana dili olan biri kontrol etti, sorun yok (kullanıcı bildirdi).
 - [ ] **Dizin başvuruları** — metinler [docs/listings.md](docs/listings.md)'de hazır; hesap açıp göndermek kullanıcıda. G2/Capterra şirket bilgisi istiyor, şirketten sonra.
 - [ ] **İlk gerçek yeni üyeyi izlemek** — kayıttan sonra örnek verinin kalkması ve deneme akışı (kullanıcı haber verir, ben kontrol ederim).
 - [ ] **Hesabım penceresini kontrol** — para birimi, saat dilimi, profil ve MetaTrader sayfasındaki "•••1234 · Sunucu" satırı.
@@ -80,7 +80,7 @@ Ana fikir: **tek bir içerik merkezi olsun, her şey oradan otomatik dağılsın
 | Ne | Neden | Durum |
 |---|---|---|
 | **Aynı kullanıcı adı her yerde** (`@simpletradejournal`, doluysa `@stjournal`) | Tanınırlık. Kullanılmasa bile bütün platformlarda şimdiden kapılmalı. | 🟡 2026-09-30 Instagram, Telegram, Reddit: `simpletradejournal`; X `SimpleTradeJrnl`; Facebook `simpletradejournalapp`; LinkedIn `simpletradejournal`; TikTok 30 gün sonra düzelecek; YouTube ve Discord bekliyor |
-| **Marka kiti:** logo çeşitleri, renkler, yazı tipleri, Canva şablonları | Bütün paylaşımlar aynı kurumsal görünsün. | 🟡 2026-09-30 palet + yazı tipleri + X/LinkedIn/Facebook kapakları hazır ([docs/brand-kit.md](docs/brand-kit.md)); kapakları hesaplara yüklemek kullanıcıda. Kalan: paylaşım şablonları |
+| **Marka kiti:** logo çeşitleri, renkler, yazı tipleri, Canva şablonları | Bütün paylaşımlar aynı kurumsal görünsün. | 🟡 2026-09-30 palet + yazı tipleri + X/LinkedIn/Facebook kapakları hazır ([docs/brand-kit.md](docs/brand-kit.md)); kapakları hesaplara yüklemek kullanıcıda. ✅ paylaşım kartı üreticisi (`scripts/brand/post.sh`) + [docs/content-calendar.md](docs/content-calendar.md) (ilk 2 hafta). Kalan: kapakların X/LinkedIn/Facebook'a yüklenmesi (Reddit ✅) |
 | **Şifre yöneticisi** (Bitwarden / 1Password) + her hesapta iki adımlı doğrulama | Hesap çalınması bir markayı bitirebilir. | ✅ 2026-09-30 Bitwarden kuruldu; 2FA hepsinde açık: TikTok, X, Discord, Instagram, Telegram, Facebook, LinkedIn, Reddit (kullanıcı bildirdi) |
 | Hesaplar kişisel değil **şirket adresleriyle** (yeni `social@` takma adı) | Hesaplar şirketin olsun, kişiye bağlı kalmasın. | ✅ 2026-09-30 `social@`; Facebook ve LinkedIn sayfaları kişisel hesaptan açıldı (ikinci yönetici eklenecek), YouTube `admin@` |
 | **Marka tescili** (TÜRKPATENT) + yedek alan adları (.com vb.) | İsmi başkası alamasın. Şirket kurulunca. | [ ] |

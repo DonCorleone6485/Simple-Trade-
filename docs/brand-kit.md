@@ -54,8 +54,17 @@ metni düzenle, sonra Chrome'la her boyut için ekran görüntüsü al:
 Logo dosyasındaki "Simple Trading Journal" yazısının alt kuyrukları kesik (p, g, j);
 kapaklarda bu yüzden yalnız STJ işareti kullanıldı.
 
+## Paylaşım kartları
+
+`scripts/brand/post.sh` kart üretir (Chrome gerekir, internet: yazı tipi Google Fonts'tan gelir):
+
+```
+scripts/brand/post.sh <ig|sq|x> "Başlık" "Altın vurgu" "Alt metin" [1/5] [çıktı.png]
+scripts/brand/post.sh ig "Size the position," "not the hope." "Risk a fixed % of your account on every trade." 1/5 ~/Desktop/kart1.png
+```
+`ig` 1080×1350 (Instagram karusel), `sq` 1080×1080, `x` 1600×900. Altın vurgu her kartta bir kez.
+
 ## Kalanlar
-- Paylaşım şablonları (Instagram 1080×1350 karusel, X 1600×900): henüz yok.
-- Kapak yüklemesi hesaplarda: kullanıcı yapar.
+- Kapak yüklemesi hesaplarda: kullanıcı yapar (Reddit 2026-09-30 yüklendi).
 
 LinkedIn kapağı tek satır: alan çok ince (191 px) ve LinkedIn üstten alttan kırpıyor, üç satır sığmadı.
