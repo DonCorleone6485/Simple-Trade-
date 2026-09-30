@@ -30,6 +30,10 @@ Altın yalnızca vurguda: bir görselde bir kez. Düğme rengi mor, altın deği
 | `cover-x.png` | 3000×1000 (1500×500'ün 2x'i) | X profil kapağı |
 | `cover-li.png` | 2256×382 (1128×191'in 2x'i) | LinkedIn şirket sayfası kapağı |
 | `cover-fb.png` | 1640×624 (820×312'nin 2x'i) | Facebook sayfası kapağı |
+| `cover-rd.png` | 1920×384 | Reddit profil afişi (yaklaşık; Reddit kırpma aracı sunar) |
+| `cover-yt.png` | 2560×1440 | YouTube kanal afişi (kanal açılınca; metin telefon güvenli alanının içinde, ortada) |
+
+Instagram, TikTok, Telegram'da kapak alanı yok. Discord sunucu afişi sunucu güçlendirmesi (boost) ister, şimdilik yok.
 
 Sol alt köşe profil resmiyle örtüşür; metin bilerek orta-sağda. Facebook telefonda
 kenarları kırpar, metin ortada kaldığı için sorun olmaz.
@@ -45,7 +49,7 @@ metni düzenle, sonra Chrome'la her boyut için ekran görüntüsü al:
   --window-size=1500,500 --screenshot=public/brand/covers/cover-x.png \
   "file://$PWD/scripts/brand/covers.html?c=x"
 ```
-(`c=x` 1500×500, `c=li` 1128×191, `c=fb` 820×312; pencere boyutu aynı olmalı.)
+(`c=x` 1500×500, `c=li` 1128×191, `c=fb` 820×312, `c=rd` 1920×384 ve `c=yt` 2560×1440 — ikisi 1x; pencere boyutu aynı olmalı.)
 
 Logo dosyasındaki "Simple Trading Journal" yazısının alt kuyrukları kesik (p, g, j);
 kapaklarda bu yüzden yalnız STJ işareti kullanıldı.
