@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { lazyRetry } from './lib/lazyRetry';
 import { pick, localeOf, pct } from './lib/appCopy';
 import { aria } from './lib/aria';
 import {
@@ -34,29 +35,29 @@ import { signedMoney, int, cur, CURRENCIES, setCurrency } from './lib/format';
  * değerlendirme metinlerini de indiriyordu. Şimdi her ekran açıldığında kendi
  * parçası geliyor.
  */
-const TradeForm = lazy(() => import('./components/TradeForm'));
-const TradeHistory = lazy(() => import('./components/TradeHistory'));
-const CalendarView = lazy(() => import('./components/CalendarView'));
-const GoalsView = lazy(() => import('./components/GoalsView'));
-const PricingPage = lazy(() => import('./components/PricingPage'));
-const PaymentModal = lazy(() => import('./components/PaymentModal'));
-const CSVImport = lazy(() => import('./components/CSVImport'));
-const MTConnect = lazy(() => import('./components/MTConnect'));
-const MTTargetPicker = lazy(() => import('./components/MTTargetPicker'));
-const SessionsView = lazy(() => import('./components/SessionsView'));
-const NewsView = lazy(() => import('./components/NewsView'));
-const DisciplineView = lazy(() => import('./components/DisciplineView'));
-const ChecklistLibrary = lazy(() => import('./components/ChecklistLibrary'));
-const PropEvaluation = lazy(() => import('./components/PropEvaluation'));
-const LandingPage = lazy(() => import('./components/LandingPage'));
-const InfoPage = lazy(() => import('./components/InfoPage'));
-const ArticlePage = lazy(() => import('./components/ArticlePage'));
-const DirectoryPage = lazy(() => import('./components/DirectoryPage'));
-const ToolPage = lazy(() => import('./components/ToolPage'));
-const ContactModal = lazy(() => import('./components/ContactModal'));
-const JournalDashboard = lazy(() => import('./components/JournalDashboard'));
-const PrintableReport = lazy(() => import('./components/PrintableReport'));
-const PropStatus = lazy(() => import('./components/PropStatus'));
+const TradeForm = lazyRetry(() => import('./components/TradeForm'));
+const TradeHistory = lazyRetry(() => import('./components/TradeHistory'));
+const CalendarView = lazyRetry(() => import('./components/CalendarView'));
+const GoalsView = lazyRetry(() => import('./components/GoalsView'));
+const PricingPage = lazyRetry(() => import('./components/PricingPage'));
+const PaymentModal = lazyRetry(() => import('./components/PaymentModal'));
+const CSVImport = lazyRetry(() => import('./components/CSVImport'));
+const MTConnect = lazyRetry(() => import('./components/MTConnect'));
+const MTTargetPicker = lazyRetry(() => import('./components/MTTargetPicker'));
+const SessionsView = lazyRetry(() => import('./components/SessionsView'));
+const NewsView = lazyRetry(() => import('./components/NewsView'));
+const DisciplineView = lazyRetry(() => import('./components/DisciplineView'));
+const ChecklistLibrary = lazyRetry(() => import('./components/ChecklistLibrary'));
+const PropEvaluation = lazyRetry(() => import('./components/PropEvaluation'));
+const LandingPage = lazyRetry(() => import('./components/LandingPage'));
+const InfoPage = lazyRetry(() => import('./components/InfoPage'));
+const ArticlePage = lazyRetry(() => import('./components/ArticlePage'));
+const DirectoryPage = lazyRetry(() => import('./components/DirectoryPage'));
+const ToolPage = lazyRetry(() => import('./components/ToolPage'));
+const ContactModal = lazyRetry(() => import('./components/ContactModal'));
+const JournalDashboard = lazyRetry(() => import('./components/JournalDashboard'));
+const PrintableReport = lazyRetry(() => import('./components/PrintableReport'));
+const PropStatus = lazyRetry(() => import('./components/PropStatus'));
 
 type View = 'dashboard' | 'expanded' | 'pricing' | 'sessions' | 'news' | 'discipline' | 'checklists' | 'propReview';
 type JournalTab = 'newTrade' | 'trades' | 'calendar' | 'stats' | 'goals' | 'mtConnect';
