@@ -116,6 +116,16 @@ async function contact(req: any, res: any) {
   }
   if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'email' });
 
+  // E-posta gönderilemese de mesaj kaybolmasın; destek birimi de buradan okur.
+  // Kayıt hatası isteği bozmaz.
+  try {
+    await supabase.from('contact_messages').insert({
+      email, message, name: name || null, user_id: userId || null,
+      lang: String(body.language || '').slice(0, 5) || null,
+      page: String(body.page || '').slice(0, 200) || null,
+    });
+  } catch { /* kayıt hatası isteği bozmasın */ }
+
   const ok = await sendContactMessage({
     email, message, name: name || undefined, userId: userId || undefined,
     lang: String(body.language || '').slice(0, 5) || undefined,
