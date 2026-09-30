@@ -1006,6 +1006,166 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "forex-trading-journal": {
+    "title": "Diário de trading de forex: o que registar e como rever",
+    "description": "O que deve ter um diário de forex — par, sessão, spread, pips, risco em R — como o preencher automaticamente a partir do MetaTrader e uma revisão semanal de 15 minutos.",
+    "body": [
+      {
+        "p": "Um diário de trading de forex é o registo de cada operação que fazes e da razão por trás dela. O forex acrescenta detalhes que os diários de ações raramente precisam: muitos pares, três sessões principais, spreads e swaps, e resultados que se contam em pips, em dinheiro ou em unidades de risco. Um diário que os capte mostra-te onde está de facto a tua vantagem, ou a tua fuga."
+      },
+      {
+        "h2": "O que registar em cada operação"
+      },
+      {
+        "ul": [
+          "Par e direção (compra ou venda).",
+          "Hora de entrada e a sessão em que caiu: asiática, Londres ou Nova Iorque.",
+          "Setup e motivo da entrada, numa frase.",
+          "Entrada, stop loss, take profit e tamanho do lote.",
+          "Risco em dinheiro e em percentagem da conta, para exprimires o resultado em R.",
+          "Resultado em pips, em dinheiro e em R.",
+          "Spread, comissão e swap.",
+          "Qualquer notícia perto da operação.",
+          "Como te sentias antes e depois, e uma captura do gráfico."
+        ]
+      },
+      {
+        "h2": "Porque é que só os pips não chegam"
+      },
+      {
+        "p": "Contar pips ignora o tamanho do lote e o valor do pip, que muda de par para par. Dez pips numa posição grande podem custar mais do que quarenta numa pequena. Regista também o resultado em dinheiro e em R e compara as operações assim."
+      },
+      {
+        "h2": "Padrões que vale a pena procurar no forex"
+      },
+      {
+        "ul": [
+          "Resultado por sessão: corre-te melhor em Londres do que em Nova Iorque?",
+          "Resultado por par: poucos pares costumam dar quase todo o lucro e um só quase toda a perda.",
+          "Resultado por dia da semana e por hora.",
+          "Operações perto de notícias face a períodos calmos.",
+          "Tempo de detenção e swap: as operações que passam a noite comportam-se de forma diferente?"
+        ]
+      },
+      {
+        "h2": "Deixa o MetaTrader preencher por ti"
+      },
+      {
+        "p": "Escrever cada operação à mão é a principal razão para as pessoas abandonarem o diário. Com o complemento para MetaTrader 4 e 5, cada operação chega sozinha com entrada, saída, stop loss, lote, comissão e swap. Tu só acrescentas o que a plataforma não pode saber: o setup, o teu raciocínio e como te sentias."
+      },
+      {
+        "h2": "Uma revisão semanal em 15 minutos"
+      },
+      {
+        "ol": [
+          "Vê o total em dinheiro e em R, não só em pips.",
+          "Divide a semana por sessão e por par e encontra o grupo mais fraco.",
+          "Lê as operações que quebraram as tuas regras e conta quanto custaram.",
+          "Escolhe uma única coisa para mudar na semana seguinte.",
+          "Escreve-a no topo do diário e confirma-a na sexta-feira."
+        ]
+      },
+      {
+        "note": "Um diário mostra o que fizeste e quanto custou. Não prevê o que o mercado vai fazer e não é aconselhamento de investimento."
+      }
+    ]
+  },
+  "trading-glossary": {
+    "title": "Glossário de trading: os termos que todo trader encontra",
+    "description": "Definições claras de pip, lote, spread, alavancagem, stop loss, drawdown, múltiplo R, rácio risco-retorno, taxa de acerto, expectativa, fator de lucro, swap, slippage e limite de perda diária.",
+    "body": [
+      {
+        "p": "Definições curtas e claras dos termos que mais aparecem ao operar e ao ler um diário de trading. Estão pela ordem em que costumas encontrá-los."
+      },
+      {
+        "h2": "Pip"
+      },
+      {
+        "p": "A unidade padrão de movimento do preço no forex. Na maioria dos pares é a quarta casa decimal (0,0001); nos pares com iene, a segunda (0,01). Um movimento de 1,0850 para 1,0851 é um pip."
+      },
+      {
+        "h2": "Lote"
+      },
+      {
+        "p": "O tamanho de uma operação. Um lote padrão são 100.000 unidades da moeda base, um minilote 10.000 e um microlote 1.000 (0,01 lote)."
+      },
+      {
+        "h2": "Spread"
+      },
+      {
+        "p": "A diferença entre o preço de compra (ask) e o de venda (bid). É um custo que pagas à entrada, por isso toda a operação começa ligeiramente no negativo."
+      },
+      {
+        "h2": "Alavancagem"
+      },
+      {
+        "p": "Exposição emprestada que te deixa controlar uma posição maior do que o teu saldo, por exemplo 1:30. Multiplica por igual ganhos e perdas. O teu risco real é definido pelo stop loss e pelo tamanho do lote, não pelo número da alavancagem."
+      },
+      {
+        "h2": "Stop loss"
+      },
+      {
+        "p": "Ordem que fecha uma operação a um preço definido para limitar a perda. A distância da entrada ao stop, vezes o tamanho do lote, é o valor que arriscas nessa operação."
+      },
+      {
+        "h2": "Drawdown"
+      },
+      {
+        "p": "A queda desde um máximo do saldo (ou do capital) até um mínimo posterior, em valor ou em percentagem. O drawdown máximo é a queda mais funda num período."
+      },
+      {
+        "h2": "Múltiplo R"
+      },
+      {
+        "p": "Um resultado medido em unidades do que arriscaste. Se arriscas 100 $ e ganhas 250 $, a operação é +2,5R; um stop completo é −1R. Permite comparar operações de tamanhos diferentes."
+      },
+      {
+        "h2": "Rácio risco-retorno"
+      },
+      {
+        "p": "O ganho potencial dividido pelo risco. Um stop a 20 pips com um alvo a 40 pips é um rácio de 1:2, ou 2R."
+      },
+      {
+        "h2": "Taxa de acerto"
+      },
+      {
+        "p": "A proporção de operações que fecharam com lucro. Sozinha diz pouco; lê-a junto com o ganho médio e a perda média."
+      },
+      {
+        "h2": "Expectativa"
+      },
+      {
+        "p": "O resultado médio por operação, de preferência em R: (taxa de acerto × ganho médio) − (taxa de erro × perda média). Uma expectativa positiva em muitas operações é o que parece um método que funciona no papel."
+      },
+      {
+        "h2": "Fator de lucro"
+      },
+      {
+        "p": "O lucro bruto dividido pela perda bruta. Acima de 1 ganhaste mais do que perdeste; 1,5 significa 1,50 $ ganhos por cada 1 $ perdido."
+      },
+      {
+        "h2": "Swap"
+      },
+      {
+        "p": "Uma taxa ou crédito por manter uma posição depois da viragem diária, com base na diferença de taxas de juro entre as duas moedas. Aparece no registo da operação."
+      },
+      {
+        "h2": "Slippage (derrapagem)"
+      },
+      {
+        "p": "A diferença entre o preço esperado e o preço obtido, sobretudo em mercados rápidos ou em torno de notícias."
+      },
+      {
+        "h2": "Limite de perda diária"
+      },
+      {
+        "p": "Uma regra, comum em contas de prop firms, que reprova a conta ou termina o teu dia quando a perda de um dia ultrapassa um valor ou percentagem fixados da conta."
+      },
+      {
+        "note": "Estas definições são educativas e não constituem aconselhamento de investimento."
+      }
+    ]
+  },
 };
 
 export default TEXT;

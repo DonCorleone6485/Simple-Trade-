@@ -1169,6 +1169,166 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "forex-trading-journal": {
+    "title": "Forex trading journal: neyi kaydetmeli, nasıl gözden geçirmeli",
+    "description": "Bir forex işlem günlüğünde ne olmalı — parite, seans, spread, pip, R cinsinden risk — MetaTrader'dan kendiliğinden nasıl doldurulur ve 15 dakikalık haftalık gözden geçirme.",
+    "body": [
+      {
+        "p": "Forex trading journal, aldığın her işlemin ve arkasındaki nedenin kaydıdır. Forex, hisse günlüklerinde nadiren gereken ayrıntılar ekler: çok sayıda parite, üç ana seans, spread ve swap, ve pip, para ya da risk birimiyle sayılabilen sonuçlar. Bunları yakalayan bir günlük, kendi avantajının — ya da kendi kaçağının — gerçekte nerede olduğunu görmeni sağlar."
+      },
+      {
+        "h2": "Her işlem için neyi kaydetmeli"
+      },
+      {
+        "ul": [
+          "Parite ve yön (alış ya da satış).",
+          "Giriş saati ve düştüğü seans: Asya, Londra ya da New York.",
+          "Kurulum (setup) ve işleme girme nedenin, tek cümleyle.",
+          "Giriş, zarar durdur, kâr al ve lot büyüklüğü.",
+          "Sonucu R cinsinden söyleyebilmek için paradaki ve hesabın yüzdesi olarak riski.",
+          "Pip, para ve R cinsinden sonuç.",
+          "Spread, komisyon ve swap.",
+          "İşleme yakın bir haber varsa hangisi.",
+          "İşlemden önce ve sonra nasıl hissettiğin, bir de grafiğin ekran görüntüsü."
+        ]
+      },
+      {
+        "h2": "Neden yalnız pip yetmez"
+      },
+      {
+        "p": "Pip sayısı, lot büyüklüğünü ve paritelere göre değişen pip değerini yok sayar. Büyük bir pozisyonda on pip, küçük birinde kırk pipten pahalı olabilir. Sonucu para ve R cinsinden de yaz ve işlemleri bu temelde karşılaştır."
+      },
+      {
+        "h2": "Forex'te aranacak örüntüler"
+      },
+      {
+        "ul": [
+          "Seansa göre sonuç: Londra'da New York'tan daha mı iyisin?",
+          "Pariteye göre sonuç: kârın çoğunu birkaç parite, zararın çoğunu tek bir parite getirebilir.",
+          "Haftanın gününe ve saate göre sonuç.",
+          "Haber saatlerindeki işlemler ile sakin dönemlerin karşılaştırması.",
+          "Tutma süresi ve swap: geceyi geçiren işlemler farklı mı davranıyor?"
+        ]
+      },
+      {
+        "h2": "MetaTrader senin yerine doldursun"
+      },
+      {
+        "p": "Her işlemi elle yazmak, insanların günlük tutmayı bırakmasının başlıca nedeni. MetaTrader 4 ve 5 eklentisiyle her işlem giriş, çıkış, zarar durdur, lot büyüklüğü, komisyon ve swap ile kendiliğinden gelir. Yalnız platformun bilemeyeceği şeyleri eklersin: kurulumu, gerekçeni ve nasıl hissettiğini."
+      },
+      {
+        "h2": "15 dakikada haftalık gözden geçirme"
+      },
+      {
+        "ol": [
+          "Toplamı yalnız pip olarak değil, para ve R olarak da gör.",
+          "Haftayı seansa ve pariteye böl, en zayıf grubu bul.",
+          "Kurallarını bozan işlemleri oku ve neye mal olduklarını say.",
+          "Gelecek hafta değiştirmek için tek bir şey seç — yalnız bir.",
+          "Günlüğünün en üstüne yaz ve cuma günü kontrol et."
+        ]
+      },
+      {
+        "note": "Günlük, ne yaptığını ve neye mal olduğunu gösterir. Piyasanın ne yapacağını tahmin etmez ve yatırım tavsiyesi değildir."
+      }
+    ]
+  },
+  "trading-glossary": {
+    "title": "Trading sözlüğü: her trader'ın karşılaştığı terimler",
+    "description": "Pip, lot, spread, kaldıraç, zarar durdur, drawdown, R değeri, risk/ödül oranı, kazanma oranı, beklenti, kâr faktörü, swap, kayma ve günlük kayıp limiti için sade tanımlar.",
+    "body": [
+      {
+        "p": "İşlem yaparken ve bir trading journal okurken en sık karşılaştığın terimlerin kısa ve sade tanımları. Genelde karşına çıktıkları sırayla dizildi."
+      },
+      {
+        "h2": "Pip"
+      },
+      {
+        "p": "Forex'te fiyat hareketinin standart birimi. Çoğu paritede dördüncü ondalık basamaktır (0,0001); yen paritelerinde ikincidir (0,01). 1,0850'den 1,0851'e hareket bir pip eder."
+      },
+      {
+        "h2": "Lot"
+      },
+      {
+        "p": "İşlemin büyüklüğü. Bir standart lot, baz para biriminin 100.000 birimidir; mini lot 10.000, mikro lot 1.000'dir (0,01 lot)."
+      },
+      {
+        "h2": "Spread"
+      },
+      {
+        "p": "Alış (ask) ile satış (bid) fiyatı arasındaki fark. Girişte ödediğin bir maliyettir; yani her işlem hafif ekside başlar."
+      },
+      {
+        "h2": "Kaldıraç"
+      },
+      {
+        "p": "Bakiyenden büyük bir pozisyonu yönetmeni sağlayan borçlu maruziyet, örneğin 1:30. Kazancı da zararı da katlar. Gerçek riskini kaldıraç rakamı değil, zarar durdurun ve lot büyüklüğün belirler."
+      },
+      {
+        "h2": "Zarar durdur (stop loss)"
+      },
+      {
+        "p": "Zararı sınırlamak için işlemi belirli bir fiyattan kapatan emir. Girişten zarar durduruna olan mesafe çarpı lot büyüklüğü, o işlemde riske ettiğin tutardır."
+      },
+      {
+        "h2": "Drawdown"
+      },
+      {
+        "p": "Zirve bakiyeden (ya da özkaynaktan) sonraki dip noktaya düşüş; tutar ya da yüzde olarak. Maksimum drawdown, bir dönemdeki en derin düşüştür."
+      },
+      {
+        "h2": "R değeri (R-multiple)"
+      },
+      {
+        "p": "Sonucun, riske ettiğin tutarın katı olarak ölçülmesi. 100 $ riske edip 250 $ kazanırsan işlem +2,5R'dir; tam zarar durdur −1R. Farklı büyüklükteki işlemleri karşılaştırmanı sağlar."
+      },
+      {
+        "h2": "Risk/ödül oranı"
+      },
+      {
+        "p": "Potansiyel ödülün riske bölünmesi. 20 pip uzakta zarar durdur ve 40 pip uzakta hedef 1:2 orandır, yani 2R."
+      },
+      {
+        "h2": "Kazanma oranı"
+      },
+      {
+        "p": "Kârla kapanan işlemlerin payı. Tek başına az şey söyler; ortalama kazanç ve ortalama kayıpla birlikte okunmalı."
+      },
+      {
+        "h2": "Beklenti (expectancy)"
+      },
+      {
+        "p": "İşlem başına ortalama sonuç, tercihen R cinsinden: (kazanma oranı × ortalama kazanç) − (kaybetme oranı × ortalama kayıp). Çok sayıda işlemde pozitif beklenti, çalışan bir yöntemin kâğıt üzerindeki halidir."
+      },
+      {
+        "h2": "Kâr faktörü"
+      },
+      {
+        "p": "Brüt kârın brüt zarara bölünmesi. 1'in üstünde kaybettiğinden fazla kazandın demektir; 1,5, her 1 $ kayba 1,50 $ kazanç demektir."
+      },
+      {
+        "h2": "Swap"
+      },
+      {
+        "p": "Pozisyonu günlük devir saatini geçirerek tutmanın ücreti ya da getirisi; iki para birimi arasındaki faiz farkına dayanır. İşlem kaydında görünür."
+      },
+      {
+        "h2": "Kayma (slippage)"
+      },
+      {
+        "p": "Beklediğin fiyat ile aldığın fiyat arasındaki fark; çoğunlukla hızlı piyasalarda ya da haber anlarında olur."
+      },
+      {
+        "h2": "Günlük kayıp limiti"
+      },
+      {
+        "p": "Prop firma hesaplarında yaygın bir kural: bir günde zarar hesabın belirli bir tutarını ya da yüzdesini aşarsa hesap kaybedilir ya da gün biter."
+      },
+      {
+        "note": "Bu tanımlar eğitim amaçlıdır ve yatırım tavsiyesi değildir."
+      }
+    ]
+  },
 };
 
 export default TEXT;

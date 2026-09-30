@@ -1006,6 +1006,166 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "forex-trading-journal": {
+    "title": "Journal de trading forex : quoi noter et comment l'analyser",
+    "description": "Ce que doit contenir un journal forex — paire, session, spread, pips, risque en R — comment le remplir automatiquement depuis MetaTrader et une revue hebdomadaire de 15 minutes.",
+    "body": [
+      {
+        "p": "Un journal de trading forex consigne chaque trade que vous prenez et la raison qui le motive. Le forex ajoute des détails que les journaux d'actions demandent rarement : de nombreuses paires, trois sessions principales, des spreads et des swaps, et des résultats comptés en pips, en argent ou en unités de risque. Un journal qui les saisit montre où se trouve vraiment votre avantage — ou votre fuite."
+      },
+      {
+        "h2": "Ce qu'il faut noter pour chaque trade"
+      },
+      {
+        "ul": [
+          "La paire et la direction (achat ou vente).",
+          "L'heure d'entrée et la session concernée : Asie, Londres ou New York.",
+          "Le setup et la raison de l'entrée, en une phrase.",
+          "L'entrée, le stop loss, le take profit et la taille du lot.",
+          "Le risque en argent et en pourcentage du compte, pour exprimer le résultat en R.",
+          "Le résultat en pips, en argent et en R.",
+          "Le spread, la commission et le swap.",
+          "Toute annonce économique proche du trade.",
+          "Ce que vous ressentiez avant et après, et une capture du graphique."
+        ]
+      },
+      {
+        "h2": "Pourquoi les pips seuls ne suffisent pas"
+      },
+      {
+        "p": "Compter les pips ignore la taille du lot et la valeur du pip, qui varie d'une paire à l'autre. Dix pips sur une grosse position peuvent coûter plus que quarante sur une petite. Notez aussi le résultat en argent et en R, et comparez les trades sur cette base."
+      },
+      {
+        "h2": "Les schémas à chercher en forex"
+      },
+      {
+        "ul": [
+          "Résultat par session : faites-vous mieux à Londres qu'à New York ?",
+          "Résultat par paire : quelques paires apportent souvent l'essentiel du gain, et une seule l'essentiel de la perte.",
+          "Résultat par jour de la semaine et par heure.",
+          "Trades autour des annonces comparés aux périodes calmes.",
+          "Durée de détention et swap : les trades gardés la nuit se comportent-ils autrement ?"
+        ]
+      },
+      {
+        "h2": "Laissez MetaTrader le remplir pour vous"
+      },
+      {
+        "p": "Saisir chaque trade à la main est la principale raison pour laquelle on abandonne son journal. Avec le module MetaTrader 4 et 5, chaque trade arrive seul avec l'entrée, la sortie, le stop loss, le lot, la commission et le swap. Vous n'ajoutez que ce que la plateforme ne peut pas savoir : le setup, votre raisonnement et votre ressenti."
+      },
+      {
+        "h2": "Une revue hebdomadaire en 15 minutes"
+      },
+      {
+        "ol": [
+          "Regardez le total en argent et en R, pas seulement en pips.",
+          "Découpez la semaine par session et par paire et trouvez le groupe le plus faible.",
+          "Lisez les trades qui ont enfreint vos règles et comptez ce qu'ils ont coûté.",
+          "Choisissez une seule chose à changer la semaine suivante.",
+          "Écrivez-la en haut du journal et vérifiez-la le vendredi."
+        ]
+      },
+      {
+        "note": "Un journal montre ce que vous avez fait et ce que cela a coûté. Il ne prédit pas ce que fera le marché et ne constitue pas un conseil en investissement."
+      }
+    ]
+  },
+  "trading-glossary": {
+    "title": "Glossaire du trading : les termes que tout trader rencontre",
+    "description": "Définitions claires du pip, du lot, du spread, de l'effet de levier, du stop loss, du drawdown, du multiple de R, du ratio risque/rendement, du taux de réussite, de l'espérance, du facteur de profit, du swap, du slippage et de la limite de perte journalière.",
+    "body": [
+      {
+        "p": "Des définitions courtes et claires des termes que vous croisez le plus en tradant et en lisant un journal de trading. Elles suivent l'ordre dans lequel on les rencontre d'ordinaire."
+      },
+      {
+        "h2": "Pip"
+      },
+      {
+        "p": "L'unité standard de mouvement du prix en forex. Pour la plupart des paires, c'est la quatrième décimale (0,0001) ; pour les paires en yen, la deuxième (0,01). Un mouvement de 1,0850 à 1,0851 vaut un pip."
+      },
+      {
+        "h2": "Lot"
+      },
+      {
+        "p": "La taille d'un trade. Un lot standard fait 100 000 unités de la devise de base, un mini-lot 10 000 et un micro-lot 1 000 (0,01 lot)."
+      },
+      {
+        "h2": "Spread"
+      },
+      {
+        "p": "L'écart entre le prix d'achat (ask) et le prix de vente (bid). C'est un coût payé à l'entrée : tout trade démarre donc légèrement dans le rouge."
+      },
+      {
+        "h2": "Effet de levier"
+      },
+      {
+        "p": "Une exposition empruntée qui permet de contrôler une position plus grande que votre solde, par exemple 1:30. Il multiplie autant les gains que les pertes. Votre vrai risque dépend du stop loss et de la taille du lot, pas du chiffre du levier."
+      },
+      {
+        "h2": "Stop loss"
+      },
+      {
+        "p": "Un ordre qui clôture un trade à un prix fixé pour limiter la perte. La distance de l'entrée au stop, multipliée par la taille du lot, est le montant que vous risquez sur ce trade."
+      },
+      {
+        "h2": "Drawdown"
+      },
+      {
+        "p": "La baisse depuis un sommet du solde (ou du capital) jusqu'à un creux ultérieur, en montant ou en pourcentage. Le drawdown maximal est la baisse la plus profonde sur une période."
+      },
+      {
+        "h2": "Multiple de R"
+      },
+      {
+        "p": "Un résultat mesuré en unités du montant risqué. Risquez 100 $ et gagnez 250 $ : le trade vaut +2,5R ; un stop complet vaut −1R. Cela permet de comparer des trades de tailles différentes."
+      },
+      {
+        "h2": "Ratio risque/rendement"
+      },
+      {
+        "p": "Le gain potentiel divisé par le risque. Un stop à 20 pips avec un objectif à 40 pips donne un ratio de 1:2, soit 2R."
+      },
+      {
+        "h2": "Taux de réussite"
+      },
+      {
+        "p": "La part des trades clôturés en gain. Seul, il dit peu de choses ; lisez-le avec le gain moyen et la perte moyenne."
+      },
+      {
+        "h2": "Espérance"
+      },
+      {
+        "p": "Le résultat moyen par trade, de préférence en R : (taux de réussite × gain moyen) − (taux d'échec × perte moyenne). Une espérance positive sur de nombreux trades, c'est à quoi ressemble une méthode qui fonctionne sur le papier."
+      },
+      {
+        "h2": "Facteur de profit"
+      },
+      {
+        "p": "Le profit brut divisé par la perte brute. Au-dessus de 1, vous avez gagné plus que perdu ; 1,5 signifie 1,50 $ gagnés pour 1 $ perdu."
+      },
+      {
+        "h2": "Swap"
+      },
+      {
+        "p": "Des frais ou un crédit pour garder une position au-delà du rollover quotidien, fondés sur l'écart de taux d'intérêt entre les deux devises. Il apparaît dans le relevé du trade."
+      },
+      {
+        "h2": "Slippage (glissement)"
+      },
+      {
+        "p": "L'écart entre le prix attendu et le prix obtenu, surtout sur les marchés rapides ou autour des annonces."
+      },
+      {
+        "h2": "Limite de perte journalière"
+      },
+      {
+        "p": "Une règle, courante sur les comptes de prop firms : si la perte d'une journée dépasse un montant ou un pourcentage fixé du compte, le compte est échoué ou votre journée s'arrête."
+      },
+      {
+        "note": "Ces définitions sont pédagogiques et ne constituent pas un conseil en investissement."
+      }
+    ]
+  },
 };
 
 export default TEXT;

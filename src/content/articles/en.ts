@@ -1169,6 +1169,166 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "forex-trading-journal": {
+    "title": "Forex trading journal: what to record and how to review it",
+    "description": "What a forex trading journal should contain — pair, session, spread, pips, risk in R — how to fill it in automatically from MetaTrader, and a 15-minute weekly review.",
+    "body": [
+      {
+        "p": "A forex trading journal is a record of every trade you take and the reasons behind it. Forex adds details that stock journals rarely need: many pairs, three main sessions, spreads and swaps, and results that can be counted in pips, in money or in risk units. A journal that captures these lets you see where your own edge — or your own leak — actually is."
+      },
+      {
+        "h2": "What to record for every trade"
+      },
+      {
+        "ul": [
+          "Pair and direction (long or short).",
+          "Time of entry and the session it fell in: Asian, London or New York.",
+          "Setup and the reason you took it, in one sentence.",
+          "Entry, stop loss, take profit and lot size.",
+          "Risk in money and as a percentage of the account, so you can express the result in R.",
+          "Result in pips, in money and in R.",
+          "Spread, commission and swap.",
+          "Any news release close to the trade.",
+          "How you felt before and after, and a screenshot of the chart."
+        ]
+      },
+      {
+        "h2": "Why pips alone are not enough"
+      },
+      {
+        "p": "A pip count ignores lot size and the value of a pip, which differs between pairs. Ten pips on a large position can cost more than forty pips on a small one. Record the result in money and in R as well, and compare trades on that basis."
+      },
+      {
+        "h2": "Patterns worth looking for in forex"
+      },
+      {
+        "ul": [
+          "Result by session: do you do better in London than in New York?",
+          "Result by pair: a few pairs often carry most of the profit, and one pair most of the losses.",
+          "Result by day of the week and by hour.",
+          "Trades around news releases compared with quiet periods.",
+          "Holding time and swap: do trades kept overnight behave differently?"
+        ]
+      },
+      {
+        "h2": "Let MetaTrader fill it in for you"
+      },
+      {
+        "p": "Typing every trade by hand is the main reason people stop journaling. With the MetaTrader 4 and 5 add-on, each trade arrives on its own with entry, exit, stop loss, lot size, commission and swap. You only add what the platform cannot know: the setup, your reasoning and how you felt."
+      },
+      {
+        "h2": "A weekly review in 15 minutes"
+      },
+      {
+        "ol": [
+          "Look at the total in money and in R, not only in pips.",
+          "Split the week by session and by pair and find the weakest group.",
+          "Read the trades that broke your rules and count what they cost.",
+          "Pick one thing to change next week — only one.",
+          "Write it at the top of your journal and check it on Friday."
+        ]
+      },
+      {
+        "note": "A journal shows what you did and what it cost. It does not predict what the market will do, and it is not investment advice."
+      }
+    ]
+  },
+  "trading-glossary": {
+    "title": "Trading glossary: the terms every trader meets",
+    "description": "Plain-language definitions of pip, lot, spread, leverage, stop loss, drawdown, R-multiple, risk-reward ratio, win rate, expectancy, profit factor, swap, slippage and daily loss limit.",
+    "body": [
+      {
+        "p": "Short, plain definitions of the terms you meet most often when you trade and when you read a trading journal. They are listed in the order you usually run into them."
+      },
+      {
+        "h2": "Pip"
+      },
+      {
+        "p": "The standard unit of price movement in forex. For most pairs it is the fourth decimal place (0.0001); for yen pairs it is the second (0.01). A move from 1.0850 to 1.0851 is one pip."
+      },
+      {
+        "h2": "Lot"
+      },
+      {
+        "p": "The size of a trade. One standard lot is 100,000 units of the base currency, a mini lot is 10,000 and a micro lot is 1,000 (0.01 lot)."
+      },
+      {
+        "h2": "Spread"
+      },
+      {
+        "p": "The difference between the buy (ask) and the sell (bid) price. It is a cost you pay on entry, so every trade starts slightly in the red."
+      },
+      {
+        "h2": "Leverage"
+      },
+      {
+        "p": "Borrowed exposure that lets you control a position larger than your balance, for example 1:30. It multiplies gains and losses alike. Your real risk is set by your stop loss and lot size, not by the leverage figure."
+      },
+      {
+        "h2": "Stop loss"
+      },
+      {
+        "p": "An order that closes a trade at a set price to cap the loss. The distance from entry to stop, times the lot size, is the amount you risk on that trade."
+      },
+      {
+        "h2": "Drawdown"
+      },
+      {
+        "p": "The fall from a peak balance (or equity) to a later low, as an amount or a percentage. Maximum drawdown is the deepest such fall over a period."
+      },
+      {
+        "h2": "R-multiple"
+      },
+      {
+        "p": "A result measured in units of the amount you risked. Risk $100 and make $250 and the trade is +2.5R; a full stop-out is −1R. It lets you compare trades of different sizes."
+      },
+      {
+        "h2": "Risk-reward ratio"
+      },
+      {
+        "p": "The potential reward divided by the risk. A stop 20 pips away with a target 40 pips away is a 1:2 ratio, or 2R."
+      },
+      {
+        "h2": "Win rate"
+      },
+      {
+        "p": "The share of trades that closed in profit. On its own it says little; read it together with the average win and the average loss."
+      },
+      {
+        "h2": "Expectancy"
+      },
+      {
+        "p": "The average result per trade, ideally in R: (win rate × average win) − (loss rate × average loss). A positive expectancy over many trades is what a working method looks like on paper."
+      },
+      {
+        "h2": "Profit factor"
+      },
+      {
+        "p": "Gross profit divided by gross loss. Above 1 you won more than you lost; 1.5 means $1.50 won for every $1 lost."
+      },
+      {
+        "h2": "Swap"
+      },
+      {
+        "p": "A fee or credit for holding a position past the daily rollover, based on the interest-rate difference between the two currencies. It appears on your trade record."
+      },
+      {
+        "h2": "Slippage"
+      },
+      {
+        "p": "The difference between the price you expected and the price you got, most often in fast markets or around news."
+      },
+      {
+        "h2": "Daily loss limit"
+      },
+      {
+        "p": "A rule, common on prop firm accounts, that fails the account or ends your day when the loss in one day passes a set amount or percentage of the account."
+      },
+      {
+        "note": "These definitions are educational and are not investment advice."
+      }
+    ]
+  },
 };
 
 export default TEXT;
