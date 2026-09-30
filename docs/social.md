@@ -153,3 +153,76 @@ açıklamanın altına eklemek için.
 - Profil alanlarını doldurmak (kullanıcı giriş yaptıktan sonra, onayıyla).
 - Sitenin alt kısmına sosyal medya bağlantıları ve yapısal veriye `sameAs`.
 - PLAN.md §2 tablosunda ilgili satırı ✅ yapmak.
+
+## 4. Discord sunucusu (2026-09-30)
+
+Sunucu "Simple Trading Journal". Kanallar hepsi İngilizce adlı metin kanalı:
+`welcome`, `announcements`, `general`, `support`, `feedback`; `LANGUAGES` kategorisinde
+`turkish`, `persian`. Arapça kanalı ilk Arapça kullanıcı gelince açılır.
+`welcome` ve `announcements` yalnız okunur (@everyone → Mesaj gönder ✗).
+Mesajlar EN + TR + FA tek mesajda; Discord metni 9 dil kuralının dışında, üç dille sınırlı.
+
+### #welcome
+
+```
+**Welcome to Simple Trading Journal 👋**
+A community for traders who want to journal their trades, review their discipline and improve over time.
+
+**Channels**
+• #announcements – product updates and new features
+• #general – trading, journaling and routines
+• #support – help with the app or MetaTrader setup
+• #feedback – tell us what to build or fix
+• #turkish, #persian – chat in your language
+
+**Rules**
+1. Be respectful. No insults or harassment.
+2. No signals, "guaranteed profit" claims or financial advice.
+3. No spam, ads or referral links.
+4. Never share passwords, logins or API keys. We will never message you first asking for them.
+5. Nothing here is financial advice. Trading involves risk.
+
+Website: https://simpletradejournal.io
+
+──────────
+
+**Simple Trading Journal'a hoş geldin 👋**
+İşlemlerini kaydetmek, disiplinini gözden geçirmek ve zamanla gelişmek isteyen trader'ların topluluğu.
+
+**Kanallar**
+• #announcements – ürün güncellemeleri ve yeni özellikler
+• #general – trading, günlük tutma ve rutinler
+• #support – uygulama ya da MetaTrader kurulumunda yardım
+• #feedback – neyi yapmamız ya da düzeltmemiz gerektiğini yaz
+• #turkish, #persian – kendi dilinde sohbet
+
+**Kurallar**
+1. Saygılı ol. Hakaret ve taciz yok.
+2. Sinyal, "garanti kazanç" iddiası ya da yatırım tavsiyesi yok.
+3. Spam, reklam ve referans bağlantısı yok.
+4. Şifre, giriş bilgisi ya da API anahtarı paylaşma. Bunları isteyen ilk mesajı biz atmayız.
+5. Buradaki hiçbir şey yatırım tavsiyesi değildir. Trading risk taşır.
+
+Web sitesi: https://simpletradejournal.io
+
+──────────
+
+**به Simple Trading Journal خوش آمدید 👋**
+جامعه‌ای برای معامله‌گرانی که می‌خواهند معاملات خود را ثبت کنند، انضباطشان را بررسی کنند و به‌مرور بهتر شوند.
+
+**کانال‌ها**
+• #announcements – به‌روزرسانی‌ها و ویژگی‌های جدید
+• #general – معامله‌گری، ژورنال‌نویسی و روتین‌ها
+• #support – کمک برای برنامه یا راه‌اندازی متاتریدر
+• #feedback – بگویید چه چیزی بسازیم یا اصلاح کنیم
+• #turkish، #persian – گفتگو به زبان خودتان
+
+**قوانین**
+۱. محترمانه رفتار کنید. توهین و آزار ممنوع است.
+۲. سیگنال، وعده «سود تضمینی» و توصیه مالی ممنوع است.
+۳. اسپم، تبلیغ و لینک معرفی ممنوع است.
+۴. رمز عبور، اطلاعات ورود یا کلید API را به اشتراک نگذارید. ما هرگز اولین پیام را برای درخواست آن‌ها نمی‌فرستیم.
+۵. هیچ‌چیز در اینجا توصیه مالی نیست. معامله‌گری ریسک دارد.
+
+وب‌سایت: https://simpletradejournal.io
+```
