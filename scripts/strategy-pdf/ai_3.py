@@ -5,19 +5,21 @@ def b14():
     h=sec(14,"Kurulum sırası ve haftalık düzen")
     h+="<p>8 rol aynı gün kurulmaz. Her aşamada işe yarayıp yaramadıklarına bakılır, sonra bir sonrakine geçilir. <b>Hiçbir aşama Ali \"başla\" demeden başlamaz.</b></p>"
     h+=T(["Aşama","Ne zaman","Roller","Neden bu sırada"],[
-    ["<b>1</b>","Ali onay verince","Koordinatör, Kalite Kontrol, Teknik Bakım, SEO ve İçerik, Araştırma","Kalite Kontrol ve Teknik Bakım'ın bir kısmı zaten çalışıyor (hata taraması). SEO en büyük bedava büyüme kaynağı. Hiçbiri hesaplara giriş gerektirmiyor."],
-    ["<b>2</b>","Aşama 1 en az 4 hafta düzgün çalışınca + sosyal yayın yöntemi seçilince","Sosyal Medya, Müşteri (taslak modunda), Operasyon ve Güven","Bunlar dışarıyla, müşteriyle ya da parayla temas eder; önce ekibin düzenli çalıştığını görmek gerekir."],
-    ["<b>3</b>","Şirket kurulunca ve ödeme açılınca","Müşteri: elde tutma ve Pro e-postaları; Operasyon: ödeme ve yasal sayfa kontrolü","Pro satılmaya başlamadan bu işlerin anlamı yok."]])
+    ["<b>1</b>","Ali onay verince","Koordinatör, Kalite Kontrol, Teknik Bakım, SEO ve İçerik, Araştırma, Müşteri ve E-posta","Kalite Kontrol ve Teknik Bakım'ın bir kısmı zaten çalışıyor (hata taraması). SEO en büyük bedava büyüme kaynağı. E-posta Ali'nin en çok vaktini alan iş; her giden mail zaten Ali'nin onayından geçtiği için risk düşük."],
+    ["<b>2</b>","Aşama 1 en az 4 hafta düzgün çalışınca + sosyal yayın yöntemi seçilince","Sosyal Medya, Operasyon ve Güven","Sosyal Medya bir yayın yöntemi ister; Operasyon parayla ve ayarlarla ilgili. Önce ekibin düzenli çalıştığını görmek gerekir."],
+    ["<b>3</b>","Şirket kurulunca ve ödeme açılınca","Müşteri ve E-posta: elde tutma ve Pro e-postaları; Operasyon: ödeme ve yasal sayfa kontrolü","Pro satılmaya başlamadan bu işlerin anlamı yok."]])
     h+="<h3>Aşama 1 kurulum adımları</h3>"+ol([
     "<code>~/Desktop/STJ-Ekip/</code> klasörü açılır (raporlar burada durur, repoya girmez).",
     "Her rol için bir zamanlanmış görev ve talimat dosyası yazılır (bu belgedeki bölümden).",
     "Mevcut <code>error-triage</code> görevi Kalite Kontrol ve Teknik Bakım'ın otomatik kolu olarak kalır; talimatına bu belgeye bağlantı eklenir.",
     "<code>scripts/growth-report.mjs</code> (haftalık rakamlar) bitirilir.",
     "Ali bir test hesabını tarayıcıda açık bırakır (Kalite Kontrol için).",
+    "Ali, şirket e-postasına (Gmail) erişim iznini bir kez verir. İlk gün asistan kutuyu okur ve ayıklama sonucunu Ali'ye gösterir.",
     "İlk hafta her görev elle bir kez çalıştırılır, çıktısı Ali'ye gösterilir. Ali beğenirse takvime alınır."])
     h+="<h3>Haftalık düzen (Aşama 1)</h3>"+T(["Gün","Kim","Ne"],[
     ["Her saat (08-23)","Kalite Kontrol (otomatik)","Hata taraması, ERRORS.md"],
     ["Her sabah","Koordinatör","KOORDİNATÖR satırlarını dağıtır, bekleyen onayı hatırlatır"],
+    ["Sabah ve akşam","Müşteri ve E-posta → Ali","Gelen mailler ayıklanır; cevaplar tek mesajda Ali'ye sorulur, \"tamam\" gelince gönderilir"],
     ["Hata geldikçe","Teknik Bakım","Dalda düzeltme → Kalite Kontrol → Ali \"evet\" → canlı"],
     ["Pazartesi-Çarşamba","SEO ve İçerik","Haftanın yazısı (9 dil)"],
     ["Perşembe","Kalite Kontrol","Haftalık genel tur + haftanın içeriklerinin kontrolü"],
