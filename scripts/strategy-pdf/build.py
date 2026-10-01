@@ -1,5 +1,10 @@
 import html, sys
 sys.path.insert(0, ".")
+import subprocess as _sp
+_r=_sp.run([sys.executable,"check.py"],capture_output=True,text=True)
+if "uyuşmazlık: 0" not in _r.stdout:
+    print(_r.stdout); sys.exit("Tablo ile platform bölümleri uyuşmuyor; PDF üretilmedi.")
+
 esc=html.escape
 
 TEAM=[("Video yapımcısı / kurgucu","Ekran kaydı, kısa ve uzun video, altyazı, kurgu"),
@@ -58,7 +63,7 @@ MX={
 9:"● ✓ ✓ - - ✓ ✓ ✓ ✓ ✓",
 10:"● ✓ ● - - ● ✓ ● - ●",
 11:"● ✓ - ● - - - - - -",
-12:"● ✓ ✓ ✓ - ● - ✓ - ●",
+12:"● ↗ ↗ ↗ - ● - ✓ - ●",
 13:"● ↗ ↗ - - ↗ ↗ ✓ ✓ ↗",
 14:"● - ↗ - - ↗ - ↗ - -",
 15:"● - ↗ - - ↗ - ✓ - ↗",
@@ -251,7 +256,7 @@ ul{{margin:1mm 0 2mm;padding-left:5mm}}li{{margin:1mm 0}}
 <p>Her tür bir kez tanımlanır, sonra Bölüm 3'teki tabloda hangi kanallarda kullanıldığı gösterilir.</p>{types_html()}</div>
 
 <div class="wide"><h2>Bölüm 3: İçerik × platform tablosu</h2>
-<p class="legend"><b style="color:#8a5a06">●</b> ana kanal: içerik burada özel üretilir ya da evi burasıdır &nbsp;·&nbsp; <b style="color:#1d6b34">✓</b> aynı içerik doğrudan paylaşılır (uygun metinle) &nbsp;·&nbsp; <b style="color:#3a45a0">↗</b> kesit ya da bağlantıyla duyurulur &nbsp;·&nbsp; boş: bu kanalda yok. &nbsp; Kısaltmalar: IG Instagram, YT YouTube, TT TikTok, TG Telegram, FB Facebook, LI LinkedIn, RD Reddit, DC Discord. Prensip: uygun içerik mümkün olduğu kadar çok kanalda paylaşılır.</p>
+<p class="legend"><b style="color:#8a5a06">●</b> ana kanal: içerik burada özel üretilir ya da evi burasıdır &nbsp;·&nbsp; <b style="color:#1d6b34">✓</b> aynı içerik doğrudan paylaşılır (uygun metinle); araçlarda aracı tanıtan içerik &nbsp;·&nbsp; <b style="color:#3a45a0">↗</b> kesit ya da bağlantıyla duyurulur &nbsp;·&nbsp; boş: bu kanalda yok. &nbsp; Kısaltmalar: IG Instagram, YT YouTube, TT TikTok, TG Telegram, FB Facebook, LI LinkedIn, RD Reddit, DC Discord. Prensip: uygun içerik mümkün olduğu kadar çok kanalda paylaşılır.</p>
 {mat_html()}</div>
 
 <div class="sec"><h2>Bölüm 4: Platform platform neler yapılacak</h2>

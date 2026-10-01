@@ -17,7 +17,7 @@ P=[
    ["İşlem öncesi kontrol listesi (PDF)","Haftalık gözden geçirme sayfası (PDF)"]),
   ("1 · 2 · 5","Gömülü videolar","İlgili yazı ve yardım sayfasına YouTube videosu gömülür: kurulum videosu yardım sayfasına, eğitim videosu blog yazısına, prop firma rehberi firma sayfasına. Hem sayfada kalma süresini artırır hem YouTube'a trafik gönderir.",
    ["MT5 kurulum videosu yardım sayfasında"]),
-  ("9 · 10 · 11","Görseller ve değişiklik günlüğü","Her yazıya özgün kapak ve gerekirse infografik (formül şeması). Değişiklik günlüğü her yayında güncellenir: ne eklendi, ekran görüntüsüyle kısa açıklama.",
+  ("9 · 10 · 11 · 23","Görseller, değişiklik günlüğü ve yapım süreci","Her yazıya özgün kapak ve gerekirse infografik (formül şeması). Değişiklik günlüğü her yayında güncellenir: ne eklendi, ekran görüntüsüyle kısa açıklama. Yapım süreci (tür 23) de burada: ayda 1 kısa yazı, bu ay ürüne neler eklediğimiz.",
    ["R-multiple şeması","Değişiklik günlüğü: yeni özellik girişi"]),
   ("22","Vaka çalışmaları (ilk kullanıcılardan sonra)","Gerçek bir kullanıcının, yazılı izinle, journal ile neyi fark ettiğini anlattığı sayfa. Uydurma yok; kullanıcı yoksa yayınlanmaz.",
    ["'İntikam işlemlerini nasıl azalttım?' kullanıcı hikâyesi"])],
@@ -199,3 +199,7 @@ P=[
   ("Dikkat","Kurallar welcome kanalında (EN, TR, FA). Şifre ve API anahtarı paylaşımı yasak; 'ilk mesajı biz atmayız' notu."),
   ("Ölçüm","Üye sayısı, haftalık aktif üye, geri bildirim sayısı.")]),
 ]
+
+from plat_extra import EXTRA
+for _i,_row in enumerate(P):
+    _row[4].extend(EXTRA.get(_row[0],[]))
