@@ -18,3 +18,16 @@ Tutarlılık kontrolü: `scripts/strategy-pdf/check.py` tablodaki her işaretin 
 bir bloğu olduğunu ve bölümlerdeki her türün tabloda işaretli olduğunu denetler; `build.py` uyuşmazlık varsa PDF üretmez.
 Platform bölümlerine ek bloklar `plat_extra.py` içinde. 2026-10-01: 23 sayfa, 0 uyuşmazlık; şablon (tür 12) satırı
 Instagram, X ve YouTube'da ↗ (PDF yüklenmez, bağlantı), Telegram ve Discord ●, LinkedIn ✓.
+
+## Çalışan el kitabı (detaylı, 54 sayfa)
+
+`STJ-PDF/Simple Trading Journal - Icerik Ekibi El Kitabi.pdf`: işe yeni başlayan, konuyu hiç bilmeyen bir çalışan için.
+Bölümler: ürün ve ekip, sözlük (28 terim, örnekli), altın kurallar (YAPMA/YAP örnekleriyle), çalışma akışı + araçlar +
+yayın öncesi kontrol listesi, 23 içerik türünün her biri için kart (ne, kim, sıklık, adım adım, hazır örnek, yapma),
+içerik x platform tablosu, 10 kanal için rehber (nasıl yüklenir, hazır örnek metinler, yapma, haftalık liste),
+takılırsan (SSS), sonra eklenecek kanallar.
+
+Kaynak: `scripts/strategy-pdf/handbook.py` + `hb_intro.py` (ürün, sözlük, kurallar, araçlar), `hb_types.py` (23 kart),
+`hb_platforms.py` (kanal rehberi); platform bölümleri ve tablo için `plat.py`, `plat_extra.py`, `build.py` (MX). Üretmek:
+`cd scripts/strategy-pdf && python3 handbook.py` sonra Chrome ile `handbook.html` -> PDF (komut yukarıda). Aynı tutarlılık kontrolü çalışır.
+Uygulama menü yolları (hangi butona basılır) 2026-10-01'de yazıldı; arayüzler değişebilir, kullanılırken doğrula.
