@@ -1166,6 +1166,110 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "max-drawdown-explained": {
+    "title": "Maximaler Drawdown: so berechnest du ihn und warum Aufholen schwerer ist als Verlieren",
+    "description": "Wie du den maximalen Drawdown aus deiner Trade-Historie misst, warum ein Verlust von 50 % einen Gewinn von 100 % zum Aufholen braucht und wie statische und mitlaufende Drawdown-Limits bei Prop-Firm-Konten funktionieren.",
+    "body": [
+      {
+        "p": "Der maximale Drawdown ist der größte Rückgang deines Kontos von einem Hoch bis zum tiefsten Punkt danach, bevor ein neues Hoch erreicht wurde. Er beantwortet eine Frage, die weder die Gewinnquote noch der Gesamtgewinn beantworten: Wie schlimm wurde es, und hättest du es durchgestanden?"
+      },
+      {
+        "h2": "So berechnest du ihn"
+      },
+      {
+        "p": "Verfolge den Kontostand Trade für Trade. Jedes Mal, wenn er ein neues Hoch erreicht, ist das der Höchststand. Der Drawdown zu jedem Zeitpunkt ist der Abstand des Kontostands zum letzten Höchststand; der maximale Drawdown ist der größte dieser Abstände."
+      },
+      {
+        "code": "Drawdown = Höchststand − aktueller Kontostand\nDrawdown % = (Höchststand − aktueller Kontostand) ÷ Höchststand × 100"
+      },
+      {
+        "p": "Beispiel: Ein Konto wächst auf 10.000 $, fällt in einer schlechten Phase auf 8.000 $ und steigt wieder. Der Drawdown beträgt 2.000 $ oder 20 %. Folgt kein tieferer Rückgang mehr, sind 20 % der maximale Drawdown. Gemessen wird vom Höchststand — nicht vom Startkapital und nicht vom letzten Trade."
+      },
+      {
+        "note": "Ein aus geschlossenen Trades berechneter Drawdown unterschätzt den echten Rückgang. Solange eine Position offen ist, kann ihr schwebender Verlust das Konto tiefer drücken, als die Kurve der geschlossenen Trades je zeigt."
+      },
+      {
+        "h2": "Warum Aufholen schwerer ist als Verlieren"
+      },
+      {
+        "p": "Ein Verlust und der Gewinn, der ihn ausgleicht, sind nicht dieselbe Zahl, weil sich der Gewinn auf einen kleineren Kontostand bezieht. Nach 20 % Verlust brauchst du +25 %, um zurückzukommen, nicht +20 %."
+      },
+      {
+        "table": [
+          [
+            "Verlust vom Höchststand",
+            "Nötiger Gewinn zum Aufholen"
+          ],
+          [
+            "10%",
+            "11.1%"
+          ],
+          [
+            "20%",
+            "25%"
+          ],
+          [
+            "30%",
+            "42.9%"
+          ],
+          [
+            "40%",
+            "66.7%"
+          ],
+          [
+            "50%",
+            "100%"
+          ],
+          [
+            "60%",
+            "150%"
+          ]
+        ]
+      },
+      {
+        "p": "Deshalb ist es wichtiger, den Drawdown zu kontrollieren, als Rendite zu jagen. Je tiefer das Loch, desto weiter bist du vom normalen Tempo deines Vorteils entfernt — und desto verlockender wird ein größeres Risiko. So werden aus Drawdowns verbrannte Konten."
+      },
+      {
+        "h2": "Wie das Risiko pro Trade den Drawdown prägt"
+      },
+      {
+        "p": "Verlustserien sind bei jeder Strategie normal; das Risiko pro Trade entscheidet, was sie kosten. Bei 1 % Risiko nehmen zehn Verluste in Folge etwa 9,6 % vom Konto. Bei 5 % nehmen dieselben zehn Verluste etwa 40 %. Denke also rückwärts: Lege fest, welchen Drawdown du akzeptieren kannst, und wähle eine Größe, die eine schlechte Serie darin hält."
+      },
+      {
+        "h2": "Prop-Firm-Konten: statisch oder mitlaufend"
+      },
+      {
+        "p": "Prop Firms setzen dem Drawdown eine Grenze, und wie er gemessen wird, ändert alles."
+      },
+      {
+        "ul": [
+          "Statisch: Das Limit wird ab dem Startkapital gezählt. Bei einem 100.000-$-Konto mit 10 % Limit liegt die Untergrenze bei 90.000 $ und bleibt dort.",
+          "Mitlaufend (Trailing): Die Untergrenze folgt dem höchsten erreichten Kontostand. Bei 10.000 $ Limit und einem Hoch von 105.000 $ ist sie auf 95.000 $ gestiegen — Gewinn bringt die Untergrenze näher. Manche Firmen beenden das Mitlaufen, sobald die Untergrenze das Startkapital erreicht; lies die genaue Regel.",
+          "Balance oder Equity: Manche Firmen messen nur geschlossene Trades, andere beziehen offene Positionen ein, sodass ein schwebender Verlust zählen kann, bevor du den Trade schließt."
+        ]
+      },
+      {
+        "p": "Dieselben Zahlen können bei einer Regel sicher und bei einer anderen tödlich sein. Prüfe, welche deine Firma verwendet, bevor du deine Positionsgrößen festlegst."
+      },
+      {
+        "h2": "So nutzt du es in der Praxis"
+      },
+      {
+        "ul": [
+          "Stelle deinen maximalen Drawdown neben deinen durchschnittlichen Monat. Wenn ein einziger Drawdown den Gewinn mehrerer Monate auslöscht, ist das Risiko für deinen Vorteil zu hoch.",
+          "Schau nicht nur auf die Tiefe, sondern auch auf die Dauer: Monate unter dem Höchststand strapazieren die Disziplin.",
+          "Lege vorab eine Regel fest — zum Beispiel das Risiko zu halbieren, nachdem du einen bestimmten Prozentsatz vom Höchststand verloren hast, und erst nach einem neuen Hoch zur Normalität zurückzukehren.",
+          "Sieh dir an, was du im Drawdown getan hast: größere Positionen, mehr Trades, übersprungene Checklisten? Das ist der Teil, den du ändern kannst."
+        ]
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "Deine Statistiken zeigen den maximalen Drawdown in Geld, und das Drawdown-Diagramm zeichnet nach jedem geschlossenen Trade den Abstand zum letzten Höchststand, sodass du siehst, wie tief und wie lang jeder Rückgang war. Bei einem Prop-Konto verfolgt die Fortschrittsansicht, wie viel des Gesamtverlustlimits verbraucht ist (beim statischen Drawdown ab dem Startkapital, beim mitlaufenden ab dem höchsten Kontostand), und zeigt die Untergrenze, über der du bleiben musst. Beides basiert auf geschlossenen Trades."
+      }
+    ]
+  },
 };
 
 export default TEXT;

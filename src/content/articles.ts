@@ -67,6 +67,7 @@ export const ARTICLES: Article[] = [
   { slug: 'revenge-trading', section: 'blog', date: '2026-09-29', minutes: 4 },
   { slug: 'expectancy-and-profit-factor', section: 'blog', date: '2026-09-29', minutes: 5 },
   { slug: 'overtrading', section: 'blog', date: '2026-09-29', minutes: 4 },
+  { slug: 'max-drawdown-explained', section: 'blog', date: '2026-10-01', minutes: 5 },
   { slug: 'forex-trading-journal', section: 'blog', date: '2026-09-30', minutes: 5 },
   { slug: 'trading-glossary', section: 'guides', date: '2026-09-30', minutes: 6 },
   // Karşılaştırmalar: rakip bilgileri kendi fiyat/yardım sayfalarından

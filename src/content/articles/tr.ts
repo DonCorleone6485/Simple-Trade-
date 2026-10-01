@@ -1329,6 +1329,110 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "max-drawdown-explained": {
+    "title": "Maksimum drawdown: nasıl hesaplanır ve toparlanmak neden kaybetmekten zordur",
+    "description": "İşlem geçmişinden maksimum drawdown'ı nasıl ölçersin, %50 zararı çıkarmak için neden %100 kazanç gerekir ve prop firma hesaplarında sabit ve takipli drawdown limitleri nasıl işler.",
+    "body": [
+      {
+        "p": "Maksimum drawdown (maksimum düşüş), hesabının bir zirveden, yeni bir zirveye ulaşmadan önceki en düşük noktaya kadar yaşadığı en büyük düşüştür. Kazanma oranı ve toplam kâr hiçbir zaman cevaplamayacağı bir soruyu cevaplar: en kötü ne kadar kötüleşti ve sen bunu atlatabilir miydin?"
+      },
+      {
+        "h2": "Nasıl hesaplanır"
+      },
+      {
+        "p": "Bakiyeyi işlem işlem takip et. Bakiye her yeni zirve yaptığında bu zirve olur. Herhangi bir andaki drawdown, bakiyenin son zirvenin ne kadar altında olduğudur; maksimum drawdown bu mesafelerin en büyüğüdür."
+      },
+      {
+        "code": "Drawdown = Zirve − Güncel bakiye\nDrawdown % = (Zirve − Güncel bakiye) ÷ Zirve × 100"
+      },
+      {
+        "p": "Örnek: hesap 10.000 $'a çıkıyor, kötü bir dönemde 8.000 $'a iniyor, sonra yeniden yükseliyor. Drawdown 2.000 $, yani %20. Ardından daha derin bir düşüş gelmezse maksimum drawdown %20'dir. Zirveden ölçülür; başladığın yerden ya da son işlemden değil."
+      },
+      {
+        "note": "Kapanmış işlemlerden hesaplanan drawdown gerçek düşüşü olduğundan küçük gösterir. Bir pozisyon açıkken, yüzen zarar hesabı kapanmış işlem eğrisinin hiç göstermediği kadar aşağı çekebilir."
+      },
+      {
+        "h2": "Toparlanmak neden kaybetmekten zordur"
+      },
+      {
+        "p": "Bir zarar ile onu geri almak için gereken kazanç aynı sayı değildir, çünkü kazanç daha küçük bir bakiye üzerinden hesaplanır. %20 kaybettikten sonra geri dönmek için %20 değil, %25 kazanman gerekir."
+      },
+      {
+        "table": [
+          [
+            "Zirveden kayıp",
+            "Toparlanmak için gereken kazanç"
+          ],
+          [
+            "10%",
+            "11.1%"
+          ],
+          [
+            "20%",
+            "25%"
+          ],
+          [
+            "30%",
+            "42.9%"
+          ],
+          [
+            "40%",
+            "66.7%"
+          ],
+          [
+            "50%",
+            "100%"
+          ],
+          [
+            "60%",
+            "150%"
+          ]
+        ]
+      },
+      {
+        "p": "Bu yüzden drawdown'ı kontrol etmek, getiri kovalamaktan daha önemlidir. Çukur ne kadar derinse avantajının normal hızından o kadar uzaksın ve daha büyük risk almak o kadar cazip gelir; drawdown'lar işte böyle patlayan hesaplara dönüşür."
+      },
+      {
+        "h2": "İşlem başına risk drawdown'ı nasıl belirler"
+      },
+      {
+        "p": "Kayıp serileri her strateji için normaldir; bedelini işlem başına riskin belirler. %1 riskle art arda on zarar hesaptan yaklaşık %9,6 götürür. %5 riskle aynı on zarar yaklaşık %40 götürür. Bu yüzden tersinden düşün: hangi drawdown'ı kaldırabileceğine karar ver, sonra kötü bir seriyi bunun içinde tutacak büyüklüğü seç."
+      },
+      {
+        "h2": "Prop firma hesapları: sabit ve takipli"
+      },
+      {
+        "p": "Prop firmaları drawdown'a bir sınır koyar ve nasıl ölçüldüğü her şeyi değiştirir."
+      },
+      {
+        "ul": [
+          "Sabit: sınır başlangıç bakiyesinden sayılır. %10 sınırlı 100.000 $'lık hesapta taban 90.000 $'dır ve orada kalır.",
+          "Takipli: taban ulaştığın en yüksek bakiyeyi izler. 10.000 $ sınır ve 105.000 $'a çıkmış bir bakiyede taban 95.000 $'a yükselmiştir; kâr tabanı yaklaştırır. Bazı firmalar taban başlangıç bakiyesine ulaşınca takibi durdurur; tam kuralı oku.",
+          "Bakiye mi, varlık (equity) mı: bazı firmalar yalnız kapanmış işlemleri ölçer, bazıları açık pozisyonları da katar; yani yüzen bir zarar işlemi kapatmadan önce sayılabilir."
+        ]
+      },
+      {
+        "p": "Aynı rakamlar bir kuralda güvenli, diğerinde ölümcül olabilir. İşlem büyüklüğünü belirlemeden önce firmanın hangisini kullandığına bak."
+      },
+      {
+        "h2": "Pratikte nasıl kullanılır"
+      },
+      {
+        "ul": [
+          "Maksimum drawdown'ını ortalama ayınla yan yana koy. Tek bir drawdown birkaç aylık kârı siliyorsa risk, avantajın taşıyabileceğinden fazladır.",
+          "Yalnız derinliğine değil, ne kadar sürdüğüne de bak: zirvenin altında geçen aylar disiplini yorar.",
+          "Önceden bir kural koy; örneğin zirveden belirli bir yüzde kaybedince riskini yarıya indir ve yeni zirveye çıkınca normale dön.",
+          "Drawdown'ın içinde ne yaptığına bak: büyütülmüş lot, fazla işlem, atlanmış kontrol listesi? Değiştirebileceğin kısım orası."
+        ]
+      },
+      {
+        "h2": "Simple Trading Journal'da"
+      },
+      {
+        "p": "İstatistiklerin maksimum drawdown'ı para olarak gösterir; drawdown grafiği her kapanan işlemden sonra son zirveye olan mesafeyi çizer, böylece her düşüşün ne kadar derin ve ne kadar uzun olduğunu görürsün. Prop hesabında ilerleme ekranı toplam kayıp limitinin ne kadarını kullandığını takip eder (sabit drawdown'da başlangıç bakiyesinden, takipli drawdown'da en yüksek bakiyeden ölçer) ve üstünde kalman gereken tabanı gösterir. İkisi de kapanmış işlemlere dayanır."
+      }
+    ]
+  },
 };
 
 export default TEXT;

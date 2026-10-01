@@ -1166,6 +1166,110 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "max-drawdown-explained": {
+    "title": "Drawdown máximo: cómo calcularlo y por qué recuperarse cuesta más que perder",
+    "description": "Cómo medir el drawdown máximo con tu historial de operaciones, por qué una pérdida del 50% exige una ganancia del 100% para recuperarse y cómo funcionan los límites de drawdown estático y dinámico en cuentas de prop firm.",
+    "body": [
+      {
+        "p": "El drawdown máximo es la mayor caída que ha sufrido tu cuenta desde un máximo hasta el punto más bajo posterior, antes de alcanzar un nuevo máximo. Responde a una pregunta que ni el porcentaje de aciertos ni el beneficio total responderán: ¿hasta dónde llegó lo malo y habrías podido aguantarlo?"
+      },
+      {
+        "h2": "Cómo se calcula"
+      },
+      {
+        "p": "Sigue el saldo operación por operación. Cada vez que marca un nuevo máximo, ese es el pico. El drawdown en cualquier momento es cuánto está el saldo por debajo del último pico; el drawdown máximo es la mayor de esas distancias."
+      },
+      {
+        "code": "Drawdown = Pico − Saldo actual\nDrawdown % = (Pico − Saldo actual) ÷ Pico × 100"
+      },
+      {
+        "p": "Ejemplo: una cuenta sube a 10.000 $, baja a 8.000 $ en una mala racha y vuelve a subir. El drawdown es de 2.000 $, es decir, 20%. Si no llega después una caída más profunda, el 20% es el drawdown máximo. Se mide desde el pico, no desde donde empezaste ni desde tu última operación."
+      },
+      {
+        "note": "Un drawdown calculado con operaciones cerradas subestima la caída real. Mientras una posición está abierta, su pérdida flotante puede llevar la cuenta más abajo de lo que muestra jamás la curva de operaciones cerradas."
+      },
+      {
+        "h2": "Por qué recuperarse cuesta más que perder"
+      },
+      {
+        "p": "Una pérdida y la ganancia necesaria para deshacerla no son el mismo número, porque la ganancia se calcula sobre un saldo menor. Tras perder un 20% necesitas un +25% para volver, no un +20%."
+      },
+      {
+        "table": [
+          [
+            "Pérdida desde el pico",
+            "Ganancia necesaria para recuperarse"
+          ],
+          [
+            "10%",
+            "11.1%"
+          ],
+          [
+            "20%",
+            "25%"
+          ],
+          [
+            "30%",
+            "42.9%"
+          ],
+          [
+            "40%",
+            "66.7%"
+          ],
+          [
+            "50%",
+            "100%"
+          ],
+          [
+            "60%",
+            "150%"
+          ]
+        ]
+      },
+      {
+        "p": "Por eso controlar el drawdown importa más que perseguir rentabilidad. Cuanto más profundo es el hoyo, más lejos estás del ritmo normal de tu ventaja y más tentador resulta arriesgar más; así es como los drawdowns se convierten en cuentas quemadas."
+      },
+      {
+        "h2": "Cómo el riesgo por operación da forma al drawdown"
+      },
+      {
+        "p": "Las rachas perdedoras son normales en cualquier estrategia; el riesgo por operación decide lo que cuestan. Con un 1% de riesgo, diez pérdidas seguidas se llevan cerca del 9,6% de la cuenta. Con un 5%, esas mismas diez pérdidas se llevan cerca del 40%. Piensa al revés: decide qué drawdown puedes aceptar y elige un tamaño que mantenga una mala racha dentro de ese margen."
+      },
+      {
+        "h2": "Cuentas de prop firm: estático frente a dinámico"
+      },
+      {
+        "p": "Las prop firms ponen un límite al drawdown, y cómo se mide lo cambia todo."
+      },
+      {
+        "ul": [
+          "Estático: el límite se cuenta desde el saldo inicial. En una cuenta de 100.000 $ con un límite del 10%, el suelo es de 90.000 $ y se queda ahí.",
+          "Dinámico (trailing): el suelo sigue al saldo más alto alcanzado. Con un límite de 10.000 $ y un saldo que llegó a 105.000 $, el suelo ha subido a 95.000 $: el beneficio acerca el suelo. Algunas firmas dejan de seguirlo cuando el suelo llega al saldo inicial; lee la regla exacta.",
+          "Saldo o equity: algunas firmas miden solo las operaciones cerradas y otras incluyen las posiciones abiertas, de modo que una pérdida flotante puede contar antes de cerrar la operación."
+        ]
+      },
+      {
+        "p": "Los mismos números pueden ser seguros con una regla y fatales con otra. Comprueba cuál usa tu firma antes de dimensionar tus operaciones."
+      },
+      {
+        "h2": "Cómo usarlo en la práctica"
+      },
+      {
+        "ul": [
+          "Pon tu drawdown máximo junto a tu mes medio. Si un solo drawdown borra los beneficios de varios meses, el riesgo es demasiado alto para tu ventaja.",
+          "Mira cuánto duran los drawdowns, no solo su profundidad: los meses por debajo del pico desgastan la disciplina.",
+          "Fija una regla de antemano; por ejemplo, reduce a la mitad el riesgo tras perder cierto porcentaje desde el pico y vuelve a lo normal solo con un nuevo máximo.",
+          "Revisa qué hiciste dentro del drawdown: ¿tamaños mayores, más operaciones, listas de verificación saltadas? Esa es la parte que puedes cambiar."
+        ]
+      },
+      {
+        "h2": "En Simple Trading Journal"
+      },
+      {
+        "p": "Tus estadísticas muestran el drawdown máximo en dinero y el gráfico de drawdown dibuja la distancia al último pico tras cada operación cerrada, así ves cuán profunda y larga fue cada caída. En una cuenta prop, la vista de progreso sigue cuánto del límite de pérdida total se ha usado (desde el saldo inicial en drawdown estático, desde el saldo más alto en dinámico) y muestra el suelo por encima del cual debes mantenerte. Ambos se basan en operaciones cerradas."
+      }
+    ]
+  },
 };
 
 export default TEXT;

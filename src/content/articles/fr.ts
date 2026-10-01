@@ -1166,6 +1166,110 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "max-drawdown-explained": {
+    "title": "Drawdown maximal : comment le calculer et pourquoi se refaire est plus dur que perdre",
+    "description": "Comment mesurer le drawdown maximal à partir de ton historique de trades, pourquoi une perte de 50 % exige un gain de 100 % pour se refaire, et comment fonctionnent les limites de drawdown statique et glissant sur les comptes de prop firm.",
+    "body": [
+      {
+        "p": "Le drawdown maximal est la plus forte baisse subie par ton compte entre un sommet et le point le plus bas qui suit, avant qu'un nouveau sommet soit atteint. Il répond à une question que ni le taux de réussite ni le gain total ne couvrent : jusqu'où est-ce descendu, et aurais-tu pu tenir ?"
+      },
+      {
+        "h2": "Comment le calculer"
+      },
+      {
+        "p": "Suis le solde trade après trade. Chaque fois qu'il atteint un nouveau plus haut, c'est le sommet. Le drawdown à un instant donné est l'écart entre le solde et le dernier sommet ; le drawdown maximal est le plus grand de ces écarts."
+      },
+      {
+        "code": "Drawdown = Sommet − Solde actuel\nDrawdown % = (Sommet − Solde actuel) ÷ Sommet × 100"
+      },
+      {
+        "p": "Exemple : un compte monte à 10 000 $, descend à 8 000 $ pendant une mauvaise passe, puis remonte. Le drawdown est de 2 000 $, soit 20 %. Si aucune baisse plus profonde ne suit, 20 % est le drawdown maximal. Il se mesure depuis le sommet — pas depuis ton point de départ ni depuis ton dernier trade."
+      },
+      {
+        "note": "Un drawdown calculé sur les trades clôturés sous-estime la baisse réelle. Tant qu'une position est ouverte, sa perte latente peut faire descendre le compte plus bas que ne le montrera jamais la courbe des trades clôturés."
+      },
+      {
+        "h2": "Pourquoi se refaire est plus dur que perdre"
+      },
+      {
+        "p": "Une perte et le gain nécessaire pour l'effacer ne sont pas le même nombre, car le gain se calcule sur un solde plus petit. Après avoir perdu 20 %, il faut +25 % pour revenir, pas +20 %."
+      },
+      {
+        "table": [
+          [
+            "Perte depuis le sommet",
+            "Gain nécessaire pour se refaire"
+          ],
+          [
+            "10%",
+            "11.1%"
+          ],
+          [
+            "20%",
+            "25%"
+          ],
+          [
+            "30%",
+            "42.9%"
+          ],
+          [
+            "40%",
+            "66.7%"
+          ],
+          [
+            "50%",
+            "100%"
+          ],
+          [
+            "60%",
+            "150%"
+          ]
+        ]
+      },
+      {
+        "p": "C'est pourquoi maîtriser le drawdown compte plus que courir après le rendement. Plus le trou est profond, plus tu es loin du rythme normal de ton avantage et plus il est tentant de prendre davantage de risque — c'est ainsi que les drawdowns deviennent des comptes grillés."
+      },
+      {
+        "h2": "Comment le risque par trade façonne le drawdown"
+      },
+      {
+        "p": "Les séries perdantes sont normales dans toute stratégie ; c'est le risque par trade qui décide de leur coût. À 1 % de risque, dix pertes de suite retirent environ 9,6 % du compte. À 5 %, les mêmes dix pertes en retirent environ 40 %. Raisonne donc à l'envers : décide quel drawdown tu peux accepter, puis choisis une taille qui garde une mauvaise série à l'intérieur."
+      },
+      {
+        "h2": "Comptes de prop firm : statique ou glissant"
+      },
+      {
+        "p": "Les prop firms fixent une limite de drawdown, et la façon de la mesurer change tout."
+      },
+      {
+        "ul": [
+          "Statique : la limite se compte depuis le solde initial. Sur un compte de 100 000 $ avec une limite de 10 %, le plancher est à 90 000 $ et y reste.",
+          "Glissant (trailing) : le plancher suit le solde le plus haut atteint. Avec une limite de 10 000 $ et un solde monté à 105 000 $, le plancher est remonté à 95 000 $ — le profit rapproche le plancher. Certaines firmes arrêtent le suivi quand le plancher atteint le solde initial ; lis la règle exacte.",
+          "Solde ou equity : certaines firmes ne mesurent que les trades clôturés, d'autres incluent les positions ouvertes, si bien qu'une perte latente peut compter avant que tu fermes le trade."
+        ]
+      },
+      {
+        "p": "Les mêmes chiffres peuvent être sûrs avec une règle et fatals avec une autre. Vérifie laquelle ta firme applique avant de dimensionner tes trades."
+      },
+      {
+        "h2": "L'utiliser en pratique"
+      },
+      {
+        "ul": [
+          "Place ton drawdown maximal à côté de ton mois moyen. Si un seul drawdown efface plusieurs mois de profit, le risque est trop élevé pour ton avantage.",
+          "Regarde la durée des drawdowns, pas seulement leur profondeur : des mois sous le sommet épuisent la discipline.",
+          "Fixe une règle à l'avance — par exemple, divise ton risque par deux après avoir perdu un certain pourcentage depuis le sommet, et ne reviens à la normale qu'après un nouveau plus haut.",
+          "Regarde ce que tu as fait pendant le drawdown : tailles plus grosses, plus de trades, checklist sautée ? C'est la partie que tu peux changer."
+        ]
+      },
+      {
+        "h2": "Dans Simple Trading Journal"
+      },
+      {
+        "p": "Tes statistiques affichent le drawdown maximal en argent, et le graphique de drawdown trace l'écart avec le dernier sommet après chaque trade clôturé, pour voir la profondeur et la durée de chaque repli. Sur un compte prop, la vue de progression suit la part de la limite de perte totale déjà utilisée (depuis le solde initial en drawdown statique, depuis le solde le plus haut en glissant) et affiche le plancher au-dessus duquel tu dois rester. Les deux reposent sur les trades clôturés."
+      }
+    ]
+  },
 };
 
 export default TEXT;

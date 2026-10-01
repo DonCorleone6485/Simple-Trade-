@@ -1329,6 +1329,110 @@ const TEXT: Record<string, ArticleText> = {
       }
     ]
   },
+  "max-drawdown-explained": {
+    "title": "Maximum drawdown: how to calculate it, and why recovering is harder than losing",
+    "description": "How to measure maximum drawdown from your trade history, why a 50% loss needs a 100% gain to recover, and how static and trailing drawdown limits work on prop firm accounts.",
+    "body": [
+      {
+        "p": "Maximum drawdown is the biggest fall your account has taken from a peak to the lowest point that followed, before a new peak was reached. It answers a question that win rate and total profit never will: how bad did it get, and could you have lived through it?"
+      },
+      {
+        "h2": "How to calculate it"
+      },
+      {
+        "p": "Follow the balance trade by trade. Every time it makes a new high, that is the peak. The drawdown at any moment is how far the balance sits below the latest peak; the maximum drawdown is the largest of those distances."
+      },
+      {
+        "code": "Drawdown = Peak − Current balance\nDrawdown % = (Peak − Current balance) ÷ Peak × 100"
+      },
+      {
+        "p": "Example: an account grows to $10,000, slides to $8,000 over a bad stretch, then climbs again. The drawdown is $2,000, or 20%. If no deeper fall ever follows, 20% is the maximum drawdown. It is measured from the peak — not from where you started and not from your last trade."
+      },
+      {
+        "note": "A drawdown calculated from closed trades understates the real dip. While a position is open, its floating loss can take the account lower than the closed-trade curve ever shows."
+      },
+      {
+        "h2": "Why recovering is harder than losing"
+      },
+      {
+        "p": "A loss and the gain needed to undo it are different numbers, because the gain is measured on a smaller balance. After losing 20% you need +25% to get back, not +20%."
+      },
+      {
+        "table": [
+          [
+            "Loss from the peak",
+            "Gain needed to recover"
+          ],
+          [
+            "10%",
+            "11.1%"
+          ],
+          [
+            "20%",
+            "25%"
+          ],
+          [
+            "30%",
+            "42.9%"
+          ],
+          [
+            "40%",
+            "66.7%"
+          ],
+          [
+            "50%",
+            "100%"
+          ],
+          [
+            "60%",
+            "150%"
+          ]
+        ]
+      },
+      {
+        "p": "This is why controlling drawdown matters more than chasing returns. The deeper the hole, the further you are from your edge's normal pace — and the more tempting bigger risks become, which is how drawdowns turn into blown accounts."
+      },
+      {
+        "h2": "How risk per trade shapes drawdown"
+      },
+      {
+        "p": "Losing streaks are normal for every strategy; your risk per trade decides what they cost. At 1% risk, ten losses in a row take about 9.6% off the account. At 5% risk, the same ten losses take about 40%. So work backwards: decide which drawdown you can accept, then choose a size that keeps a bad streak inside it."
+      },
+      {
+        "h2": "Prop firm accounts: static versus trailing"
+      },
+      {
+        "p": "Prop firms put a limit on drawdown, and how it is measured changes everything."
+      },
+      {
+        "ul": [
+          "Static: the limit is counted from the starting balance. On a $100,000 account with a 10% limit, the floor is $90,000 and stays there.",
+          "Trailing: the floor follows the highest balance you have reached. With a $10,000 limit and a balance that peaked at $105,000, the floor has moved up to $95,000 — profit brings the floor closer. Some firms stop the trailing once the floor reaches the starting balance; read the exact rule.",
+          "Balance or equity: some firms measure on closed trades only, others include open positions, so a floating loss can count before you close the trade."
+        ]
+      },
+      {
+        "p": "The same numbers can be safe under one rule and fatal under another. Check which one your firm uses before you size your trades."
+      },
+      {
+        "h2": "Using it in practice"
+      },
+      {
+        "ul": [
+          "Put your maximum drawdown next to your average month. If one drawdown wipes out several months of profit, the risk is too high for the edge.",
+          "Look at how long drawdowns last, not only how deep: months below the peak are hard on discipline.",
+          "Set a rule in advance — for example, halve your risk after losing a set percentage from the peak, and go back to normal only after a new high.",
+          "Look at what you did inside the drawdown: bigger sizes, more trades, skipped checklists? That is the part you can change."
+        ]
+      },
+      {
+        "h2": "In Simple Trading Journal"
+      },
+      {
+        "p": "Your statistics show the maximum drawdown in money, and the drawdown chart plots the distance from the latest peak after every closed trade, so you can see how deep and how long each dip was. On a prop account, the progress view tracks how much of your total loss limit is used — measured from the starting balance for static drawdown, from the highest balance for trailing — and shows the floor you must stay above. Both are based on closed trades."
+      }
+    ]
+  },
 };
 
 export default TEXT;
