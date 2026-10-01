@@ -72,6 +72,7 @@ def s4():
     ["Geri çağırma 1","14 gündür giriş yok ve MetaTrader bağlı değil","Sana işe yarayacak tek bir şey (yeni araç ya da yazı)","Ürün","Sonra"],
     ["Geri çağırma 2","30 gündür giriş yok","Son mail: \"verilerin yerinde, istersen buradan devam\". <b>Sonra durur.</b>","Ürün","Sonra"],
     ["Aylık yenilikler","Ayın 15'i, geçen ay yeni bir şey çıktıysa","Değişiklik günlüğünden 3 madde","Ürün","Sonra"]])
+    h+=box("warn","\"Geri çağırma\" ile \"bülten\" farklı şeyler","<p>Prop firmaların neredeyse her gün attığı mailler geri çağırma değil, <b>pazarlama</b> (bülten, kampanya). Kullanıcı kayıtta ya da satın alırken buna izin vermiştir; izin verdiği sürece, hiç alışveriş yapmasa da her gün mail alabilir. Bizde de aynısı olacak: şirket kurulunca pazarlamaya izin veren kullanıcı, siteye hiç girmese de bülteni ve kampanyaları alır, ta ki kendisi çıkana kadar. <b>\"En çok 2\" sınırı yalnız izinsiz gönderilen \"seni özledik\" maillerine konur.</b> Nedenleri: (1) izin yokken satış ya da ısrar içeren mail yasal değil; (2) açmayan kişiye sürekli mail atmak Gmail'in gözünde \"spam gönderen\" yapar, sonra hoş geldin ve bilet mailleri de spam klasörüne düşer. Büyük firmaların yıllardır biriken bir gönderici itibarı var, yeni bir alan adının yok. Bu yüzden pazarlama mailleri ayrı bir alt adresten (örneğin news.simpletradejournal.io) gönderilmeli ki sorun çıkarsa öteki mailleri etkilemesin.</p>")
     h+=box("info","Neden \"MetaTrader bağlıysa geri çağırma yok\"?","<p>Eklentisi bağlı kullanıcının işlemleri zaten kendiliğinden geliyor; siteye girmese de journal'ı dolu ve haftalık özeti alıyor. Ona \"seni özledik\" demek gereksiz olur.</p>")
     return h
 
@@ -138,8 +139,9 @@ def s9():
 
 def s10():
     h=sec(10,"Kurulum sırası ve Ali'nin işi")
+    h+=box("warn","Şimdi kurulmuyor (Ali'nin kararı, 1 Ekim 2026)","<p>Bu planın hiçbir aşaması şu an kurulmayacak. Plan hazır duruyor; Ali \"başla\" deyince A aşamasından başlanır.</p>")
     h+=T(["Aşama","Ne","Ali ne yapar"],[
-    ["<b>A: şimdi</b>","1) Bilet sistemi + anında otomatik cevap (9 dil)<br>2) 4 kategorili tercihler + tek tıkla çıkış<br>3) Karşılama serisi: gün 1, 3, 7<br>4) \"Bağlantın koptu\" uyarısı","Kod için bir kez \"evet\"; her yeni şablonun Türkçesine bir kez \"tamam\""],
+    ["<b>A: ilk kurulacak</b>","1) Bilet sistemi + anında otomatik cevap (9 dil)<br>2) 4 kategorili tercihler + tek tıkla çıkış<br>3) Karşılama serisi: gün 1, 3, 7<br>4) \"Bağlantın koptu\" uyarısı","Kod için bir kez \"evet\"; her yeni şablonun Türkçesine bir kez \"tamam\""],
     ["<b>B: A'dan 2-4 hafta sonra</b>","Aylık rapor, \"kilitli işlemlerin var\", gün 14 özelliği tanı, geri çağırma, aylık yenilikler. A'nın rakamlarına bakarak.","Aynı: şablon başına bir \"tamam\""],
     ["<b>C: şirket + ödeme</b>","Rıza kutusu, bülten, Pro lansmanı, kurucu üye kampanyası, yorum isteği, deneme maillerine \"Pro'ya geç\", iade onayı maili","Kampanya kararları"]])
     h+=box("ok","Sonuç: Ali neyle uğraşır, neyle uğraşmaz?","<p><b>Uğraşmaz:</b> otomatik mailler, bilet numaraları, kim ne zaman hangi maili alacak. Hepsi kendiliğinden.<br><b>Uğraşır:</b> her şablona bir kez \"tamam\"; kullanıcı cevap yazınca e-posta asistanının günde en çok iki kez sorduğu \"tamam mı?\" sorusu; kampanya kararları.</p>")
@@ -150,7 +152,8 @@ def s11():
     h+="<p>İlk incelemede \"iade politikası sitede yok\" denmişti. Doğru, ama şu an bir eksik değil:</p>"
     h+=ul(["<b>Şu an hiçbir şey satılmıyor.</b> Pro satın alınamıyor, kart alınmıyor. Satılmayan bir şeyin iade şartını yazmak kafa karıştırır.",
     "<b>Ödeme açılmadan önce ise şart.</b> Paddle gibi ödeme aracıları başvuruda iade politikasını ister; tüketici yasaları da bunu bekler. PLAN.md'de gizlilik ve kullanım şartlarıyla birlikte \"şirket kurulunca, kesin yapılacak\" diye yazılı."])
-    h+="<h3>Önerim (karar Ali'nin)</h3>"+T(["Konu","Öneri","Neden"],[
+    h+=box("warn","Karar verilmedi","<p>Aşağıdakiler yalnız öneri. Ali'nin kararı (1 Ekim 2026): iade kuralları <b>ödeme sistemi kurulurken</b> konuşulacak, şimdi karar verilmeyecek.</p>")
+    h+="<h3>Önerim (ödeme kurulurken konuşulacak)</h3>"+T(["Konu","Öneri","Neden"],[
     ["Yıllık plan","İlk ödemeden sonra <b>14 gün içinde, sebep sormadan tam iade</b>","Daha önce konuşulan kural; güven verir, yıllık satışı kolaylaştırır"],
     ["Aylık plan","İade yok; istediği an iptal eder, ödediği ayın sonuna kadar kullanır","Zaten 3 gün kartsız deneyebiliyor; aylık tutar küçük"],
     ["Kötüye kullanım","Aynı kişiye ikinci kez iade yok","Al, kullan, iade et, tekrar al döngüsünü önler"],
