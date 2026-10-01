@@ -4,8 +4,8 @@ PRODUCT = [
 ("Simple Trading Journal nedir?","Trader'ların (borsada ya da döviz piyasasında alım satım yapan insanların) işlemlerini otomatik kaydeden bir online defterdir. Trader bir işlem yapar; program işlemi kendisi deftere yazar. Sonra trader bu defterden 'neyi doğru, neyi yanlış yapıyorum?' sorusunun cevabını görür. Adres: simpletradejournal.io"),
 ("Biz ne satıyoruz?","Bir yazılım satıyoruz. Para kazandırmayı, hisse önermeyi, 'şunu al şunu sat' demeyi satmıyoruz. Bu çok önemli: biz bir araç şirketiyiz, yatırım danışmanı değiliz."),
 ("Müşteri kim?","Her gün işlem yapan bireysel trader'lar ve 'prop firma' (fon sağlayan firma) hesabıyla çalışanlar. Çoğu MetaTrader adlı programı kullanır. Bizim program MetaTrader'daki işlemleri otomatik çeker."),
-("Fiyat","Ücretsiz plan var (kart gerekmez). Pro plan: ayda 14,99 dolar ya da yılda 119 dolar. Ücretsiz planda her gün ilk 2 işlem açık görünür."),
-("Neyi öne çıkarırız?","(1) MetaTrader'dan işlemler kendiliğinden gelir, elle yazılmaz. (2) 'Hata analizi': intikam işlemi, aşırı işlem gibi alışkanlıkları gösterir. (3) Prop firma kuralına ne kadar yaklaşıldığını gösterir. (4) 9 dilde. (5) Ücretsiz hesap makineleri."),
+("Planlar ve fiyat","İki plan var. ÜCRETSİZ plan (kart gerekmez): 1 journal; günde 2 işlem (fazlası silinmez, kilitli saklanır); MetaTrader otomatik kayıt ve dosya içe aktarma; tüm istatistikler, takvim ve disiplin analizi; seanslar, günün haberleri, prop değerlendirme. PRO plan: her gün sınırsız işlem ve journal, sesli not ve yapay zekâ analizi, işlem öncesi ve sonrası 3'er fotoğraf. Pro 3 gün kartsız denenebilir. ÖNEMLİ: Pro şu an satın alınamıyor (ödeme sistemi şirket kurulunca açılacak). Bu yüzden içeriklerde ve cevaplarda FİYAT YAZMA. Fiyat soran olursa: 'Ücretsiz plan var, Pro 3 gün kartsız denenebilir; ücretli plan fiyatı ödeme açılınca duyurulacak.'"),
+("Neyi öne çıkarırız?","(1) MetaTrader'dan işlemler kendiliğinden gelir, elle yazılmaz. (2) 'Hata analizi': intikam işlemi, aşırı işlem gibi alışkanlıkları gösterir. (3) Prop firma kuralına ne kadar yaklaşıldığını gösterir. (4) 9 dilde. (5) Ücretsiz hesap makineleri. (6) Pro planda sesli not, yapay zekâ analizi ve işlem fotoğrafları."),
 ("İçerik ekibinin işi ne?","Trader'lara yardım eden içerikler üretmek: eğitici videolar, kartlar, yazılar, hesap makineleri. Böylece insanlar bizi tanır, güvenir ve siteyi dener. Satış yapmaya çalışmayız; yardım ederiz, merak eden siteye gelir."),
 ]
 
@@ -113,4 +113,5 @@ PRE_PUBLISH = [
 "Bağlantı çalışıyor (tıkla ve dene).",
 "Başka platformun logosu (filigran) videoda görünmüyor.",
 "Danışman onayı geldi. Yönetici onayı geldi.",
+"Metinde fiyat yok (Pro şu an satın alınamıyor; fiyat soran olursa Ücretsiz plan ve 3 günlük deneme anlatılır).",
 ]

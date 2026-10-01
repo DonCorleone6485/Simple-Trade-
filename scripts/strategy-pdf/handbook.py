@@ -32,6 +32,7 @@ def sec_product():
     ch = [("Web sitesi","simpletradejournal.io","Açık"),("Instagram","@simpletradejournal","Açık"),("X","@SimpleTradeJrnl","Açık"),("YouTube","@simpletradejournal","Açılacak (11 Ekim'den sonra)"),("TikTok","(ad 30 Ekim'den sonra düzelecek)","Açık"),("Telegram","t.me/simpletradejournal","Açık"),("Facebook","facebook.com/simpletradejournalapp","Açık"),("LinkedIn","linkedin.com/company/simpletradejournal","Açık"),("Reddit","u/simpletradejournal","Açık"),("Discord","discord.gg/yUJ5NXyJHg","Açık")]
     o += "<h3>10 kanalımız</h3><table class='t'><tr><th>Kanal</th><th>Adres</th><th>Durum</th></tr>" + "".join(f"<tr><td><b>{e(a)}</b></td><td>{e(b)}</td><td>{e(c)}</td></tr>" for a, b, c in ch) + "</table>"
     o += "<p class='note'>Hesapların şifrelerini ve doğrulama kodlarını yönetici tutar. Hiçbir zaman şifre isteme, paylaşma ya da kaydetme.</p>"
+    o += "<p class='note'><b>Sürüm notu (2. sürüm, 1 Ekim 2026):</b> plan ve fiyat bilgisi, site adresleri ve yayındaki yazı ve araçlar sitenin kendisiyle karşılaştırıldı; X ve YouTube adımları düzeltildi.</p>"
     return o
 
 def sec_gloss():
@@ -93,13 +94,14 @@ def sec_platforms():
     byname = {r[0]: r for r in P}
     pairs = list(zip(PG, P))
     o = "<h2 class='brk'>Bölüm 7: Kanal kanal rehber</h2><p>Her kanal için: ne işe yaradığı, nasıl yüklendiği (hangi butona basılır), hazır örnek metinler, yapılmayacaklar ve haftalık görev listesi. Altta o kanalda hangi içerik türlerinin paylaşıldığı yazıyor.</p>"
+    o += "<div class='box'><b>Menü yolları hakkında önemli not.</b> Uygulamalar arayüzlerini sık değiştirir; düğme adları ya da yerleri değişmiş olabilir. Bu bölümdeki adımlar 1 Ekim 2026'da kontrol edildi: YouTube adımları resmi yardım sayfasından, X ve Instagram adımları yayımlanmış kaynaklardan doğrulandı. TikTok, Facebook, LinkedIn, Telegram, Reddit ve Discord adımları yaygın bilinen akışa göre yazıldı ve henüz uygulamada tek tek denenmedi. Bir düğmeyi bulamazsan ya da adı farklıysa tahmin etme: ekran görüntüsüyle yöneticiye göster, birlikte belgeyi güncelleriz.</div>"
     return o + "".join(platform(pg, row) for pg, row in pairs)
 
 def sec_faq():
     qa = [("Yanlış bir şey yayınladım, ne yapayım?","Gönderiyi hemen sil ya da gizle, sonra yöneticiye haber ver. Saklamak durumu kötüleştirir."),
     ("Biri yorumda 'hangi parite alayım?' diye sordu.","Nazikçe: 'Teşekkürler! Biz sinyal ya da tavsiye vermiyoruz; kendi işlemlerini kaydedip incelemene yardım ediyoruz.' Başka bir şey yazma."),
     ("Biri hakaret etti ya da kızgın yazdı.","Cevap verme, tartışma. Gerekirse yorumu gizle ve yöneticiye ekran görüntüsüyle bildir."),
-    ("Birisi 'hesabıma girilmiyor / işlemlerim gelmiyor' dedi.","Çözmeye çalışma. 'Destek ekibimize yazın: support kanalı ya da iletişim formu' de ve yöneticiye bildir."),
+    ("Birisi 'hesabıma girilmiyor / işlemlerim gelmiyor' dedi.","Çözmeye çalışma. 'Destek ekibimize yazın: support@simpletradejournal.io, sitedeki iletişim formu ya da Discord'daki support kanalı' de ve yöneticiye bildir. Sitenin çalışıp çalışmadığına status.simpletradejournal.io sayfasından bakılır."),
     ("Bir rakip ya da firma bizim hakkımızda kötü yazdı.","Cevap verme. Yöneticiye bildir."),
     ("Hesaba giriş istedim ama yönetici yok.","Bekle. Şifre isteme, başkasından alma, tahmin etme."),
     ("Videomda yanlış bir bilgi söyledim, yayınladım.","Videoyu gizle (silme), yöneticiye haber ver, doğrusunu çek."),
