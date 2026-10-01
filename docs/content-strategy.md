@@ -31,3 +31,15 @@ Kaynak: `scripts/strategy-pdf/handbook.py` + `hb_intro.py` (ürün, sözlük, ku
 `hb_platforms.py` (kanal rehberi); platform bölümleri ve tablo için `plat.py`, `plat_extra.py`, `build.py` (MX). Üretmek:
 `cd scripts/strategy-pdf && python3 handbook.py` sonra Chrome ile `handbook.html` -> PDF (komut yukarıda). Aynı tutarlılık kontrolü çalışır.
 Uygulama menü yolları (hangi butona basılır) 2026-10-01'de yazıldı; arayüzler değişebilir, kullanılırken doğrula.
+
+## Yapay zekâ ekibi el kitabı (2. sürüm, 22 sayfa)
+
+`STJ-PDF/Simple Trading Journal - Yapay Zeka Ekibi El Kitabi.pdf`: siteyi yönetecek 1 koordinatör + 7 yapay zekâ asistanının
+görev talimatları (Kalite Kontrol, Teknik Bakım, SEO ve İçerik, Araştırma, Sosyal Medya, Müşteri, Operasyon ve Güven).
+İlk sürüm (`STJ-PDF/simpletradejournal-yapay-zeka-ekibi.pdf`, 12 sayfa) başka bir Claude oturumunun dışarıdan incelemesiydi;
+2. sürüm sitenin gerçek durumuna göre düzeltildi (yazılar 9 dilde, Pro satılmıyor, kurulu görevler, onay kuralları) ve
+Bölüm 1'deki tabloda neyin neden değiştiği yazılı. Kurulum 3 aşamalı; Aşama 1 Ali'nin onayını bekliyor.
+
+Kaynak: `scripts/strategy-pdf/ai_1.py` (giriş, site gerçekleri, şema, ortak kurallar), `ai_2.py` (8 rol), `ai_3.py`
+(kurulum sırası, SSS), `ai_build.py`. Üretmek: `cd scripts/strategy-pdf && python3 ai_build.py`, sonra Chrome ile
+`ai_ekip.html` -> PDF (komut yukarıda). Site gerçekleri (sayfa sayıları, kurulu görevler) değişince Bölüm 2 güncellenir.
