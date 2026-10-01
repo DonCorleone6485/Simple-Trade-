@@ -396,7 +396,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
   const faqs = [
     {
       q: t('Ücretsiz olarak kullanabilir miyim?', 'Can I use it for free?', 'آیا می‌توانم رایگان استفاده کنم؟'),
-      a: t('Evet. Ücretsiz plan 1 journal ve günde 2 işlemle süresiz senin; fazladan girilen işlemler silinmez, kilitli saklanır. MetaTrader otomatik kaydı, içe aktarma, tüm istatistikler, takvim ve disiplin analizi dahil. Kart bilgisi istemiyoruz.', 'Yes. The Free plan is yours for good with 1 journal and 2 trades a day; extra trades aren\'t deleted, they\'re kept locked. MetaTrader auto-sync, importing, all statistics, the calendar and discipline analysis are included. No card required.', 'بله. پلن رایگان با ۱ ژورنال و ۲ معامله در روز همیشه در اختیار توست؛ معاملات اضافه حذف نمی‌شوند و قفل نگه داشته می‌شوند. ثبت خودکار متاتریدر، وارد کردن فایل، همه آمارها، تقویم و تحلیل انضباط شامل است. کارت لازم نیست.'),
+      a: t('Evet. Ücretsiz plan 1 journal ve günde 2 işlemle süresiz senin; fazladan girilen işlemler silinmez, kilitli saklanır. MetaTrader otomatik kaydı, içe aktarma, tüm istatistikler, takvim ve disiplin analizi dahil. Ücretsiz plan ve 3 günlük deneme için kart istemiyoruz.', 'Yes. The Free plan is yours for good with 1 journal and 2 trades a day; extra trades aren\'t deleted, they\'re kept locked. MetaTrader auto-sync, importing, all statistics, the calendar and discipline analysis are included. No card required.', 'بله. پلن رایگان با ۱ ژورنال و ۲ معامله در روز همیشه در اختیار توست؛ معاملات اضافه حذف نمی‌شوند و قفل نگه داشته می‌شوند. ثبت خودکار متاتریدر، وارد کردن فایل، همه آمارها، تقویم و تحلیل انضباط شامل است. کارت لازم نیست.'),
     },
     {
       q: t('Pro deneme için kart bilgisi gerekiyor mu?', 'Does the Pro trial require a card?', 'آیا آزمایش Pro نیاز به کارت دارد؟'),
@@ -829,7 +829,7 @@ export default function LandingPage({ onGetStarted, onSignIn, signedIn = false, 
             <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {t(
                 'Verilerin satır bazlı güvenlikle (RLS) izole — başka hiçbir kullanıcı senin journal\'ını, işlemlerini ya da fotoğraflarını göremez. Kart bilgisi istemiyoruz.',
-                'Your data is isolated with row-level security (RLS) — no other user can see your journals, trades or screenshots. We never ask for a card.',
+                'Your data is isolated with row-level security (RLS) — no other user can see your journals, trades or screenshots. No card is needed for the Free plan or the 3-day trial.',
                 'داده‌های شما با امنیت سطح ردیف (RLS) ایزوله است — هیچ کاربر دیگری ژورنال شما را نمی‌بیند.'
               )}
             </p>

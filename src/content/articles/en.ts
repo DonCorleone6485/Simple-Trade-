@@ -503,7 +503,7 @@ const TEXT: Record<string, ArticleText> = {
   },
   'edgewonk-alternative': {
     "title": "Simple Trading Journal vs Edgewonk: an honest comparison",
-    "description": "Looking for a Edgewonk alternative? Prices, free plan, trial and MetaTrader sync compared side by side, with where each one is stronger.",
+    "description": "Looking for an Edgewonk alternative? Prices, free plan, trial and MetaTrader sync compared side by side, with where each one is stronger.",
     "body": [
       {
         "p": "Edgewonk is one of the best-known trading journals. If you are looking for an alternative — cheaper, in your own language, or with a free plan — here is how Simple Trading Journal compares."

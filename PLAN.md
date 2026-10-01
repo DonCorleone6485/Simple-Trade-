@@ -4,7 +4,7 @@ Kalan işler ve büyüme planı. Tek kaynak burası: bir iş bitince aynı deği
 burada işaretlenir (✅ + tarih), yeni iş çıkınca eklenir. Ayrıntılar ve kararlar
 NOTES.md'de.
 
-Son güncelleme: 2026-09-30
+Son güncelleme: 2026-10-01
 
 ---
 
@@ -41,6 +41,7 @@ Not: 29 Eylül'e kadar listelerde "biyografiler hazır" yazıyordu ama yazılmam
 
 ### Kullanıcıyı beklemeden yapılabilecekler
 - ✅ 2026-09-30 **Hata izleme ve otomatik düzeltme döngüsü** — sunucu hataları da `client_errors`'a (kind 'server'), `ERRORS.md`, zamanlanmış görev `error-triage` (her saat 08-23, geceleri 2 saatte bir; uygulama açıkken çalışır). Düzeltme dalda hazırlanır, main'e kullanıcı onayıyla alınır. İlk bulgu: eski sekmede sayfa dosyası hatası, düzeltildi.
+- 🟡 **Akıllı içerik dağıtım sistemi** — ✅ 2026-10-01 tasarım + dışarıdan birine verilecek kurulum paketi hazır (masaüstü `STJ-PDF/Dagitim-Sistemi-Kurulum-Paketi/`: 49 sayfa el kitabı (sonunda sistem şeması), şema, 23×10 karar tablosu, referans kural motoru, 47 test). Kaynak: `scripts/strategy-pdf/` (`dagitim.py`, `paket.py`, `kk_*.py`). Kalan: kuracak kişi/yöntem kararı, yayın servisi seçimi ve bütçe, Ek A'daki 10 karar.
 - [ ] **MetaTrader eklentisinin (EA) mesajlarını 9 dile çevirmek** — sunucu şu an hata/uyarı mesajlarını yalnız İngilizce döndürüyor (`api/ingest.ts`); kullanıcının dilinde döndürülebilir.
 - [ ] **DMARC'ı sıkılaştırmak** (p=none → p=quarantine) — önce admin@'e gelen DMARC raporlarında Google, Clerk ve Resend'in geçtiğini görmek gerekiyor. Şu an `p=none`.
 - ✅ 2026-09-29 **Dizin başvuru metinleri** — [docs/listings.md](docs/listings.md): Product Hunt, G2, Capterra, Trustpilot, AlternativeTo, SaaSHub; 9 dilde kısa açıklama.
@@ -53,6 +54,8 @@ Not: 29 Eylül'e kadar listelerde "biyografiler hazır" yazıyordu ama yazılmam
 
 ### Ertelenenler (şirket kurulunca)
 - Ödeme sistemi ve yasal sayfalar.
+- [ ] **Gizlilik politikası, kullanım şartları, iade politikası** (`/privacy`, `/terms`, `/refund`, 9 dilde + alt bilgide bağlantı) — şu an üçü de 404 (2026-10-01'de başka bir Claude'un site incelemesinde de çıktı). Şirket kurulunca yazılır: hizmeti sunan (şirket adı, ülke, adres), iade kuralı ve veri işleyiciler (Clerk, Supabase, Groq, Vercel, Resend) lazım. **Kesin yapılacak.**
+- [ ] **Paddle başvurusu** — şirket kurulmadan başvurulmaz (2026-10-01 kullanıcı kararı); yukarıdaki üç sayfa başvurudan önce canlıda olmalı.
 - Bölgesel fiyat grupları — indirim grupları onaylı, ödemeyle anlam kazanıyor.
 - Yıllıkta 14 gün iade.
 - Ortaklık programı (§3).
@@ -61,6 +64,7 @@ Not: 29 Eylül'e kadar listelerde "biyografiler hazır" yazıyordu ama yazılmam
 - **Kurucu üye kampanyası** — ilk 500 kişiye yıllık $79 (1.990 TL), ömür boyu bu fiyat. Ödeme sistemine bağlı.
 
 ### Biten (son)
+- ✅ 2026-10-01 Site incelemesi düzeltmeleri: ana sayfadaki "kart istemiyoruz" cümlesi yalnız ücretsiz plan ve deneme için olacak şekilde 9 dilde düzeltildi; Edgewonk yazısında "a" → "an". İncelemedeki "blog yalnız İngilizce" iddiası yanlış çıktı (9 dilde canlı).
 - ✅ 2026-09-29 Yardım sayfasına FAQPage yapısal verisi (13 soru, 9 dil).
 - ✅ 2026-09-29 Aşırı işlem yazısı + Tradervue, TradesViz, FX Replay karşılaştırmaları (9 dil, 36 yeni adres); IndexNow'a 38 adres, Search Console'da 3 adres.
 - ✅ 2026-09-29 Namecheap 2FA yeniden açıldı (kullanıcı).
