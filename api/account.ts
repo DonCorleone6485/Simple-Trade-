@@ -15,7 +15,8 @@ const supabase = createClient(
  * silinmesini her zaman isteyebilmeli (KVKK / GDPR). Burası o yol.
  *
  * Silinenler: fotoğraflar, işlemler, journal'lar, MetaTrader anahtarları,
- * davet kodları, kullanıcı satırı ve en son Clerk hesabı.
+ * davet kodları, iletişim formu mesajları (hesap e-postasıyla ya da kullanıcı
+ * numarasıyla yazılmış olanlar), kullanıcı satırı ve en son Clerk hesabı.
  *
  * Tutulanlar — kimliği değil yalnızca özeti: mt_accounts (MT hesap no +
  * sunucunun özeti) ve used_trials (e-postanın özeti). İkisi de denemenin
@@ -53,12 +54,22 @@ async function handler(req: any, res: any) {
     if (files.length < 100) break;
   }
 
+  // İletişim formu mesajları: giriş yapılmışsa user_id'li, yapılmamışsa yalnız
+  // e-postalı kaydedilir; ikisini de silmek için hesabın e-postası lazım.
+  let email = '';
+  try {
+    const u = await createClerkClient({ secretKey: secret }).users.getUser(userId);
+    email = u.emailAddresses.find(e => e.id === u.primaryEmailAddressId)?.emailAddress || '';
+  } catch { /* e-posta bulunamazsa yalnız user_id ile silinir */ }
+
   // ── Veritabanı ──
   const steps: [string, () => PromiseLike<{ error: any }>][] = [
     ['trades', () => supabase.from('trades').delete().eq('user_id', userId)],
     ['api_keys', () => supabase.from('api_keys').delete().eq('user_id', userId)],
     ['journals', () => supabase.from('journals').delete().eq('user_id', userId)],
     ['referrals', () => supabase.from('referrals').delete().eq('referrer_user_id', userId)],
+    ['contact_messages', () => supabase.from('contact_messages').delete().eq('user_id', userId)],
+    ...(email ? [['contact_messages (e-posta)', () => supabase.from('contact_messages').delete().ilike('email', email.replace(/[%_]/g, m => '\\' + m))] as [string, () => PromiseLike<{ error: any }>]] : []),
     ['users', () => supabase.from('users').delete().eq('user_id', userId)],
   ];
   for (const [name, run] of steps) {

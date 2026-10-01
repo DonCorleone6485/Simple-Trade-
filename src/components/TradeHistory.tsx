@@ -1059,7 +1059,10 @@ export default function TradeHistory({
               {aiLoading ? t('aiAnalyzeLoading') : t('aiAnalyzeBtn')}
             </button>
           </div>
-          {!showAi && !aiLoading && <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('aiAnalyzeDesc')}</p>}
+          {!showAi && !aiLoading && <>
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{t('aiAnalyzeDesc')}</p>
+            <p className="text-xs mt-2" style={{ color: 'rgba(255,255,255,0.35)' }}>{t('aiPrivacyNote')}</p>
+          </>}
           {aiLoading && (
             <div className="flex items-center gap-3 py-4">
               <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: 'rgba(139,92,246,0.3)', borderTopColor: '#8b5cf6' }} />

@@ -268,9 +268,17 @@ async function handler(req: any, res: any) {
   const { data: replaced } = await supabase.from('api_keys').delete()
     .not('replaced_by', 'is', null).lt('revoked_at', weekAgo).select('id');
 
+  // Saklama süresi (KVKK / GDPR: gereğinden uzun tutma): hata kayıtları 90 gün,
+  // iletişim formu mesajları 1 yıl. docs/privacy-inventory.md ile aynı olmalı.
+  const { data: oldErrors } = await supabase.from('client_errors').delete()
+    .lt('created_at', new Date(now - 90 * DAY).toISOString()).select('id');
+  const { data: oldMessages } = await supabase.from('contact_messages').delete()
+    .lt('created_at', new Date(now - 365 * DAY).toISOString()).select('id');
+
   return res.status(200).json({
     sent: counts, errors,
     keysRemoved: { unused: (unused || []).length, replaced: (replaced || []).length },
+    purged: { errors: (oldErrors || []).length, messages: (oldMessages || []).length },
   });
 }
 

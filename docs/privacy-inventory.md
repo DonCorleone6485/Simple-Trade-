@@ -14,8 +14,8 @@ Tarih: 2026-10-01. Kaynak: kodun kendisi (api/, src/, vercel.json). Hukuki tavsi
 | MetaTrader API anahtarı (özet), son kullanım | `api_keys` | EA bağlantısı | hesap silince silinir |
 | Davet kodu ilişkileri | `referrals` | davet sistemi | referrer tarafı silinir |
 | MT hesap numarası + sunucu **özeti**, e-posta **özeti** | `mt_accounts`, `used_trials` | deneme kötüye kullanımını önlemek | **bilerek tutulur** (kimlik değil, özet) |
-| İletişim formu: e-posta, mesaj, ad, kullanıcı no, dil, sayfa | `contact_messages` | destek | **silinmiyor, süre sınırı yok** (aşağıda bulgu 1) |
-| Tarayıcı/sunucu/CSP hataları: mesaj, yığın, sayfa adresi, tarayıcı bilgisi, dil | `client_errors` | hata düzeltme | **süre sınırı yok** (bulgu 2) |
+| İletişim formu: e-posta, mesaj, ad, kullanıcı no, dil, sayfa | `contact_messages` | destek | hesap silince silinir (✅ 2026-10-01); 1 yıl sonra otomatik silinir |
+| Tarayıcı/sunucu/CSP hataları: mesaj, yığın, sayfa adresi, tarayıcı bilgisi, dil | `client_errors` | hata düzeltme | 90 gün sonra otomatik silinir (✅ 2026-10-01) |
 | Ziyaret sayıları, sayfalar | Vercel Analytics | istatistik | çerezsiz; adres `/journal/…` kısaltılıyor |
 | Ülke kodu (IP'den) | yalnız yanıt olarak döner, **saklanmaz** | para birimi/dil önerisi | — |
 
@@ -29,11 +29,11 @@ Tarih: 2026-10-01. Kaynak: kodun kendisi (api/, src/, vercel.json). Hukuki tavsi
 | **Groq** | AI analizinde: istatistikler, sembol/setup özeti ve **en çok 10 işlemin notları (150 karaktere kısaltılmış)**; ses yazdırmada **ses kaydı** | notlara kişisel bir şey yazılırsa oraya gider |
 | **Resend** | alıcı e-postası ve mesaj içeriği | haftalık özet, deneme, iletişim formu |
 | **Cloudflare Turnstile** | kayıtta bot doğrulaması (Clerk üzerinden) | CSP'de `challenges.cloudflare.com` |
-| **Google Fonts** | her ziyaretçinin IP adresi (yazı tipi indirirken) | bulgu 3 |
+| ~~Google Fonts~~ | ✅ 2026-10-01 kaldırıldı: yazı tipleri `public/fonts/` altından kendi sunucumuzdan | artık Google'a istek yok |
 | **Better Stack** | durum sayfası için sağlık kontrolü | kullanıcı verisi yok (`/api/geo?health`) |
 | Google Workspace | admin@, support@, social@ kutuları, iletişim formu postaları | şirket e-postası |
 
-## 3. Bulgular (yapılacak; şirket kurulunca metinle birlikte)
+## 3. Bulgular (2026-10-01'de 1, 2, 3, 4, 6 giderildi; 5 zaten temizdi)
 
 1. **Hesap silince `contact_messages` kalıyor.** `api/account.ts` bu tabloyu silmiyor; kullanıcının e-postası ve yazdıkları duruyor. Çözüm: hesap silerken `user_id` ya da e-postaya göre sil (küçük kod değişikliği, onayla yapılır).
 2. **`client_errors` ve `contact_messages` için saklama süresi yok.** Öneri: hatalar 90 gün, iletişim mesajları sorun kapanınca/1 yıl. Günlük cron (`api/emails.ts`) içinde silme eklenir.

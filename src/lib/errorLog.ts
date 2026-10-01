@@ -41,7 +41,7 @@ export function logError(kind: 'error' | 'rejection' | 'render', err: unknown, e
     try { lang = localStorage.getItem('language') || ''; } catch { /* yok */ }
     void supabase.from('client_errors').insert({
       kind, message, stack: stack || null,
-      url: (location.pathname + location.search).slice(0, 500),
+      url: location.pathname.slice(0, 500), // sorgu dizesi (?…) bilerek yok: davet kodu vb. girmesin
       user_agent: navigator.userAgent.slice(0, 400),
       lang: lang.slice(0, 5) || null,
     }).then(() => {}, () => {});
