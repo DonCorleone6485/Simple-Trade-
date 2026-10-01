@@ -43,3 +43,10 @@ Bölüm 1'deki tabloda neyin neden değiştiği yazılı. Kurulum 3 aşamalı; A
 Kaynak: `scripts/strategy-pdf/ai_1.py` (giriş, site gerçekleri, şema, ortak kurallar), `ai_2.py` (8 rol), `ai_3.py`
 (kurulum sırası, SSS), `ai_build.py`. Üretmek: `cd scripts/strategy-pdf && python3 ai_build.py`, sonra Chrome ile
 `ai_ekip.html` -> PDF (komut yukarıda). Site gerçekleri (sayfa sayıları, kurulu görevler) değişince Bölüm 2 güncellenir.
+
+## E-posta sistemi ve mail marketing planı (10 sayfa)
+
+`STJ-PDF/Simple Trading Journal - E-posta Sistemi ve Mail Marketing Plani.pdf`: üç tür e-posta (hesap/destek, ürün, pazarlama),
+destek bilet sistemi, kullanıcı yolculuğu e-postaları (koşullu), raporlar, sıklık ve tercih kuralları, yasal çerçeve, ölçüm,
+A/B/C kurulum sırası, iade önerisi, örnek metinler. Kaynak: `scripts/strategy-pdf/mail_plan.py` (tek dosya; `python3 mail_plan.py`
+sonra Chrome ile `mail_plan.html` -> PDF).
